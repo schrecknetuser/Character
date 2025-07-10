@@ -1,5 +1,32 @@
 import SwiftUI
 
+// Data structures for character traits with costs
+struct Advantage: Identifiable, Codable, Hashable {
+    var id = UUID()
+    var name: String
+    var cost: Int
+    var isCustom: Bool = false
+    
+    init(name: String, cost: Int, isCustom: Bool = false) {
+        self.name = name
+        self.cost = cost
+        self.isCustom = isCustom
+    }
+}
+
+struct Flaw: Identifiable, Codable, Hashable {
+    var id = UUID()
+    var name: String
+    var cost: Int // Negative cost for flaws (points gained)
+    var isCustom: Bool = false
+    
+    init(name: String, cost: Int, isCustom: Bool = false) {
+        self.name = name
+        self.cost = cost
+        self.isCustom = isCustom
+    }
+}
+
 // V5 Character System Constants
 struct V5Constants {
     // Physical Attributes
@@ -25,6 +52,46 @@ struct V5Constants {
     
     // V5 Clans
     static let clans = ["Brujah", "Gangrel", "Malkavian", "Nosferatu", "Toreador", "Tremere", "Ventrue", "Banu Haqim", "Hecata", "Lasombra", "Ministry", "Ravnos", "Salubri", "Tzimisce", "Caitiff", "Thin-Blood"]
+    
+    // Predefined V5 Advantages with costs
+    static let predefinedAdvantages = [
+        Advantage(name: "Allies", cost: 3),
+        Advantage(name: "Contacts", cost: 1),
+        Advantage(name: "Fame", cost: 1),
+        Advantage(name: "Herd", cost: 3),
+        Advantage(name: "Influence", cost: 2),
+        Advantage(name: "Resources", cost: 3),
+        Advantage(name: "Retainers", cost: 2),
+        Advantage(name: "Status", cost: 2),
+        Advantage(name: "Haven", cost: 2),
+        Advantage(name: "Feeding Grounds", cost: 1),
+        Advantage(name: "Iron Will", cost: 5),
+        Advantage(name: "Time Sense", cost: 1),
+        Advantage(name: "Eidetic Memory", cost: 2),
+        Advantage(name: "Linguistics", cost: 1),
+        Advantage(name: "Domain", cost: 2),
+        Advantage(name: "Thin-Blooded Alchemy", cost: 5)
+    ]
+    
+    // Predefined V5 Flaws with costs (negative values as they give points back)
+    static let predefinedFlaws = [
+        Flaw(name: "Enemy", cost: -1),
+        Flaw(name: "Dark Secret", cost: -1),
+        Flaw(name: "Hunted", cost: -3),
+        Flaw(name: "Folkloric Block", cost: -2),
+        Flaw(name: "Clan Curse", cost: -2),
+        Flaw(name: "Feeding Restriction", cost: -1),
+        Flaw(name: "Obvious Predator", cost: -2),
+        Flaw(name: "Prey Exclusion", cost: -1),
+        Flaw(name: "Stigmata", cost: -2),
+        Flaw(name: "Thin-Blooded", cost: -4),
+        Flaw(name: "Caitiff", cost: -2),
+        Flaw(name: "Anachronism", cost: -1),
+        Flaw(name: "Archaic", cost: -1),
+        Flaw(name: "Disgraced", cost: -2),
+        Flaw(name: "Shunned", cost: -1),
+        Flaw(name: "Suspect", cost: -2)
+    ]
 }
 
 struct Character: Identifiable, Codable {
@@ -53,8 +120,8 @@ struct Character: Identifiable, Codable {
     var disciplines: [String: Int]
     
     // V5 Character Traits
-    var advantages: [String]
-    var flaws: [String]
+    var advantages: [Advantage]
+    var flaws: [Flaw]
     var convictions: [String]
     var touchstones: [String]
     var chronicleTenets: [String]
@@ -62,6 +129,8 @@ struct Character: Identifiable, Codable {
     // V5 Condition Tracking
     var hunger: Int
     var health: Int
+    
+
     
     // Default initializer for new characters
     init(name: String = "", clan: String = "", generation: Int = 13) {
@@ -101,7 +170,7 @@ struct Character: Identifiable, Codable {
     }
     
     // Full initializer for existing characters or manual creation
-    init(name: String, clan: String, generation: Int, physicalAttributes: [String: Int], socialAttributes: [String: Int], mentalAttributes: [String: Int], physicalSkills: [String: Int], socialSkills: [String: Int], mentalSkills: [String: Int], bloodPotency: Int, humanity: Int, willpower: Int, experience: Int, disciplines: [String: Int], advantages: [String], flaws: [String], convictions: [String], touchstones: [String], chronicleTenets: [String], hunger: Int, health: Int) {
+    init(name: String, clan: String, generation: Int, physicalAttributes: [String: Int], socialAttributes: [String: Int], mentalAttributes: [String: Int], physicalSkills: [String: Int], socialSkills: [String: Int], mentalSkills: [String: Int], bloodPotency: Int, humanity: Int, willpower: Int, experience: Int, disciplines: [String: Int], advantages: [Advantage], flaws: [Flaw], convictions: [String], touchstones: [String], chronicleTenets: [String], hunger: Int, health: Int) {
         self.name = name
         self.clan = clan
         self.generation = generation
@@ -123,6 +192,19 @@ struct Character: Identifiable, Codable {
         self.chronicleTenets = chronicleTenets
         self.hunger = hunger
         self.health = health
+    }
+    
+    // Computed properties for advantage/flaw costs
+    var totalAdvantageCost: Int {
+        advantages.reduce(0) { $0 + $1.cost }
+    }
+    
+    var totalFlawValue: Int {
+        flaws.reduce(0) { $0 + $1.cost } // Flaw costs are negative, so this gives total points gained
+    }
+    
+    var netAdvantageFlawCost: Int {
+        totalAdvantageCost + totalFlawValue // Since flaw costs are negative, this is the net cost
     }
 }
 
