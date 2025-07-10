@@ -47,6 +47,7 @@ struct CharacterTests {
         #expect(character.hunger == 1)
         #expect(character.health == 3)
         
+
         // Check status tracking arrays
         #expect(character.healthStates.count == 3)
         #expect(character.willpowerStates.count == 3)
@@ -59,6 +60,14 @@ struct CharacterTests {
         #expect(character.physicalSkills["Athletics"] == 0)
         #expect(character.socialSkills["Persuasion"] == 0)
         #expect(character.mentalSkills["Academics"] == 0)
+
+        // Check that character traits are initialized properly
+        #expect(character.advantages.isEmpty)
+        #expect(character.flaws.isEmpty)
+        #expect(character.convictions.isEmpty)
+        #expect(character.touchstones.isEmpty)
+        #expect(character.chronicleTenets.isEmpty)
+
     }
     
     @Test func testHealthStateEnum() async throws {
@@ -213,4 +222,54 @@ struct CharacterTests {
         let enemyFlaw = V5Constants.predefinedFlaws.first { $0.name == "Enemy" }
         #expect(enemyFlaw?.cost == -1)
     }
-}
+
+    @Test func testAdvantageFlawCosts() async throws {
+        // Test advantage and flaw cost calculations
+        var character = Character(name: "Test", clan: "Brujah", generation: 12)
+        
+        // Add some advantages
+        character.advantages = [
+            Advantage(name: "Allies", cost: 3),
+            Advantage(name: "Resources", cost: 3),
+            Advantage(name: "Custom Advantage", cost: 2, isCustom: true)
+        ]
+        
+        // Add some flaws
+        character.flaws = [
+            Flaw(name: "Enemy", cost: -1),
+            Flaw(name: "Hunted", cost: -3),
+            Flaw(name: "Custom Flaw", cost: -2, isCustom: true)
+        ]
+        
+        // Test cost calculations
+        #expect(character.totalAdvantageCost == 8) // 3 + 3 + 2
+        #expect(character.totalFlawValue == -6) // -1 + -3 + -2
+        #expect(character.netAdvantageFlawCost == 2) // 8 + (-6)
+    }
+    
+    @Test func testPredefinedAdvantagesAndFlaws() async throws {
+        // Test that predefined advantages and flaws exist
+        #expect(!V5Constants.predefinedAdvantages.isEmpty)
+        #expect(!V5Constants.predefinedFlaws.isEmpty)
+        
+        // Test that some expected advantages exist
+        #expect(V5Constants.predefinedAdvantages.contains { $0.name == "Allies" })
+        #expect(V5Constants.predefinedAdvantages.contains { $0.name == "Resources" })
+        #expect(V5Constants.predefinedAdvantages.contains { $0.name == "Herd" })
+        
+        // Test that some expected flaws exist
+        #expect(V5Constants.predefinedFlaws.contains { $0.name == "Enemy" })
+        #expect(V5Constants.predefinedFlaws.contains { $0.name == "Hunted" })
+        #expect(V5Constants.predefinedFlaws.contains { $0.name == "Dark Secret" })
+        
+        // Test that flaw costs are negative
+        for flaw in V5Constants.predefinedFlaws {
+            #expect(flaw.cost < 0)
+        }
+        
+        // Test that advantage costs are positive
+        for advantage in V5Constants.predefinedAdvantages {
+            #expect(advantage.cost > 0)
+        }
+    }
+

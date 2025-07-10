@@ -142,7 +142,8 @@ struct Character: Identifiable, Codable {
     // V5 Disciplines
     var disciplines: [String: Int]
     
-    // V5 Character Traits - using master's structured approach
+
+    // V5 Character Traits
     var advantages: [Advantage]
     var flaws: [Flaw]
     var convictions: [String]
@@ -208,6 +209,7 @@ struct Character: Identifiable, Codable {
     
     // Full initializer for existing characters or manual creation
     init(name: String, clan: String, generation: Int, physicalAttributes: [String: Int], socialAttributes: [String: Int], mentalAttributes: [String: Int], physicalSkills: [String: Int], socialSkills: [String: Int], mentalSkills: [String: Int], bloodPotency: Int, humanity: Int, willpower: Int, experience: Int, disciplines: [String: Int], advantages: [Advantage], flaws: [Flaw], convictions: [String], touchstones: [String], chronicleTenets: [String], hunger: Int, health: Int, spentExperience: Int = 0, ambition: String = "", desire: String = "", chronicleName: String = "", healthStates: [HealthState]? = nil, willpowerStates: [WillpowerState]? = nil, humanityStates: [HumanityState]? = nil) {
+
         self.name = name
         self.clan = clan
         self.generation = generation

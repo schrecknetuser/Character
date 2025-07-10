@@ -39,6 +39,7 @@ struct CharacterDetailView: View {
                     Image(systemName: "star.fill")
                     Text("Advantages & Flaws")
                 }
+
         }
         .navigationTitle(character.name)
         .navigationBarTitleDisplayMode(.inline)
