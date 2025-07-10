@@ -1,5 +1,12 @@
 import SwiftUI
 
+// String extension for trimming whitespace
+extension String {
+    func trim() -> String {
+        return self.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+}
+
 struct CharacterDetailView: View {
     @Binding var character: Character
     @ObservedObject var store: CharacterStore
@@ -8,7 +15,7 @@ struct CharacterDetailView: View {
     var body: some View {
         TabView {
             // First Tab - Character Information
-            CharacterInfoTab(character: character, isEditing: $isEditing)
+            CharacterInfoTab(character: $character, isEditing: $isEditing)
                 .tabItem {
                     Image(systemName: "person.fill")
                     Text("Character")
@@ -61,9 +68,11 @@ struct CharacterDetailView: View {
 
 // First Tab - Character Information
 struct CharacterInfoTab: View {
-    let character: Character
+    @Binding var character: Character
     @Binding var isEditing: Bool
     @State private var dynamicFontSize: CGFloat = 16
+    @State private var newConviction: String = ""
+    @State private var newTouchstone: String = ""
     
     var body: some View {
         GeometryReader { geometry in
@@ -73,57 +82,77 @@ struct CharacterInfoTab: View {
                         Text("Name:")
                             .fontWeight(.medium)
                             .font(.system(size: dynamicFontSize))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.6)
                         Spacer()
-                        Text(character.name)
-                            .font(.system(size: dynamicFontSize))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.5)
+                        if isEditing {
+                            TextField("Name", text: $character.name)
+                                .font(.system(size: dynamicFontSize))
+                                .multilineTextAlignment(.trailing)
+                        } else {
+                            Text(character.name)
+                                .font(.system(size: dynamicFontSize))
+                        }
                     }
-                    if !character.chronicleName.isEmpty {
-                        HStack {
-                            Text("Chronicle:")
-                                .fontWeight(.medium)
+                    HStack {
+                        Text("Chronicle:")
+                            .fontWeight(.medium)
+                            .font(.system(size: dynamicFontSize))
+                        Spacer()
+                        if isEditing {
+                            TextField("Chronicle Name", text: $character.chronicleName)
                                 .font(.system(size: dynamicFontSize))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.6)
-                            Spacer()
-                            Text(character.chronicleName)
-                                .font(.system(size: dynamicFontSize))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.5)
+                                .multilineTextAlignment(.trailing)
+                        } else {
+                            if !character.chronicleName.isEmpty {
+                                Text(character.chronicleName)
+                                    .font(.system(size: dynamicFontSize))
+                            } else {
+                                Text("Not set")
+                                    .foregroundColor(.secondary)
+                                    .font(.system(size: dynamicFontSize))
+                            }
                         }
                     }
                 }
                 
                 Section(header: Text("Character Background")) {
-                    if !character.ambition.isEmpty {
-                        HStack {
-                            Text("Ambition:")
-                                .fontWeight(.medium)
+                    HStack {
+                        Text("Ambition:")
+                            .fontWeight(.medium)
+                            .font(.system(size: dynamicFontSize))
+                        Spacer()
+                        if isEditing {
+                            TextField("Ambition", text: $character.ambition)
                                 .font(.system(size: dynamicFontSize))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.6)
-                            Spacer()
-                            Text(character.ambition)
-                                .font(.system(size: dynamicFontSize))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.5)
+                                .multilineTextAlignment(.trailing)
+                        } else {
+                            if !character.ambition.isEmpty {
+                                Text(character.ambition)
+                                    .font(.system(size: dynamicFontSize))
+                            } else {
+                                Text("Not set")
+                                    .foregroundColor(.secondary)
+                                    .font(.system(size: dynamicFontSize))
+                            }
                         }
                     }
-                    if !character.desire.isEmpty {
-                        HStack {
-                            Text("Desire:")
-                                .fontWeight(.medium)
+                    HStack {
+                        Text("Desire:")
+                            .fontWeight(.medium)
+                            .font(.system(size: dynamicFontSize))
+                        Spacer()
+                        if isEditing {
+                            TextField("Desire", text: $character.desire)
                                 .font(.system(size: dynamicFontSize))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.6)
-                            Spacer()
-                            Text(character.desire)
-                                .font(.system(size: dynamicFontSize))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.5)
+                                .multilineTextAlignment(.trailing)
+                        } else {
+                            if !character.desire.isEmpty {
+                                Text(character.desire)
+                                    .font(.system(size: dynamicFontSize))
+                            } else {
+                                Text("Not set")
+                                    .foregroundColor(.secondary)
+                                    .font(.system(size: dynamicFontSize))
+                            }
                         }
                     }
                 }
@@ -133,14 +162,34 @@ struct CharacterInfoTab: View {
                         Text("No convictions recorded")
                             .foregroundColor(.secondary)
                             .font(.system(size: dynamicFontSize))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.6)
                     } else {
-                        ForEach(character.convictions, id: \.self) { conviction in
-                            Text(conviction)
+                        ForEach(character.convictions.indices, id: \.self) { index in
+                            HStack {
+                                Text(character.convictions[index])
+                                    .font(.system(size: dynamicFontSize))
+                                Spacer()
+                                if isEditing {
+                                    Button("Remove") {
+                                        character.convictions.remove(at: index)
+                                    }
+                                    .font(.caption)
+                                    .foregroundColor(.red)
+                                }
+                            }
+                        }
+                    }
+                    
+                    if isEditing {
+                        HStack {
+                            TextField("New conviction", text: $newConviction)
                                 .font(.system(size: dynamicFontSize))
-                                .lineLimit(2)
-                                .minimumScaleFactor(0.5)
+                            Button("Add") {
+                                if !newConviction.trim().isEmpty {
+                                    character.convictions.append(newConviction.trim())
+                                    newConviction = ""
+                                }
+                            }
+                            .disabled(newConviction.trim().isEmpty)
                         }
                     }
                 }
@@ -150,14 +199,34 @@ struct CharacterInfoTab: View {
                         Text("No touchstones recorded")
                             .foregroundColor(.secondary)
                             .font(.system(size: dynamicFontSize))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.6)
                     } else {
-                        ForEach(character.touchstones, id: \.self) { touchstone in
-                            Text(touchstone)
+                        ForEach(character.touchstones.indices, id: \.self) { index in
+                            HStack {
+                                Text(character.touchstones[index])
+                                    .font(.system(size: dynamicFontSize))
+                                Spacer()
+                                if isEditing {
+                                    Button("Remove") {
+                                        character.touchstones.remove(at: index)
+                                    }
+                                    .font(.caption)
+                                    .foregroundColor(.red)
+                                }
+                            }
+                        }
+                    }
+                    
+                    if isEditing {
+                        HStack {
+                            TextField("New touchstone", text: $newTouchstone)
                                 .font(.system(size: dynamicFontSize))
-                                .lineLimit(2)
-                                .minimumScaleFactor(0.5)
+                            Button("Add") {
+                                if !newTouchstone.trim().isEmpty {
+                                    character.touchstones.append(newTouchstone.trim())
+                                    newTouchstone = ""
+                                }
+                            }
+                            .disabled(newTouchstone.trim().isEmpty)
                         }
                     }
                 }
@@ -167,34 +236,39 @@ struct CharacterInfoTab: View {
                         Text("Total Experience:")
                             .fontWeight(.medium)
                             .font(.system(size: dynamicFontSize))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.6)
                         Spacer()
-                        Text("\(character.experience)")
-                            .font(.system(size: dynamicFontSize))
-                            .lineLimit(1)
+                        if isEditing {
+                            TextField("Total", value: $character.experience, formatter: NumberFormatter())
+                                .font(.system(size: dynamicFontSize))
+                                .multilineTextAlignment(.trailing)
+                                .keyboardType(.numberPad)
+                        } else {
+                            Text("\(character.experience)")
+                                .font(.system(size: dynamicFontSize))
+                        }
                     }
                     HStack {
                         Text("Spent Experience:")
                             .fontWeight(.medium)
                             .font(.system(size: dynamicFontSize))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.6)
                         Spacer()
-                        Text("\(character.spentExperience)")
-                            .font(.system(size: dynamicFontSize))
-                            .lineLimit(1)
+                        if isEditing {
+                            TextField("Spent", value: $character.spentExperience, formatter: NumberFormatter())
+                                .font(.system(size: dynamicFontSize))
+                                .multilineTextAlignment(.trailing)
+                                .keyboardType(.numberPad)
+                        } else {
+                            Text("\(character.spentExperience)")
+                                .font(.system(size: dynamicFontSize))
+                        }
                     }
                     HStack {
                         Text("Available Experience:")
                             .fontWeight(.medium)
                             .font(.system(size: dynamicFontSize))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.6)
                         Spacer()
                         Text("\(character.experience - character.spentExperience)")
                             .font(.system(size: dynamicFontSize))
-                            .lineLimit(1)
                     }
                 }
             }
@@ -268,23 +342,17 @@ struct AttributesSkillsTab: View {
                     VStack(alignment: .leading, spacing: 15) {
                         Text("Attributes")
                             .font(.system(size: titleFontSize, weight: .bold))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.7)
                         
                         HStack(alignment: .top, spacing: 20) {
                             // Physical Attributes Column
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Physical")
                                     .font(.system(size: headerFontSize, weight: .semibold))
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.7)
                                 
                                 ForEach(V5Constants.physicalAttributes, id: \.self) { attribute in
                                     HStack {
                                         Text(attribute)
                                             .font(.system(size: dynamicFontSize))
-                                            .lineLimit(1)
-                                            .minimumScaleFactor(0.5)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -315,15 +383,11 @@ struct AttributesSkillsTab: View {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Social")
                                     .font(.system(size: headerFontSize, weight: .semibold))
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.7)
                                 
                                 ForEach(V5Constants.socialAttributes, id: \.self) { attribute in
                                     HStack {
                                         Text(attribute)
                                             .font(.system(size: dynamicFontSize))
-                                            .lineLimit(1)
-                                            .minimumScaleFactor(0.5)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -354,15 +418,11 @@ struct AttributesSkillsTab: View {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Mental")
                                     .font(.system(size: headerFontSize, weight: .semibold))
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.7)
                                 
                                 ForEach(V5Constants.mentalAttributes, id: \.self) { attribute in
                                     HStack {
                                         Text(attribute)
                                             .font(.system(size: dynamicFontSize))
-                                            .lineLimit(1)
-                                            .minimumScaleFactor(0.5)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -395,23 +455,17 @@ struct AttributesSkillsTab: View {
                     VStack(alignment: .leading, spacing: 15) {
                         Text("Skills")
                             .font(.system(size: titleFontSize, weight: .bold))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.7)
                         
                         HStack(alignment: .top, spacing: 20) {
                             // Physical Skills Column
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Physical")
                                     .font(.system(size: headerFontSize, weight: .semibold))
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.7)
                                 
                                 ForEach(V5Constants.physicalSkills, id: \.self) { skill in
                                     HStack {
                                         Text(skill)
                                             .font(.system(size: dynamicFontSize))
-                                            .lineLimit(1)
-                                            .minimumScaleFactor(0.5)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -442,15 +496,11 @@ struct AttributesSkillsTab: View {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Social")
                                     .font(.system(size: headerFontSize, weight: .semibold))
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.7)
                                 
                                 ForEach(V5Constants.socialSkills, id: \.self) { skill in
                                     HStack {
                                         Text(skill)
                                             .font(.system(size: dynamicFontSize))
-                                            .lineLimit(1)
-                                            .minimumScaleFactor(0.5)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -481,15 +531,11 @@ struct AttributesSkillsTab: View {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Mental")
                                     .font(.system(size: headerFontSize, weight: .semibold))
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.7)
                                 
                                 ForEach(V5Constants.mentalSkills, id: \.self) { skill in
                                     HStack {
                                         Text(skill)
                                             .font(.system(size: dynamicFontSize))
-                                            .lineLimit(1)
-                                            .minimumScaleFactor(0.5)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(

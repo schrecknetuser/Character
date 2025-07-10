@@ -284,7 +284,8 @@ struct EditableStatusRowView: View {
     }
     
     private func canIncreaseSuperficial() -> Bool {
-        states.contains(.ok)
+        // Can increase if there are ok boxes OR if there are superficial boxes that can be converted to aggravated
+        states.contains(.ok) || states.contains(.superficial)
     }
     
     private func decreaseSuperficial() {
@@ -320,7 +321,8 @@ struct EditableStatusRowView: View {
     }
     
     private func canIncreaseAggravated() -> Bool {
-        !states.filter({ $0 != .aggravated }).isEmpty
+        // Can increase if there are any non-aggravated boxes (ok or superficial)
+        states.contains(.ok) || states.contains(.superficial)
     }
     
     private func decreaseAggravated() {
