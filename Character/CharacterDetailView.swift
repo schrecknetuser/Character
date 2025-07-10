@@ -354,7 +354,6 @@ struct AttributesSkillsTab: View {
                                         Text(attribute)
                                             .font(.system(size: dynamicFontSize))
                                             .lineLimit(1)
-                                            .minimumScaleFactor(0.6)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -391,7 +390,6 @@ struct AttributesSkillsTab: View {
                                         Text(attribute)
                                             .font(.system(size: dynamicFontSize))
                                             .lineLimit(1)
-                                            .minimumScaleFactor(0.6)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -428,7 +426,6 @@ struct AttributesSkillsTab: View {
                                         Text(attribute)
                                             .font(.system(size: dynamicFontSize))
                                             .lineLimit(1)
-                                            .minimumScaleFactor(0.6)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -473,7 +470,6 @@ struct AttributesSkillsTab: View {
                                         Text(skill)
                                             .font(.system(size: dynamicFontSize))
                                             .lineLimit(1)
-                                            .minimumScaleFactor(0.6)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -510,7 +506,6 @@ struct AttributesSkillsTab: View {
                                         Text(skill)
                                             .font(.system(size: dynamicFontSize))
                                             .lineLimit(1)
-                                            .minimumScaleFactor(0.6)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -547,7 +542,6 @@ struct AttributesSkillsTab: View {
                                         Text(skill)
                                             .font(.system(size: dynamicFontSize))
                                             .lineLimit(1)
-                                            .minimumScaleFactor(0.6)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
