@@ -14,7 +14,7 @@ struct AttributeDragData: Transferable, Codable {
     let sourceAttribute: String?
     
     static var transferRepresentation: some TransferRepresentation {
-        CodableRepresentation(contentType: .plainText)
+        CodableRepresentation(contentType: .json)
     }
 }
 
@@ -62,25 +62,28 @@ struct CharacterCreationWizard: View {
                     .padding(.bottom)
                 
                 // Current stage content
-                Group {
-                    switch currentStage {
-                    case .nameAndChronicle:
-                        NameAndChronicleStage(character: $character)
-                    case .clan:
-                        ClanSelectionStage(character: $character)
-                    case .attributes:
-                        AttributesStage(character: $character)
-                    case .skills:
-                        SkillsStage(character: $character)
-                    case .disciplines:
-                        DisciplinesStage(character: $character)
-                    case .meritsAndFlaws:
-                        MeritsAndFlawsStage(character: $character)
-                    case .convictionsAndTouchstones:
-                        ConvictionsAndTouchstonesStage(character: $character)
-                    case .ambitionAndDesire:
-                        AmbitionAndDesireStage(character: $character)
+                ScrollView {
+                    Group {
+                        switch currentStage {
+                        case .nameAndChronicle:
+                            NameAndChronicleStage(character: $character)
+                        case .clan:
+                            ClanSelectionStage(character: $character)
+                        case .attributes:
+                            AttributesStage(character: $character)
+                        case .skills:
+                            SkillsStage(character: $character)
+                        case .disciplines:
+                            DisciplinesStage(character: $character)
+                        case .meritsAndFlaws:
+                            MeritsAndFlawsStage(character: $character)
+                        case .convictionsAndTouchstones:
+                            ConvictionsAndTouchstonesStage(character: $character)
+                        case .ambitionAndDesire:
+                            AmbitionAndDesireStage(character: $character)
+                        }
                     }
+                    .frame(maxWidth: .infinity)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 
@@ -216,131 +219,128 @@ struct AttributesStage: View {
     }
     
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                // Available values section
-                VStack(alignment: .leading) {
-                    Text("Unassigned Values")
-                        .font(.headline)
-                    
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 5), spacing: 10) {
-                        ForEach(availableValues, id: \.1) { valueWithId in
-                            DraggableValueBox(value: valueWithId.0, id: valueWithId.1)
-                        }
-                    }
-                    .dropDestination(for: AttributeDragData.self) { items, location in
-                        if let draggedItem = items.first {
-                            // Find the attribute that had this value and remove it
-                            if let sourceAttribute = draggedItem.sourceAttribute {
-                                availableValues.append((draggedItem.value, UUID()))
-                                availableValues.sort { $0.0 > $1.0 }
-                                assignedValues.removeValue(forKey: sourceAttribute)
-                                
-                                // Reset the character attribute to base value
-                                if V5Constants.physicalAttributes.contains(sourceAttribute) {
-                                    character.physicalAttributes[sourceAttribute] = 1
-                                } else if V5Constants.socialAttributes.contains(sourceAttribute) {
-                                    character.socialAttributes[sourceAttribute] = 1
-                                } else if V5Constants.mentalAttributes.contains(sourceAttribute) {
-                                    character.mentalAttributes[sourceAttribute] = 1
-                                }
-                                return true
-                            }
-                        }
-                        return false
-                    } isTargeted: { targeted in
-                        // Add visual feedback for targeting the unassigned area
-                        // This could be used to change the background color when hovering
+        VStack(alignment: .leading, spacing: 20) {
+            // Available values section
+            VStack(alignment: .leading) {
+                Text("Unassigned Values")
+                    .font(.headline)
+                
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 5), spacing: 10) {
+                    ForEach(availableValues, id: \.1) { valueWithId in
+                        DraggableValueBox(value: valueWithId.0, id: valueWithId.1)
                     }
                 }
-                .padding()
-                .background(Color.secondary.opacity(0.1))
-                .cornerRadius(10)
-                
-                // Attributes table
-                VStack(alignment: .leading) {
-                    Text("Attributes")
-                        .font(.headline)
+                .dropDestination(for: AttributeDragData.self) { items, location in
+                    guard let draggedItem = items.first else { return false }
                     
-                    // Table header
-                    HStack {
-                        Text("Physical")
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.secondary)
-                            .frame(maxWidth: .infinity)
+                    // Find the attribute that had this value and remove it
+                    if let sourceAttribute = draggedItem.sourceAttribute {
+                        availableValues.append((draggedItem.value, UUID()))
+                        availableValues.sort { $0.0 > $1.0 }
+                        assignedValues.removeValue(forKey: sourceAttribute)
                         
-                        Text("Social")
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.secondary)
-                            .frame(maxWidth: .infinity)
-                        
-                        Text("Mental")
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.secondary)
-                            .frame(maxWidth: .infinity)
-                    }
-                    .padding(.bottom, 10)
-                    
-                    // Attribute rows
-                    ForEach(0..<3, id: \.self) { rowIndex in
-                        HStack {
-                            // Physical attribute
-                            AttributeDropRow(
-                                attribute: V5Constants.physicalAttributes[rowIndex],
-                                assignedValues: $assignedValues,
-                                availableValues: $availableValues,
-                                characterAttributes: $character.physicalAttributes
-                            )
-                            .frame(maxWidth: .infinity)
-                            
-                            // Social attribute
-                            AttributeDropRow(
-                                attribute: V5Constants.socialAttributes[rowIndex],
-                                assignedValues: $assignedValues,
-                                availableValues: $availableValues,
-                                characterAttributes: $character.socialAttributes
-                            )
-                            .frame(maxWidth: .infinity)
-                            
-                            // Mental attribute
-                            AttributeDropRow(
-                                attribute: V5Constants.mentalAttributes[rowIndex],
-                                assignedValues: $assignedValues,
-                                availableValues: $availableValues,
-                                characterAttributes: $character.mentalAttributes
-                            )
-                            .frame(maxWidth: .infinity)
+                        // Reset the character attribute to base value
+                        if V5Constants.physicalAttributes.contains(sourceAttribute) {
+                            character.physicalAttributes[sourceAttribute] = 1
+                        } else if V5Constants.socialAttributes.contains(sourceAttribute) {
+                            character.socialAttributes[sourceAttribute] = 1
+                        } else if V5Constants.mentalAttributes.contains(sourceAttribute) {
+                            character.mentalAttributes[sourceAttribute] = 1
                         }
-                        .padding(.vertical, 2)
                     }
-                }
-                
-                // Progress indicator
-                VStack(alignment: .leading) {
-                    Text("Progress: \(assignedValues.count) of \(allAttributes.count) attributes assigned")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
-                    Text("Remaining values: \(availableValues.count)")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
-                    if assignedValues.count < allAttributes.count || !availableValues.isEmpty {
-                        Text("Assign all attribute values to proceed.")
-                            .font(.caption)
-                            .foregroundColor(.orange)
-                    } else {
-                        Text("All values assigned! You can proceed to the next stage.")
-                            .font(.caption)
-                            .foregroundColor(.green)
-                    }
+                    return true
+                } isTargeted: { targeted in
+                    // Add visual feedback for targeting the unassigned area
+                    // This could be used to change the background color when hovering
                 }
             }
             .padding()
+            .background(Color.secondary.opacity(0.1))
+            .cornerRadius(10)
+            
+            // Attributes table
+            VStack(alignment: .leading) {
+                Text("Attributes")
+                    .font(.headline)
+                
+                // Table header
+                HStack {
+                    Text("Physical")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.secondary)
+                        .frame(maxWidth: .infinity)
+                    
+                    Text("Social")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.secondary)
+                        .frame(maxWidth: .infinity)
+                    
+                    Text("Mental")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.secondary)
+                        .frame(maxWidth: .infinity)
+                }
+                .padding(.bottom, 10)
+                
+                // Attribute rows
+                ForEach(0..<3, id: \.self) { rowIndex in
+                    HStack {
+                        // Physical attribute
+                        AttributeDropRow(
+                            attribute: V5Constants.physicalAttributes[rowIndex],
+                            assignedValues: $assignedValues,
+                            availableValues: $availableValues,
+                            characterAttributes: $character.physicalAttributes
+                        )
+                        .frame(maxWidth: .infinity)
+                        
+                        // Social attribute
+                        AttributeDropRow(
+                            attribute: V5Constants.socialAttributes[rowIndex],
+                            assignedValues: $assignedValues,
+                            availableValues: $availableValues,
+                            characterAttributes: $character.socialAttributes
+                        )
+                        .frame(maxWidth: .infinity)
+                        
+                        // Mental attribute
+                        AttributeDropRow(
+                            attribute: V5Constants.mentalAttributes[rowIndex],
+                            assignedValues: $assignedValues,
+                            availableValues: $availableValues,
+                            characterAttributes: $character.mentalAttributes
+                        )
+                        .frame(maxWidth: .infinity)
+                    }
+                    .padding(.vertical, 2)
+                }
+            }
+            
+            // Progress indicator
+            VStack(alignment: .leading) {
+                Text("Progress: \(assignedValues.count) of \(allAttributes.count) attributes assigned")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                
+                Text("Remaining values: \(availableValues.count)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                
+                if assignedValues.count < allAttributes.count || !availableValues.isEmpty {
+                    Text("Assign all attribute values to proceed.")
+                        .font(.caption)
+                        .foregroundColor(.orange)
+                } else {
+                    Text("All values assigned! You can proceed to the next stage.")
+                        .font(.caption)
+                        .foregroundColor(.green)
+                }
+            }
         }
+        .padding()
         .onAppear {
             initializeAttributeValues()
         }
@@ -416,17 +416,6 @@ struct DraggableValueBox: View {
                     .foregroundColor(.white)
                     .cornerRadius(8)
             }
-            .simultaneousGesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { _ in
-                        isDragging = true
-                    }
-                    .onEnded { _ in
-                        isDragging = false
-                    }
-            )
-            .contentShape(Rectangle())
-            .allowsHitTesting(true)
     }
 }
 
@@ -437,7 +426,6 @@ struct AttributeDropRow: View {
     @Binding var availableValues: [(Int, UUID)]
     @Binding var characterAttributes: [String: Int]
     @State private var isTargeted = false
-    @State private var isDraggedValuePresent = false
     
     var body: some View {
         VStack {
@@ -449,7 +437,7 @@ struct AttributeDropRow: View {
             ZStack {
                 Rectangle()
                     .stroke(isTargeted ? Color.blue : Color.gray, lineWidth: isTargeted ? 2 : 1)
-                    .frame(height: 80) // Increased from 60 to 80
+                    .frame(height: 80) // Large drop zone
                     .background(
                         Group {
                             if isTargeted {
@@ -467,8 +455,6 @@ struct AttributeDropRow: View {
                     Text("\(value)")
                         .font(.title3)
                         .fontWeight(.bold)
-                        .scaleEffect(isDraggedValuePresent ? 1.1 : 1.0)
-                        .animation(.easeInOut(duration: 0.1), value: isDraggedValuePresent)
                         .draggable(AttributeDragData(value: value, sourceAttribute: attribute)) {
                             Text("\(value)")
                                 .font(.title3)
@@ -478,17 +464,6 @@ struct AttributeDropRow: View {
                                 .foregroundColor(.white)
                                 .cornerRadius(8)
                         }
-                        .simultaneousGesture(
-                            DragGesture(minimumDistance: 0)
-                                .onChanged { _ in
-                                    isDraggedValuePresent = true
-                                }
-                                .onEnded { _ in
-                                    isDraggedValuePresent = false
-                                }
-                        )
-                        .contentShape(Rectangle())
-                        .allowsHitTesting(true)
                 } else {
                     Text("—")
                         .foregroundColor(.gray)
@@ -496,21 +471,17 @@ struct AttributeDropRow: View {
                 }
             }
             .dropDestination(for: AttributeDragData.self) { items, location in
-                if let draggedItem = items.first {
-                    assignValueToAttribute(attribute: attribute, dragData: draggedItem)
-                    return true
-                }
-                return false
+                guard let draggedItem = items.first else { return false }
+                assignValueToAttribute(attribute: attribute, dragData: draggedItem)
+                return true
             } isTargeted: { targeted in
                 isTargeted = targeted
             }
             .dropDestination(for: Int.self) { items, location in
-                if let draggedValue = items.first {
-                    // This handles drops from unassigned pool
-                    assignValueToAttribute(attribute: attribute, dragData: AttributeDragData(value: draggedValue, sourceAttribute: nil))
-                    return true
-                }
-                return false
+                guard let draggedValue = items.first else { return false }
+                // This handles drops from unassigned pool
+                assignValueToAttribute(attribute: attribute, dragData: AttributeDragData(value: draggedValue, sourceAttribute: nil))
+                return true
             } isTargeted: { targeted in
                 isTargeted = targeted
             }
@@ -531,7 +502,15 @@ struct AttributeDropRow: View {
         if let sourceAttr = sourceAttribute {
             // Dragged from another attribute - remove from source
             assignedValues.removeValue(forKey: sourceAttr)
-            characterAttributes[sourceAttr] = 1 // Reset to base value
+            
+            // Reset source attribute to base value
+            if V5Constants.physicalAttributes.contains(sourceAttr) {
+                characterAttributes[sourceAttr] = 1
+            } else if V5Constants.socialAttributes.contains(sourceAttr) {
+                characterAttributes[sourceAttr] = 1
+            } else if V5Constants.mentalAttributes.contains(sourceAttr) {
+                characterAttributes[sourceAttr] = 1
+            }
         } else {
             // Dragged from unassigned pool - remove from available values
             if let index = availableValues.firstIndex(where: { $0.0 == value }) {
