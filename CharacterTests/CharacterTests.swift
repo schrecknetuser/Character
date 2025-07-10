@@ -104,6 +104,75 @@ struct CharacterTests {
         #expect(character.netAdvantageFlawCost == 2) // 8 + (-6)
     }
     
+    @Test func testBackwardCompatibility() async throws {
+        // Test that old character data format can be loaded correctly
+        let oldFormatJSON = """
+        {
+            "id": "12345678-1234-1234-1234-123456789012",
+            "name": "Test Character",
+            "clan": "Brujah",
+            "generation": 12,
+            "physicalAttributes": {"Strength": 2, "Dexterity": 3, "Stamina": 2},
+            "socialAttributes": {"Charisma": 3, "Manipulation": 2, "Composure": 2},
+            "mentalAttributes": {"Intelligence": 3, "Wits": 2, "Resolve": 3},
+            "physicalSkills": {"Athletics": 2, "Brawl": 3},
+            "socialSkills": {"Persuasion": 3, "Intimidation": 2},
+            "mentalSkills": {"Academics": 2, "Investigation": 3},
+            "bloodPotency": 1,
+            "humanity": 7,
+            "willpower": 5,
+            "experience": 10,
+            "disciplines": {"Potence": 2, "Presence": 1},
+            "advantages": ["Allies", "Resources", "Haven"],
+            "flaws": ["Enemy", "Dark Secret"],
+            "convictions": ["Protect the innocent"],
+            "touchstones": ["My mortal sister"],
+            "chronicleTenets": ["Do not kill mortals"],
+            "hunger": 2,
+            "health": 5
+        }
+        """
+        
+        let jsonData = oldFormatJSON.data(using: .utf8)!
+        let decoder = JSONDecoder()
+        
+        // This should not throw an error
+        let character = try decoder.decode(Character.self, from: jsonData)
+        
+        // Verify basic properties
+        #expect(character.name == "Test Character")
+        #expect(character.clan == "Brujah")
+        #expect(character.generation == 12)
+        
+        // Verify that old string advantages were converted to Advantage structs
+        #expect(character.advantages.count == 3)
+        #expect(character.advantages.contains { $0.name == "Allies" })
+        #expect(character.advantages.contains { $0.name == "Resources" })
+        #expect(character.advantages.contains { $0.name == "Haven" })
+        
+        // Verify all converted advantages are marked as custom with default cost of 1
+        for advantage in character.advantages {
+            #expect(advantage.isCustom == true)
+            #expect(advantage.cost == 1)
+        }
+        
+        // Verify that old string flaws were converted to Flaw structs
+        #expect(character.flaws.count == 2)
+        #expect(character.flaws.contains { $0.name == "Enemy" })
+        #expect(character.flaws.contains { $0.name == "Dark Secret" })
+        
+        // Verify all converted flaws are marked as custom with default cost of -1
+        for flaw in character.flaws {
+            #expect(flaw.isCustom == true)
+            #expect(flaw.cost == -1)
+        }
+        
+        // Verify other properties remain unchanged
+        #expect(character.convictions == ["Protect the innocent"])
+        #expect(character.touchstones == ["My mortal sister"])
+        #expect(character.chronicleTenets == ["Do not kill mortals"])
+    }
+    
     @Test func testPredefinedAdvantagesAndFlaws() async throws {
         // Test that predefined advantages and flaws exist
         #expect(!V5Constants.predefinedAdvantages.isEmpty)
