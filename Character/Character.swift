@@ -94,6 +94,23 @@ struct V5Constants {
     ]
 }
 
+// Health tracking states
+enum HealthState: String, Codable, CaseIterable {
+    case ok = "ok"
+    case superficial = "superficial"
+    case aggravated = "aggravated"
+}
+
+// Willpower tracking states (same as health)
+typealias WillpowerState = HealthState
+
+// Humanity tracking states
+enum HumanityState: String, Codable, CaseIterable {
+    case checked = "checked"
+    case unchecked = "unchecked"
+    case stained = "stained"
+}
+
 struct Character: Identifiable, Codable {
     var id = UUID()
     var name: String
@@ -116,9 +133,16 @@ struct Character: Identifiable, Codable {
     var willpower: Int
     var experience: Int
     
+    // Multi-tab fields
+    var spentExperience: Int
+    var ambition: String
+    var desire: String
+    var chronicleName: String
+    
     // V5 Disciplines
     var disciplines: [String: Int]
     
+
     // V5 Character Traits
     var advantages: [Advantage]
     var flaws: [Flaw]
@@ -130,7 +154,10 @@ struct Character: Identifiable, Codable {
     var hunger: Int
     var health: Int
     
-
+    // Multi-tab status tracking arrays
+    var healthStates: [HealthState]
+    var willpowerStates: [WillpowerState]
+    var humanityStates: [HumanityState]
     
     // Default initializer for new characters
     init(name: String = "", clan: String = "", generation: Int = 13) {
@@ -154,6 +181,12 @@ struct Character: Identifiable, Codable {
         self.willpower = 3
         self.experience = 0
         
+        // Multi-tab fields
+        self.spentExperience = 0
+        self.ambition = ""
+        self.desire = ""
+        self.chronicleName = ""
+        
         // Initialize disciplines (empty by default)
         self.disciplines = [:]
         
@@ -167,10 +200,16 @@ struct Character: Identifiable, Codable {
         // Initialize condition tracking
         self.hunger = 1
         self.health = 3
+        
+        // Initialize status tracking arrays
+        self.healthStates = Array(repeating: .ok, count: 3)
+        self.willpowerStates = Array(repeating: .ok, count: 3)
+        self.humanityStates = Array(repeating: .unchecked, count: 10)
     }
     
     // Full initializer for existing characters or manual creation
-    init(name: String, clan: String, generation: Int, physicalAttributes: [String: Int], socialAttributes: [String: Int], mentalAttributes: [String: Int], physicalSkills: [String: Int], socialSkills: [String: Int], mentalSkills: [String: Int], bloodPotency: Int, humanity: Int, willpower: Int, experience: Int, disciplines: [String: Int], advantages: [Advantage], flaws: [Flaw], convictions: [String], touchstones: [String], chronicleTenets: [String], hunger: Int, health: Int) {
+    init(name: String, clan: String, generation: Int, physicalAttributes: [String: Int], socialAttributes: [String: Int], mentalAttributes: [String: Int], physicalSkills: [String: Int], socialSkills: [String: Int], mentalSkills: [String: Int], bloodPotency: Int, humanity: Int, willpower: Int, experience: Int, disciplines: [String: Int], advantages: [Advantage], flaws: [Flaw], convictions: [String], touchstones: [String], chronicleTenets: [String], hunger: Int, health: Int, spentExperience: Int = 0, ambition: String = "", desire: String = "", chronicleName: String = "", healthStates: [HealthState]? = nil, willpowerStates: [WillpowerState]? = nil, humanityStates: [HumanityState]? = nil) {
+
         self.name = name
         self.clan = clan
         self.generation = generation
@@ -192,6 +231,17 @@ struct Character: Identifiable, Codable {
         self.chronicleTenets = chronicleTenets
         self.hunger = hunger
         self.health = health
+        
+        // Multi-tab fields
+        self.spentExperience = spentExperience
+        self.ambition = ambition
+        self.desire = desire
+        self.chronicleName = chronicleName
+        
+        // Initialize status tracking arrays with defaults
+        self.healthStates = healthStates ?? Array(repeating: .ok, count: max(health, 1))
+        self.willpowerStates = willpowerStates ?? Array(repeating: .ok, count: max(willpower, 1))
+        self.humanityStates = humanityStates ?? Array(repeating: .unchecked, count: 10)
     }
     
     // Computed properties for advantage/flaw costs
@@ -205,6 +255,31 @@ struct Character: Identifiable, Codable {
     
     var netAdvantageFlawCost: Int {
         totalAdvantageCost + totalFlawValue // Since flaw costs are negative, this is the net cost
+    }
+    
+    // Computed properties for status tracking
+    var sortedHealthStates: [HealthState] {
+        healthStates.sorted { first, second in
+            switch (first, second) {
+            case (.aggravated, .superficial), (.aggravated, .ok): return true
+            case (.superficial, .ok): return true
+            default: return false
+            }
+        }
+    }
+    
+    var sortedWillpowerStates: [WillpowerState] {
+        willpowerStates.sorted { first, second in
+            switch (first, second) {
+            case (.aggravated, .superficial), (.aggravated, .ok): return true
+            case (.superficial, .ok): return true
+            default: return false
+            }
+        }
+    }
+    
+    var availableExperience: Int {
+        experience - spentExperience
     }
 }
 

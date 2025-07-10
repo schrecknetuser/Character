@@ -287,6 +287,12 @@ struct AddCharacterView: View {
     @State private var willpower = 3
     @State private var experience = 0
     
+    // Multi-tab fields
+    @State private var spentExperience = 0
+    @State private var ambition = ""
+    @State private var desire = ""
+    @State private var chronicleName = ""
+    
     // V5 Disciplines
     @State private var selectedDisciplines: [String: Int] = [:]
     
@@ -331,11 +337,19 @@ struct AddCharacterView: View {
                     Stepper("Generation: \(generation)", value: $generation, in: 4...15)
                 }
                 
+                // Multi-tab fields section
+                Section(header: Text("Character Details")) {
+                    TextField("Chronicle Name", text: $chronicleName)
+                    TextField("Ambition", text: $ambition)
+                    TextField("Desire", text: $desire)
+                }
+                
                 Section(header: Text("Core Traits")) {
                     Stepper("Blood Potency: \(bloodPotency)", value: $bloodPotency, in: 0...10)
                     Stepper("Humanity: \(humanity)", value: $humanity, in: 0...10)
                     Stepper("Willpower: \(willpower)", value: $willpower, in: 1...10)
                     Stepper("Experience: \(experience)", value: $experience, in: 0...999)
+                    Stepper("Spent Experience: \(spentExperience)", value: $spentExperience, in: 0...experience)
                 }
 
                 Section(header: Text("Physical Attributes")) {
@@ -443,7 +457,11 @@ struct AddCharacterView: View {
                             touchstones: touchstones,
                             chronicleTenets: chronicleTenets,
                             hunger: hunger,
-                            health: health
+                            health: health,
+                            spentExperience: spentExperience,
+                            ambition: ambition,
+                            desire: desire,
+                            chronicleName: chronicleName
                         )
                         store.addCharacter(newCharacter)
                         dismiss()
