@@ -198,7 +198,7 @@ struct ClanSelectionStage: View {
 // MARK: - Stage 3: Attributes with Drag and Drop
 struct AttributesStage: View {
     @Binding var character: Character
-    @State private var availableValues: [Int] = [4, 3, 3, 3, 2, 2, 2, 2, 1]
+    @State private var availableValues: [(Int, UUID)] = [(4, UUID()), (3, UUID()), (3, UUID()), (3, UUID()), (2, UUID()), (2, UUID()), (2, UUID()), (2, UUID()), (1, UUID())]
     @State private var assignedValues: [String: Int] = [:]
     
     private var allAttributes: [String] {
@@ -214,16 +214,16 @@ struct AttributesStage: View {
                         .font(.headline)
                     
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 5), spacing: 10) {
-                        ForEach(availableValues, id: \.self) { value in
-                            DraggableValueBox(value: value)
+                        ForEach(availableValues, id: \.1) { valueWithId in
+                            DraggableValueBox(value: valueWithId.0, id: valueWithId.1)
                         }
                     }
                     .dropDestination(for: Int.self) { items, location in
                         if let draggedValue = items.first {
                             // Find the attribute that had this value and remove it
                             if let attributeWithValue = assignedValues.first(where: { $0.value == draggedValue })?.key {
-                                availableValues.append(draggedValue)
-                                availableValues.sort(by: >)
+                                availableValues.append((draggedValue, UUID()))
+                                availableValues.sort { $0.0 > $1.0 }
                                 assignedValues.removeValue(forKey: attributeWithValue)
                                 
                                 // Reset the character attribute to base value
@@ -249,33 +249,59 @@ struct AttributesStage: View {
                     Text("Attributes")
                         .font(.headline)
                     
-                    VStack(spacing: 15) {
-                        // Physical
-                        AttributeCategoryView(
-                            title: "Physical",
-                            attributes: V5Constants.physicalAttributes,
-                            assignedValues: $assignedValues,
-                            availableValues: $availableValues,
-                            characterAttributes: $character.physicalAttributes
-                        )
+                    // Table header
+                    HStack {
+                        Text("Physical")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.secondary)
+                            .frame(maxWidth: .infinity)
                         
-                        // Social
-                        AttributeCategoryView(
-                            title: "Social",
-                            attributes: V5Constants.socialAttributes,
-                            assignedValues: $assignedValues,
-                            availableValues: $availableValues,
-                            characterAttributes: $character.socialAttributes
-                        )
+                        Text("Social")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.secondary)
+                            .frame(maxWidth: .infinity)
                         
-                        // Mental
-                        AttributeCategoryView(
-                            title: "Mental",
-                            attributes: V5Constants.mentalAttributes,
-                            assignedValues: $assignedValues,
-                            availableValues: $availableValues,
-                            characterAttributes: $character.mentalAttributes
-                        )
+                        Text("Mental")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.secondary)
+                            .frame(maxWidth: .infinity)
+                    }
+                    .padding(.bottom, 10)
+                    
+                    // Attribute rows
+                    ForEach(0..<3, id: \.self) { rowIndex in
+                        HStack {
+                            // Physical attribute
+                            AttributeDropRow(
+                                attribute: V5Constants.physicalAttributes[rowIndex],
+                                assignedValues: $assignedValues,
+                                availableValues: $availableValues,
+                                characterAttributes: $character.physicalAttributes
+                            )
+                            .frame(maxWidth: .infinity)
+                            
+                            // Social attribute
+                            AttributeDropRow(
+                                attribute: V5Constants.socialAttributes[rowIndex],
+                                assignedValues: $assignedValues,
+                                availableValues: $availableValues,
+                                characterAttributes: $character.socialAttributes
+                            )
+                            .frame(maxWidth: .infinity)
+                            
+                            // Mental attribute
+                            AttributeDropRow(
+                                attribute: V5Constants.mentalAttributes[rowIndex],
+                                assignedValues: $assignedValues,
+                                availableValues: $availableValues,
+                                characterAttributes: $character.mentalAttributes
+                            )
+                            .frame(maxWidth: .infinity)
+                        }
+                        .padding(.vertical, 2)
                     }
                 }
                 
@@ -321,7 +347,7 @@ struct AttributesStage: View {
             
             if currentValue > 1 {
                 assignedValues[attribute] = currentValue
-                if let index = availableValues.firstIndex(of: currentValue) {
+                if let index = availableValues.firstIndex(where: { $0.0 == currentValue }) {
                     availableValues.remove(at: index)
                 }
             }
@@ -355,6 +381,7 @@ struct AttributesStage: View {
 
 struct DraggableValueBox: View {
     let value: Int
+    let id: UUID
     
     var body: some View {
         Text("\(value)")
@@ -368,48 +395,24 @@ struct DraggableValueBox: View {
     }
 }
 
-struct AttributeCategoryView: View {
-    let title: String
-    let attributes: [String]
-    @Binding var assignedValues: [String: Int]
-    @Binding var availableValues: [Int]
-    @Binding var characterAttributes: [String: Int]
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            Text(title)
-                .font(.subheadline)
-                .fontWeight(.semibold)
-                .foregroundColor(.secondary)
-            
-            ForEach(attributes, id: \.self) { attribute in
-                AttributeDropRow(
-                    attribute: attribute,
-                    assignedValues: $assignedValues,
-                    availableValues: $availableValues,
-                    characterAttributes: $characterAttributes
-                )
-            }
-        }
-    }
-}
 
 struct AttributeDropRow: View {
     let attribute: String
     @Binding var assignedValues: [String: Int]
-    @Binding var availableValues: [Int]
+    @Binding var availableValues: [(Int, UUID)]
     @Binding var characterAttributes: [String: Int]
     
     var body: some View {
-        HStack {
+        VStack {
             Text(attribute)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .font(.caption)
+                .frame(maxWidth: .infinity, alignment: .center)
             
             // Drop zone
             ZStack {
                 Rectangle()
                     .stroke(Color.gray, lineWidth: 1)
-                    .frame(width: 60, height: 40)
+                    .frame(height: 40)
                     .background(assignedValues[attribute] != nil ? Color.green.opacity(0.2) : Color.clear)
                 
                 if let value = assignedValues[attribute] {
@@ -443,8 +446,8 @@ struct AttributeDropRow: View {
     private func assignValueToAttribute(attribute: String, value: Int) {
         // If this attribute already has a value, return it to available values
         if let currentValue = assignedValues[attribute] {
-            availableValues.append(currentValue)
-            availableValues.sort(by: >)
+            availableValues.append((currentValue, UUID()))
+            availableValues.sort { $0.0 > $1.0 }
         }
         
         // If another attribute has this value, swap them
@@ -458,7 +461,7 @@ struct AttributeDropRow: View {
             }
         } else {
             // Remove from available values
-            if let index = availableValues.firstIndex(of: value) {
+            if let index = availableValues.firstIndex(where: { $0.0 == value }) {
                 availableValues.remove(at: index)
             }
         }
