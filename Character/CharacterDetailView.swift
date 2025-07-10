@@ -353,6 +353,8 @@ struct AttributesSkillsTab: View {
                                     HStack {
                                         Text(attribute)
                                             .font(.system(size: dynamicFontSize))
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.6)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -388,6 +390,8 @@ struct AttributesSkillsTab: View {
                                     HStack {
                                         Text(attribute)
                                             .font(.system(size: dynamicFontSize))
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.6)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -423,6 +427,8 @@ struct AttributesSkillsTab: View {
                                     HStack {
                                         Text(attribute)
                                             .font(.system(size: dynamicFontSize))
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.6)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -466,6 +472,8 @@ struct AttributesSkillsTab: View {
                                     HStack {
                                         Text(skill)
                                             .font(.system(size: dynamicFontSize))
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.6)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -501,6 +509,8 @@ struct AttributesSkillsTab: View {
                                     HStack {
                                         Text(skill)
                                             .font(.system(size: dynamicFontSize))
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.6)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -536,6 +546,8 @@ struct AttributesSkillsTab: View {
                                     HStack {
                                         Text(skill)
                                             .font(.system(size: dynamicFontSize))
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.6)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
