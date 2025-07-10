@@ -35,7 +35,6 @@ struct AdvantagesListView: View {
             }
             
             Button("Add Advantage") {
-                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 showingAddAdvantage = true
             }
             .foregroundColor(.accentColor)
@@ -139,7 +138,6 @@ struct FlawsListView: View {
             }
             
             Button("Add Flaw") {
-                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 showingAddFlaw = true
             }
             .foregroundColor(.accentColor)
@@ -410,10 +408,6 @@ struct AddCharacterView: View {
                     StringListView(items: $touchstones, title: "Touchstones")
                     Divider()
                     StringListView(items: $chronicleTenets, title: "Chronicle Tenets")
-                }
-                .onTapGesture {
-                    // Clear focus from all input fields when tapping anywhere in the character traits section
-                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 }
 
                 Section(header: Text("Condition Tracking")) {
