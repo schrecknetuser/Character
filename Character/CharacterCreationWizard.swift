@@ -238,6 +238,9 @@ struct AttributesStage: View {
                             }
                         }
                         return false
+                    } isTargeted: { targeted in
+                        // Add visual feedback for targeting the unassigned area
+                        // This could be used to change the background color when hovering
                     }
                 }
                 .padding()
@@ -382,16 +385,42 @@ struct AttributesStage: View {
 struct DraggableValueBox: View {
     let value: Int
     let id: UUID
+    @State private var dragOffset = CGSize.zero
+    @State private var isDragging = false
     
     var body: some View {
         Text("\(value)")
             .font(.title2)
             .fontWeight(.bold)
             .frame(width: 50, height: 50)
-            .background(Color.blue.opacity(0.8))
+            .background(Color.blue.opacity(isDragging ? 0.6 : 0.8))
             .foregroundColor(.white)
             .cornerRadius(8)
-            .draggable(value)
+            .scaleEffect(isDragging ? 1.1 : 1.0)
+            .offset(dragOffset)
+            .animation(.easeInOut(duration: 0.1), value: isDragging)
+            .draggable(value) {
+                Text("\(value)")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .frame(width: 50, height: 50)
+                    .background(Color.blue.opacity(0.8))
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+            }
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 0, coordinateSpace: .global)
+                    .onChanged { value in
+                        if !isDragging {
+                            isDragging = true
+                        }
+                        dragOffset = value.translation
+                    }
+                    .onEnded { _ in
+                        isDragging = false
+                        dragOffset = .zero
+                    }
+            )
     }
 }
 
@@ -401,6 +430,8 @@ struct AttributeDropRow: View {
     @Binding var assignedValues: [String: Int]
     @Binding var availableValues: [(Int, UUID)]
     @Binding var characterAttributes: [String: Int]
+    @State private var isTargeted = false
+    @State private var isDraggedValuePresent = false
     
     var body: some View {
         VStack {
@@ -408,29 +439,52 @@ struct AttributeDropRow: View {
                 .font(.caption)
                 .frame(maxWidth: .infinity, alignment: .center)
             
-            // Drop zone
+            // Drop zone - made much larger and more responsive
             ZStack {
                 Rectangle()
-                    .stroke(Color.gray, lineWidth: 1)
-                    .frame(height: 60)
-                    .background(assignedValues[attribute] != nil ? Color.green.opacity(0.2) : Color.clear)
+                    .stroke(isTargeted ? Color.blue : Color.gray, lineWidth: isTargeted ? 2 : 1)
+                    .frame(height: 80) // Increased from 60 to 80
+                    .background(
+                        Group {
+                            if isTargeted {
+                                Color.blue.opacity(0.3)
+                            } else if assignedValues[attribute] != nil {
+                                Color.green.opacity(0.2)
+                            } else {
+                                Color.gray.opacity(0.1)
+                            }
+                        }
+                    )
+                    .animation(.easeInOut(duration: 0.1), value: isTargeted)
                 
                 if let value = assignedValues[attribute] {
                     Text("\(value)")
                         .font(.title3)
                         .fontWeight(.bold)
+                        .scaleEffect(isDraggedValuePresent ? 1.1 : 1.0)
+                        .animation(.easeInOut(duration: 0.1), value: isDraggedValuePresent)
                         .draggable(value) {
                             Text("\(value)")
                                 .font(.title3)
                                 .fontWeight(.bold)
-                                .frame(width: 50, height: 60)
+                                .frame(width: 50, height: 50)
                                 .background(Color.green.opacity(0.8))
                                 .foregroundColor(.white)
                                 .cornerRadius(8)
                         }
+                        .simultaneousGesture(
+                            DragGesture(minimumDistance: 0)
+                                .onChanged { _ in
+                                    isDraggedValuePresent = true
+                                }
+                                .onEnded { _ in
+                                    isDraggedValuePresent = false
+                                }
+                        )
                 } else {
                     Text("—")
                         .foregroundColor(.gray)
+                        .font(.title2)
                 }
             }
             .dropDestination(for: Int.self) { items, location in
@@ -439,6 +493,8 @@ struct AttributeDropRow: View {
                     return true
                 }
                 return false
+            } isTargeted: { targeted in
+                isTargeted = targeted
             }
         }
     }
