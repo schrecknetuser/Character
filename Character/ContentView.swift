@@ -42,7 +42,7 @@ struct ContentView: View {
                     }
                 }
             }
-            .sheet(isPresented: $showingAddSheet) {
+            .fullScreenCover(isPresented: $showingAddSheet) {
                 CharacterCreationWizard(store: store)
             }
         }

@@ -412,7 +412,7 @@ struct AttributeDropRow: View {
             ZStack {
                 Rectangle()
                     .stroke(Color.gray, lineWidth: 1)
-                    .frame(height: 40)
+                    .frame(height: 60)
                     .background(assignedValues[attribute] != nil ? Color.green.opacity(0.2) : Color.clear)
                 
                 if let value = assignedValues[attribute] {
@@ -423,7 +423,7 @@ struct AttributeDropRow: View {
                             Text("\(value)")
                                 .font(.title3)
                                 .fontWeight(.bold)
-                                .frame(width: 50, height: 40)
+                                .frame(width: 50, height: 60)
                                 .background(Color.green.opacity(0.8))
                                 .foregroundColor(.white)
                                 .cornerRadius(8)
@@ -450,17 +450,12 @@ struct AttributeDropRow: View {
             availableValues.sort { $0.0 > $1.0 }
         }
         
-        // If another attribute has this value, swap them
+        // If another attribute has this value, remove it from that attribute (no swapping)
         if let existingAttribute = assignedValues.first(where: { $0.value == value })?.key {
-            if let existingValue = assignedValues[attribute] {
-                assignedValues[existingAttribute] = existingValue
-                characterAttributes[existingAttribute] = existingValue
-            } else {
-                assignedValues.removeValue(forKey: existingAttribute)
-                characterAttributes[existingAttribute] = 1 // Reset to base value
-            }
+            assignedValues.removeValue(forKey: existingAttribute)
+            characterAttributes[existingAttribute] = 1 // Reset to base value
         } else {
-            // Remove from available values
+            // Remove from available values (if it came from unassigned pool)
             if let index = availableValues.firstIndex(where: { $0.0 == value }) {
                 availableValues.remove(at: index)
             }
