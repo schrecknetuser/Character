@@ -8,6 +8,16 @@ extension Int: Transferable {
     }
 }
 
+// Helper struct to track drag source
+struct AttributeDragData: Transferable, Codable {
+    let value: Int
+    let sourceAttribute: String?
+    
+    static var transferRepresentation: some TransferRepresentation {
+        CodableRepresentation(contentType: .plainText)
+    }
+}
+
 enum CreationStage: Int, CaseIterable {
     case nameAndChronicle = 0
     case clan = 1
@@ -218,21 +228,21 @@ struct AttributesStage: View {
                             DraggableValueBox(value: valueWithId.0, id: valueWithId.1)
                         }
                     }
-                    .dropDestination(for: Int.self) { items, location in
-                        if let draggedValue = items.first {
+                    .dropDestination(for: AttributeDragData.self) { items, location in
+                        if let draggedItem = items.first {
                             // Find the attribute that had this value and remove it
-                            if let attributeWithValue = assignedValues.first(where: { $0.value == draggedValue })?.key {
-                                availableValues.append((draggedValue, UUID()))
+                            if let sourceAttribute = draggedItem.sourceAttribute {
+                                availableValues.append((draggedItem.value, UUID()))
                                 availableValues.sort { $0.0 > $1.0 }
-                                assignedValues.removeValue(forKey: attributeWithValue)
+                                assignedValues.removeValue(forKey: sourceAttribute)
                                 
                                 // Reset the character attribute to base value
-                                if V5Constants.physicalAttributes.contains(attributeWithValue) {
-                                    character.physicalAttributes[attributeWithValue] = 1
-                                } else if V5Constants.socialAttributes.contains(attributeWithValue) {
-                                    character.socialAttributes[attributeWithValue] = 1
-                                } else if V5Constants.mentalAttributes.contains(attributeWithValue) {
-                                    character.mentalAttributes[attributeWithValue] = 1
+                                if V5Constants.physicalAttributes.contains(sourceAttribute) {
+                                    character.physicalAttributes[sourceAttribute] = 1
+                                } else if V5Constants.socialAttributes.contains(sourceAttribute) {
+                                    character.socialAttributes[sourceAttribute] = 1
+                                } else if V5Constants.mentalAttributes.contains(sourceAttribute) {
+                                    character.mentalAttributes[sourceAttribute] = 1
                                 }
                                 return true
                             }
@@ -385,7 +395,6 @@ struct AttributesStage: View {
 struct DraggableValueBox: View {
     let value: Int
     let id: UUID
-    @State private var dragOffset = CGSize.zero
     @State private var isDragging = false
     
     var body: some View {
@@ -397,7 +406,6 @@ struct DraggableValueBox: View {
             .foregroundColor(.white)
             .cornerRadius(8)
             .scaleEffect(isDragging ? 1.1 : 1.0)
-            .offset(dragOffset)
             .animation(.easeInOut(duration: 0.1), value: isDragging)
             .draggable(value) {
                 Text("\(value)")
@@ -409,18 +417,16 @@ struct DraggableValueBox: View {
                     .cornerRadius(8)
             }
             .simultaneousGesture(
-                DragGesture(minimumDistance: 0, coordinateSpace: .global)
-                    .onChanged { value in
-                        if !isDragging {
-                            isDragging = true
-                        }
-                        dragOffset = value.translation
+                DragGesture(minimumDistance: 0)
+                    .onChanged { _ in
+                        isDragging = true
                     }
                     .onEnded { _ in
                         isDragging = false
-                        dragOffset = .zero
                     }
             )
+            .contentShape(Rectangle())
+            .allowsHitTesting(true)
     }
 }
 
@@ -463,7 +469,7 @@ struct AttributeDropRow: View {
                         .fontWeight(.bold)
                         .scaleEffect(isDraggedValuePresent ? 1.1 : 1.0)
                         .animation(.easeInOut(duration: 0.1), value: isDraggedValuePresent)
-                        .draggable(value) {
+                        .draggable(AttributeDragData(value: value, sourceAttribute: attribute)) {
                             Text("\(value)")
                                 .font(.title3)
                                 .fontWeight(.bold)
@@ -481,15 +487,27 @@ struct AttributeDropRow: View {
                                     isDraggedValuePresent = false
                                 }
                         )
+                        .contentShape(Rectangle())
+                        .allowsHitTesting(true)
                 } else {
                     Text("—")
                         .foregroundColor(.gray)
                         .font(.title2)
                 }
             }
+            .dropDestination(for: AttributeDragData.self) { items, location in
+                if let draggedItem = items.first {
+                    assignValueToAttribute(attribute: attribute, dragData: draggedItem)
+                    return true
+                }
+                return false
+            } isTargeted: { targeted in
+                isTargeted = targeted
+            }
             .dropDestination(for: Int.self) { items, location in
                 if let draggedValue = items.first {
-                    assignValueToAttribute(attribute: attribute, value: draggedValue)
+                    // This handles drops from unassigned pool
+                    assignValueToAttribute(attribute: attribute, dragData: AttributeDragData(value: draggedValue, sourceAttribute: nil))
                     return true
                 }
                 return false
@@ -499,19 +517,23 @@ struct AttributeDropRow: View {
         }
     }
     
-    private func assignValueToAttribute(attribute: String, value: Int) {
+    private func assignValueToAttribute(attribute: String, dragData: AttributeDragData) {
+        let value = dragData.value
+        let sourceAttribute = dragData.sourceAttribute
+        
         // If this attribute already has a value, return it to available values
         if let currentValue = assignedValues[attribute] {
             availableValues.append((currentValue, UUID()))
             availableValues.sort { $0.0 > $1.0 }
         }
         
-        // If another attribute has this value, remove it from that attribute (no swapping)
-        if let existingAttribute = assignedValues.first(where: { $0.value == value })?.key {
-            assignedValues.removeValue(forKey: existingAttribute)
-            characterAttributes[existingAttribute] = 1 // Reset to base value
+        // Handle the source of the drag
+        if let sourceAttr = sourceAttribute {
+            // Dragged from another attribute - remove from source
+            assignedValues.removeValue(forKey: sourceAttr)
+            characterAttributes[sourceAttr] = 1 // Reset to base value
         } else {
-            // Remove from available values (if it came from unassigned pool)
+            // Dragged from unassigned pool - remove from available values
             if let index = availableValues.firstIndex(where: { $0.0 == value }) {
                 availableValues.remove(at: index)
             }
@@ -522,6 +544,8 @@ struct AttributeDropRow: View {
         characterAttributes[attribute] = value
     }
 }
+
+// Remove the old AttributeDragValue struct definition from here since it's now defined at the top
 
 // MARK: - Stage 4: Skills with Presets
 struct SkillsStage: View {
