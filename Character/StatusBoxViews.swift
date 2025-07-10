@@ -302,8 +302,8 @@ struct EditableStatusRowView: View {
         var newStates = states
         if let index = newStates.firstIndex(of: .ok) {
             newStates[index] = .superficial
-        } else if states.contains(.superficial) {
-            // If no empty boxes, convert one superficial to aggravated
+        } else if !states.contains(.ok) && states.contains(.superficial) {
+            // If no empty boxes and there are superficial boxes, convert one superficial to aggravated
             if let index = newStates.firstIndex(of: .superficial) {
                 newStates[index] = .aggravated
             }
@@ -440,7 +440,7 @@ struct EditableHumanityRowView: View {
             character.humanityStates[index] = .unchecked
         }
         
-        // Reorder humanity states: checked first, then stained, then unchecked
+        // Reorder humanity states: checked first, then unchecked, then stained on the right
         character.humanityStates = reorderHumanityStates(character.humanityStates)
     }
     
@@ -449,7 +449,7 @@ struct EditableHumanityRowView: View {
             character.humanityStates[index] = .checked
         }
         
-        // Reorder humanity states: checked first, then stained, then unchecked
+        // Reorder humanity states: checked first, then unchecked, then stained on the right
         character.humanityStates = reorderHumanityStates(character.humanityStates)
     }
     
@@ -463,25 +463,26 @@ struct EditableHumanityRowView: View {
     }
     
     private func decreaseStains() {
-        if let index = character.humanityStates.lastIndex(of: .stained) {
+        // Remove stains from left to right (first stained box found)
+        if let index = character.humanityStates.firstIndex(of: .stained) {
             character.humanityStates[index] = .unchecked
         }
         
-        // Reorder humanity states: checked first, then stained, then unchecked
+        // Reorder humanity states: checked first, then unchecked, then stained on the right
         character.humanityStates = reorderHumanityStates(character.humanityStates)
     }
     
     private func increaseStains() {
-        // Find the rightmost unchecked box (stains are added from right to left)
+        // Find an unchecked box to convert to stained (stains are added from right to left)
         if let index = character.humanityStates.lastIndex(of: .unchecked) {
             character.humanityStates[index] = .stained
         }
         
-        // Reorder humanity states: checked first, then stained, then unchecked
+        // Reorder humanity states: checked first, then unchecked, then stained on the right
         character.humanityStates = reorderHumanityStates(character.humanityStates)
     }
     
-    // Helper function to reorder humanity states: checked first, then stained, then unchecked
+    // Helper function to reorder humanity states: checked first, then unchecked, then stained on the right
     private func reorderHumanityStates(_ states: [HumanityState]) -> [HumanityState] {
         let checkedCount = states.filter { $0 == .checked }.count
         let stainedCount = states.filter { $0 == .stained }.count
@@ -489,8 +490,8 @@ struct EditableHumanityRowView: View {
         
         var reorderedStates: [HumanityState] = []
         reorderedStates.append(contentsOf: Array(repeating: .checked, count: checkedCount))
-        reorderedStates.append(contentsOf: Array(repeating: .stained, count: stainedCount))
         reorderedStates.append(contentsOf: Array(repeating: .unchecked, count: uncheckedCount))
+        reorderedStates.append(contentsOf: Array(repeating: .stained, count: stainedCount))
         
         return reorderedStates
     }
