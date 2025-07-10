@@ -1,4 +1,12 @@
 import SwiftUI
+import UniformTypeIdentifiers
+
+// Make Int conform to Transferable for drag and drop functionality
+extension Int: Transferable {
+    public static var transferRepresentation: some TransferRepresentation {
+        CodableRepresentation(contentType: .plainText)
+    }
+}
 
 enum CreationStage: Int, CaseIterable {
     case nameAndChronicle = 0
@@ -541,7 +549,7 @@ struct SkillsStage: View {
         .onAppear {
             initializePresetValues()
         }
-        .onChange(of: allSkillValues) { _ in
+        .onChange(of: allSkillValues) {
             updateAvailablePresets()
         }
     }

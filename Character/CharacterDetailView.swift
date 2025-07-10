@@ -275,7 +275,7 @@ struct CharacterInfoTab: View {
             .onAppear {
                 calculateOptimalFontSize(for: geometry.size)
             }
-            .onChange(of: geometry.size) { newSize in
+            .onChange(of: geometry.size) { _, newSize in
                 calculateOptimalFontSize(for: newSize)
             }
         }
@@ -575,7 +575,7 @@ struct AttributesSkillsTab: View {
                 .onAppear {
                     calculateOptimalFontSizes(for: geometry.size)
                 }
-                .onChange(of: geometry.size) { newSize in
+                .onChange(of: geometry.size) { _, newSize in
                     calculateOptimalFontSizes(for: newSize)
                 }
             }
@@ -672,7 +672,7 @@ struct DisciplinesTab: View {
             .onAppear {
                 calculateOptimalFontSize(for: geometry.size)
             }
-            .onChange(of: geometry.size) { newSize in
+            .onChange(of: geometry.size) { _, newSize in
                 calculateOptimalFontSize(for: newSize)
             }
             .sheet(isPresented: $showingAddDiscipline) {
@@ -816,7 +816,7 @@ struct AdvantagesFlawsTab: View {
             .onAppear {
                 calculateOptimalFontSizes(for: geometry.size)
             }
-            .onChange(of: geometry.size) { newSize in
+            .onChange(of: geometry.size) { _, newSize in
                 calculateOptimalFontSizes(for: newSize)
             }
         }
