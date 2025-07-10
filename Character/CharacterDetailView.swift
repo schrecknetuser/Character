@@ -48,100 +48,134 @@ struct CharacterDetailView: View {
 // First Tab - Character Information
 struct CharacterInfoTab: View {
     let character: Character
+    @State private var dynamicFontSize: CGFloat = 16
     
     var body: some View {
-        Form {
-            Section(header: Text("Basic Information")) {
-                HStack {
-                    Text("Name:")
-                        .fontWeight(.medium)
-                    Spacer()
-                    Text(character.name)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                }
-                if !character.chronicleName.isEmpty {
+        GeometryReader { geometry in
+            Form {
+                Section(header: Text("Basic Information")) {
                     HStack {
-                        Text("Chronicle:")
+                        Text("Name:")
                             .fontWeight(.medium)
+                            .font(.system(size: dynamicFontSize))
                         Spacer()
-                        Text(character.chronicleName)
-                            .lineLimit(1)
-                            .truncationMode(.tail)
+                        Text(character.name)
+                            .font(.system(size: dynamicFontSize))
+                            .minimumScaleFactor(0.5)
+                    }
+                    if !character.chronicleName.isEmpty {
+                        HStack {
+                            Text("Chronicle:")
+                                .fontWeight(.medium)
+                                .font(.system(size: dynamicFontSize))
+                            Spacer()
+                            Text(character.chronicleName)
+                                .font(.system(size: dynamicFontSize))
+                                .minimumScaleFactor(0.5)
+                        }
                     }
                 }
-            }
-            
-            Section(header: Text("Character Background")) {
-                if !character.ambition.isEmpty {
+                
+                Section(header: Text("Character Background")) {
+                    if !character.ambition.isEmpty {
+                        HStack {
+                            Text("Ambition:")
+                                .fontWeight(.medium)
+                                .font(.system(size: dynamicFontSize))
+                            Spacer()
+                            Text(character.ambition)
+                                .font(.system(size: dynamicFontSize))
+                                .minimumScaleFactor(0.5)
+                        }
+                    }
+                    if !character.desire.isEmpty {
+                        HStack {
+                            Text("Desire:")
+                                .fontWeight(.medium)
+                                .font(.system(size: dynamicFontSize))
+                            Spacer()
+                            Text(character.desire)
+                                .font(.system(size: dynamicFontSize))
+                                .minimumScaleFactor(0.5)
+                        }
+                    }
+                }
+                
+                Section(header: Text("Convictions")) {
+                    if character.convictions.isEmpty {
+                        Text("No convictions recorded")
+                            .foregroundColor(.secondary)
+                            .font(.system(size: dynamicFontSize))
+                    } else {
+                        ForEach(character.convictions, id: \.self) { conviction in
+                            Text(conviction)
+                                .font(.system(size: dynamicFontSize))
+                                .minimumScaleFactor(0.5)
+                        }
+                    }
+                }
+                
+                Section(header: Text("Touchstones")) {
+                    if character.touchstones.isEmpty {
+                        Text("No touchstones recorded")
+                            .foregroundColor(.secondary)
+                            .font(.system(size: dynamicFontSize))
+                    } else {
+                        ForEach(character.touchstones, id: \.self) { touchstone in
+                            Text(touchstone)
+                                .font(.system(size: dynamicFontSize))
+                                .minimumScaleFactor(0.5)
+                        }
+                    }
+                }
+                
+                Section(header: Text("Experience")) {
                     HStack {
-                        Text("Ambition:")
+                        Text("Total Experience:")
                             .fontWeight(.medium)
+                            .font(.system(size: dynamicFontSize))
                         Spacer()
-                        Text(character.ambition)
-                            .lineLimit(1)
-                            .truncationMode(.tail)
+                        Text("\(character.experience)")
+                            .font(.system(size: dynamicFontSize))
                     }
-                }
-                if !character.desire.isEmpty {
                     HStack {
-                        Text("Desire:")
+                        Text("Spent Experience:")
                             .fontWeight(.medium)
+                            .font(.system(size: dynamicFontSize))
                         Spacer()
-                        Text(character.desire)
-                            .lineLimit(1)
-                            .truncationMode(.tail)
+                        Text("\(character.spentExperience)")
+                            .font(.system(size: dynamicFontSize))
+                    }
+                    HStack {
+                        Text("Available Experience:")
+                            .fontWeight(.medium)
+                            .font(.system(size: dynamicFontSize))
+                        Spacer()
+                        Text("\(character.experience - character.spentExperience)")
+                            .font(.system(size: dynamicFontSize))
                     }
                 }
             }
-            
-            Section(header: Text("Convictions")) {
-                if character.convictions.isEmpty {
-                    Text("No convictions recorded")
-                        .foregroundColor(.secondary)
-                } else {
-                    ForEach(character.convictions, id: \.self) { conviction in
-                        Text(conviction)
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-                    }
-                }
+            .onAppear {
+                calculateOptimalFontSize(for: geometry.size)
             }
-            
-            Section(header: Text("Touchstones")) {
-                if character.touchstones.isEmpty {
-                    Text("No touchstones recorded")
-                        .foregroundColor(.secondary)
-                } else {
-                    ForEach(character.touchstones, id: \.self) { touchstone in
-                        Text(touchstone)
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-                    }
-                }
-            }
-            
-            Section(header: Text("Experience")) {
-                HStack {
-                    Text("Total Experience:")
-                        .fontWeight(.medium)
-                    Spacer()
-                    Text("\(character.experience)")
-                }
-                HStack {
-                    Text("Spent Experience:")
-                        .fontWeight(.medium)
-                    Spacer()
-                    Text("\(character.spentExperience)")
-                }
-                HStack {
-                    Text("Available Experience:")
-                        .fontWeight(.medium)
-                    Spacer()
-                    Text("\(character.experience - character.spentExperience)")
-                }
+            .onChange(of: geometry.size) { newSize in
+                calculateOptimalFontSize(for: newSize)
             }
         }
+    }
+    
+    private func calculateOptimalFontSize(for size: CGSize) {
+        // Calculate based on screen width - smaller screens get smaller text
+        let baseSize: CGFloat = 16
+        let minSize: CGFloat = 12
+        let maxSize: CGFloat = 18
+        
+        // Scale font size based on available width
+        let scaleFactor = size.width / 375 // iPhone standard width
+        let calculatedSize = baseSize * scaleFactor
+        
+        dynamicFontSize = max(minSize, min(maxSize, calculatedSize))
     }
 }
 
@@ -169,240 +203,272 @@ struct StatusTab: View {
 // Third Tab - Attributes and Skills
 struct AttributesSkillsTab: View {
     let character: Character
+    @State private var dynamicFontSize: CGFloat = 14
+    @State private var titleFontSize: CGFloat = 20
+    @State private var headerFontSize: CGFloat = 17
     
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 30) {
-                // Attributes Section
-                VStack(alignment: .leading, spacing: 15) {
-                    Text("Attributes")
-                        .font(.title2)
-                        .fontWeight(.bold)
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 30) {
+                    // Attributes Section
+                    VStack(alignment: .leading, spacing: 15) {
+                        Text("Attributes")
+                            .font(.system(size: titleFontSize, weight: .bold))
+                        
+                        HStack(alignment: .top, spacing: 20) {
+                            // Physical Attributes Column
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Physical")
+                                    .font(.system(size: headerFontSize, weight: .semibold))
+                                
+                                ForEach(V5Constants.physicalAttributes, id: \.self) { attribute in
+                                    HStack {
+                                        Text(attribute)
+                                            .font(.system(size: dynamicFontSize))
+                                            .minimumScaleFactor(0.5)
+                                        Spacer()
+                                        Text("\(character.physicalAttributes[attribute] ?? 0)")
+                                            .font(.system(size: dynamicFontSize, weight: .medium))
+                                            .frame(width: 25, alignment: .center)
+                                            .padding(.horizontal, 6)
+                                            .cornerRadius(4)
+                                    }
+                                }
+                            }
+                            .frame(maxWidth: .infinity)
+                            
+                            // Social Attributes Column
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Social")
+                                    .font(.system(size: headerFontSize, weight: .semibold))
+                                
+                                ForEach(V5Constants.socialAttributes, id: \.self) { attribute in
+                                    HStack {
+                                        Text(attribute)
+                                            .font(.system(size: dynamicFontSize))
+                                            .minimumScaleFactor(0.5)
+                                        Spacer()
+                                        Text("\(character.socialAttributes[attribute] ?? 0)")
+                                            .font(.system(size: dynamicFontSize, weight: .medium))
+                                            .frame(width: 25, alignment: .center)
+                                            .padding(.horizontal, 6)
+                                            .cornerRadius(4)
+                                    }
+                                }
+                            }
+                            .frame(maxWidth: .infinity)
+                            
+                            // Mental Attributes Column
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Mental")
+                                    .font(.system(size: headerFontSize, weight: .semibold))
+                                
+                                ForEach(V5Constants.mentalAttributes, id: \.self) { attribute in
+                                    HStack {
+                                        Text(attribute)
+                                            .font(.system(size: dynamicFontSize))
+                                            .minimumScaleFactor(0.5)
+                                        Spacer()
+                                        Text("\(character.mentalAttributes[attribute] ?? 0)")
+                                            .font(.system(size: dynamicFontSize, weight: .medium))
+                                            .frame(width: 25, alignment: .center)
+                                            .padding(.horizontal, 6)
+                                            .cornerRadius(4)
+                                    }
+                                }
+                            }
+                            .frame(maxWidth: .infinity)
+                        }
+                    }
                     
-                    HStack(alignment: .top, spacing: 20) {
-                        // Physical Attributes Column
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Physical")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                            
-                            ForEach(V5Constants.physicalAttributes, id: \.self) { attribute in
-                                HStack {
-                                    Text(attribute)
-                                        .font(.system(size: 14))
-                                        .lineLimit(1)
-                                        .minimumScaleFactor(0.8)
-                                    Spacer()
-                                    Text("\(character.physicalAttributes[attribute] ?? 0)")
-                                        .font(.system(size: 14, weight: .medium))
-                                        .frame(width: 25, alignment: .center)
-                                        .padding(.horizontal, 6)
-                                        .background(Color.gray.opacity(0.2))
-                                        .cornerRadius(4)
-                                }
-                            }
-                        }
-                        .frame(maxWidth: .infinity)
+                    // Skills Section
+                    VStack(alignment: .leading, spacing: 15) {
+                        Text("Skills")
+                            .font(.system(size: titleFontSize, weight: .bold))
                         
-                        // Social Attributes Column
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Social")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                            
-                            ForEach(V5Constants.socialAttributes, id: \.self) { attribute in
-                                HStack {
-                                    Text(attribute)
-                                        .font(.system(size: 14))
-                                        .lineLimit(1)
-                                        .minimumScaleFactor(0.8)
-                                    Spacer()
-                                    Text("\(character.socialAttributes[attribute] ?? 0)")
-                                        .font(.system(size: 14, weight: .medium))
-                                        .frame(width: 25, alignment: .center)
-                                        .padding(.horizontal, 6)
-                                        .background(Color.gray.opacity(0.2))
-                                        .cornerRadius(4)
+                        HStack(alignment: .top, spacing: 20) {
+                            // Physical Skills Column
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Physical")
+                                    .font(.system(size: headerFontSize, weight: .semibold))
+                                
+                                ForEach(V5Constants.physicalSkills, id: \.self) { skill in
+                                    HStack {
+                                        Text(skill)
+                                            .font(.system(size: dynamicFontSize))
+                                            .minimumScaleFactor(0.5)
+                                        Spacer()
+                                        Text("\(character.physicalSkills[skill] ?? 0)")
+                                            .font(.system(size: dynamicFontSize, weight: .medium))
+                                            .frame(width: 25, alignment: .center)
+                                            .padding(.horizontal, 6)
+                                            .cornerRadius(4)
+                                    }
                                 }
                             }
-                        }
-                        .frame(maxWidth: .infinity)
-                        
-                        // Mental Attributes Column
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Mental")
-                                .font(.headline)
-                                .fontWeight(.semibold)
+                            .frame(maxWidth: .infinity)
                             
-                            ForEach(V5Constants.mentalAttributes, id: \.self) { attribute in
-                                HStack {
-                                    Text(attribute)
-                                        .font(.system(size: 14))
-                                        .lineLimit(1)
-                                        .minimumScaleFactor(0.8)
-                                    Spacer()
-                                    Text("\(character.mentalAttributes[attribute] ?? 0)")
-                                        .font(.system(size: 14, weight: .medium))
-                                        .frame(width: 25, alignment: .center)
-                                        .padding(.horizontal, 6)
-                                        .background(Color.gray.opacity(0.2))
-                                        .cornerRadius(4)
+                            // Social Skills Column
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Social")
+                                    .font(.system(size: headerFontSize, weight: .semibold))
+                                
+                                ForEach(V5Constants.socialSkills, id: \.self) { skill in
+                                    HStack {
+                                        Text(skill)
+                                            .font(.system(size: dynamicFontSize))
+                                            .minimumScaleFactor(0.5)
+                                        Spacer()
+                                        Text("\(character.socialSkills[skill] ?? 0)")
+                                            .font(.system(size: dynamicFontSize, weight: .medium))
+                                            .frame(width: 25, alignment: .center)
+                                            .padding(.horizontal, 6)
+                                            .cornerRadius(4)
+                                    }
                                 }
                             }
+                            .frame(maxWidth: .infinity)
+                            
+                            // Mental Skills Column
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Mental")
+                                    .font(.system(size: headerFontSize, weight: .semibold))
+                                
+                                ForEach(V5Constants.mentalSkills, id: \.self) { skill in
+                                    HStack {
+                                        Text(skill)
+                                            .font(.system(size: dynamicFontSize))
+                                            .minimumScaleFactor(0.5)
+                                        Spacer()
+                                        Text("\(character.mentalSkills[skill] ?? 0)")
+                                            .font(.system(size: dynamicFontSize, weight: .medium))
+                                            .frame(width: 25, alignment: .center)
+                                            .padding(.horizontal, 6)
+                                            .cornerRadius(4)
+                                    }
+                                }
+                            }
+                            .frame(maxWidth: .infinity)
                         }
-                        .frame(maxWidth: .infinity)
                     }
                 }
-                
-                // Skills Section
-                VStack(alignment: .leading, spacing: 15) {
-                    Text("Skills")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                    
-                    HStack(alignment: .top, spacing: 20) {
-                        // Physical Skills Column
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Physical")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                            
-                            ForEach(V5Constants.physicalSkills, id: \.self) { skill in
-                                HStack {
-                                    Text(skill)
-                                        .font(.system(size: 14))
-                                        .lineLimit(1)
-                                        .minimumScaleFactor(0.8)
-                                    Spacer()
-                                    Text("\(character.physicalSkills[skill] ?? 0)")
-                                        .font(.system(size: 14, weight: .medium))
-                                        .frame(width: 25, alignment: .center)
-                                        .padding(.horizontal, 6)
-                                        .background(Color.gray.opacity(0.2))
-                                        .cornerRadius(4)
-                                }
-                            }
-                        }
-                        .frame(maxWidth: .infinity)
-                        
-                        // Social Skills Column
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Social")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                            
-                            ForEach(V5Constants.socialSkills, id: \.self) { skill in
-                                HStack {
-                                    Text(skill)
-                                        .font(.system(size: 14))
-                                        .lineLimit(1)
-                                        .minimumScaleFactor(0.8)
-                                    Spacer()
-                                    Text("\(character.socialSkills[skill] ?? 0)")
-                                        .font(.system(size: 14, weight: .medium))
-                                        .frame(width: 25, alignment: .center)
-                                        .padding(.horizontal, 6)
-                                        .background(Color.gray.opacity(0.2))
-                                        .cornerRadius(4)
-                                }
-                            }
-                        }
-                        .frame(maxWidth: .infinity)
-                        
-                        // Mental Skills Column
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Mental")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                            
-                            ForEach(V5Constants.mentalSkills, id: \.self) { skill in
-                                HStack {
-                                    Text(skill)
-                                        .font(.system(size: 14))
-                                        .lineLimit(1)
-                                        .minimumScaleFactor(0.8)
-                                    Spacer()
-                                    Text("\(character.mentalSkills[skill] ?? 0)")
-                                        .font(.system(size: 14, weight: .medium))
-                                        .frame(width: 25, alignment: .center)
-                                        .padding(.horizontal, 6)
-                                        .background(Color.gray.opacity(0.2))
-                                        .cornerRadius(4)
-                                }
-                            }
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
+                .padding(.horizontal, 20)
+                .padding(.top, 20)
+                .onAppear {
+                    calculateOptimalFontSizes(for: geometry.size)
+                }
+                .onChange(of: geometry.size) { newSize in
+                    calculateOptimalFontSizes(for: newSize)
                 }
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 20)
         }
+    }
+    
+    private func calculateOptimalFontSizes(for size: CGSize) {
+        // Calculate based on screen width - smaller screens get smaller text
+        let scaleFactor = size.width / 375 // iPhone standard width
+        
+        // Base font sizes
+        let baseDynamicSize: CGFloat = 14
+        let baseTitleSize: CGFloat = 20
+        let baseHeaderSize: CGFloat = 17
+        
+        // Calculate scaled sizes
+        dynamicFontSize = max(10, min(16, baseDynamicSize * scaleFactor))
+        titleFontSize = max(16, min(24, baseTitleSize * scaleFactor))
+        headerFontSize = max(14, min(20, baseHeaderSize * scaleFactor))
     }
 }
 
 // Fourth Tab - Disciplines
 struct DisciplinesTab: View {
     let character: Character
+    @State private var dynamicFontSize: CGFloat = 16
     
     var body: some View {
-        Form {
+        GeometryReader { geometry in
+            Form {
                 Section(header: Text("Disciplines")) {
                     if character.disciplines.isEmpty {
                         Text("No disciplines learned")
                             .foregroundColor(.secondary)
+                            .font(.system(size: dynamicFontSize))
                     } else {
                         ForEach(character.disciplines.sorted(by: { $0.key < $1.key }), id: \.key) { discipline, level in
                             HStack {
                                 Text(discipline)
-                                    .lineLimit(1)
-                                    .truncationMode(.tail)
+                                    .font(.system(size: dynamicFontSize))
+                                    .minimumScaleFactor(0.5)
                                 Spacer()
                                 Text("Level \(level)")
                                     .foregroundColor(.secondary)
-                                    .font(.caption)
+                                    .font(.system(size: dynamicFontSize * 0.8))
                             }
                         }
                     }
                 }
             }
+            .onAppear {
+                calculateOptimalFontSize(for: geometry.size)
+            }
+            .onChange(of: geometry.size) { newSize in
+                calculateOptimalFontSize(for: newSize)
+            }
         }
+    }
+    
+    private func calculateOptimalFontSize(for size: CGSize) {
+        // Calculate based on screen width - smaller screens get smaller text
+        let baseSize: CGFloat = 16
+        let minSize: CGFloat = 12
+        let maxSize: CGFloat = 18
+        
+        // Scale font size based on available width
+        let scaleFactor = size.width / 375 // iPhone standard width
+        let calculatedSize = baseSize * scaleFactor
+        
+        dynamicFontSize = max(minSize, min(maxSize, calculatedSize))
     }
 }
 
 // Fifth Tab - Advantages and Flaws
 struct AdvantagesFlawsTab: View {
     let character: Character
+    @State private var dynamicFontSize: CGFloat = 16
+    @State private var captionFontSize: CGFloat = 12
     
     var body: some View {
-        Form {
+        GeometryReader { geometry in
+            Form {
                 Section(header: Text("Advantages")) {
                     if character.advantages.isEmpty {
                         Text("No advantages recorded")
                             .foregroundColor(.secondary)
+                            .font(.system(size: dynamicFontSize))
                     } else {
                         ForEach(character.advantages) { advantage in
                             HStack {
                                 Text(advantage.name)
-                                    .lineLimit(1)
-                                    .truncationMode(.tail)
+                                    .font(.system(size: dynamicFontSize))
+                                    .minimumScaleFactor(0.5)
                                 Spacer()
                                 if advantage.isCustom {
                                     Text("(Custom)")
-                                        .font(.caption)
+                                        .font(.system(size: captionFontSize))
                                         .foregroundColor(.orange)
                                 }
                                 Text("\(advantage.cost) pts")
-                                    .font(.caption)
+                                    .font(.system(size: captionFontSize))
                                     .foregroundColor(.secondary)
                             }
                         }
                         HStack {
                             Text("Total Cost:")
-                                .font(.headline)
+                                .font(.system(size: dynamicFontSize, weight: .semibold))
                             Spacer()
                             Text("\(character.totalAdvantageCost) pts")
-                                .font(.headline)
+                                .font(.system(size: dynamicFontSize, weight: .semibold))
                                 .foregroundColor(.primary)
                         }
                     }
@@ -412,29 +478,30 @@ struct AdvantagesFlawsTab: View {
                     if character.flaws.isEmpty {
                         Text("No flaws recorded")
                             .foregroundColor(.secondary)
+                            .font(.system(size: dynamicFontSize))
                     } else {
                         ForEach(character.flaws) { flaw in
                             HStack {
                                 Text(flaw.name)
-                                    .lineLimit(1)
-                                    .truncationMode(.tail)
+                                    .font(.system(size: dynamicFontSize))
+                                    .minimumScaleFactor(0.5)
                                 Spacer()
                                 if flaw.isCustom {
                                     Text("(Custom)")
-                                        .font(.caption)
+                                        .font(.system(size: captionFontSize))
                                         .foregroundColor(.orange)
                                 }
                                 Text("\(abs(flaw.cost)) pts")
-                                    .font(.caption)
+                                    .font(.system(size: captionFontSize))
                                     .foregroundColor(.secondary)
                             }
                         }
                         HStack {
                             Text("Total Value:")
-                                .font(.headline)
+                                .font(.system(size: dynamicFontSize, weight: .semibold))
                             Spacer()
                             Text("\(abs(character.totalFlawValue)) pts")
-                                .font(.headline)
+                                .font(.system(size: dynamicFontSize, weight: .semibold))
                                 .foregroundColor(.primary)
                         }
                     }
@@ -444,15 +511,32 @@ struct AdvantagesFlawsTab: View {
                     Section(header: Text("Net Cost")) {
                         HStack {
                             Text("Advantages - Flaws:")
-                                .font(.headline)
+                                .font(.system(size: dynamicFontSize, weight: .semibold))
                             Spacer()
                             Text("\(character.netAdvantageFlawCost) pts")
-                                .font(.headline)
+                                .font(.system(size: dynamicFontSize, weight: .semibold))
                                 .foregroundColor(character.netAdvantageFlawCost <= 0 ? .green : .red)
                         }
                     }
                 }
             }
+            .onAppear {
+                calculateOptimalFontSizes(for: geometry.size)
+            }
+            .onChange(of: geometry.size) { newSize in
+                calculateOptimalFontSizes(for: newSize)
+            }
         }
+    }
+    
+    private func calculateOptimalFontSizes(for size: CGSize) {
+        // Calculate based on screen width - smaller screens get smaller text
+        let scaleFactor = size.width / 375 // iPhone standard width
+        
+        let baseDynamicSize: CGFloat = 16
+        let baseCaptionSize: CGFloat = 12
+        
+        dynamicFontSize = max(12, min(18, baseDynamicSize * scaleFactor))
+        captionFontSize = max(10, min(14, baseCaptionSize * scaleFactor))
     }
 }
