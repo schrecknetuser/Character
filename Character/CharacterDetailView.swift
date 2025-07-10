@@ -353,7 +353,6 @@ struct AttributesSkillsTab: View {
                                     HStack {
                                         Text(attribute)
                                             .font(.system(size: dynamicFontSize))
-                                            .lineLimit(1)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -389,7 +388,6 @@ struct AttributesSkillsTab: View {
                                     HStack {
                                         Text(attribute)
                                             .font(.system(size: dynamicFontSize))
-                                            .lineLimit(1)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -425,7 +423,6 @@ struct AttributesSkillsTab: View {
                                     HStack {
                                         Text(attribute)
                                             .font(.system(size: dynamicFontSize))
-                                            .lineLimit(1)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -469,7 +466,6 @@ struct AttributesSkillsTab: View {
                                     HStack {
                                         Text(skill)
                                             .font(.system(size: dynamicFontSize))
-                                            .lineLimit(1)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -505,7 +501,6 @@ struct AttributesSkillsTab: View {
                                     HStack {
                                         Text(skill)
                                             .font(.system(size: dynamicFontSize))
-                                            .lineLimit(1)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -541,7 +536,6 @@ struct AttributesSkillsTab: View {
                                     HStack {
                                         Text(skill)
                                             .font(.system(size: dynamicFontSize))
-                                            .lineLimit(1)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -584,7 +578,7 @@ struct AttributesSkillsTab: View {
     
     private func calculateOptimalFontSizes(for size: CGSize) {
         // Calculate based on screen width and available space
-        let availableWidth = (size.width - 100) / 3 // Account for padding and 3 columns, more conservative
+        let availableWidth = (size.width - 120) / 3 // Account for padding and 3 columns, more conservative
         
         // Find the longest text among all displayed values
         let allDisplayedTexts = V5Constants.physicalAttributes + V5Constants.socialAttributes + V5Constants.mentalAttributes +
@@ -593,19 +587,19 @@ struct AttributesSkillsTab: View {
         let longestText = allDisplayedTexts.max(by: { $0.count < $1.count }) ?? "Intelligence"
         
         // Determine optimal font size based on available width per column
-        let scaleFactor = min(1.0, availableWidth / (CGFloat(longestText.count) * 7)) // More conservative character width estimate
+        let scaleFactor = min(1.0, availableWidth / (CGFloat(longestText.count) * 8)) // More conservative character width estimate
         
         // Base font sizes adjusted for actual content - more conservative
-        let baseDynamicSize: CGFloat = 12
-        let baseTitleSize: CGFloat = 18
-        let baseHeaderSize: CGFloat = 15
-        let baseRowHeight: CGFloat = 22
+        let baseDynamicSize: CGFloat = 11
+        let baseTitleSize: CGFloat = 17
+        let baseHeaderSize: CGFloat = 14
+        let baseRowHeight: CGFloat = 24
         
         // Calculate scaled sizes with more conservative scaling
-        dynamicFontSize = max(10, min(14, baseDynamicSize * scaleFactor))
-        titleFontSize = max(16, min(20, baseTitleSize * scaleFactor))
-        headerFontSize = max(13, min(17, baseHeaderSize * scaleFactor))
-        rowHeight = max(20, min(26, baseRowHeight * scaleFactor))
+        dynamicFontSize = max(9, min(13, baseDynamicSize * scaleFactor))
+        titleFontSize = max(15, min(19, baseTitleSize * scaleFactor))
+        headerFontSize = max(12, min(16, baseHeaderSize * scaleFactor))
+        rowHeight = max(22, min(28, baseRowHeight * scaleFactor))
     }
 }
 
