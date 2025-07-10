@@ -1,5 +1,32 @@
 import SwiftUI
 
+// Data structures for character traits with costs
+struct Advantage: Identifiable, Codable, Hashable {
+    var id = UUID()
+    var name: String
+    var cost: Int
+    var isCustom: Bool = false
+    
+    init(name: String, cost: Int, isCustom: Bool = false) {
+        self.name = name
+        self.cost = cost
+        self.isCustom = isCustom
+    }
+}
+
+struct Flaw: Identifiable, Codable, Hashable {
+    var id = UUID()
+    var name: String
+    var cost: Int // Negative cost for flaws (points gained)
+    var isCustom: Bool = false
+    
+    init(name: String, cost: Int, isCustom: Bool = false) {
+        self.name = name
+        self.cost = cost
+        self.isCustom = isCustom
+    }
+}
+
 // V5 Character System Constants
 struct V5Constants {
     // Physical Attributes
@@ -25,6 +52,46 @@ struct V5Constants {
     
     // V5 Clans
     static let clans = ["Brujah", "Gangrel", "Malkavian", "Nosferatu", "Toreador", "Tremere", "Ventrue", "Banu Haqim", "Hecata", "Lasombra", "Ministry", "Ravnos", "Salubri", "Tzimisce", "Caitiff", "Thin-Blood"]
+    
+    // Predefined V5 Advantages with costs
+    static let predefinedAdvantages = [
+        Advantage(name: "Allies", cost: 3),
+        Advantage(name: "Contacts", cost: 1),
+        Advantage(name: "Fame", cost: 1),
+        Advantage(name: "Herd", cost: 3),
+        Advantage(name: "Influence", cost: 2),
+        Advantage(name: "Resources", cost: 3),
+        Advantage(name: "Retainers", cost: 2),
+        Advantage(name: "Status", cost: 2),
+        Advantage(name: "Haven", cost: 2),
+        Advantage(name: "Feeding Grounds", cost: 1),
+        Advantage(name: "Iron Will", cost: 5),
+        Advantage(name: "Time Sense", cost: 1),
+        Advantage(name: "Eidetic Memory", cost: 2),
+        Advantage(name: "Linguistics", cost: 1),
+        Advantage(name: "Domain", cost: 2),
+        Advantage(name: "Thin-Blooded Alchemy", cost: 5)
+    ]
+    
+    // Predefined V5 Flaws with costs (negative values as they give points back)
+    static let predefinedFlaws = [
+        Flaw(name: "Enemy", cost: -1),
+        Flaw(name: "Dark Secret", cost: -1),
+        Flaw(name: "Hunted", cost: -3),
+        Flaw(name: "Folkloric Block", cost: -2),
+        Flaw(name: "Clan Curse", cost: -2),
+        Flaw(name: "Feeding Restriction", cost: -1),
+        Flaw(name: "Obvious Predator", cost: -2),
+        Flaw(name: "Prey Exclusion", cost: -1),
+        Flaw(name: "Stigmata", cost: -2),
+        Flaw(name: "Thin-Blooded", cost: -4),
+        Flaw(name: "Caitiff", cost: -2),
+        Flaw(name: "Anachronism", cost: -1),
+        Flaw(name: "Archaic", cost: -1),
+        Flaw(name: "Disgraced", cost: -2),
+        Flaw(name: "Shunned", cost: -1),
+        Flaw(name: "Suspect", cost: -2)
+    ]
 }
 
 // Health tracking states
@@ -65,9 +132,9 @@ struct Character: Identifiable, Codable {
     var humanity: Int
     var willpower: Int
     var experience: Int
-    var spentExperience: Int
     
-    // V5 Character Background
+    // Multi-tab fields
+    var spentExperience: Int
     var ambition: String
     var desire: String
     var chronicleName: String
@@ -75,9 +142,9 @@ struct Character: Identifiable, Codable {
     // V5 Disciplines
     var disciplines: [String: Int]
     
-    // V5 Character Traits
-    var advantages: [String]
-    var flaws: [String]
+    // V5 Character Traits - using master's structured approach
+    var advantages: [Advantage]
+    var flaws: [Flaw]
     var convictions: [String]
     var touchstones: [String]
     var chronicleTenets: [String]
@@ -85,8 +152,10 @@ struct Character: Identifiable, Codable {
     // V5 Condition Tracking
     var hunger: Int
     var health: Int
+    
+    // Multi-tab status tracking arrays
     var healthStates: [HealthState]
-    var willpowerStates: [WillpowerState] 
+    var willpowerStates: [WillpowerState]
     var humanityStates: [HumanityState]
     
     // Default initializer for new characters
@@ -110,9 +179,9 @@ struct Character: Identifiable, Codable {
         self.humanity = 7
         self.willpower = 3
         self.experience = 0
-        self.spentExperience = 0
         
-        // Initialize character background
+        // Multi-tab fields
+        self.spentExperience = 0
         self.ambition = ""
         self.desire = ""
         self.chronicleName = ""
@@ -130,14 +199,15 @@ struct Character: Identifiable, Codable {
         // Initialize condition tracking
         self.hunger = 1
         self.health = 3
+        
+        // Initialize status tracking arrays
         self.healthStates = Array(repeating: .ok, count: 3)
-        self.willpower = 3
         self.willpowerStates = Array(repeating: .ok, count: 3)
         self.humanityStates = Array(repeating: .unchecked, count: 10)
     }
     
     // Full initializer for existing characters or manual creation
-    init(name: String, clan: String, generation: Int, physicalAttributes: [String: Int], socialAttributes: [String: Int], mentalAttributes: [String: Int], physicalSkills: [String: Int], socialSkills: [String: Int], mentalSkills: [String: Int], bloodPotency: Int, humanity: Int, willpower: Int, experience: Int, spentExperience: Int = 0, ambition: String = "", desire: String = "", chronicleName: String = "", disciplines: [String: Int], advantages: [String], flaws: [String], convictions: [String], touchstones: [String], chronicleTenets: [String], hunger: Int, health: Int, healthStates: [HealthState]? = nil, willpowerStates: [WillpowerState]? = nil, humanityStates: [HumanityState]? = nil) {
+    init(name: String, clan: String, generation: Int, physicalAttributes: [String: Int], socialAttributes: [String: Int], mentalAttributes: [String: Int], physicalSkills: [String: Int], socialSkills: [String: Int], mentalSkills: [String: Int], bloodPotency: Int, humanity: Int, willpower: Int, experience: Int, disciplines: [String: Int], advantages: [Advantage], flaws: [Flaw], convictions: [String], touchstones: [String], chronicleTenets: [String], hunger: Int, health: Int, spentExperience: Int = 0, ambition: String = "", desire: String = "", chronicleName: String = "", healthStates: [HealthState]? = nil, willpowerStates: [WillpowerState]? = nil, humanityStates: [HumanityState]? = nil) {
         self.name = name
         self.clan = clan
         self.generation = generation
@@ -151,10 +221,6 @@ struct Character: Identifiable, Codable {
         self.humanity = humanity
         self.willpower = willpower
         self.experience = experience
-        self.spentExperience = spentExperience
-        self.ambition = ambition
-        self.desire = desire
-        self.chronicleName = chronicleName
         self.disciplines = disciplines
         self.advantages = advantages
         self.flaws = flaws
@@ -163,9 +229,55 @@ struct Character: Identifiable, Codable {
         self.chronicleTenets = chronicleTenets
         self.hunger = hunger
         self.health = health
+        
+        // Multi-tab fields
+        self.spentExperience = spentExperience
+        self.ambition = ambition
+        self.desire = desire
+        self.chronicleName = chronicleName
+        
+        // Initialize status tracking arrays with defaults
         self.healthStates = healthStates ?? Array(repeating: .ok, count: max(health, 1))
         self.willpowerStates = willpowerStates ?? Array(repeating: .ok, count: max(willpower, 1))
         self.humanityStates = humanityStates ?? Array(repeating: .unchecked, count: 10)
+    }
+    
+    // Computed properties for advantage/flaw costs
+    var totalAdvantageCost: Int {
+        advantages.reduce(0) { $0 + $1.cost }
+    }
+    
+    var totalFlawValue: Int {
+        flaws.reduce(0) { $0 + $1.cost } // Flaw costs are negative, so this gives total points gained
+    }
+    
+    var netAdvantageFlawCost: Int {
+        totalAdvantageCost + totalFlawValue // Since flaw costs are negative, this is the net cost
+    }
+    
+    // Computed properties for status tracking
+    var sortedHealthStates: [HealthState] {
+        healthStates.sorted { first, second in
+            switch (first, second) {
+            case (.aggravated, .superficial), (.aggravated, .ok): return true
+            case (.superficial, .ok): return true
+            default: return false
+            }
+        }
+    }
+    
+    var sortedWillpowerStates: [WillpowerState] {
+        willpowerStates.sorted { first, second in
+            switch (first, second) {
+            case (.aggravated, .superficial), (.aggravated, .ok): return true
+            case (.superficial, .ok): return true
+            default: return false
+            }
+        }
+    }
+    
+    var availableExperience: Int {
+        experience - spentExperience
     }
 }
 

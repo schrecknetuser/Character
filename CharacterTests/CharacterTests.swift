@@ -112,6 +112,15 @@ struct CharacterTests {
     
     @Test func testCharacterWithDisciplinesAndAdvantages() async throws {
         // Test a character with some disciplines and advantages/flaws
+        let testAdvantages = [
+            Advantage(name: "Beautiful", cost: 2),
+            Advantage(name: "Resources (Wealth)", cost: 3)
+        ]
+        let testFlaws = [
+            Flaw(name: "Obsession (Art)", cost: -2),
+            Flaw(name: "Enemy (Rival Artist)", cost: -1)
+        ]
+        
         let character = Character(
             name: "Test Vampire",
             clan: "Toreador",
@@ -126,15 +135,15 @@ struct CharacterTests {
             humanity: 6,
             willpower: 6,
             experience: 50,
-            spentExperience: 35,
             disciplines: ["Auspex": 2, "Presence": 3, "Celerity": 1],
-            advantages: ["Beautiful", "Resources (Wealth)"],
-            flaws: ["Obsession (Art)", "Enemy (Rival Artist)"],
+            advantages: testAdvantages,
+            flaws: testFlaws,
             convictions: ["Art must be preserved", "Beauty deserves immortality"],
             touchstones: ["Maria - Art Student", "Vincent - Gallery Owner"],
             chronicleTenets: ["Respect artistic expression"],
             hunger: 2,
-            health: 6
+            health: 6,
+            spentExperience: 35
         )
         
         // Verify the character data
@@ -151,15 +160,57 @@ struct CharacterTests {
         #expect(character.disciplines["Celerity"] == 1)
         #expect(character.disciplines.count == 3)
         
-        // Verify advantages and flaws
-        #expect(character.advantages.contains("Beautiful"))
-        #expect(character.advantages.contains("Resources (Wealth)"))
-        #expect(character.flaws.contains("Obsession (Art)"))
-        #expect(character.flaws.contains("Enemy (Rival Artist)"))
+        // Verify advantages and flaws with new structure
+        #expect(character.advantages.count == 2)
+        #expect(character.advantages.contains { $0.name == "Beautiful" })
+        #expect(character.advantages.contains { $0.name == "Resources (Wealth)" })
+        #expect(character.flaws.count == 2)
+        #expect(character.flaws.contains { $0.name == "Obsession (Art)" })
+        #expect(character.flaws.contains { $0.name == "Enemy (Rival Artist)" })
+        
+        // Test advantage/flaw cost calculations
+        #expect(character.totalAdvantageCost == 5) // 2 + 3
+        #expect(character.totalFlawValue == -3) // -2 + -1
+        #expect(character.netAdvantageFlawCost == 2) // 5 + (-3)
         
         // Verify experience tracking
         #expect(character.experience == 50)
         #expect(character.spentExperience == 35)
-        #expect((character.experience - character.spentExperience) == 15)
+        #expect(character.availableExperience == 15)
+    }
+    
+    @Test func testAdvantageFlawStructures() async throws {
+        // Test advantage and flaw data structures
+        let advantage = Advantage(name: "Resources", cost: 3, isCustom: false)
+        #expect(advantage.name == "Resources")
+        #expect(advantage.cost == 3)
+        #expect(advantage.isCustom == false)
+        
+        let customAdvantage = Advantage(name: "Special Ability", cost: 5, isCustom: true)
+        #expect(customAdvantage.isCustom == true)
+        
+        let flaw = Flaw(name: "Enemy", cost: -2, isCustom: false)
+        #expect(flaw.name == "Enemy")
+        #expect(flaw.cost == -2) // Should be negative
+        #expect(flaw.isCustom == false)
+        
+        let customFlaw = Flaw(name: "Custom Weakness", cost: -3, isCustom: true)
+        #expect(customFlaw.isCustom == true)
+    }
+    
+    @Test func testPredefinedAdvantagesAndFlaws() async throws {
+        // Test that predefined advantages and flaws are available
+        #expect(V5Constants.predefinedAdvantages.count > 0)
+        #expect(V5Constants.predefinedFlaws.count > 0)
+        
+        // Test some specific predefined items
+        #expect(V5Constants.predefinedAdvantages.contains { $0.name == "Resources" })
+        #expect(V5Constants.predefinedAdvantages.contains { $0.name == "Allies" })
+        #expect(V5Constants.predefinedFlaws.contains { $0.name == "Enemy" })
+        #expect(V5Constants.predefinedFlaws.contains { $0.name == "Dark Secret" })
+        
+        // Verify that flaw costs are negative
+        let enemyFlaw = V5Constants.predefinedFlaws.first { $0.name == "Enemy" }
+        #expect(enemyFlaw?.cost == -1)
     }
 }
