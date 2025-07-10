@@ -88,5 +88,52 @@ struct CharacterTests {
         #expect(allAttributes["Charisma"] == 1)
         #expect(allAttributes["Intelligence"] == 1)
     }
+    
+    @Test func testCodableBackwardCompatibility() async throws {
+        // Test that old character format can be decoded to new format
+        let oldCharacterJSON = """
+        {
+            "id": "12345678-1234-1234-1234-123456789012",
+            "name": "Old Character",
+            "clan": "Toreador",
+            "generation": 11,
+            "attributes": {"Strength": 2, "Dexterity": 3, "Charisma": 4},
+            "disciplines": {"Presence": 2},
+            "advantages": ["Influence"],
+            "flaws": ["Enemy"],
+            "hunger": 2,
+            "health": 4
+        }
+        """
+        
+        let data = oldCharacterJSON.data(using: .utf8)!
+        let decodedCharacter = try JSONDecoder().decode(Character.self, from: data)
+        
+        #expect(decodedCharacter.name == "Old Character")
+        #expect(decodedCharacter.clan == "Toreador")
+        #expect(decodedCharacter.generation == 11)
+        
+        // Check that legacy attributes were migrated
+        #expect(decodedCharacter.physicalAttributes["Strength"] == 2)
+        #expect(decodedCharacter.physicalAttributes["Dexterity"] == 3)
+        #expect(decodedCharacter.socialAttributes["Charisma"] == 4)
+        
+        // Check that missing attributes got defaults
+        #expect(decodedCharacter.physicalAttributes["Stamina"] == 1)
+        #expect(decodedCharacter.socialAttributes["Manipulation"] == 1)
+        #expect(decodedCharacter.mentalAttributes["Intelligence"] == 1)
+        
+        // Check that new V5 traits got defaults
+        #expect(decodedCharacter.bloodPotency == 1)
+        #expect(decodedCharacter.humanity == 7)
+        #expect(decodedCharacter.willpower == 3)
+        
+        // Check that existing data was preserved
+        #expect(decodedCharacter.disciplines["Presence"] == 2)
+        #expect(decodedCharacter.advantages.contains("Influence"))
+        #expect(decodedCharacter.flaws.contains("Enemy"))
+        #expect(decodedCharacter.hunger == 2)
+        #expect(decodedCharacter.health == 4)
+    }
 
 }

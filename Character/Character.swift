@@ -72,6 +72,114 @@ struct Character: Identifiable, Codable {
         return allAttributes
     }
     
+    // Custom coding keys for backward compatibility
+    enum CodingKeys: String, CodingKey {
+        case id, name, clan, generation
+        case physicalAttributes, socialAttributes, mentalAttributes
+        case physicalSkills, socialSkills, mentalSkills
+        case bloodPotency, humanity, willpower, experience
+        case disciplines, advantages, flaws, convictions, touchstones, chronicleTenets
+        case hunger, health
+        // Old field for backward compatibility
+        case legacyAttributes = "attributes"
+    }
+    
+    // Custom decoder for backward compatibility
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        id = try container.decode(UUID.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        clan = try container.decode(String.self, forKey: .clan)
+        generation = try container.decode(Int.self, forKey: .generation)
+        
+        // Try to decode new structure first, fall back to legacy if needed
+        if let physical = try? container.decode([String: Int].self, forKey: .physicalAttributes) {
+            physicalAttributes = physical
+        } else {
+            physicalAttributes = Dictionary(uniqueKeysWithValues: V5Constants.physicalAttributes.map { ($0, 1) })
+        }
+        
+        if let social = try? container.decode([String: Int].self, forKey: .socialAttributes) {
+            socialAttributes = social
+        } else {
+            socialAttributes = Dictionary(uniqueKeysWithValues: V5Constants.socialAttributes.map { ($0, 1) })
+        }
+        
+        if let mental = try? container.decode([String: Int].self, forKey: .mentalAttributes) {
+            mentalAttributes = mental
+        } else {
+            mentalAttributes = Dictionary(uniqueKeysWithValues: V5Constants.mentalAttributes.map { ($0, 1) })
+        }
+        
+        // Handle legacy attributes field if present
+        if let legacyAttrs = try? container.decode([String: Int].self, forKey: .legacyAttributes) {
+            // Merge legacy attributes into new structure
+            for (key, value) in legacyAttrs {
+                if V5Constants.physicalAttributes.contains(key) {
+                    physicalAttributes[key] = value
+                } else if V5Constants.socialAttributes.contains(key) {
+                    socialAttributes[key] = value
+                } else if V5Constants.mentalAttributes.contains(key) {
+                    mentalAttributes[key] = value
+                }
+            }
+        }
+        
+        physicalSkills = (try? container.decode([String: Int].self, forKey: .physicalSkills)) ?? Dictionary(uniqueKeysWithValues: V5Constants.physicalSkills.map { ($0, 0) })
+        socialSkills = (try? container.decode([String: Int].self, forKey: .socialSkills)) ?? Dictionary(uniqueKeysWithValues: V5Constants.socialSkills.map { ($0, 0) })
+        mentalSkills = (try? container.decode([String: Int].self, forKey: .mentalSkills)) ?? Dictionary(uniqueKeysWithValues: V5Constants.mentalSkills.map { ($0, 0) })
+        
+        bloodPotency = (try? container.decode(Int.self, forKey: .bloodPotency)) ?? 1
+        humanity = (try? container.decode(Int.self, forKey: .humanity)) ?? 7
+        willpower = (try? container.decode(Int.self, forKey: .willpower)) ?? 3
+        experience = (try? container.decode(Int.self, forKey: .experience)) ?? 0
+        
+        disciplines = try container.decode([String: Int].self, forKey: .disciplines)
+        advantages = try container.decode([String].self, forKey: .advantages)
+        flaws = try container.decode([String].self, forKey: .flaws)
+        
+        convictions = (try? container.decode([String].self, forKey: .convictions)) ?? []
+        touchstones = (try? container.decode([String].self, forKey: .touchstones)) ?? []
+        chronicleTenets = (try? container.decode([String].self, forKey: .chronicleTenets)) ?? []
+        
+        hunger = try container.decode(Int.self, forKey: .hunger)
+        health = try container.decode(Int.self, forKey: .health)
+    }
+    
+    // Custom encoder (just encode new structure)
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encode(clan, forKey: .clan)
+        try container.encode(generation, forKey: .generation)
+        
+        try container.encode(physicalAttributes, forKey: .physicalAttributes)
+        try container.encode(socialAttributes, forKey: .socialAttributes)
+        try container.encode(mentalAttributes, forKey: .mentalAttributes)
+        
+        try container.encode(physicalSkills, forKey: .physicalSkills)
+        try container.encode(socialSkills, forKey: .socialSkills)
+        try container.encode(mentalSkills, forKey: .mentalSkills)
+        
+        try container.encode(bloodPotency, forKey: .bloodPotency)
+        try container.encode(humanity, forKey: .humanity)
+        try container.encode(willpower, forKey: .willpower)
+        try container.encode(experience, forKey: .experience)
+        
+        try container.encode(disciplines, forKey: .disciplines)
+        try container.encode(advantages, forKey: .advantages)
+        try container.encode(flaws, forKey: .flaws)
+        try container.encode(convictions, forKey: .convictions)
+        try container.encode(touchstones, forKey: .touchstones)
+        try container.encode(chronicleTenets, forKey: .chronicleTenets)
+        
+        try container.encode(hunger, forKey: .hunger)
+        try container.encode(health, forKey: .health)
+    }
+    
     // Default initializer for new characters
     init(name: String = "", clan: String = "", generation: Int = 13) {
         self.name = name
@@ -145,40 +253,10 @@ class CharacterStore: ObservableObject {
     init() {
         if let data = UserDefaults.standard.data(forKey: "characters"),
            let decoded = try? JSONDecoder().decode([Character].self, from: data) {
-            characters = decoded.map { migrateCharacterIfNeeded($0) }
+            characters = decoded
         } else {
             characters = []
         }
-    }
-    
-    // Migration function for backward compatibility
-    private func migrateCharacterIfNeeded(_ character: Character) -> Character {
-        // Check if this is an old character that needs migration
-        // If any of the new properties are missing, create a new character with defaults
-        var migratedCharacter = character
-        
-        // Initialize any missing attributes/skills with defaults if needed
-        if character.physicalAttributes.isEmpty {
-            migratedCharacter.physicalAttributes = Dictionary(uniqueKeysWithValues: V5Constants.physicalAttributes.map { ($0, 1) })
-        }
-        if character.socialAttributes.isEmpty {
-            migratedCharacter.socialAttributes = Dictionary(uniqueKeysWithValues: V5Constants.socialAttributes.map { ($0, 1) })
-        }
-        if character.mentalAttributes.isEmpty {
-            migratedCharacter.mentalAttributes = Dictionary(uniqueKeysWithValues: V5Constants.mentalAttributes.map { ($0, 1) })
-        }
-        
-        if character.physicalSkills.isEmpty {
-            migratedCharacter.physicalSkills = Dictionary(uniqueKeysWithValues: V5Constants.physicalSkills.map { ($0, 0) })
-        }
-        if character.socialSkills.isEmpty {
-            migratedCharacter.socialSkills = Dictionary(uniqueKeysWithValues: V5Constants.socialSkills.map { ($0, 0) })
-        }
-        if character.mentalSkills.isEmpty {
-            migratedCharacter.mentalSkills = Dictionary(uniqueKeysWithValues: V5Constants.mentalSkills.map { ($0, 0) })
-        }
-        
-        return migratedCharacter
     }
 
     func save() {
