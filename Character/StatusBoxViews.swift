@@ -3,53 +3,53 @@ import SwiftUI
 // Health/Willpower Box View
 struct HealthBoxView: View {
     let state: HealthState
-    let size: CGFloat = 30
+    @ScaledMetric private var boxSize: CGFloat = 30
     
     var body: some View {
         ZStack {
             Rectangle()
                 .stroke(Color.primary, lineWidth: 1)
-                .frame(width: size, height: size)
+                .frame(width: boxSize, height: boxSize)
             
             switch state {
             case .ok:
                 EmptyView()
             case .superficial:
                 Path { path in
-                    path.move(to: CGPoint(x: 0, y: size))
-                    path.addLine(to: CGPoint(x: size, y: 0))
+                    path.move(to: CGPoint(x: 0, y: boxSize))
+                    path.addLine(to: CGPoint(x: boxSize, y: 0))
                 }
                 .stroke(Color.primary, lineWidth: 1)
             case .aggravated:
                 ZStack {
                     Path { path in
                         path.move(to: CGPoint(x: 0, y: 0))
-                        path.addLine(to: CGPoint(x: size, y: size))
+                        path.addLine(to: CGPoint(x: boxSize, y: boxSize))
                     }
                     .stroke(Color.primary, lineWidth: 1)
                     
                     Path { path in
-                        path.move(to: CGPoint(x: 0, y: size))
-                        path.addLine(to: CGPoint(x: size, y: 0))
+                        path.move(to: CGPoint(x: 0, y: boxSize))
+                        path.addLine(to: CGPoint(x: boxSize, y: 0))
                     }
                     .stroke(Color.primary, lineWidth: 1)
                 }
             }
         }
-        .frame(width: size, height: size)
+        .frame(width: boxSize, height: boxSize)
     }
 }
 
 // Humanity Box View
 struct HumanityBoxView: View {
     let state: HumanityState
-    let size: CGFloat = 30
+    @ScaledMetric private var boxSize: CGFloat = 30
     
     var body: some View {
         ZStack {
             Rectangle()
                 .stroke(Color.primary, lineWidth: 1)
-                .frame(width: size, height: size)
+                .frame(width: boxSize, height: boxSize)
             
             switch state {
             case .unchecked:
@@ -57,16 +57,16 @@ struct HumanityBoxView: View {
             case .checked:
                 Rectangle()
                     .fill(Color.primary)
-                    .frame(width: size - 2, height: size - 2)
+                    .frame(width: boxSize - 2, height: boxSize - 2)
             case .stained:
                 Path { path in
-                    path.move(to: CGPoint(x: 0, y: size))
-                    path.addLine(to: CGPoint(x: size, y: 0))
+                    path.move(to: CGPoint(x: 0, y: boxSize))
+                    path.addLine(to: CGPoint(x: boxSize, y: 0))
                 }
                 .stroke(Color.primary, lineWidth: 1)
             }
         }
-        .frame(width: size, height: size)
+        .frame(width: boxSize, height: boxSize)
     }
 }
 
@@ -75,6 +75,8 @@ struct StatusRowView: View {
     let title: String
     let healthStates: [HealthState]?
     let humanityStates: [HumanityState]?
+    @ScaledMetric private var boxSpacing: CGFloat = 35
+    @ScaledMetric private var gridSpacing: CGFloat = 5
     
     init(title: String, healthStates: [HealthState]) {
         self.title = title
@@ -92,6 +94,7 @@ struct StatusRowView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.headline)
+                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
             
             if let healthStates = healthStates {
                 // Sort boxes: aggravated first, then superficial, then ok
@@ -102,7 +105,7 @@ struct StatusRowView: View {
                     return firstIndex < secondIndex
                 }
                 
-                LazyVGrid(columns: Array(repeating: GridItem(.fixed(35)), count: min(10, sortedStates.count)), spacing: 5) {
+                LazyVGrid(columns: Array(repeating: GridItem(.fixed(boxSpacing)), count: min(10, sortedStates.count)), spacing: gridSpacing) {
                     ForEach(sortedStates.indices, id: \.self) { index in
                         HealthBoxView(state: sortedStates[index])
                     }
@@ -110,7 +113,7 @@ struct StatusRowView: View {
             }
             
             if let humanityStates = humanityStates {
-                LazyVGrid(columns: Array(repeating: GridItem(.fixed(35)), count: min(10, humanityStates.count)), spacing: 5) {
+                LazyVGrid(columns: Array(repeating: GridItem(.fixed(boxSpacing)), count: min(10, humanityStates.count)), spacing: gridSpacing) {
                     ForEach(humanityStates.indices, id: \.self) { index in
                         HumanityBoxView(state: humanityStates[index])
                     }
