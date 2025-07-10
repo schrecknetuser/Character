@@ -35,6 +35,7 @@ struct AdvantagesListView: View {
             }
             
             Button("Add Advantage") {
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 showingAddAdvantage = true
             }
             .foregroundColor(.accentColor)
@@ -138,6 +139,7 @@ struct FlawsListView: View {
             }
             
             Button("Add Flaw") {
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 showingAddFlaw = true
             }
             .foregroundColor(.accentColor)
@@ -240,6 +242,7 @@ struct StringListView: View {
             }
             
             Button("Add \(singularTitle)") {
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 showingAdd = true
             }
             .foregroundColor(.accentColor)
