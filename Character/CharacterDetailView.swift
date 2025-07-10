@@ -298,7 +298,7 @@ struct AttributesSkillsTab: View {
                                                 }
                                             }
                                             .pickerStyle(MenuPickerStyle())
-                                            .frame(width: 70)
+                                            .frame(width: 80)
                                             .clipped()
                                         } else {
                                             Text("\(character.physicalAttributes[attribute] ?? 0)")
@@ -337,7 +337,7 @@ struct AttributesSkillsTab: View {
                                                 }
                                             }
                                             .pickerStyle(MenuPickerStyle())
-                                            .frame(width: 70)
+                                            .frame(width: 80)
                                             .clipped()
                                         } else {
                                             Text("\(character.socialAttributes[attribute] ?? 0)")
@@ -376,7 +376,7 @@ struct AttributesSkillsTab: View {
                                                 }
                                             }
                                             .pickerStyle(MenuPickerStyle())
-                                            .frame(width: 70)
+                                            .frame(width: 80)
                                             .clipped()
                                         } else {
                                             Text("\(character.mentalAttributes[attribute] ?? 0)")
@@ -425,7 +425,7 @@ struct AttributesSkillsTab: View {
                                                 }
                                             }
                                             .pickerStyle(MenuPickerStyle())
-                                            .frame(width: 70)
+                                            .frame(width: 80)
                                             .clipped()
                                         } else {
                                             Text("\(character.physicalSkills[skill] ?? 0)")
@@ -464,7 +464,7 @@ struct AttributesSkillsTab: View {
                                                 }
                                             }
                                             .pickerStyle(MenuPickerStyle())
-                                            .frame(width: 70)
+                                            .frame(width: 80)
                                             .clipped()
                                         } else {
                                             Text("\(character.socialSkills[skill] ?? 0)")
@@ -503,7 +503,7 @@ struct AttributesSkillsTab: View {
                                                 }
                                             }
                                             .pickerStyle(MenuPickerStyle())
-                                            .frame(width: 70)
+                                            .frame(width: 80)
                                             .clipped()
                                         } else {
                                             Text("\(character.mentalSkills[skill] ?? 0)")
@@ -532,7 +532,7 @@ struct AttributesSkillsTab: View {
     
     private func calculateOptimalFontSizes(for size: CGSize) {
         // Calculate based on screen width and available space
-        let availableWidth = (size.width - 80) / 3 // Account for padding and 3 columns
+        let availableWidth = (size.width - 100) / 3 // Account for padding and 3 columns, more conservative
         
         // Find the longest text among all displayed values
         let allDisplayedTexts = V5Constants.physicalAttributes + V5Constants.socialAttributes + V5Constants.mentalAttributes +
@@ -541,19 +541,19 @@ struct AttributesSkillsTab: View {
         let longestText = allDisplayedTexts.max(by: { $0.count < $1.count }) ?? "Intelligence"
         
         // Determine optimal font size based on available width per column
-        let scaleFactor = min(1.0, availableWidth / (CGFloat(longestText.count) * 8)) // Rough character width estimate
+        let scaleFactor = min(1.0, availableWidth / (CGFloat(longestText.count) * 7)) // More conservative character width estimate
         
-        // Base font sizes adjusted for actual content
-        let baseDynamicSize: CGFloat = 14
-        let baseTitleSize: CGFloat = 20
-        let baseHeaderSize: CGFloat = 17
-        let baseRowHeight: CGFloat = 20
+        // Base font sizes adjusted for actual content - more conservative
+        let baseDynamicSize: CGFloat = 12
+        let baseTitleSize: CGFloat = 18
+        let baseHeaderSize: CGFloat = 15
+        let baseRowHeight: CGFloat = 22
         
         // Calculate scaled sizes with more conservative scaling
-        dynamicFontSize = max(9, min(16, baseDynamicSize * scaleFactor))
-        titleFontSize = max(14, min(24, baseTitleSize * scaleFactor))
-        headerFontSize = max(12, min(20, baseHeaderSize * scaleFactor))
-        rowHeight = max(16, min(24, baseRowHeight * scaleFactor))
+        dynamicFontSize = max(10, min(14, baseDynamicSize * scaleFactor))
+        titleFontSize = max(16, min(20, baseTitleSize * scaleFactor))
+        headerFontSize = max(13, min(17, baseHeaderSize * scaleFactor))
+        rowHeight = max(20, min(26, baseRowHeight * scaleFactor))
     }
 }
 

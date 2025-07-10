@@ -191,51 +191,55 @@ struct EditableStatusRowView: View {
             
             // Superficial damage controls
             HStack {
-                Button(action: {
-                    decreaseSuperficial()
-                }) {
-                    Image(systemName: "minus.circle")
-                        .foregroundColor(.red)
+                if canDecreaseSuperficial() {
+                    Button(action: {
+                        decreaseSuperficial()
+                    }) {
+                        Image(systemName: "minus.circle")
+                            .foregroundColor(.red)
+                    }
                 }
-                .disabled(!canDecreaseSuperficial())
                 
                 Text("Superficial")
                     .font(.body)
                 
                 Spacer()
                 
-                Button(action: {
-                    increaseSuperficial()
-                }) {
-                    Image(systemName: "plus.circle")
-                        .foregroundColor(.green)
+                if canIncreaseSuperficial() {
+                    Button(action: {
+                        increaseSuperficial()
+                    }) {
+                        Image(systemName: "plus.circle")
+                            .foregroundColor(.green)
+                    }
                 }
-                .disabled(!canIncreaseSuperficial())
             }
             .padding(.top, 8)
             
             // Aggravated damage controls
             HStack {
-                Button(action: {
-                    decreaseAggravated()
-                }) {
-                    Image(systemName: "minus.circle")
-                        .foregroundColor(.red)
+                if canDecreaseAggravated() {
+                    Button(action: {
+                        decreaseAggravated()
+                    }) {
+                        Image(systemName: "minus.circle")
+                            .foregroundColor(.red)
+                    }
                 }
-                .disabled(!canDecreaseAggravated())
                 
                 Text("Aggravated")
                     .font(.body)
                 
                 Spacer()
                 
-                Button(action: {
-                    increaseAggravated()
-                }) {
-                    Image(systemName: "plus.circle")
-                        .foregroundColor(.green)
+                if canIncreaseAggravated() {
+                    Button(action: {
+                        increaseAggravated()
+                    }) {
+                        Image(systemName: "plus.circle")
+                            .foregroundColor(.green)
+                    }
                 }
-                .disabled(!canIncreaseAggravated())
             }
             .padding(.top, 4)
         }
@@ -279,7 +283,7 @@ struct EditableStatusRowView: View {
     
     private func decreaseSuperficial() {
         var newStates = states
-        if let index = newStates.firstIndex(of: .superficial) {
+        if let index = newStates.lastIndex(of: .superficial) {
             newStates[index] = .ok
             updateStates(newStates)
         }
@@ -290,9 +294,12 @@ struct EditableStatusRowView: View {
         if let index = newStates.firstIndex(of: .ok) {
             newStates[index] = .superficial
             updateStates(newStates)
-        } else if let index = newStates.firstIndex(of: .superficial) {
-            newStates[index] = .aggravated
-            updateStates(newStates)
+        } else if !states.contains(.ok) && states.contains(.superficial) {
+            // If no empty boxes, convert superficial to aggravated
+            if let index = newStates.firstIndex(of: .superficial) {
+                newStates[index] = .aggravated
+                updateStates(newStates)
+            }
         }
     }
     
@@ -307,7 +314,7 @@ struct EditableStatusRowView: View {
     
     private func decreaseAggravated() {
         var newStates = states
-        if let index = newStates.firstIndex(of: .aggravated) {
+        if let index = newStates.lastIndex(of: .aggravated) {
             newStates[index] = .ok
             updateStates(newStates)
         }
@@ -349,51 +356,55 @@ struct EditableHumanityRowView: View {
             
             // Humanity controls
             HStack {
-                Button(action: {
-                    decreaseHumanity()
-                }) {
-                    Image(systemName: "minus.circle")
-                        .foregroundColor(.red)
+                if canDecreaseHumanity() {
+                    Button(action: {
+                        decreaseHumanity()
+                    }) {
+                        Image(systemName: "minus.circle")
+                            .foregroundColor(.red)
+                    }
                 }
-                .disabled(!canDecreaseHumanity())
                 
                 Text("Humanity")
                     .font(.body)
                 
                 Spacer()
                 
-                Button(action: {
-                    increaseHumanity()
-                }) {
-                    Image(systemName: "plus.circle")
-                        .foregroundColor(.green)
+                if canIncreaseHumanity() {
+                    Button(action: {
+                        increaseHumanity()
+                    }) {
+                        Image(systemName: "plus.circle")
+                            .foregroundColor(.green)
+                    }
                 }
-                .disabled(!canIncreaseHumanity())
             }
             .padding(.top, 8)
             
             // Stains controls
             HStack {
-                Button(action: {
-                    decreaseStains()
-                }) {
-                    Image(systemName: "minus.circle")
-                        .foregroundColor(.red)
+                if canDecreaseStains() {
+                    Button(action: {
+                        decreaseStains()
+                    }) {
+                        Image(systemName: "minus.circle")
+                            .foregroundColor(.red)
+                    }
                 }
-                .disabled(!canDecreaseStains())
                 
                 Text("Stains")
                     .font(.body)
                 
                 Spacer()
                 
-                Button(action: {
-                    increaseStains()
-                }) {
-                    Image(systemName: "plus.circle")
-                        .foregroundColor(.green)
+                if canIncreaseStains() {
+                    Button(action: {
+                        increaseStains()
+                    }) {
+                        Image(systemName: "plus.circle")
+                            .foregroundColor(.green)
+                    }
                 }
-                .disabled(!canIncreaseStains())
             }
             .padding(.top, 4)
         }
@@ -409,13 +420,13 @@ struct EditableHumanityRowView: View {
     }
     
     private func decreaseHumanity() {
-        if let index = character.humanityStates.firstIndex(of: .checked) {
+        if let index = character.humanityStates.lastIndex(of: .checked) {
             character.humanityStates[index] = .unchecked
         }
     }
     
     private func increaseHumanity() {
-        if let index = character.humanityStates.firstIndex(of: .unchecked) {
+        if let index = character.humanityStates.lastIndex(of: .unchecked) {
             character.humanityStates[index] = .checked
         }
     }
@@ -436,7 +447,7 @@ struct EditableHumanityRowView: View {
     }
     
     private func increaseStains() {
-        if let index = character.humanityStates.firstIndex(of: .unchecked) {
+        if let index = character.humanityStates.lastIndex(of: .unchecked) {
             character.humanityStates[index] = .stained
         }
     }
