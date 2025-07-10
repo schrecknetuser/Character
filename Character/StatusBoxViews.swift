@@ -1,7 +1,7 @@
 import SwiftUI
 
 // Shared box size constant for consistency
-private let statusBoxSize: CGFloat = 25
+let statusBoxSize: CGFloat = 25
 
 // Health/Willpower Box View
 struct HealthBoxView: View {
