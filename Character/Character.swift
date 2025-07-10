@@ -175,14 +175,19 @@ struct Character: Identifiable, Codable {
         self.socialSkills = Dictionary(uniqueKeysWithValues: V5Constants.socialSkills.map { ($0, 0) })
         self.mentalSkills = Dictionary(uniqueKeysWithValues: V5Constants.mentalSkills.map { ($0, 0) })
         
-        // Initialize core traits
+        // Initialize core traits with default values for character creation
         self.bloodPotency = 1
         self.humanity = 7
-        self.willpower = 3
-        self.experience = 0
+        // Willpower and health are calculated based on attributes
+        let stamina = self.physicalAttributes["Stamina"] ?? 1
+        let resolve = self.mentalAttributes["Resolve"] ?? 1
+        let composure = self.socialAttributes["Composure"] ?? 1
+        self.willpower = resolve + composure
+        self.health = stamina + 3
+        self.experience = 0  // Always start at 0 for new characters
         
-        // Multi-tab fields
-        self.spentExperience = 0
+        // Multi-tab fields with defaults for character creation
+        self.spentExperience = 0  // Always start at 0 for new characters
         self.ambition = ""
         self.desire = ""
         self.chronicleName = ""
@@ -197,19 +202,12 @@ struct Character: Identifiable, Codable {
         self.touchstones = []
         self.chronicleTenets = []
         
-        // Initialize condition tracking
-        self.hunger = 1
-        self.health = 3
+        // Initialize condition tracking with defaults
+        self.hunger = 1  // Always start at 1 for new characters
         
-        // Initialize status tracking arrays
-        let stamina = physicalAttributes["Stamina"] ?? 1
-        let resolve = mentalAttributes["Resolve"] ?? 1
-        let composure = socialAttributes["Composure"] ?? 1
-        let calculatedHealthCount = stamina + 3
-        let calculatedWillpowerCount = resolve + composure
-        
-        self.healthStates = Array(repeating: .ok, count: calculatedHealthCount)
-        self.willpowerStates = Array(repeating: .ok, count: calculatedWillpowerCount)
+        // Initialize status tracking arrays based on calculated values
+        self.healthStates = Array(repeating: .ok, count: self.health)
+        self.willpowerStates = Array(repeating: .ok, count: self.willpower)
         self.humanityStates = Array(repeating: .unchecked, count: 10)
     }
     
@@ -295,6 +293,37 @@ struct Character: Identifiable, Codable {
     
     var willpowerBoxCount: Int {
         (mentalAttributes["Resolve"] ?? 1) + (socialAttributes["Composure"] ?? 1)
+    }
+    
+    // Method to recalculate derived values when attributes change
+    mutating func recalculateDerivedValues() {
+        let stamina = physicalAttributes["Stamina"] ?? 1
+        let resolve = mentalAttributes["Resolve"] ?? 1
+        let composure = socialAttributes["Composure"] ?? 1
+        
+        let newHealth = stamina + 3
+        let newWillpower = resolve + composure
+        
+        // Update health and willpower if they changed
+        if newHealth != health {
+            health = newHealth
+            // Adjust health states array
+            if healthStates.count < newHealth {
+                healthStates.append(contentsOf: Array(repeating: .ok, count: newHealth - healthStates.count))
+            } else if healthStates.count > newHealth {
+                healthStates = Array(healthStates.prefix(newHealth))
+            }
+        }
+        
+        if newWillpower != willpower {
+            willpower = newWillpower
+            // Adjust willpower states array
+            if willpowerStates.count < newWillpower {
+                willpowerStates.append(contentsOf: Array(repeating: .ok, count: newWillpower - willpowerStates.count))
+            } else if willpowerStates.count > newWillpower {
+                willpowerStates = Array(willpowerStates.prefix(newWillpower))
+            }
+        }
     }
 }
 

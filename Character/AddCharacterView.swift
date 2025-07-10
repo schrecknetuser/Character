@@ -8,7 +8,7 @@ struct AdvantagesListView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Text("Advantages")
+                Text("Merits")
                     .font(.headline)
                 Spacer()
                 Text("Total Cost: \(selectedAdvantages.reduce(0) { $0 + $1.cost })")
@@ -34,7 +34,7 @@ struct AdvantagesListView: View {
                 }
             }
             
-            Button("Add Advantage") {
+            Button("Add Merit") {
                 UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 showingAddAdvantage = true
             }
@@ -58,7 +58,7 @@ struct AddAdvantageView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section("Predefined Advantages") {
+                Section("Predefined Merits") {
                     ForEach(V5Constants.predefinedAdvantages) { advantage in
                         HStack {
                             Text(advantage.name)
@@ -78,7 +78,7 @@ struct AddAdvantageView: View {
                     }
                 }
                 
-                Section("Custom Advantage") {
+                Section("Custom Merit") {
                     TextField("Name", text: $customName)
                     Stepper("Cost: \(customCost)", value: $customCost, in: 1...10)
                     Button("Add Custom") {
@@ -92,7 +92,7 @@ struct AddAdvantageView: View {
                     .disabled(customName.isEmpty)
                 }
             }
-            .navigationTitle("Add Advantage")
+            .navigationTitle("Add Merit")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {

@@ -43,7 +43,7 @@ struct ContentView: View {
                 }
             }
             .sheet(isPresented: $showingAddSheet) {
-                AddCharacterView(store: store)
+                CharacterCreationWizard(store: store)
             }
         }
     }

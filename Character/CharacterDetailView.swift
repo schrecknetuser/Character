@@ -42,11 +42,11 @@ struct CharacterDetailView: View {
                     Text("Disciplines")
                 }
             
-            // Fifth Tab - Advantages and Flaws
+            // Fifth Tab - Merits and Flaws
             AdvantagesFlawsTab(character: $character, isEditing: $isEditing)
                 .tabItem {
                     Image(systemName: "star.fill")
-                    Text("Advantages & Flaws")
+                    Text("Merits & Flaws")
                 }
 
         }
@@ -695,7 +695,7 @@ struct DisciplinesTab: View {
     }
 }
 
-// Fifth Tab - Advantages and Flaws
+// Fifth Tab - Merits and Flaws
 struct AdvantagesFlawsTab: View {
     @Binding var character: Character
     @Binding var isEditing: Bool
@@ -705,9 +705,9 @@ struct AdvantagesFlawsTab: View {
     var body: some View {
         GeometryReader { geometry in
             Form {
-                Section(header: Text("Advantages")) {
+                Section(header: Text("Merits")) {
                     if character.advantages.isEmpty {
-                        Text("No advantages recorded")
+                        Text("No merits recorded")
                             .foregroundColor(.secondary)
                             .font(.system(size: dynamicFontSize))
                             .lineLimit(1)
@@ -867,13 +867,13 @@ struct AddDisciplineView: View {
     }
 }
 
-// Editable Advantages List View
+// Editable Merits List View
 struct EditableAdvantagesListView: View {
     @Binding var selectedAdvantages: [Advantage]
     @State private var showingAddAdvantage = false
     
     var body: some View {
-        Button("Add Advantage") {
+        Button("Add Merit") {
             showingAddAdvantage = true
         }
         .foregroundColor(.accentColor)
