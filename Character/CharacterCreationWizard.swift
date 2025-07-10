@@ -210,6 +210,27 @@ struct AttributesStage: View {
                             DraggableValueBox(value: value)
                         }
                     }
+                    .dropDestination(for: Int.self) { items, location in
+                        if let draggedValue = items.first {
+                            // Find the attribute that had this value and remove it
+                            if let attributeWithValue = assignedValues.first(where: { $0.value == draggedValue })?.key {
+                                availableValues.append(draggedValue)
+                                availableValues.sort(by: >)
+                                assignedValues.removeValue(forKey: attributeWithValue)
+                                
+                                // Reset the character attribute to base value
+                                if V5Constants.physicalAttributes.contains(attributeWithValue) {
+                                    character.physicalAttributes[attributeWithValue] = 1
+                                } else if V5Constants.socialAttributes.contains(attributeWithValue) {
+                                    character.socialAttributes[attributeWithValue] = 1
+                                } else if V5Constants.mentalAttributes.contains(attributeWithValue) {
+                                    character.mentalAttributes[attributeWithValue] = 1
+                                }
+                                return true
+                            }
+                        }
+                        return false
+                    }
                 }
                 .padding()
                 .background(Color.secondary.opacity(0.1))
@@ -256,11 +277,15 @@ struct AttributesStage: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                     
-                    if assignedValues.count < allAttributes.count {
+                    Text("Remaining values: \(availableValues.count)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    if assignedValues.count < allAttributes.count || !availableValues.isEmpty {
                         Text("Assign all attribute values to proceed.")
                             .font(.caption)
                             .foregroundColor(.orange)
-                    } else if availableValues.isEmpty {
+                    } else {
                         Text("All values assigned! You can proceed to the next stage.")
                             .font(.caption)
                             .foregroundColor(.green)
@@ -299,6 +324,7 @@ struct AttributesStage: View {
         let allAttributes = V5Constants.physicalAttributes + V5Constants.socialAttributes + V5Constants.mentalAttributes
         
         // Check if all attributes have values > 1 (meaning they were assigned)
+        var assignedCount = 0
         for attribute in allAttributes {
             var currentValue = 1
             if V5Constants.physicalAttributes.contains(attribute) {
@@ -309,11 +335,13 @@ struct AttributesStage: View {
                 currentValue = character.mentalAttributes[attribute] ?? 1
             }
             
-            if currentValue == 1 {
-                return false
+            if currentValue > 1 {
+                assignedCount += 1
             }
         }
-        return true
+        
+        // All 9 attributes must be assigned and we must have used all 9 available values
+        return assignedCount == allAttributes.count
     }
 }
 
