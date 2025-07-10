@@ -23,11 +23,14 @@ struct AdvantagesListView: View {
                     Text("\(advantage.cost) pts")
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    Button("Remove") {
+                    Button(action: {
                         selectedAdvantages.removeAll { $0.id == advantage.id }
+                    }) {
+                        Text("Remove")
+                            .font(.caption)
+                            .foregroundColor(.red)
                     }
-                    .font(.caption)
-                    .foregroundColor(.red)
+                    .buttonStyle(BorderlessButtonStyle())
                 }
             }
             
@@ -38,6 +41,12 @@ struct AdvantagesListView: View {
         }
         .sheet(isPresented: $showingAddAdvantage) {
             AddAdvantageView(selectedAdvantages: $selectedAdvantages)
+        }
+        .onChange(of: showingAddAdvantage) { _, newValue in
+            if newValue {
+                // Clear any focus when showing the sheet to prevent auto-scrolling
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            }
         }
     }
 }
@@ -116,11 +125,14 @@ struct FlawsListView: View {
                     Text("\(abs(flaw.cost)) pts")
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    Button("Remove") {
+                    Button(action: {
                         selectedFlaws.removeAll { $0.id == flaw.id }
+                    }) {
+                        Text("Remove")
+                            .font(.caption)
+                            .foregroundColor(.red)
                     }
-                    .font(.caption)
-                    .foregroundColor(.red)
+                    .buttonStyle(BorderlessButtonStyle())
                 }
             }
             
@@ -131,6 +143,12 @@ struct FlawsListView: View {
         }
         .sheet(isPresented: $showingAddFlaw) {
             AddFlawView(selectedFlaws: $selectedFlaws)
+        }
+        .onChange(of: showingAddFlaw) { _, newValue in
+            if newValue {
+                // Clear any focus when showing the sheet to prevent auto-scrolling
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            }
         }
     }
 }
@@ -191,6 +209,14 @@ struct StringListView: View {
     @State private var newItem = ""
     @State private var showingAdd = false
     
+    // Compute singular form of title for button text
+    private var singularTitle: String {
+        if title.hasSuffix("s") {
+            return String(title.dropLast())
+        }
+        return title
+    }
+    
     var body: some View {
         VStack(alignment: .leading) {
             Text(title)
@@ -200,20 +226,23 @@ struct StringListView: View {
                 HStack {
                     Text(item)
                     Spacer()
-                    Button("Remove") {
+                    Button(action: {
                         items.remove(at: index)
+                    }) {
+                        Text("Remove")
+                            .font(.caption)
+                            .foregroundColor(.red)
                     }
-                    .font(.caption)
-                    .foregroundColor(.red)
+                    .buttonStyle(BorderlessButtonStyle())
                 }
             }
             
-            Button("Add \(title.dropLast().description)") {
+            Button("Add \(singularTitle)") {
                 showingAdd = true
             }
             .foregroundColor(.accentColor)
         }
-        .alert("Add \(title.dropLast().description)", isPresented: $showingAdd) {
+        .alert("Add \(singularTitle)", isPresented: $showingAdd) {
             TextField("Enter text", text: $newItem)
             Button("Add") {
                 if !newItem.isEmpty {
@@ -231,6 +260,7 @@ struct StringListView: View {
 struct AddCharacterView: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var store: CharacterStore
+    @FocusState private var isNameFieldFocused: Bool
 
     @State private var name = ""
     @State private var clan = ""
@@ -285,6 +315,7 @@ struct AddCharacterView: View {
             Form {
                 Section(header: Text("Basic Information")) {
                     TextField("Name", text: $name)
+                        .focused($isNameFieldFocused)
                     Picker("Clan", selection: $clan) {
                         Text("Select Clan").tag("")
                         ForEach(V5Constants.clans, id: \.self) { clanName in
@@ -375,6 +406,10 @@ struct AddCharacterView: View {
                     StringListView(items: $touchstones, title: "Touchstones")
                     Divider()
                     StringListView(items: $chronicleTenets, title: "Chronicle Tenets")
+                }
+                .onTapGesture {
+                    // Clear focus when tapping anywhere in the character traits section
+                    isNameFieldFocused = false
                 }
 
                 Section(header: Text("Condition Tracking")) {

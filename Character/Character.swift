@@ -130,105 +130,7 @@ struct Character: Identifiable, Codable {
     var hunger: Int
     var health: Int
     
-    // Custom decoding to handle backward compatibility
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        
-        // Decode basic properties
-        id = try container.decode(UUID.self, forKey: .id)
-        name = try container.decode(String.self, forKey: .name)
-        clan = try container.decode(String.self, forKey: .clan)
-        generation = try container.decode(Int.self, forKey: .generation)
-        
-        // Decode attributes and skills
-        physicalAttributes = try container.decode([String: Int].self, forKey: .physicalAttributes)
-        socialAttributes = try container.decode([String: Int].self, forKey: .socialAttributes)
-        mentalAttributes = try container.decode([String: Int].self, forKey: .mentalAttributes)
-        physicalSkills = try container.decode([String: Int].self, forKey: .physicalSkills)
-        socialSkills = try container.decode([String: Int].self, forKey: .socialSkills)
-        mentalSkills = try container.decode([String: Int].self, forKey: .mentalSkills)
-        
-        // Decode core traits
-        bloodPotency = try container.decode(Int.self, forKey: .bloodPotency)
-        humanity = try container.decode(Int.self, forKey: .humanity)
-        willpower = try container.decode(Int.self, forKey: .willpower)
-        experience = try container.decode(Int.self, forKey: .experience)
-        
-        // Decode disciplines
-        disciplines = try container.decode([String: Int].self, forKey: .disciplines)
-        
-        // Handle backward compatibility for advantages and flaws
-        if let newAdvantages = try? container.decode([Advantage].self, forKey: .advantages) {
-            // New format - structured advantages with costs
-            advantages = newAdvantages
-        } else if let oldAdvantages = try? container.decode([String].self, forKey: .advantages) {
-            // Old format - convert string array to Advantage array
-            advantages = oldAdvantages.map { Advantage(name: $0, cost: 1, isCustom: true) }
-        } else {
-            advantages = []
-        }
-        
-        if let newFlaws = try? container.decode([Flaw].self, forKey: .flaws) {
-            // New format - structured flaws with costs
-            flaws = newFlaws
-        } else if let oldFlaws = try? container.decode([String].self, forKey: .flaws) {
-            // Old format - convert string array to Flaw array
-            flaws = oldFlaws.map { Flaw(name: $0, cost: -1, isCustom: true) }
-        } else {
-            flaws = []
-        }
-        
-        // Decode remaining traits (these haven't changed)
-        convictions = try container.decode([String].self, forKey: .convictions)
-        touchstones = try container.decode([String].self, forKey: .touchstones)
-        chronicleTenets = try container.decode([String].self, forKey: .chronicleTenets)
-        
-        // Decode condition tracking
-        hunger = try container.decode(Int.self, forKey: .hunger)
-        health = try container.decode(Int.self, forKey: .health)
-    }
-    
-    // Standard encoding (always use new format)
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        
-        try container.encode(id, forKey: .id)
-        try container.encode(name, forKey: .name)
-        try container.encode(clan, forKey: .clan)
-        try container.encode(generation, forKey: .generation)
-        
-        try container.encode(physicalAttributes, forKey: .physicalAttributes)
-        try container.encode(socialAttributes, forKey: .socialAttributes)
-        try container.encode(mentalAttributes, forKey: .mentalAttributes)
-        try container.encode(physicalSkills, forKey: .physicalSkills)
-        try container.encode(socialSkills, forKey: .socialSkills)
-        try container.encode(mentalSkills, forKey: .mentalSkills)
-        
-        try container.encode(bloodPotency, forKey: .bloodPotency)
-        try container.encode(humanity, forKey: .humanity)
-        try container.encode(willpower, forKey: .willpower)
-        try container.encode(experience, forKey: .experience)
-        
-        try container.encode(disciplines, forKey: .disciplines)
-        try container.encode(advantages, forKey: .advantages)
-        try container.encode(flaws, forKey: .flaws)
-        try container.encode(convictions, forKey: .convictions)
-        try container.encode(touchstones, forKey: .touchstones)
-        try container.encode(chronicleTenets, forKey: .chronicleTenets)
-        
-        try container.encode(hunger, forKey: .hunger)
-        try container.encode(health, forKey: .health)
-    }
-    
-    // Coding keys for Codable
-    enum CodingKeys: String, CodingKey {
-        case id, name, clan, generation
-        case physicalAttributes, socialAttributes, mentalAttributes
-        case physicalSkills, socialSkills, mentalSkills
-        case bloodPotency, humanity, willpower, experience
-        case disciplines, advantages, flaws, convictions, touchstones, chronicleTenets
-        case hunger, health
-    }
+
     
     // Default initializer for new characters
     init(name: String = "", clan: String = "", generation: Int = 13) {
@@ -314,15 +216,9 @@ class CharacterStore: ObservableObject {
     }
 
     init() {
-        if let data = UserDefaults.standard.data(forKey: "characters") {
-            do {
-                let decoded = try JSONDecoder().decode([Character].self, from: data)
-                characters = decoded
-            } catch {
-                print("Failed to decode character data: \(error)")
-                print("This may be due to a format change. Initializing with empty character list.")
-                characters = []
-            }
+        if let data = UserDefaults.standard.data(forKey: "characters"),
+           let decoded = try? JSONDecoder().decode([Character].self, from: data) {
+            characters = decoded
         } else {
             characters = []
         }
