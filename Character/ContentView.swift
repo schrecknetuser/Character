@@ -15,17 +15,17 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             List {
-                ForEach(store.characters) { character in
-                    NavigationLink(destination: CharacterDetailView(character: character)) {
+                ForEach(store.characters.indices, id: \.self) { index in
+                    NavigationLink(destination: CharacterDetailView(character: $store.characters[index], store: store)) {
                         VStack(alignment: .leading) {
-                            Text(character.name).font(.headline)
-                            Text("\(character.clan), Gen \(character.generation)")
+                            Text(store.characters[index].name).font(.headline)
+                            Text("\(store.characters[index].clan), Gen \(store.characters[index].generation)")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                             HStack {
-                                Text("BP: \(character.bloodPotency)")
-                                Text("Humanity: \(character.humanity)")
-                                Text("Hunger: \(character.hunger)")
+                                Text("BP: \(store.characters[index].bloodPotency)")
+                                Text("Humanity: \(store.characters[index].humanity)")
+                                Text("Hunger: \(store.characters[index].hunger)")
                             }
                             .font(.caption)
                             .foregroundColor(.secondary)

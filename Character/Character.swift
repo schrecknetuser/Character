@@ -202,8 +202,14 @@ struct Character: Identifiable, Codable {
         self.health = 3
         
         // Initialize status tracking arrays
-        self.healthStates = Array(repeating: .ok, count: 3)
-        self.willpowerStates = Array(repeating: .ok, count: 3)
+        let stamina = physicalAttributes["Stamina"] ?? 1
+        let resolve = mentalAttributes["Resolve"] ?? 1
+        let composure = socialAttributes["Composure"] ?? 1
+        let calculatedHealthCount = stamina + 3
+        let calculatedWillpowerCount = resolve + composure
+        
+        self.healthStates = Array(repeating: .ok, count: calculatedHealthCount)
+        self.willpowerStates = Array(repeating: .ok, count: calculatedWillpowerCount)
         self.humanityStates = Array(repeating: .unchecked, count: 10)
     }
     
@@ -281,6 +287,15 @@ struct Character: Identifiable, Codable {
     var availableExperience: Int {
         experience - spentExperience
     }
+    
+    // Computed properties for dynamic box counts
+    var healthBoxCount: Int {
+        (physicalAttributes["Stamina"] ?? 1) + 3
+    }
+    
+    var willpowerBoxCount: Int {
+        (mentalAttributes["Resolve"] ?? 1) + (socialAttributes["Composure"] ?? 1)
+    }
 }
 
 class CharacterStore: ObservableObject {
@@ -311,5 +326,11 @@ class CharacterStore: ObservableObject {
 
     func deleteCharacter(at offsets: IndexSet) {
         characters.remove(atOffsets: offsets)
+    }
+    
+    func updateCharacter(_ updatedCharacter: Character) {
+        if let index = characters.firstIndex(where: { $0.id == updatedCharacter.id }) {
+            characters[index] = updatedCharacter
+        }
     }
 }

@@ -1,40 +1,42 @@
 import SwiftUI
 
 struct CharacterDetailView: View {
-    var character: Character
+    @Binding var character: Character
+    @ObservedObject var store: CharacterStore
+    @State private var isEditing = false
 
     var body: some View {
         TabView {
             // First Tab - Character Information
-            CharacterInfoTab(character: character)
+            CharacterInfoTab(character: character, isEditing: $isEditing)
                 .tabItem {
                     Image(systemName: "person.fill")
                     Text("Character")
                 }
             
             // Second Tab - Status
-            StatusTab(character: character)
+            StatusTab(character: $character, isEditing: $isEditing)
                 .tabItem {
                     Image(systemName: "heart.fill")
                     Text("Status")
                 }
             
             // Third Tab - Attributes and Skills
-            AttributesSkillsTab(character: character)
+            AttributesSkillsTab(character: $character, isEditing: $isEditing)
                 .tabItem {
                     Image(systemName: "brain.head.profile")
                     Text("Attributes & Skills")
                 }
             
             // Fourth Tab - Disciplines
-            DisciplinesTab(character: character)
+            DisciplinesTab(character: $character, isEditing: $isEditing)
                 .tabItem {
                     Image(systemName: "flame.fill")
                     Text("Disciplines")
                 }
             
             // Fifth Tab - Advantages and Flaws
-            AdvantagesFlawsTab(character: character)
+            AdvantagesFlawsTab(character: $character, isEditing: $isEditing)
                 .tabItem {
                     Image(systemName: "star.fill")
                     Text("Advantages & Flaws")
@@ -43,12 +45,24 @@ struct CharacterDetailView: View {
         }
         .navigationTitle(character.name)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(isEditing ? "Save" : "Edit") {
+                    if isEditing {
+                        // Save changes
+                        store.updateCharacter(character)
+                    }
+                    isEditing.toggle()
+                }
+            }
+        }
     }
 }
 
 // First Tab - Character Information
 struct CharacterInfoTab: View {
     let character: Character
+    @Binding var isEditing: Bool
     @State private var dynamicFontSize: CGFloat = 16
     
     var body: some View {
@@ -209,17 +223,26 @@ struct CharacterInfoTab: View {
 
 // Second Tab - Status
 struct StatusTab: View {
-    let character: Character
+    @Binding var character: Character
+    @Binding var isEditing: Bool
     
     var body: some View {
         GeometryReader { geometry in
             ScrollView {
                 VStack(alignment: .leading, spacing: 30) {
-                    StatusRowView(title: "Health", healthStates: character.healthStates, availableWidth: geometry.size.width - 40)
-                    
-                    StatusRowView(title: "Willpower", healthStates: character.willpowerStates, availableWidth: geometry.size.width - 40)
-                    
-                    StatusRowView(title: "Humanity", humanityStates: character.humanityStates, availableWidth: geometry.size.width - 40)
+                    if isEditing {
+                        EditableStatusRowView(character: $character, title: "Health", type: .health, availableWidth: geometry.size.width - 40)
+                        
+                        EditableStatusRowView(character: $character, title: "Willpower", type: .willpower, availableWidth: geometry.size.width - 40)
+                        
+                        EditableHumanityRowView(character: $character, availableWidth: geometry.size.width - 40)
+                    } else {
+                        StatusRowView(title: "Health", healthStates: character.healthStates, availableWidth: geometry.size.width - 40)
+                        
+                        StatusRowView(title: "Willpower", healthStates: character.willpowerStates, availableWidth: geometry.size.width - 40)
+                        
+                        StatusRowView(title: "Humanity", humanityStates: character.humanityStates, availableWidth: geometry.size.width - 40)
+                    }
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
@@ -230,7 +253,8 @@ struct StatusTab: View {
 
 // Third Tab - Attributes and Skills
 struct AttributesSkillsTab: View {
-    let character: Character
+    @Binding var character: Character
+    @Binding var isEditing: Bool
     @State private var dynamicFontSize: CGFloat = 14
     @State private var titleFontSize: CGFloat = 20
     @State private var headerFontSize: CGFloat = 17
@@ -262,9 +286,22 @@ struct AttributesSkillsTab: View {
                                             .lineLimit(1)
                                             .minimumScaleFactor(0.5)
                                         Spacer()
-                                        Text("\(character.physicalAttributes[attribute] ?? 0)")
-                                            .font(.system(size: dynamicFontSize, weight: .medium))
-                                            .frame(width: 25, alignment: .center)
+                                        if isEditing {
+                                            Picker("", selection: Binding(
+                                                get: { character.physicalAttributes[attribute] ?? 1 },
+                                                set: { character.physicalAttributes[attribute] = $0 }
+                                            )) {
+                                                ForEach(0...10, id: \.self) { value in
+                                                    Text("\(value)").tag(value)
+                                                }
+                                            }
+                                            .pickerStyle(MenuPickerStyle())
+                                            .frame(width: 60)
+                                        } else {
+                                            Text("\(character.physicalAttributes[attribute] ?? 0)")
+                                                .font(.system(size: dynamicFontSize, weight: .medium))
+                                                .frame(width: 25, alignment: .center)
+                                        }
                                     }
                                     .frame(minHeight: rowHeight)
                                 }
@@ -285,9 +322,22 @@ struct AttributesSkillsTab: View {
                                             .lineLimit(1)
                                             .minimumScaleFactor(0.5)
                                         Spacer()
-                                        Text("\(character.socialAttributes[attribute] ?? 0)")
-                                            .font(.system(size: dynamicFontSize, weight: .medium))
-                                            .frame(width: 25, alignment: .center)
+                                        if isEditing {
+                                            Picker("", selection: Binding(
+                                                get: { character.socialAttributes[attribute] ?? 1 },
+                                                set: { character.socialAttributes[attribute] = $0 }
+                                            )) {
+                                                ForEach(0...10, id: \.self) { value in
+                                                    Text("\(value)").tag(value)
+                                                }
+                                            }
+                                            .pickerStyle(MenuPickerStyle())
+                                            .frame(width: 60)
+                                        } else {
+                                            Text("\(character.socialAttributes[attribute] ?? 0)")
+                                                .font(.system(size: dynamicFontSize, weight: .medium))
+                                                .frame(width: 25, alignment: .center)
+                                        }
                                     }
                                     .frame(minHeight: rowHeight)
                                 }
@@ -308,9 +358,22 @@ struct AttributesSkillsTab: View {
                                             .lineLimit(1)
                                             .minimumScaleFactor(0.5)
                                         Spacer()
-                                        Text("\(character.mentalAttributes[attribute] ?? 0)")
-                                            .font(.system(size: dynamicFontSize, weight: .medium))
-                                            .frame(width: 25, alignment: .center)
+                                        if isEditing {
+                                            Picker("", selection: Binding(
+                                                get: { character.mentalAttributes[attribute] ?? 1 },
+                                                set: { character.mentalAttributes[attribute] = $0 }
+                                            )) {
+                                                ForEach(0...10, id: \.self) { value in
+                                                    Text("\(value)").tag(value)
+                                                }
+                                            }
+                                            .pickerStyle(MenuPickerStyle())
+                                            .frame(width: 60)
+                                        } else {
+                                            Text("\(character.mentalAttributes[attribute] ?? 0)")
+                                                .font(.system(size: dynamicFontSize, weight: .medium))
+                                                .frame(width: 25, alignment: .center)
+                                        }
                                     }
                                     .frame(minHeight: rowHeight)
                                 }
@@ -341,9 +404,22 @@ struct AttributesSkillsTab: View {
                                             .lineLimit(1)
                                             .minimumScaleFactor(0.5)
                                         Spacer()
-                                        Text("\(character.physicalSkills[skill] ?? 0)")
-                                            .font(.system(size: dynamicFontSize, weight: .medium))
-                                            .frame(width: 25, alignment: .center)
+                                        if isEditing {
+                                            Picker("", selection: Binding(
+                                                get: { character.physicalSkills[skill] ?? 0 },
+                                                set: { character.physicalSkills[skill] = $0 }
+                                            )) {
+                                                ForEach(0...10, id: \.self) { value in
+                                                    Text("\(value)").tag(value)
+                                                }
+                                            }
+                                            .pickerStyle(MenuPickerStyle())
+                                            .frame(width: 60)
+                                        } else {
+                                            Text("\(character.physicalSkills[skill] ?? 0)")
+                                                .font(.system(size: dynamicFontSize, weight: .medium))
+                                                .frame(width: 25, alignment: .center)
+                                        }
                                     }
                                     .frame(minHeight: rowHeight)
                                 }
@@ -364,9 +440,22 @@ struct AttributesSkillsTab: View {
                                             .lineLimit(1)
                                             .minimumScaleFactor(0.5)
                                         Spacer()
-                                        Text("\(character.socialSkills[skill] ?? 0)")
-                                            .font(.system(size: dynamicFontSize, weight: .medium))
-                                            .frame(width: 25, alignment: .center)
+                                        if isEditing {
+                                            Picker("", selection: Binding(
+                                                get: { character.socialSkills[skill] ?? 0 },
+                                                set: { character.socialSkills[skill] = $0 }
+                                            )) {
+                                                ForEach(0...10, id: \.self) { value in
+                                                    Text("\(value)").tag(value)
+                                                }
+                                            }
+                                            .pickerStyle(MenuPickerStyle())
+                                            .frame(width: 60)
+                                        } else {
+                                            Text("\(character.socialSkills[skill] ?? 0)")
+                                                .font(.system(size: dynamicFontSize, weight: .medium))
+                                                .frame(width: 25, alignment: .center)
+                                        }
                                     }
                                     .frame(minHeight: rowHeight)
                                 }
@@ -387,9 +476,22 @@ struct AttributesSkillsTab: View {
                                             .lineLimit(1)
                                             .minimumScaleFactor(0.5)
                                         Spacer()
-                                        Text("\(character.mentalSkills[skill] ?? 0)")
-                                            .font(.system(size: dynamicFontSize, weight: .medium))
-                                            .frame(width: 25, alignment: .center)
+                                        if isEditing {
+                                            Picker("", selection: Binding(
+                                                get: { character.mentalSkills[skill] ?? 0 },
+                                                set: { character.mentalSkills[skill] = $0 }
+                                            )) {
+                                                ForEach(0...10, id: \.self) { value in
+                                                    Text("\(value)").tag(value)
+                                                }
+                                            }
+                                            .pickerStyle(MenuPickerStyle())
+                                            .frame(width: 60)
+                                        } else {
+                                            Text("\(character.mentalSkills[skill] ?? 0)")
+                                                .font(.system(size: dynamicFontSize, weight: .medium))
+                                                .frame(width: 25, alignment: .center)
+                                        }
                                     }
                                     .frame(minHeight: rowHeight)
                                 }
@@ -439,8 +541,10 @@ struct AttributesSkillsTab: View {
 
 // Fourth Tab - Disciplines
 struct DisciplinesTab: View {
-    let character: Character
+    @Binding var character: Character
+    @Binding var isEditing: Bool
     @State private var dynamicFontSize: CGFloat = 16
+    @State private var showingAddDiscipline = false
     
     var body: some View {
         GeometryReader { geometry in
@@ -460,13 +564,38 @@ struct DisciplinesTab: View {
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.5)
                                 Spacer()
-                                Text("Level \(level)")
-                                    .foregroundColor(.secondary)
-                                    .font(.system(size: dynamicFontSize * 0.8))
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.6)
+                                if isEditing {
+                                    Picker("", selection: Binding(
+                                        get: { character.disciplines[discipline] ?? 0 },
+                                        set: { newValue in
+                                            if newValue == 0 {
+                                                character.disciplines.removeValue(forKey: discipline)
+                                            } else {
+                                                character.disciplines[discipline] = newValue
+                                            }
+                                        }
+                                    )) {
+                                        ForEach(0...5, id: \.self) { value in
+                                            Text("Level \(value)").tag(value)
+                                        }
+                                    }
+                                    .pickerStyle(MenuPickerStyle())
+                                } else {
+                                    Text("Level \(level)")
+                                        .foregroundColor(.secondary)
+                                        .font(.system(size: dynamicFontSize * 0.8))
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.6)
+                                }
                             }
                         }
+                    }
+                    
+                    if isEditing {
+                        Button("Add Discipline") {
+                            showingAddDiscipline = true
+                        }
+                        .foregroundColor(.accentColor)
                     }
                 }
             }
@@ -475,6 +604,9 @@ struct DisciplinesTab: View {
             }
             .onChange(of: geometry.size) { newSize in
                 calculateOptimalFontSize(for: newSize)
+            }
+            .sheet(isPresented: $showingAddDiscipline) {
+                AddDisciplineView(character: $character)
             }
         }
     }
@@ -495,7 +627,8 @@ struct DisciplinesTab: View {
 
 // Fifth Tab - Advantages and Flaws
 struct AdvantagesFlawsTab: View {
-    let character: Character
+    @Binding var character: Character
+    @Binding var isEditing: Bool
     @State private var dynamicFontSize: CGFloat = 16
     @State private var captionFontSize: CGFloat = 12
     
@@ -529,6 +662,13 @@ struct AdvantagesFlawsTab: View {
                                     .foregroundColor(.secondary)
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.6)
+                                if isEditing {
+                                    Button("Remove") {
+                                        character.advantages.removeAll { $0.id == advantage.id }
+                                    }
+                                    .font(.caption)
+                                    .foregroundColor(.red)
+                                }
                             }
                         }
                         HStack {
@@ -542,6 +682,10 @@ struct AdvantagesFlawsTab: View {
                                 .foregroundColor(.primary)
                                 .lineLimit(1)
                         }
+                    }
+                    
+                    if isEditing {
+                        EditableAdvantagesListView(selectedAdvantages: $character.advantages)
                     }
                 }
                 
@@ -572,6 +716,13 @@ struct AdvantagesFlawsTab: View {
                                     .foregroundColor(.secondary)
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.6)
+                                if isEditing {
+                                    Button("Remove") {
+                                        character.flaws.removeAll { $0.id == flaw.id }
+                                    }
+                                    .font(.caption)
+                                    .foregroundColor(.red)
+                                }
                             }
                         }
                         HStack {
@@ -586,21 +737,9 @@ struct AdvantagesFlawsTab: View {
                                 .lineLimit(1)
                         }
                     }
-                }
-                
-                if !character.advantages.isEmpty || !character.flaws.isEmpty {
-                    Section(header: Text("Net Cost")) {
-                        HStack {
-                            Text("Advantages - Flaws:")
-                                .font(.system(size: dynamicFontSize, weight: .semibold))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.6)
-                            Spacer()
-                            Text("\(character.netAdvantageFlawCost) pts")
-                                .font(.system(size: dynamicFontSize, weight: .semibold))
-                                .foregroundColor(character.netAdvantageFlawCost <= 0 ? .green : .red)
-                                .lineLimit(1)
-                        }
+                    
+                    if isEditing {
+                        EditableFlawsListView(selectedFlaws: $character.flaws)
                     }
                 }
             }
@@ -622,5 +761,70 @@ struct AdvantagesFlawsTab: View {
         
         dynamicFontSize = max(11, min(18, baseDynamicSize * scaleFactor))
         captionFontSize = max(9, min(14, baseCaptionSize * scaleFactor))
+    }
+}
+
+// Add Discipline View
+struct AddDisciplineView: View {
+    @Binding var character: Character
+    @Environment(\.dismiss) var dismiss
+    
+    var availableDisciplines: [String] {
+        V5Constants.disciplines.filter { !character.disciplines.keys.contains($0) }
+    }
+    
+    var body: some View {
+        NavigationView {
+            Form {
+                Section("Available Disciplines") {
+                    ForEach(availableDisciplines, id: \.self) { discipline in
+                        Button(discipline) {
+                            character.disciplines[discipline] = 1
+                            dismiss()
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Add Discipline")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Editable Advantages List View
+struct EditableAdvantagesListView: View {
+    @Binding var selectedAdvantages: [Advantage]
+    @State private var showingAddAdvantage = false
+    
+    var body: some View {
+        Button("Add Advantage") {
+            showingAddAdvantage = true
+        }
+        .foregroundColor(.accentColor)
+        .sheet(isPresented: $showingAddAdvantage) {
+            AddAdvantageView(selectedAdvantages: $selectedAdvantages)
+        }
+    }
+}
+
+// Editable Flaws List View
+struct EditableFlawsListView: View {
+    @Binding var selectedFlaws: [Flaw]
+    @State private var showingAddFlaw = false
+    
+    var body: some View {
+        Button("Add Flaw") {
+            showingAddFlaw = true
+        }
+        .foregroundColor(.accentColor)
+        .sheet(isPresented: $showingAddFlaw) {
+            AddFlawView(selectedFlaws: $selectedFlaws)
+        }
     }
 }
