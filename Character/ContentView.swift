@@ -19,7 +19,16 @@ struct ContentView: View {
                     NavigationLink(destination: CharacterDetailView(character: character)) {
                         VStack(alignment: .leading) {
                             Text(character.name).font(.headline)
-                            Text("\(character.clan), Gen \(character.generation)").font(.subheadline)
+                            Text("\(character.clan), Gen \(character.generation)")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            HStack {
+                                Text("BP: \(character.bloodPotency)")
+                                Text("Humanity: \(character.humanity)")
+                                Text("Hunger: \(character.hunger)")
+                            }
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                         }
                     }
                 }
