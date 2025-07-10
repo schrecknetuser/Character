@@ -95,16 +95,16 @@ struct StatusRowView: View {
             
             if let healthStates = healthStates {
                 // Sort boxes: aggravated first, then superficial, then ok
-                let sortedBoxes = healthStates.enumerated().sorted { (first, second) in
+                let sortedStates = healthStates.sorted { first, second in
                     let order: [HealthState] = [.aggravated, .superficial, .ok]
-                    let firstIndex = order.firstIndex(of: first.element) ?? order.count
-                    let secondIndex = order.firstIndex(of: second.element) ?? order.count
+                    let firstIndex = order.firstIndex(of: first) ?? order.count
+                    let secondIndex = order.firstIndex(of: second) ?? order.count
                     return firstIndex < secondIndex
                 }
                 
-                LazyVGrid(columns: Array(repeating: GridItem(.fixed(35)), count: min(10, healthStates.count)), spacing: 5) {
-                    ForEach(sortedBoxes, id: \.offset) { index, state in
-                        HealthBoxView(state: state)
+                LazyVGrid(columns: Array(repeating: GridItem(.fixed(35)), count: min(10, sortedStates.count)), spacing: 5) {
+                    ForEach(sortedStates.indices, id: \.self) { index in
+                        HealthBoxView(state: sortedStates[index])
                     }
                 }
             }

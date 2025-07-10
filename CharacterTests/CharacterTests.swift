@@ -61,6 +61,24 @@ struct CharacterTests {
         #expect(character.mentalSkills["Academics"] == 0)
     }
     
+    @Test func testHealthStateEnum() async throws {
+        // Test that health state enum has correct cases
+        let allCases = HealthState.allCases
+        #expect(allCases.contains(.ok))
+        #expect(allCases.contains(.superficial))
+        #expect(allCases.contains(.aggravated))
+        #expect(allCases.count == 3)
+    }
+    
+    @Test func testHumanityStateEnum() async throws {
+        // Test that humanity state enum has correct cases
+        let allCases = HumanityState.allCases
+        #expect(allCases.contains(.unchecked))
+        #expect(allCases.contains(.checked))
+        #expect(allCases.contains(.stained))
+        #expect(allCases.count == 3)
+    }
+    
     @Test func testV5Constants() async throws {
         // Test that we have the right number of attributes and skills
         #expect(V5Constants.physicalAttributes.count == 3)
