@@ -41,7 +41,7 @@ struct CharacterDetailView: View {
                 }
         }
         .navigationTitle(character.name)
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
@@ -52,22 +52,46 @@ struct CharacterInfoTab: View {
     var body: some View {
         Form {
             Section(header: Text("Basic Information")) {
-                Text("Name: \(character.name)")
-                    .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                HStack {
+                    Text("Name:")
+                        .fontWeight(.medium)
+                    Spacer()
+                    Text(character.name)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                }
                 if !character.chronicleName.isEmpty {
-                    Text("Chronicle: \(character.chronicleName)")
-                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                    HStack {
+                        Text("Chronicle:")
+                            .fontWeight(.medium)
+                        Spacer()
+                        Text(character.chronicleName)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                    }
                 }
             }
             
             Section(header: Text("Character Background")) {
                 if !character.ambition.isEmpty {
-                    Text("Ambition: \(character.ambition)")
-                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                    HStack {
+                        Text("Ambition:")
+                            .fontWeight(.medium)
+                        Spacer()
+                        Text(character.ambition)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                    }
                 }
                 if !character.desire.isEmpty {
-                    Text("Desire: \(character.desire)")
-                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                    HStack {
+                        Text("Desire:")
+                            .fontWeight(.medium)
+                        Spacer()
+                        Text(character.desire)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                    }
                 }
             }
             
@@ -75,11 +99,11 @@ struct CharacterInfoTab: View {
                 if character.convictions.isEmpty {
                     Text("No convictions recorded")
                         .foregroundColor(.secondary)
-                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
                 } else {
                     ForEach(character.convictions, id: \.self) { conviction in
                         Text(conviction)
-                            .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
                     }
                 }
             }
@@ -88,133 +112,141 @@ struct CharacterInfoTab: View {
                 if character.touchstones.isEmpty {
                     Text("No touchstones recorded")
                         .foregroundColor(.secondary)
-                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
                 } else {
                     ForEach(character.touchstones, id: \.self) { touchstone in
                         Text(touchstone)
-                            .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
                     }
                 }
             }
             
             Section(header: Text("Experience")) {
-                Text("Total Experience: \(character.experience)")
-                    .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-                Text("Spent Experience: \(character.spentExperience)")
-                    .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-                Text("Available Experience: \(character.experience - character.spentExperience)")
-                    .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                HStack {
+                    Text("Total Experience:")
+                        .fontWeight(.medium)
+                    Spacer()
+                    Text("\(character.experience)")
+                }
+                HStack {
+                    Text("Spent Experience:")
+                        .fontWeight(.medium)
+                    Spacer()
+                    Text("\(character.spentExperience)")
+                }
+                HStack {
+                    Text("Available Experience:")
+                        .fontWeight(.medium)
+                    Spacer()
+                    Text("\(character.experience - character.spentExperience)")
+                }
             }
         }
-        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
     }
 }
 
 // Second Tab - Status
 struct StatusTab: View {
     let character: Character
-    @ScaledMetric private var sectionSpacing: CGFloat = 20
     
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: sectionSpacing) {
-                StatusRowView(title: "Health", healthStates: character.healthStates)
-                
-                StatusRowView(title: "Willpower", healthStates: character.willpowerStates)
-                
-                StatusRowView(title: "Humanity", humanityStates: character.humanityStates)
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 30) {
+                    StatusRowView(title: "Health", healthStates: character.healthStates, availableWidth: geometry.size.width - 40)
+                    
+                    StatusRowView(title: "Willpower", healthStates: character.willpowerStates, availableWidth: geometry.size.width - 40)
+                    
+                    StatusRowView(title: "Humanity", humanityStates: character.humanityStates, availableWidth: geometry.size.width - 40)
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 20)
             }
-            .padding()
-            .padding(.top) // Extra padding to ensure safe area clearance
         }
-        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
     }
 }
 
 // Third Tab - Attributes and Skills
 struct AttributesSkillsTab: View {
     let character: Character
-    @ScaledMetric private var sectionSpacing: CGFloat = 30
-    @ScaledMetric private var columnSpacing: CGFloat = 20
-    @ScaledMetric private var rowSpacing: CGFloat = 8
-    @ScaledMetric private var headerSpacing: CGFloat = 15
-    @ScaledMetric private var valueWidth: CGFloat = 30
     
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: sectionSpacing) {
+            VStack(alignment: .leading, spacing: 30) {
                 // Attributes Section
-                VStack(alignment: .leading, spacing: headerSpacing) {
+                VStack(alignment: .leading, spacing: 15) {
                     Text("Attributes")
                         .font(.title2)
                         .fontWeight(.bold)
-                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
                     
-                    HStack(alignment: .top, spacing: columnSpacing) {
+                    HStack(alignment: .top, spacing: 20) {
                         // Physical Attributes Column
-                        VStack(alignment: .leading, spacing: rowSpacing) {
+                        VStack(alignment: .leading, spacing: 8) {
                             Text("Physical")
                                 .font(.headline)
-                                .foregroundColor(.blue)
-                                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                                .fontWeight(.semibold)
                             
                             ForEach(V5Constants.physicalAttributes, id: \.self) { attribute in
                                 HStack {
                                     Text(attribute)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                                        .font(.system(size: 14))
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.8)
+                                    Spacer()
                                     Text("\(character.physicalAttributes[attribute] ?? 0)")
-                                        .frame(width: valueWidth, alignment: .center)
-                                        .padding(.horizontal, 8)
+                                        .font(.system(size: 14, weight: .medium))
+                                        .frame(width: 25, alignment: .center)
+                                        .padding(.horizontal, 6)
                                         .background(Color.gray.opacity(0.2))
                                         .cornerRadius(4)
-                                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
                                 }
                             }
                         }
                         .frame(maxWidth: .infinity)
                         
                         // Social Attributes Column
-                        VStack(alignment: .leading, spacing: rowSpacing) {
+                        VStack(alignment: .leading, spacing: 8) {
                             Text("Social")
                                 .font(.headline)
-                                .foregroundColor(.green)
-                                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                                .fontWeight(.semibold)
                             
                             ForEach(V5Constants.socialAttributes, id: \.self) { attribute in
                                 HStack {
                                     Text(attribute)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                                        .font(.system(size: 14))
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.8)
+                                    Spacer()
                                     Text("\(character.socialAttributes[attribute] ?? 0)")
-                                        .frame(width: valueWidth, alignment: .center)
-                                        .padding(.horizontal, 8)
+                                        .font(.system(size: 14, weight: .medium))
+                                        .frame(width: 25, alignment: .center)
+                                        .padding(.horizontal, 6)
                                         .background(Color.gray.opacity(0.2))
                                         .cornerRadius(4)
-                                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
                                 }
                             }
                         }
                         .frame(maxWidth: .infinity)
                         
                         // Mental Attributes Column
-                        VStack(alignment: .leading, spacing: rowSpacing) {
+                        VStack(alignment: .leading, spacing: 8) {
                             Text("Mental")
                                 .font(.headline)
-                                .foregroundColor(.purple)
-                                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                                .fontWeight(.semibold)
                             
                             ForEach(V5Constants.mentalAttributes, id: \.self) { attribute in
                                 HStack {
                                     Text(attribute)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                                        .font(.system(size: 14))
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.8)
+                                    Spacer()
                                     Text("\(character.mentalAttributes[attribute] ?? 0)")
-                                        .frame(width: valueWidth, alignment: .center)
-                                        .padding(.horizontal, 8)
+                                        .font(.system(size: 14, weight: .medium))
+                                        .frame(width: 25, alignment: .center)
+                                        .padding(.horizontal, 6)
                                         .background(Color.gray.opacity(0.2))
                                         .cornerRadius(4)
-                                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
                                 }
                             }
                         }
@@ -223,77 +255,79 @@ struct AttributesSkillsTab: View {
                 }
                 
                 // Skills Section
-                VStack(alignment: .leading, spacing: headerSpacing) {
+                VStack(alignment: .leading, spacing: 15) {
                     Text("Skills")
                         .font(.title2)
                         .fontWeight(.bold)
-                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
                     
-                    HStack(alignment: .top, spacing: columnSpacing) {
+                    HStack(alignment: .top, spacing: 20) {
                         // Physical Skills Column
-                        VStack(alignment: .leading, spacing: rowSpacing) {
+                        VStack(alignment: .leading, spacing: 8) {
                             Text("Physical")
                                 .font(.headline)
-                                .foregroundColor(.blue)
-                                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                                .fontWeight(.semibold)
                             
                             ForEach(V5Constants.physicalSkills, id: \.self) { skill in
                                 HStack {
                                     Text(skill)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                                        .font(.system(size: 14))
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.8)
+                                    Spacer()
                                     Text("\(character.physicalSkills[skill] ?? 0)")
-                                        .frame(width: valueWidth, alignment: .center)
-                                        .padding(.horizontal, 8)
+                                        .font(.system(size: 14, weight: .medium))
+                                        .frame(width: 25, alignment: .center)
+                                        .padding(.horizontal, 6)
                                         .background(Color.gray.opacity(0.2))
                                         .cornerRadius(4)
-                                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
                                 }
                             }
                         }
                         .frame(maxWidth: .infinity)
                         
                         // Social Skills Column
-                        VStack(alignment: .leading, spacing: rowSpacing) {
+                        VStack(alignment: .leading, spacing: 8) {
                             Text("Social")
                                 .font(.headline)
-                                .foregroundColor(.green)
-                                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                                .fontWeight(.semibold)
                             
                             ForEach(V5Constants.socialSkills, id: \.self) { skill in
                                 HStack {
                                     Text(skill)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                                        .font(.system(size: 14))
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.8)
+                                    Spacer()
                                     Text("\(character.socialSkills[skill] ?? 0)")
-                                        .frame(width: valueWidth, alignment: .center)
-                                        .padding(.horizontal, 8)
+                                        .font(.system(size: 14, weight: .medium))
+                                        .frame(width: 25, alignment: .center)
+                                        .padding(.horizontal, 6)
                                         .background(Color.gray.opacity(0.2))
                                         .cornerRadius(4)
-                                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
                                 }
                             }
                         }
                         .frame(maxWidth: .infinity)
                         
                         // Mental Skills Column
-                        VStack(alignment: .leading, spacing: rowSpacing) {
+                        VStack(alignment: .leading, spacing: 8) {
                             Text("Mental")
                                 .font(.headline)
-                                .foregroundColor(.purple)
-                                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                                .fontWeight(.semibold)
                             
                             ForEach(V5Constants.mentalSkills, id: \.self) { skill in
                                 HStack {
                                     Text(skill)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                                        .font(.system(size: 14))
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.8)
+                                    Spacer()
                                     Text("\(character.mentalSkills[skill] ?? 0)")
-                                        .frame(width: valueWidth, alignment: .center)
-                                        .padding(.horizontal, 8)
+                                        .font(.system(size: 14, weight: .medium))
+                                        .frame(width: 25, alignment: .center)
+                                        .padding(.horizontal, 6)
                                         .background(Color.gray.opacity(0.2))
                                         .cornerRadius(4)
-                                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
                                 }
                             }
                         }
@@ -301,10 +335,9 @@ struct AttributesSkillsTab: View {
                     }
                 }
             }
-            .padding()
-            .padding(.top) // Extra padding to ensure safe area clearance
+            .padding(.horizontal, 20)
+            .padding(.top, 20)
         }
-        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
     }
 }
 
@@ -314,26 +347,26 @@ struct DisciplinesTab: View {
     
     var body: some View {
         Form {
-            Section(header: Text("Disciplines")) {
-                if character.disciplines.isEmpty {
-                    Text("No disciplines learned")
-                        .foregroundColor(.secondary)
-                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-                } else {
-                    ForEach(character.disciplines.sorted(by: { $0.key < $1.key }), id: \.key) { discipline, level in
-                        HStack {
-                            Text(discipline)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-                            Text("Level \(level)")
-                                .foregroundColor(.secondary)
-                                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                Section(header: Text("Disciplines")) {
+                    if character.disciplines.isEmpty {
+                        Text("No disciplines learned")
+                            .foregroundColor(.secondary)
+                    } else {
+                        ForEach(character.disciplines.sorted(by: { $0.key < $1.key }), id: \.key) { discipline, level in
+                            HStack {
+                                Text(discipline)
+                                    .lineLimit(1)
+                                    .truncationMode(.tail)
+                                Spacer()
+                                Text("Level \(level)")
+                                    .foregroundColor(.secondary)
+                                    .font(.caption)
+                            }
                         }
                     }
                 }
             }
         }
-        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
     }
 }
 
@@ -343,93 +376,83 @@ struct AdvantagesFlawsTab: View {
     
     var body: some View {
         Form {
-            Section(header: Text("Advantages")) {
-                if character.advantages.isEmpty {
-                    Text("No advantages recorded")
-                        .foregroundColor(.secondary)
-                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-                } else {
-                    ForEach(character.advantages) { advantage in
-                        HStack {
-                            Text(advantage.name)
-                                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-                            Spacer()
-                            Text("\(advantage.cost) pts")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-                            if advantage.isCustom {
-                                Text("(Custom)")
+                Section(header: Text("Advantages")) {
+                    if character.advantages.isEmpty {
+                        Text("No advantages recorded")
+                            .foregroundColor(.secondary)
+                    } else {
+                        ForEach(character.advantages) { advantage in
+                            HStack {
+                                Text(advantage.name)
+                                    .lineLimit(1)
+                                    .truncationMode(.tail)
+                                Spacer()
+                                if advantage.isCustom {
+                                    Text("(Custom)")
+                                        .font(.caption)
+                                        .foregroundColor(.orange)
+                                }
+                                Text("\(advantage.cost) pts")
                                     .font(.caption)
-                                    .foregroundColor(.orange)
-                                    .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                                    .foregroundColor(.secondary)
                             }
                         }
-                    }
-                    HStack {
-                        Text("Total Cost:")
-                            .font(.headline)
-                            .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-                        Spacer()
-                        Text("\(character.totalAdvantageCost) pts")
-                            .font(.headline)
-                            .foregroundColor(.primary)
-                            .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-                    }
-                }
-            }
-            
-            Section(header: Text("Flaws")) {
-                if character.flaws.isEmpty {
-                    Text("No flaws recorded")
-                        .foregroundColor(.secondary)
-                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-                } else {
-                    ForEach(character.flaws) { flaw in
                         HStack {
-                            Text(flaw.name)
-                                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                            Text("Total Cost:")
+                                .font(.headline)
                             Spacer()
-                            Text("\(abs(flaw.cost)) pts")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-                            if flaw.isCustom {
-                                Text("(Custom)")
-                                    .font(.caption)
-                                    .foregroundColor(.orange)
-                                    .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-                            }
+                            Text("\(character.totalAdvantageCost) pts")
+                                .font(.headline)
+                                .foregroundColor(.primary)
                         }
                     }
-                    HStack {
-                        Text("Total Value:")
-                            .font(.headline)
-                            .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-                        Spacer()
-                        Text("\(abs(character.totalFlawValue)) pts")
-                            .font(.headline)
-                            .foregroundColor(.primary)
-                            .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                }
+                
+                Section(header: Text("Flaws")) {
+                    if character.flaws.isEmpty {
+                        Text("No flaws recorded")
+                            .foregroundColor(.secondary)
+                    } else {
+                        ForEach(character.flaws) { flaw in
+                            HStack {
+                                Text(flaw.name)
+                                    .lineLimit(1)
+                                    .truncationMode(.tail)
+                                Spacer()
+                                if flaw.isCustom {
+                                    Text("(Custom)")
+                                        .font(.caption)
+                                        .foregroundColor(.orange)
+                                }
+                                Text("\(abs(flaw.cost)) pts")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        HStack {
+                            Text("Total Value:")
+                                .font(.headline)
+                            Spacer()
+                            Text("\(abs(character.totalFlawValue)) pts")
+                                .font(.headline)
+                                .foregroundColor(.primary)
+                        }
                     }
                 }
-            }
-            
-            if !character.advantages.isEmpty || !character.flaws.isEmpty {
-                Section(header: Text("Net Cost")) {
-                    HStack {
-                        Text("Advantages - Flaws:")
-                            .font(.headline)
-                            .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-                        Spacer()
-                        Text("\(character.netAdvantageFlawCost) pts")
-                            .font(.headline)
-                            .foregroundColor(character.netAdvantageFlawCost <= 0 ? .green : .red)
-                            .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                
+                if !character.advantages.isEmpty || !character.flaws.isEmpty {
+                    Section(header: Text("Net Cost")) {
+                        HStack {
+                            Text("Advantages - Flaws:")
+                                .font(.headline)
+                            Spacer()
+                            Text("\(character.netAdvantageFlawCost) pts")
+                                .font(.headline)
+                                .foregroundColor(character.netAdvantageFlawCost <= 0 ? .green : .red)
+                        }
                     }
                 }
             }
         }
-        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
     }
 }
