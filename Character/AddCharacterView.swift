@@ -422,8 +422,8 @@ struct AddCharacterView: View {
                     StringListView(items: $chronicleTenets, title: "Chronicle Tenets")
                 }
                 .onTapGesture {
-                    // Clear focus when tapping anywhere in the character traits section
-                    isNameFieldFocused = false
+                    // Clear focus from all input fields when tapping anywhere in the character traits section
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 }
 
                 Section(header: Text("Condition Tracking")) {
