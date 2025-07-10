@@ -104,17 +104,9 @@ struct StatusRowView: View {
                 .fontWeight(.semibold)
             
             if let healthStates = healthStates {
-                // Sort boxes: aggravated first, then superficial, then ok
-                let sortedStates = healthStates.sorted { first, second in
-                    let order: [HealthState] = [.aggravated, .superficial, .ok]
-                    let firstIndex = order.firstIndex(of: first) ?? order.count
-                    let secondIndex = order.firstIndex(of: second) ?? order.count
-                    return firstIndex < secondIndex
-                }
-                
                 LazyVGrid(columns: Array(repeating: GridItem(.fixed(statusBoxSize), spacing: 5), count: boxesPerRow), spacing: 5) {
-                    ForEach(sortedStates.indices, id: \.self) { index in
-                        HealthBoxView(state: sortedStates[index])
+                    ForEach(healthStates.indices, id: \.self) { index in
+                        HealthBoxView(state: healthStates[index])
                     }
                 }
             }
@@ -272,6 +264,20 @@ struct EditableStatusRowView: View {
         return adjustedStates
     }
     
+    // Helper function to reorder health states: aggravated first, then superficial, then ok
+    private func reorderHealthStates(_ states: [HealthState]) -> [HealthState] {
+        let aggravatedCount = states.filter { $0 == .aggravated }.count
+        let superficialCount = states.filter { $0 == .superficial }.count
+        let okCount = states.filter { $0 == .ok }.count
+        
+        var reorderedStates: [HealthState] = []
+        reorderedStates.append(contentsOf: Array(repeating: .aggravated, count: aggravatedCount))
+        reorderedStates.append(contentsOf: Array(repeating: .superficial, count: superficialCount))
+        reorderedStates.append(contentsOf: Array(repeating: .ok, count: okCount))
+        
+        return reorderedStates
+    }
+    
     // Superficial damage logic
     private func canDecreaseSuperficial() -> Bool {
         states.contains(.superficial)
@@ -285,22 +291,27 @@ struct EditableStatusRowView: View {
         var newStates = states
         if let index = newStates.lastIndex(of: .superficial) {
             newStates[index] = .ok
-            updateStates(newStates)
         }
+        
+        // Reorder states: aggravated first, then superficial, then ok
+        newStates = reorderHealthStates(newStates)
+        updateStates(newStates)
     }
     
     private func increaseSuperficial() {
         var newStates = states
         if let index = newStates.firstIndex(of: .ok) {
             newStates[index] = .superficial
-            updateStates(newStates)
-        } else if !states.contains(.ok) && states.contains(.superficial) {
-            // If no empty boxes, convert superficial to aggravated
+        } else if states.contains(.superficial) {
+            // If no empty boxes, convert one superficial to aggravated
             if let index = newStates.firstIndex(of: .superficial) {
                 newStates[index] = .aggravated
-                updateStates(newStates)
             }
         }
+        
+        // Reorder states: aggravated first, then superficial, then ok
+        newStates = reorderHealthStates(newStates)
+        updateStates(newStates)
     }
     
     // Aggravated damage logic
@@ -316,19 +327,24 @@ struct EditableStatusRowView: View {
         var newStates = states
         if let index = newStates.lastIndex(of: .aggravated) {
             newStates[index] = .ok
-            updateStates(newStates)
         }
+        
+        // Reorder states: aggravated first, then superficial, then ok
+        newStates = reorderHealthStates(newStates)
+        updateStates(newStates)
     }
     
     private func increaseAggravated() {
         var newStates = states
         if let index = newStates.firstIndex(of: .ok) {
             newStates[index] = .aggravated
-            updateStates(newStates)
         } else if let index = newStates.firstIndex(of: .superficial) {
             newStates[index] = .aggravated
-            updateStates(newStates)
         }
+        
+        // Reorder states: aggravated first, then superficial, then ok
+        newStates = reorderHealthStates(newStates)
+        updateStates(newStates)
     }
 }
 
@@ -423,12 +439,18 @@ struct EditableHumanityRowView: View {
         if let index = character.humanityStates.lastIndex(of: .checked) {
             character.humanityStates[index] = .unchecked
         }
+        
+        // Reorder humanity states: checked first, then stained, then unchecked
+        character.humanityStates = reorderHumanityStates(character.humanityStates)
     }
     
     private func increaseHumanity() {
-        if let index = character.humanityStates.lastIndex(of: .unchecked) {
+        if let index = character.humanityStates.firstIndex(of: .unchecked) {
             character.humanityStates[index] = .checked
         }
+        
+        // Reorder humanity states: checked first, then stained, then unchecked
+        character.humanityStates = reorderHumanityStates(character.humanityStates)
     }
     
     // Stains logic
@@ -441,14 +463,35 @@ struct EditableHumanityRowView: View {
     }
     
     private func decreaseStains() {
-        if let index = character.humanityStates.firstIndex(of: .stained) {
+        if let index = character.humanityStates.lastIndex(of: .stained) {
             character.humanityStates[index] = .unchecked
         }
+        
+        // Reorder humanity states: checked first, then stained, then unchecked
+        character.humanityStates = reorderHumanityStates(character.humanityStates)
     }
     
     private func increaseStains() {
+        // Find the rightmost unchecked box (stains are added from right to left)
         if let index = character.humanityStates.lastIndex(of: .unchecked) {
             character.humanityStates[index] = .stained
         }
+        
+        // Reorder humanity states: checked first, then stained, then unchecked
+        character.humanityStates = reorderHumanityStates(character.humanityStates)
+    }
+    
+    // Helper function to reorder humanity states: checked first, then stained, then unchecked
+    private func reorderHumanityStates(_ states: [HumanityState]) -> [HumanityState] {
+        let checkedCount = states.filter { $0 == .checked }.count
+        let stainedCount = states.filter { $0 == .stained }.count
+        let uncheckedCount = states.filter { $0 == .unchecked }.count
+        
+        var reorderedStates: [HumanityState] = []
+        reorderedStates.append(contentsOf: Array(repeating: .checked, count: checkedCount))
+        reorderedStates.append(contentsOf: Array(repeating: .stained, count: stainedCount))
+        reorderedStates.append(contentsOf: Array(repeating: .unchecked, count: uncheckedCount))
+        
+        return reorderedStates
     }
 }
