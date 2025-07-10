@@ -71,8 +71,12 @@ struct AddAdvantageView: View {
                             Text("\(advantage.cost) pts")
                                 .foregroundColor(.secondary)
                             Button("Add") {
-                                selectedAdvantages.append(advantage)
-                                dismiss()
+                                let newAdvantage = Advantage(name: advantage.name, cost: advantage.cost, isCustom: advantage.isCustom)
+                                selectedAdvantages.append(newAdvantage)
+                                // Small delay to ensure state update is processed
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    dismiss()
+                                }
                             }
                             .disabled(selectedAdvantages.contains { $0.name == advantage.name })
                         }
@@ -85,7 +89,10 @@ struct AddAdvantageView: View {
                     Button("Add Custom") {
                         let customAdvantage = Advantage(name: customName, cost: customCost, isCustom: true)
                         selectedAdvantages.append(customAdvantage)
-                        dismiss()
+                        // Small delay to ensure state update is processed
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            dismiss()
+                        }
                     }
                     .disabled(customName.isEmpty)
                 }
@@ -171,8 +178,12 @@ struct AddFlawView: View {
                             Text("\(abs(flaw.cost)) pts")
                                 .foregroundColor(.secondary)
                             Button("Add") {
-                                selectedFlaws.append(flaw)
-                                dismiss()
+                                let newFlaw = Flaw(name: flaw.name, cost: flaw.cost, isCustom: flaw.isCustom)
+                                selectedFlaws.append(newFlaw)
+                                // Small delay to ensure state update is processed
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    dismiss()
+                                }
                             }
                             .disabled(selectedFlaws.contains { $0.name == flaw.name })
                         }
@@ -185,7 +196,10 @@ struct AddFlawView: View {
                     Button("Add Custom") {
                         let customFlaw = Flaw(name: customName, cost: -customCost, isCustom: true) // Negative cost for flaws
                         selectedFlaws.append(customFlaw)
-                        dismiss()
+                        // Small delay to ensure state update is processed
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            dismiss()
+                        }
                     }
                     .disabled(customName.isEmpty)
                 }
