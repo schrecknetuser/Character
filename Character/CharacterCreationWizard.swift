@@ -293,7 +293,8 @@ struct AttributesStage: View {
                             attribute: V5Constants.physicalAttributes[rowIndex],
                             assignedValues: $assignedValues,
                             availableValues: $availableValues,
-                            characterAttributes: $character.physicalAttributes
+                            characterAttributes: $character.physicalAttributes,
+                            character: $character
                         )
                         .frame(maxWidth: .infinity)
                         
@@ -302,7 +303,8 @@ struct AttributesStage: View {
                             attribute: V5Constants.socialAttributes[rowIndex],
                             assignedValues: $assignedValues,
                             availableValues: $availableValues,
-                            characterAttributes: $character.socialAttributes
+                            characterAttributes: $character.socialAttributes,
+                            character: $character
                         )
                         .frame(maxWidth: .infinity)
                         
@@ -311,7 +313,8 @@ struct AttributesStage: View {
                             attribute: V5Constants.mentalAttributes[rowIndex],
                             assignedValues: $assignedValues,
                             availableValues: $availableValues,
-                            characterAttributes: $character.mentalAttributes
+                            characterAttributes: $character.mentalAttributes,
+                            character: $character
                         )
                         .frame(maxWidth: .infinity)
                     }
@@ -425,6 +428,7 @@ struct AttributeDropRow: View {
     @Binding var assignedValues: [String: Int]
     @Binding var availableValues: [(Int, UUID)]
     @Binding var characterAttributes: [String: Int]
+    @Binding var character: Character
     @State private var isTargeted = false
     
     var body: some View {
@@ -503,13 +507,13 @@ struct AttributeDropRow: View {
             // Dragged from another attribute - remove from source
             assignedValues.removeValue(forKey: sourceAttr)
             
-            // Reset source attribute to base value
+            // Reset source attribute to base value in the correct character attribute category
             if V5Constants.physicalAttributes.contains(sourceAttr) {
-                characterAttributes[sourceAttr] = 1
+                character.physicalAttributes[sourceAttr] = 1
             } else if V5Constants.socialAttributes.contains(sourceAttr) {
-                characterAttributes[sourceAttr] = 1
+                character.socialAttributes[sourceAttr] = 1
             } else if V5Constants.mentalAttributes.contains(sourceAttr) {
-                characterAttributes[sourceAttr] = 1
+                character.mentalAttributes[sourceAttr] = 1
             }
         } else {
             // Dragged from unassigned pool - remove from available values
