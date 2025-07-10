@@ -58,9 +58,12 @@ struct CharacterInfoTab: View {
                         Text("Name:")
                             .fontWeight(.medium)
                             .font(.system(size: dynamicFontSize))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
                         Spacer()
                         Text(character.name)
                             .font(.system(size: dynamicFontSize))
+                            .lineLimit(1)
                             .minimumScaleFactor(0.5)
                     }
                     if !character.chronicleName.isEmpty {
@@ -68,9 +71,12 @@ struct CharacterInfoTab: View {
                             Text("Chronicle:")
                                 .fontWeight(.medium)
                                 .font(.system(size: dynamicFontSize))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.6)
                             Spacer()
                             Text(character.chronicleName)
                                 .font(.system(size: dynamicFontSize))
+                                .lineLimit(1)
                                 .minimumScaleFactor(0.5)
                         }
                     }
@@ -82,9 +88,12 @@ struct CharacterInfoTab: View {
                             Text("Ambition:")
                                 .fontWeight(.medium)
                                 .font(.system(size: dynamicFontSize))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.6)
                             Spacer()
                             Text(character.ambition)
                                 .font(.system(size: dynamicFontSize))
+                                .lineLimit(1)
                                 .minimumScaleFactor(0.5)
                         }
                     }
@@ -93,9 +102,12 @@ struct CharacterInfoTab: View {
                             Text("Desire:")
                                 .fontWeight(.medium)
                                 .font(.system(size: dynamicFontSize))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.6)
                             Spacer()
                             Text(character.desire)
                                 .font(.system(size: dynamicFontSize))
+                                .lineLimit(1)
                                 .minimumScaleFactor(0.5)
                         }
                     }
@@ -106,10 +118,13 @@ struct CharacterInfoTab: View {
                         Text("No convictions recorded")
                             .foregroundColor(.secondary)
                             .font(.system(size: dynamicFontSize))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
                     } else {
                         ForEach(character.convictions, id: \.self) { conviction in
                             Text(conviction)
                                 .font(.system(size: dynamicFontSize))
+                                .lineLimit(2)
                                 .minimumScaleFactor(0.5)
                         }
                     }
@@ -120,10 +135,13 @@ struct CharacterInfoTab: View {
                         Text("No touchstones recorded")
                             .foregroundColor(.secondary)
                             .font(.system(size: dynamicFontSize))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
                     } else {
                         ForEach(character.touchstones, id: \.self) { touchstone in
                             Text(touchstone)
                                 .font(.system(size: dynamicFontSize))
+                                .lineLimit(2)
                                 .minimumScaleFactor(0.5)
                         }
                     }
@@ -134,25 +152,34 @@ struct CharacterInfoTab: View {
                         Text("Total Experience:")
                             .fontWeight(.medium)
                             .font(.system(size: dynamicFontSize))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
                         Spacer()
                         Text("\(character.experience)")
                             .font(.system(size: dynamicFontSize))
+                            .lineLimit(1)
                     }
                     HStack {
                         Text("Spent Experience:")
                             .fontWeight(.medium)
                             .font(.system(size: dynamicFontSize))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
                         Spacer()
                         Text("\(character.spentExperience)")
                             .font(.system(size: dynamicFontSize))
+                            .lineLimit(1)
                     }
                     HStack {
                         Text("Available Experience:")
                             .fontWeight(.medium)
                             .font(.system(size: dynamicFontSize))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
                         Spacer()
                         Text("\(character.experience - character.spentExperience)")
                             .font(.system(size: dynamicFontSize))
+                            .lineLimit(1)
                     }
                 }
             }
@@ -166,13 +193,13 @@ struct CharacterInfoTab: View {
     }
     
     private func calculateOptimalFontSize(for size: CGSize) {
-        // Calculate based on screen width - smaller screens get smaller text
+        // Calculate based on screen width with more conservative scaling
         let baseSize: CGFloat = 16
-        let minSize: CGFloat = 12
+        let minSize: CGFloat = 11
         let maxSize: CGFloat = 18
         
         // Scale font size based on available width
-        let scaleFactor = size.width / 375 // iPhone standard width
+        let scaleFactor = min(1.2, size.width / 375) // iPhone standard width, cap at 1.2x
         let calculatedSize = baseSize * scaleFactor
         
         dynamicFontSize = max(minSize, min(maxSize, calculatedSize))
@@ -206,6 +233,7 @@ struct AttributesSkillsTab: View {
     @State private var dynamicFontSize: CGFloat = 14
     @State private var titleFontSize: CGFloat = 20
     @State private var headerFontSize: CGFloat = 17
+    @State private var rowHeight: CGFloat = 20
     
     var body: some View {
         GeometryReader { geometry in
@@ -215,25 +243,29 @@ struct AttributesSkillsTab: View {
                     VStack(alignment: .leading, spacing: 15) {
                         Text("Attributes")
                             .font(.system(size: titleFontSize, weight: .bold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
                         
                         HStack(alignment: .top, spacing: 20) {
                             // Physical Attributes Column
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Physical")
                                     .font(.system(size: headerFontSize, weight: .semibold))
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.7)
                                 
                                 ForEach(V5Constants.physicalAttributes, id: \.self) { attribute in
                                     HStack {
                                         Text(attribute)
                                             .font(.system(size: dynamicFontSize))
+                                            .lineLimit(1)
                                             .minimumScaleFactor(0.5)
                                         Spacer()
                                         Text("\(character.physicalAttributes[attribute] ?? 0)")
                                             .font(.system(size: dynamicFontSize, weight: .medium))
                                             .frame(width: 25, alignment: .center)
-                                            .padding(.horizontal, 6)
-                                            .cornerRadius(4)
                                     }
+                                    .frame(minHeight: rowHeight)
                                 }
                             }
                             .frame(maxWidth: .infinity)
@@ -242,19 +274,21 @@ struct AttributesSkillsTab: View {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Social")
                                     .font(.system(size: headerFontSize, weight: .semibold))
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.7)
                                 
                                 ForEach(V5Constants.socialAttributes, id: \.self) { attribute in
                                     HStack {
                                         Text(attribute)
                                             .font(.system(size: dynamicFontSize))
+                                            .lineLimit(1)
                                             .minimumScaleFactor(0.5)
                                         Spacer()
                                         Text("\(character.socialAttributes[attribute] ?? 0)")
                                             .font(.system(size: dynamicFontSize, weight: .medium))
                                             .frame(width: 25, alignment: .center)
-                                            .padding(.horizontal, 6)
-                                            .cornerRadius(4)
                                     }
+                                    .frame(minHeight: rowHeight)
                                 }
                             }
                             .frame(maxWidth: .infinity)
@@ -263,19 +297,21 @@ struct AttributesSkillsTab: View {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Mental")
                                     .font(.system(size: headerFontSize, weight: .semibold))
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.7)
                                 
                                 ForEach(V5Constants.mentalAttributes, id: \.self) { attribute in
                                     HStack {
                                         Text(attribute)
                                             .font(.system(size: dynamicFontSize))
+                                            .lineLimit(1)
                                             .minimumScaleFactor(0.5)
                                         Spacer()
                                         Text("\(character.mentalAttributes[attribute] ?? 0)")
                                             .font(.system(size: dynamicFontSize, weight: .medium))
                                             .frame(width: 25, alignment: .center)
-                                            .padding(.horizontal, 6)
-                                            .cornerRadius(4)
                                     }
+                                    .frame(minHeight: rowHeight)
                                 }
                             }
                             .frame(maxWidth: .infinity)
@@ -286,25 +322,29 @@ struct AttributesSkillsTab: View {
                     VStack(alignment: .leading, spacing: 15) {
                         Text("Skills")
                             .font(.system(size: titleFontSize, weight: .bold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
                         
                         HStack(alignment: .top, spacing: 20) {
                             // Physical Skills Column
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Physical")
                                     .font(.system(size: headerFontSize, weight: .semibold))
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.7)
                                 
                                 ForEach(V5Constants.physicalSkills, id: \.self) { skill in
                                     HStack {
                                         Text(skill)
                                             .font(.system(size: dynamicFontSize))
+                                            .lineLimit(1)
                                             .minimumScaleFactor(0.5)
                                         Spacer()
                                         Text("\(character.physicalSkills[skill] ?? 0)")
                                             .font(.system(size: dynamicFontSize, weight: .medium))
                                             .frame(width: 25, alignment: .center)
-                                            .padding(.horizontal, 6)
-                                            .cornerRadius(4)
                                     }
+                                    .frame(minHeight: rowHeight)
                                 }
                             }
                             .frame(maxWidth: .infinity)
@@ -313,19 +353,21 @@ struct AttributesSkillsTab: View {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Social")
                                     .font(.system(size: headerFontSize, weight: .semibold))
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.7)
                                 
                                 ForEach(V5Constants.socialSkills, id: \.self) { skill in
                                     HStack {
                                         Text(skill)
                                             .font(.system(size: dynamicFontSize))
+                                            .lineLimit(1)
                                             .minimumScaleFactor(0.5)
                                         Spacer()
                                         Text("\(character.socialSkills[skill] ?? 0)")
                                             .font(.system(size: dynamicFontSize, weight: .medium))
                                             .frame(width: 25, alignment: .center)
-                                            .padding(.horizontal, 6)
-                                            .cornerRadius(4)
                                     }
+                                    .frame(minHeight: rowHeight)
                                 }
                             }
                             .frame(maxWidth: .infinity)
@@ -334,19 +376,21 @@ struct AttributesSkillsTab: View {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Mental")
                                     .font(.system(size: headerFontSize, weight: .semibold))
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.7)
                                 
                                 ForEach(V5Constants.mentalSkills, id: \.self) { skill in
                                     HStack {
                                         Text(skill)
                                             .font(.system(size: dynamicFontSize))
+                                            .lineLimit(1)
                                             .minimumScaleFactor(0.5)
                                         Spacer()
                                         Text("\(character.mentalSkills[skill] ?? 0)")
                                             .font(.system(size: dynamicFontSize, weight: .medium))
                                             .frame(width: 25, alignment: .center)
-                                            .padding(.horizontal, 6)
-                                            .cornerRadius(4)
                                     }
+                                    .frame(minHeight: rowHeight)
                                 }
                             }
                             .frame(maxWidth: .infinity)
@@ -366,18 +410,25 @@ struct AttributesSkillsTab: View {
     }
     
     private func calculateOptimalFontSizes(for size: CGSize) {
-        // Calculate based on screen width - smaller screens get smaller text
-        let scaleFactor = size.width / 375 // iPhone standard width
+        // Calculate based on screen width and available space
+        let availableWidth = (size.width - 80) / 3 // Account for padding and 3 columns
         
-        // Base font sizes
+        // Determine optimal font size based on available width per column
+        // Base calculations on fitting longest skill names
+        let longestText = "Intimidation" // One of the longest skill names
+        let scaleFactor = min(1.0, availableWidth / (longestText.count * 8)) // Rough character width estimate
+        
+        // Base font sizes adjusted for actual content
         let baseDynamicSize: CGFloat = 14
         let baseTitleSize: CGFloat = 20
         let baseHeaderSize: CGFloat = 17
+        let baseRowHeight: CGFloat = 20
         
-        // Calculate scaled sizes
-        dynamicFontSize = max(10, min(16, baseDynamicSize * scaleFactor))
-        titleFontSize = max(16, min(24, baseTitleSize * scaleFactor))
-        headerFontSize = max(14, min(20, baseHeaderSize * scaleFactor))
+        // Calculate scaled sizes with more conservative scaling
+        dynamicFontSize = max(9, min(16, baseDynamicSize * scaleFactor))
+        titleFontSize = max(14, min(24, baseTitleSize * scaleFactor))
+        headerFontSize = max(12, min(20, baseHeaderSize * scaleFactor))
+        rowHeight = max(16, min(24, baseRowHeight * scaleFactor))
     }
 }
 
@@ -394,16 +445,21 @@ struct DisciplinesTab: View {
                         Text("No disciplines learned")
                             .foregroundColor(.secondary)
                             .font(.system(size: dynamicFontSize))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
                     } else {
                         ForEach(character.disciplines.sorted(by: { $0.key < $1.key }), id: \.key) { discipline, level in
                             HStack {
                                 Text(discipline)
                                     .font(.system(size: dynamicFontSize))
+                                    .lineLimit(1)
                                     .minimumScaleFactor(0.5)
                                 Spacer()
                                 Text("Level \(level)")
                                     .foregroundColor(.secondary)
                                     .font(.system(size: dynamicFontSize * 0.8))
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.6)
                             }
                         }
                     }
@@ -419,13 +475,13 @@ struct DisciplinesTab: View {
     }
     
     private func calculateOptimalFontSize(for size: CGSize) {
-        // Calculate based on screen width - smaller screens get smaller text
+        // Calculate based on screen width with more conservative scaling
         let baseSize: CGFloat = 16
-        let minSize: CGFloat = 12
+        let minSize: CGFloat = 11
         let maxSize: CGFloat = 18
         
         // Scale font size based on available width
-        let scaleFactor = size.width / 375 // iPhone standard width
+        let scaleFactor = min(1.2, size.width / 375) // iPhone standard width, cap at 1.2x
         let calculatedSize = baseSize * scaleFactor
         
         dynamicFontSize = max(minSize, min(maxSize, calculatedSize))
@@ -446,30 +502,40 @@ struct AdvantagesFlawsTab: View {
                         Text("No advantages recorded")
                             .foregroundColor(.secondary)
                             .font(.system(size: dynamicFontSize))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
                     } else {
                         ForEach(character.advantages) { advantage in
                             HStack {
                                 Text(advantage.name)
                                     .font(.system(size: dynamicFontSize))
+                                    .lineLimit(1)
                                     .minimumScaleFactor(0.5)
                                 Spacer()
                                 if advantage.isCustom {
                                     Text("(Custom)")
                                         .font(.system(size: captionFontSize))
                                         .foregroundColor(.orange)
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.6)
                                 }
                                 Text("\(advantage.cost) pts")
                                     .font(.system(size: captionFontSize))
                                     .foregroundColor(.secondary)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.6)
                             }
                         }
                         HStack {
                             Text("Total Cost:")
                                 .font(.system(size: dynamicFontSize, weight: .semibold))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.6)
                             Spacer()
                             Text("\(character.totalAdvantageCost) pts")
                                 .font(.system(size: dynamicFontSize, weight: .semibold))
                                 .foregroundColor(.primary)
+                                .lineLimit(1)
                         }
                     }
                 }
@@ -479,30 +545,40 @@ struct AdvantagesFlawsTab: View {
                         Text("No flaws recorded")
                             .foregroundColor(.secondary)
                             .font(.system(size: dynamicFontSize))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
                     } else {
                         ForEach(character.flaws) { flaw in
                             HStack {
                                 Text(flaw.name)
                                     .font(.system(size: dynamicFontSize))
+                                    .lineLimit(1)
                                     .minimumScaleFactor(0.5)
                                 Spacer()
                                 if flaw.isCustom {
                                     Text("(Custom)")
                                         .font(.system(size: captionFontSize))
                                         .foregroundColor(.orange)
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.6)
                                 }
                                 Text("\(abs(flaw.cost)) pts")
                                     .font(.system(size: captionFontSize))
                                     .foregroundColor(.secondary)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.6)
                             }
                         }
                         HStack {
                             Text("Total Value:")
                                 .font(.system(size: dynamicFontSize, weight: .semibold))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.6)
                             Spacer()
                             Text("\(abs(character.totalFlawValue)) pts")
                                 .font(.system(size: dynamicFontSize, weight: .semibold))
                                 .foregroundColor(.primary)
+                                .lineLimit(1)
                         }
                     }
                 }
@@ -512,10 +588,13 @@ struct AdvantagesFlawsTab: View {
                         HStack {
                             Text("Advantages - Flaws:")
                                 .font(.system(size: dynamicFontSize, weight: .semibold))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.6)
                             Spacer()
                             Text("\(character.netAdvantageFlawCost) pts")
                                 .font(.system(size: dynamicFontSize, weight: .semibold))
                                 .foregroundColor(character.netAdvantageFlawCost <= 0 ? .green : .red)
+                                .lineLimit(1)
                         }
                     }
                 }
@@ -530,13 +609,13 @@ struct AdvantagesFlawsTab: View {
     }
     
     private func calculateOptimalFontSizes(for size: CGSize) {
-        // Calculate based on screen width - smaller screens get smaller text
-        let scaleFactor = size.width / 375 // iPhone standard width
+        // Calculate based on screen width with more conservative scaling
+        let scaleFactor = min(1.2, size.width / 375) // iPhone standard width, cap at 1.2x
         
         let baseDynamicSize: CGFloat = 16
         let baseCaptionSize: CGFloat = 12
         
-        dynamicFontSize = max(12, min(18, baseDynamicSize * scaleFactor))
-        captionFontSize = max(10, min(14, baseCaptionSize * scaleFactor))
+        dynamicFontSize = max(11, min(18, baseDynamicSize * scaleFactor))
+        captionFontSize = max(9, min(14, baseCaptionSize * scaleFactor))
     }
 }
