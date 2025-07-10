@@ -61,14 +61,66 @@ struct CharacterDetailView: View {
             }
 
             Section(header: Text("Advantages")) {
-                ForEach(character.advantages, id: \.self) { adv in
-                    Text(adv)
+                ForEach(character.advantages) { advantage in
+                    HStack {
+                        Text(advantage.name)
+                        Spacer()
+                        Text("\(advantage.cost) pts")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        if advantage.isCustom {
+                            Text("(Custom)")
+                                .font(.caption)
+                                .foregroundColor(.orange)
+                        }
+                    }
+                }
+                if !character.advantages.isEmpty {
+                    HStack {
+                        Text("Total Cost:")
+                            .font(.headline)
+                        Spacer()
+                        Text("\(character.totalAdvantageCost) pts")
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                    }
                 }
             }
 
             Section(header: Text("Flaws")) {
-                ForEach(character.flaws, id: \.self) { flaw in
-                    Text(flaw)
+                ForEach(character.flaws) { flaw in
+                    HStack {
+                        Text(flaw.name)
+                        Spacer()
+                        Text("\(abs(flaw.cost)) pts")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        if flaw.isCustom {
+                            Text("(Custom)")
+                                .font(.caption)
+                                .foregroundColor(.orange)
+                        }
+                    }
+                }
+                if !character.flaws.isEmpty {
+                    HStack {
+                        Text("Total Value:")
+                            .font(.headline)
+                        Spacer()
+                        Text("\(abs(character.totalFlawValue)) pts")
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                    }
+                }
+                if !character.advantages.isEmpty || !character.flaws.isEmpty {
+                    HStack {
+                        Text("Net Cost:")
+                            .font(.headline)
+                        Spacer()
+                        Text("\(character.netAdvantageFlawCost) pts")
+                            .font(.headline)
+                            .foregroundColor(character.netAdvantageFlawCost <= 0 ? .green : .red)
+                    }
                 }
             }
             

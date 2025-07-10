@@ -1,5 +1,233 @@
 import SwiftUI
 
+// Helper view for managing advantages list
+struct AdvantagesListView: View {
+    @Binding var selectedAdvantages: [Advantage]
+    @State private var showingAddAdvantage = false
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            HStack {
+                Text("Advantages")
+                    .font(.headline)
+                Spacer()
+                Text("Total Cost: \(selectedAdvantages.reduce(0) { $0 + $1.cost })")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            
+            ForEach(selectedAdvantages) { advantage in
+                HStack {
+                    Text(advantage.name)
+                    Spacer()
+                    Text("\(advantage.cost) pts")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Button("Remove") {
+                        selectedAdvantages.removeAll { $0.id == advantage.id }
+                    }
+                    .font(.caption)
+                    .foregroundColor(.red)
+                }
+            }
+            
+            Button("Add Advantage") {
+                showingAddAdvantage = true
+            }
+            .foregroundColor(.accentColor)
+        }
+        .sheet(isPresented: $showingAddAdvantage) {
+            AddAdvantageView(selectedAdvantages: $selectedAdvantages)
+        }
+    }
+}
+
+// Helper view for adding advantages
+struct AddAdvantageView: View {
+    @Binding var selectedAdvantages: [Advantage]
+    @Environment(\.dismiss) var dismiss
+    @State private var selectedPredefined: Advantage?
+    @State private var customName = ""
+    @State private var customCost = 1
+    @State private var isCustom = false
+    
+    var body: some View {
+        NavigationView {
+            Form {
+                Section("Predefined Advantages") {
+                    ForEach(V5Constants.predefinedAdvantages) { advantage in
+                        HStack {
+                            Text(advantage.name)
+                            Spacer()
+                            Text("\(advantage.cost) pts")
+                                .foregroundColor(.secondary)
+                            Button("Add") {
+                                selectedAdvantages.append(advantage)
+                                dismiss()
+                            }
+                            .disabled(selectedAdvantages.contains { $0.name == advantage.name })
+                        }
+                    }
+                }
+                
+                Section("Custom Advantage") {
+                    TextField("Name", text: $customName)
+                    Stepper("Cost: \(customCost)", value: $customCost, in: 1...10)
+                    Button("Add Custom") {
+                        let customAdvantage = Advantage(name: customName, cost: customCost, isCustom: true)
+                        selectedAdvantages.append(customAdvantage)
+                        dismiss()
+                    }
+                    .disabled(customName.isEmpty)
+                }
+            }
+            .navigationTitle("Add Advantage")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Helper view for managing flaws list
+struct FlawsListView: View {
+    @Binding var selectedFlaws: [Flaw]
+    @State private var showingAddFlaw = false
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            HStack {
+                Text("Flaws")
+                    .font(.headline)
+                Spacer()
+                Text("Total Value: \(abs(selectedFlaws.reduce(0) { $0 + $1.cost })) pts")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            
+            ForEach(selectedFlaws) { flaw in
+                HStack {
+                    Text(flaw.name)
+                    Spacer()
+                    Text("\(abs(flaw.cost)) pts")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Button("Remove") {
+                        selectedFlaws.removeAll { $0.id == flaw.id }
+                    }
+                    .font(.caption)
+                    .foregroundColor(.red)
+                }
+            }
+            
+            Button("Add Flaw") {
+                showingAddFlaw = true
+            }
+            .foregroundColor(.accentColor)
+        }
+        .sheet(isPresented: $showingAddFlaw) {
+            AddFlawView(selectedFlaws: $selectedFlaws)
+        }
+    }
+}
+
+// Helper view for adding flaws
+struct AddFlawView: View {
+    @Binding var selectedFlaws: [Flaw]
+    @Environment(\.dismiss) var dismiss
+    @State private var customName = ""
+    @State private var customCost = 1
+    
+    var body: some View {
+        NavigationView {
+            Form {
+                Section("Predefined Flaws") {
+                    ForEach(V5Constants.predefinedFlaws) { flaw in
+                        HStack {
+                            Text(flaw.name)
+                            Spacer()
+                            Text("\(abs(flaw.cost)) pts")
+                                .foregroundColor(.secondary)
+                            Button("Add") {
+                                selectedFlaws.append(flaw)
+                                dismiss()
+                            }
+                            .disabled(selectedFlaws.contains { $0.name == flaw.name })
+                        }
+                    }
+                }
+                
+                Section("Custom Flaw") {
+                    TextField("Name", text: $customName)
+                    Stepper("Value: \(customCost)", value: $customCost, in: 1...10)
+                    Button("Add Custom") {
+                        let customFlaw = Flaw(name: customName, cost: -customCost, isCustom: true) // Negative cost for flaws
+                        selectedFlaws.append(customFlaw)
+                        dismiss()
+                    }
+                    .disabled(customName.isEmpty)
+                }
+            }
+            .navigationTitle("Add Flaw")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Helper view for managing string lists (convictions, touchstones, etc.)
+struct StringListView: View {
+    @Binding var items: [String]
+    let title: String
+    @State private var newItem = ""
+    @State private var showingAdd = false
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(title)
+                .font(.headline)
+            
+            ForEach(Array(items.enumerated()), id: \.offset) { index, item in
+                HStack {
+                    Text(item)
+                    Spacer()
+                    Button("Remove") {
+                        items.remove(at: index)
+                    }
+                    .font(.caption)
+                    .foregroundColor(.red)
+                }
+            }
+            
+            Button("Add \(title.dropLast().description)") {
+                showingAdd = true
+            }
+            .foregroundColor(.accentColor)
+        }
+        .alert("Add \(title.dropLast().description)", isPresented: $showingAdd) {
+            TextField("Enter text", text: $newItem)
+            Button("Add") {
+                if !newItem.isEmpty {
+                    items.append(newItem)
+                    newItem = ""
+                }
+            }
+            Button("Cancel", role: .cancel) {
+                newItem = ""
+            }
+        }
+    }
+}
+
 struct AddCharacterView: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var store: CharacterStore
@@ -28,11 +256,11 @@ struct AddCharacterView: View {
     @State private var selectedDisciplines: [String: Int] = [:]
     
     // V5 Character Traits
-    @State private var advantagesText = ""
-    @State private var flawsText = ""
-    @State private var convictionsText = ""
-    @State private var touchstonesText = ""
-    @State private var chronicleTenetsText = ""
+    @State private var selectedAdvantages: [Advantage] = []
+    @State private var selectedFlaws: [Flaw] = []
+    @State private var convictions: [String] = []
+    @State private var touchstones: [String] = []
+    @State private var chronicleTenets: [String] = []
     
     // V5 Condition Tracking
     @State private var hunger = 1
@@ -138,16 +366,15 @@ struct AddCharacterView: View {
                 }
 
                 Section(header: Text("Character Traits")) {
-                    TextField("Advantages (comma-separated)", text: $advantagesText, axis: .vertical)
-                        .lineLimit(2...4)
-                    TextField("Flaws (comma-separated)", text: $flawsText, axis: .vertical)
-                        .lineLimit(2...4)
-                    TextField("Convictions (comma-separated)", text: $convictionsText, axis: .vertical)
-                        .lineLimit(2...4)
-                    TextField("Touchstones (comma-separated)", text: $touchstonesText, axis: .vertical)
-                        .lineLimit(2...4)
-                    TextField("Chronicle Tenets (comma-separated)", text: $chronicleTenetsText, axis: .vertical)
-                        .lineLimit(2...4)
+                    AdvantagesListView(selectedAdvantages: $selectedAdvantages)
+                    Divider()
+                    FlawsListView(selectedFlaws: $selectedFlaws)
+                    Divider()
+                    StringListView(items: $convictions, title: "Convictions")
+                    Divider()
+                    StringListView(items: $touchstones, title: "Touchstones")
+                    Divider()
+                    StringListView(items: $chronicleTenets, title: "Chronicle Tenets")
                 }
 
                 Section(header: Text("Condition Tracking")) {
@@ -174,11 +401,11 @@ struct AddCharacterView: View {
                             willpower: willpower,
                             experience: experience,
                             disciplines: selectedDisciplines.filter { $0.value > 0 },
-                            advantages: advantagesText.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty },
-                            flaws: flawsText.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty },
-                            convictions: convictionsText.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty },
-                            touchstones: touchstonesText.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty },
-                            chronicleTenets: chronicleTenetsText.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty },
+                            advantages: selectedAdvantages,
+                            flaws: selectedFlaws,
+                            convictions: convictions,
+                            touchstones: touchstones,
+                            chronicleTenets: chronicleTenets,
                             hunger: hunger,
                             health: health
                         )
