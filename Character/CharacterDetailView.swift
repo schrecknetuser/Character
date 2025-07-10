@@ -343,16 +343,17 @@ struct AttributesSkillsTab: View {
                         Text("Attributes")
                             .font(.system(size: titleFontSize, weight: .bold))
                         
-                        HStack(alignment: .top, spacing: 20) {
+                        HStack(alignment: .top, spacing: 12) {
                             // Physical Attributes Column
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Physical")
                                     .font(.system(size: headerFontSize, weight: .semibold))
                                 
                                 ForEach(V5Constants.physicalAttributes, id: \.self) { attribute in
-                                    HStack {
+                                    HStack(spacing: 6) {
                                         Text(attribute)
                                             .font(.system(size: dynamicFontSize))
+                                            .lineLimit(1)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -366,7 +367,7 @@ struct AttributesSkillsTab: View {
                                                 }
                                             }
                                             .pickerStyle(MenuPickerStyle())
-                                            .frame(width: 80)
+                                            .frame(width: 55)
                                             .clipped()
                                         } else {
                                             Text("\(character.physicalAttributes[attribute] ?? 0)")
@@ -385,9 +386,10 @@ struct AttributesSkillsTab: View {
                                     .font(.system(size: headerFontSize, weight: .semibold))
                                 
                                 ForEach(V5Constants.socialAttributes, id: \.self) { attribute in
-                                    HStack {
+                                    HStack(spacing: 6) {
                                         Text(attribute)
                                             .font(.system(size: dynamicFontSize))
+                                            .lineLimit(1)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -401,7 +403,7 @@ struct AttributesSkillsTab: View {
                                                 }
                                             }
                                             .pickerStyle(MenuPickerStyle())
-                                            .frame(width: 80)
+                                            .frame(width: 55)
                                             .clipped()
                                         } else {
                                             Text("\(character.socialAttributes[attribute] ?? 0)")
@@ -420,9 +422,10 @@ struct AttributesSkillsTab: View {
                                     .font(.system(size: headerFontSize, weight: .semibold))
                                 
                                 ForEach(V5Constants.mentalAttributes, id: \.self) { attribute in
-                                    HStack {
+                                    HStack(spacing: 6) {
                                         Text(attribute)
                                             .font(.system(size: dynamicFontSize))
+                                            .lineLimit(1)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -436,7 +439,7 @@ struct AttributesSkillsTab: View {
                                                 }
                                             }
                                             .pickerStyle(MenuPickerStyle())
-                                            .frame(width: 80)
+                                            .frame(width: 55)
                                             .clipped()
                                         } else {
                                             Text("\(character.mentalAttributes[attribute] ?? 0)")
@@ -456,16 +459,17 @@ struct AttributesSkillsTab: View {
                         Text("Skills")
                             .font(.system(size: titleFontSize, weight: .bold))
                         
-                        HStack(alignment: .top, spacing: 20) {
+                        HStack(alignment: .top, spacing: 12) {
                             // Physical Skills Column
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Physical")
                                     .font(.system(size: headerFontSize, weight: .semibold))
                                 
                                 ForEach(V5Constants.physicalSkills, id: \.self) { skill in
-                                    HStack {
+                                    HStack(spacing: 6) {
                                         Text(skill)
                                             .font(.system(size: dynamicFontSize))
+                                            .lineLimit(1)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -479,7 +483,7 @@ struct AttributesSkillsTab: View {
                                                 }
                                             }
                                             .pickerStyle(MenuPickerStyle())
-                                            .frame(width: 80)
+                                            .frame(width: 55)
                                             .clipped()
                                         } else {
                                             Text("\(character.physicalSkills[skill] ?? 0)")
@@ -498,9 +502,10 @@ struct AttributesSkillsTab: View {
                                     .font(.system(size: headerFontSize, weight: .semibold))
                                 
                                 ForEach(V5Constants.socialSkills, id: \.self) { skill in
-                                    HStack {
+                                    HStack(spacing: 6) {
                                         Text(skill)
                                             .font(.system(size: dynamicFontSize))
+                                            .lineLimit(1)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -514,7 +519,7 @@ struct AttributesSkillsTab: View {
                                                 }
                                             }
                                             .pickerStyle(MenuPickerStyle())
-                                            .frame(width: 80)
+                                            .frame(width: 55)
                                             .clipped()
                                         } else {
                                             Text("\(character.socialSkills[skill] ?? 0)")
@@ -533,9 +538,10 @@ struct AttributesSkillsTab: View {
                                     .font(.system(size: headerFontSize, weight: .semibold))
                                 
                                 ForEach(V5Constants.mentalSkills, id: \.self) { skill in
-                                    HStack {
+                                    HStack(spacing: 6) {
                                         Text(skill)
                                             .font(.system(size: dynamicFontSize))
+                                            .lineLimit(1)
                                         Spacer()
                                         if isEditing {
                                             Picker("", selection: Binding(
@@ -549,7 +555,7 @@ struct AttributesSkillsTab: View {
                                                 }
                                             }
                                             .pickerStyle(MenuPickerStyle())
-                                            .frame(width: 80)
+                                            .frame(width: 55)
                                             .clipped()
                                         } else {
                                             Text("\(character.mentalSkills[skill] ?? 0)")
