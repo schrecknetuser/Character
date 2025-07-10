@@ -4,97 +4,93 @@ struct CharacterDetailView: View {
     var character: Character
 
     var body: some View {
+        TabView {
+            // First Tab - Character Information
+            CharacterInfoTab(character: character)
+                .tabItem {
+                    Image(systemName: "person.fill")
+                    Text("Character")
+                }
+            
+            // Second Tab - Status
+            StatusTab(character: character)
+                .tabItem {
+                    Image(systemName: "heart.fill")
+                    Text("Status")
+                }
+        }
+        .navigationTitle(character.name)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+// First Tab - Character Information
+struct CharacterInfoTab: View {
+    let character: Character
+    
+    var body: some View {
         Form {
             Section(header: Text("Basic Information")) {
                 Text("Name: \(character.name)")
-                Text("Clan: \(character.clan)")
-                Text("Generation: \(character.generation)")
-            }
-            
-            Section(header: Text("Core Traits")) {
-                Text("Blood Potency: \(character.bloodPotency)")
-                Text("Humanity: \(character.humanity)")
-                Text("Willpower: \(character.willpower)")
-                Text("Experience: \(character.experience)")
-            }
-
-            Section(header: Text("Physical Attributes")) {
-                ForEach(character.physicalAttributes.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
-                    Text("\(key): \(value)")
+                if !character.chronicleName.isEmpty {
+                    Text("Chronicle: \(character.chronicleName)")
                 }
             }
             
-            Section(header: Text("Social Attributes")) {
-                ForEach(character.socialAttributes.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
-                    Text("\(key): \(value)")
+            Section(header: Text("Character Background")) {
+                if !character.ambition.isEmpty {
+                    Text("Ambition: \(character.ambition)")
                 }
-            }
-            
-            Section(header: Text("Mental Attributes")) {
-                ForEach(character.mentalAttributes.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
-                    Text("\(key): \(value)")
-                }
-            }
-            
-            Section(header: Text("Physical Skills")) {
-                ForEach(character.physicalSkills.filter { $0.value > 0 }.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
-                    Text("\(key): \(value)")
-                }
-            }
-            
-            Section(header: Text("Social Skills")) {
-                ForEach(character.socialSkills.filter { $0.value > 0 }.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
-                    Text("\(key): \(value)")
-                }
-            }
-            
-            Section(header: Text("Mental Skills")) {
-                ForEach(character.mentalSkills.filter { $0.value > 0 }.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
-                    Text("\(key): \(value)")
-                }
-            }
-
-            Section(header: Text("Disciplines")) {
-                ForEach(character.disciplines.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
-                    Text("\(key): \(value)")
-                }
-            }
-
-            Section(header: Text("Advantages")) {
-                ForEach(character.advantages, id: \.self) { adv in
-                    Text(adv)
-                }
-            }
-
-            Section(header: Text("Flaws")) {
-                ForEach(character.flaws, id: \.self) { flaw in
-                    Text(flaw)
+                if !character.desire.isEmpty {
+                    Text("Desire: \(character.desire)")
                 }
             }
             
             Section(header: Text("Convictions")) {
-                ForEach(character.convictions, id: \.self) { conviction in
-                    Text(conviction)
+                if character.convictions.isEmpty {
+                    Text("No convictions recorded")
+                        .foregroundColor(.secondary)
+                } else {
+                    ForEach(character.convictions, id: \.self) { conviction in
+                        Text(conviction)
+                    }
                 }
             }
             
             Section(header: Text("Touchstones")) {
-                ForEach(character.touchstones, id: \.self) { touchstone in
-                    Text(touchstone)
+                if character.touchstones.isEmpty {
+                    Text("No touchstones recorded")
+                        .foregroundColor(.secondary)
+                } else {
+                    ForEach(character.touchstones, id: \.self) { touchstone in
+                        Text(touchstone)
+                    }
                 }
             }
             
-            Section(header: Text("Chronicle Tenets")) {
-                ForEach(character.chronicleTenets, id: \.self) { tenet in
-                    Text(tenet)
-                }
-            }
-
-            Section(header: Text("Condition Tracking")) {
-                Text("Hunger: \(character.hunger)")
-                Text("Health: \(character.health)")
+            Section(header: Text("Experience")) {
+                Text("Total Experience: \(character.experience)")
+                Text("Spent Experience: \(character.spentExperience)")
+                Text("Available Experience: \(character.experience - character.spentExperience)")
             }
         }
-        .navigationTitle(character.name)
+    }
+}
+
+// Second Tab - Status
+struct StatusTab: View {
+    let character: Character
+    
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                StatusRowView(title: "Health", healthStates: character.healthStates)
+                
+                StatusRowView(title: "Willpower", healthStates: character.willpowerStates)
+                
+                StatusRowView(title: "Humanity", humanityStates: character.humanityStates)
+            }
+            .padding()
+        }
     }
 }

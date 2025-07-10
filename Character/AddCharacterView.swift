@@ -8,6 +8,11 @@ struct AddCharacterView: View {
     @State private var clan = ""
     @State private var generation = 13
     
+    // Character background
+    @State private var ambition = ""
+    @State private var desire = ""
+    @State private var chronicleName = ""
+    
     // V5 Attributes
     @State private var physicalAttributes: [String: Int] = [:]
     @State private var socialAttributes: [String: Int] = [:]
@@ -23,6 +28,7 @@ struct AddCharacterView: View {
     @State private var humanity = 7
     @State private var willpower = 3
     @State private var experience = 0
+    @State private var spentExperience = 0
     
     // V5 Disciplines
     @State private var selectedDisciplines: [String: Int] = [:]
@@ -67,11 +73,20 @@ struct AddCharacterView: View {
                     Stepper("Generation: \(generation)", value: $generation, in: 4...15)
                 }
                 
+                Section(header: Text("Character Background")) {
+                    TextField("Chronicle Name", text: $chronicleName)
+                    TextField("Ambition", text: $ambition, axis: .vertical)
+                        .lineLimit(2...4)
+                    TextField("Desire", text: $desire, axis: .vertical)
+                        .lineLimit(2...4)
+                }
+                
                 Section(header: Text("Core Traits")) {
                     Stepper("Blood Potency: \(bloodPotency)", value: $bloodPotency, in: 0...10)
                     Stepper("Humanity: \(humanity)", value: $humanity, in: 0...10)
                     Stepper("Willpower: \(willpower)", value: $willpower, in: 1...10)
                     Stepper("Experience: \(experience)", value: $experience, in: 0...999)
+                    Stepper("Spent Experience: \(spentExperience)", value: $spentExperience, in: 0...experience)
                 }
 
                 Section(header: Text("Physical Attributes")) {
@@ -173,6 +188,10 @@ struct AddCharacterView: View {
                             humanity: humanity,
                             willpower: willpower,
                             experience: experience,
+                            spentExperience: spentExperience,
+                            ambition: ambition,
+                            desire: desire,
+                            chronicleName: chronicleName,
                             disciplines: selectedDisciplines.filter { $0.value > 0 },
                             advantages: advantagesText.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty },
                             flaws: flawsText.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty },

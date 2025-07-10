@@ -27,6 +27,23 @@ struct V5Constants {
     static let clans = ["Brujah", "Gangrel", "Malkavian", "Nosferatu", "Toreador", "Tremere", "Ventrue", "Banu Haqim", "Hecata", "Lasombra", "Ministry", "Ravnos", "Salubri", "Tzimisce", "Caitiff", "Thin-Blood"]
 }
 
+// Health tracking states
+enum HealthState: String, Codable, CaseIterable {
+    case ok = "ok"
+    case superficial = "superficial"
+    case aggravated = "aggravated"
+}
+
+// Willpower tracking states (same as health)
+typealias WillpowerState = HealthState
+
+// Humanity tracking states
+enum HumanityState: String, Codable, CaseIterable {
+    case checked = "checked"
+    case unchecked = "unchecked"
+    case stained = "stained"
+}
+
 struct Character: Identifiable, Codable {
     var id = UUID()
     var name: String
@@ -48,6 +65,12 @@ struct Character: Identifiable, Codable {
     var humanity: Int
     var willpower: Int
     var experience: Int
+    var spentExperience: Int
+    
+    // V5 Character Background
+    var ambition: String
+    var desire: String
+    var chronicleName: String
     
     // V5 Disciplines
     var disciplines: [String: Int]
@@ -62,6 +85,9 @@ struct Character: Identifiable, Codable {
     // V5 Condition Tracking
     var hunger: Int
     var health: Int
+    var healthStates: [HealthState]
+    var willpowerStates: [WillpowerState] 
+    var humanityStates: [HumanityState]
     
     // Default initializer for new characters
     init(name: String = "", clan: String = "", generation: Int = 13) {
@@ -84,6 +110,12 @@ struct Character: Identifiable, Codable {
         self.humanity = 7
         self.willpower = 3
         self.experience = 0
+        self.spentExperience = 0
+        
+        // Initialize character background
+        self.ambition = ""
+        self.desire = ""
+        self.chronicleName = ""
         
         // Initialize disciplines (empty by default)
         self.disciplines = [:]
@@ -98,10 +130,14 @@ struct Character: Identifiable, Codable {
         // Initialize condition tracking
         self.hunger = 1
         self.health = 3
+        self.healthStates = Array(repeating: .ok, count: 3)
+        self.willpower = 3
+        self.willpowerStates = Array(repeating: .ok, count: 3)
+        self.humanityStates = Array(repeating: .unchecked, count: 10)
     }
     
     // Full initializer for existing characters or manual creation
-    init(name: String, clan: String, generation: Int, physicalAttributes: [String: Int], socialAttributes: [String: Int], mentalAttributes: [String: Int], physicalSkills: [String: Int], socialSkills: [String: Int], mentalSkills: [String: Int], bloodPotency: Int, humanity: Int, willpower: Int, experience: Int, disciplines: [String: Int], advantages: [String], flaws: [String], convictions: [String], touchstones: [String], chronicleTenets: [String], hunger: Int, health: Int) {
+    init(name: String, clan: String, generation: Int, physicalAttributes: [String: Int], socialAttributes: [String: Int], mentalAttributes: [String: Int], physicalSkills: [String: Int], socialSkills: [String: Int], mentalSkills: [String: Int], bloodPotency: Int, humanity: Int, willpower: Int, experience: Int, spentExperience: Int = 0, ambition: String = "", desire: String = "", chronicleName: String = "", disciplines: [String: Int], advantages: [String], flaws: [String], convictions: [String], touchstones: [String], chronicleTenets: [String], hunger: Int, health: Int, healthStates: [HealthState]? = nil, willpowerStates: [WillpowerState]? = nil, humanityStates: [HumanityState]? = nil) {
         self.name = name
         self.clan = clan
         self.generation = generation
@@ -115,6 +151,10 @@ struct Character: Identifiable, Codable {
         self.humanity = humanity
         self.willpower = willpower
         self.experience = experience
+        self.spentExperience = spentExperience
+        self.ambition = ambition
+        self.desire = desire
+        self.chronicleName = chronicleName
         self.disciplines = disciplines
         self.advantages = advantages
         self.flaws = flaws
@@ -123,6 +163,9 @@ struct Character: Identifiable, Codable {
         self.chronicleTenets = chronicleTenets
         self.hunger = hunger
         self.health = health
+        self.healthStates = healthStates ?? Array(repeating: .ok, count: max(health, 1))
+        self.willpowerStates = willpowerStates ?? Array(repeating: .ok, count: max(willpower, 1))
+        self.humanityStates = humanityStates ?? Array(repeating: .unchecked, count: 10)
     }
 }
 

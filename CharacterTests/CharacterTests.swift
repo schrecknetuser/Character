@@ -36,10 +36,24 @@ struct CharacterTests {
         #expect(character.humanity == 7)
         #expect(character.willpower == 3)
         #expect(character.experience == 0)
+        #expect(character.spentExperience == 0)
+        
+        // Check character background
+        #expect(character.ambition == "")
+        #expect(character.desire == "")
+        #expect(character.chronicleName == "")
         
         // Check default condition tracking
         #expect(character.hunger == 1)
         #expect(character.health == 3)
+        
+        // Check status tracking arrays
+        #expect(character.healthStates.count == 3)
+        #expect(character.willpowerStates.count == 3)
+        #expect(character.humanityStates.count == 10)
+        #expect(character.healthStates.allSatisfy { $0 == .ok })
+        #expect(character.willpowerStates.allSatisfy { $0 == .ok })
+        #expect(character.humanityStates.allSatisfy { $0 == .unchecked })
         
         // Check that skills default to 0
         #expect(character.physicalSkills["Athletics"] == 0)
