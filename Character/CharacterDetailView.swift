@@ -413,10 +413,14 @@ struct AttributesSkillsTab: View {
         // Calculate based on screen width and available space
         let availableWidth = (size.width - 80) / 3 // Account for padding and 3 columns
         
+        // Find the longest text among all displayed values
+        let allDisplayedTexts = V5Constants.physicalAttributes + V5Constants.socialAttributes + V5Constants.mentalAttributes +
+                               V5Constants.physicalSkills + V5Constants.socialSkills + V5Constants.mentalSkills +
+                               ["Physical", "Social", "Mental", "Attributes", "Skills"]
+        let longestText = allDisplayedTexts.max(by: { $0.count < $1.count }) ?? "Intelligence"
+        
         // Determine optimal font size based on available width per column
-        // Base calculations on fitting longest skill names
-        let longestText = "Intimidation" // One of the longest skill names
-        let scaleFactor = min(1.0, availableWidth / (longestText.count * 8)) // Rough character width estimate
+        let scaleFactor = min(1.0, availableWidth / (CGFloat(longestText.count) * 8)) // Rough character width estimate
         
         // Base font sizes adjusted for actual content
         let baseDynamicSize: CGFloat = 14
