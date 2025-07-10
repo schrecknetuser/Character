@@ -62,9 +62,8 @@ struct CharacterCreationWizard: View {
                     .padding(.bottom)
                 
                 // Current stage content
-                ScrollView {
-                    Group {
-                        switch currentStage {
+                Group {
+                    switch currentStage {
                         case .nameAndChronicle:
                             NameAndChronicleStage(character: $character)
                         case .clan:
@@ -81,11 +80,9 @@ struct CharacterCreationWizard: View {
                             ConvictionsAndTouchstonesStage(character: $character)
                         case .ambitionAndDesire:
                             AmbitionAndDesireStage(character: $character)
-                        }
                     }
-                    .frame(maxWidth: .infinity)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(maxWidth: .infinity)
                 
                 // Navigation buttons
                 HStack {
@@ -378,14 +375,14 @@ struct AttributesStage: View {
         for attribute in allAttributes {
             var currentValue = 1
             if V5Constants.physicalAttributes.contains(attribute) {
-                currentValue = character.physicalAttributes[attribute] ?? 1
+                currentValue = character.physicalAttributes[attribute] ?? 0
             } else if V5Constants.socialAttributes.contains(attribute) {
-                currentValue = character.socialAttributes[attribute] ?? 1
+                currentValue = character.socialAttributes[attribute] ?? 0
             } else if V5Constants.mentalAttributes.contains(attribute) {
-                currentValue = character.mentalAttributes[attribute] ?? 1
+                currentValue = character.mentalAttributes[attribute] ?? 0
             }
             
-            if currentValue > 1 {
+            if currentValue > 0 {
                 assignedCount += 1
             }
         }
@@ -410,7 +407,7 @@ struct DraggableValueBox: View {
             .cornerRadius(8)
             .scaleEffect(isDragging ? 1.1 : 1.0)
             .animation(.easeInOut(duration: 0.1), value: isDragging)
-            .draggable(value) {
+            .draggable(AttributeDragData(value: value, sourceAttribute: nil)) {
                 Text("\(value)")
                     .font(.title2)
                     .fontWeight(.bold)
@@ -481,14 +478,14 @@ struct AttributeDropRow: View {
             } isTargeted: { targeted in
                 isTargeted = targeted
             }
-            .dropDestination(for: Int.self) { items, location in
+            /*.dropDestination(for: Int.self) { items, location in
                 guard let draggedValue = items.first else { return false }
                 // This handles drops from unassigned pool
                 assignValueToAttribute(attribute: attribute, dragData: AttributeDragData(value: draggedValue, sourceAttribute: nil))
                 return true
             } isTargeted: { targeted in
                 isTargeted = targeted
-            }
+            }*/
         }
     }
     
