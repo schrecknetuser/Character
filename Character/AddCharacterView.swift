@@ -35,18 +35,13 @@ struct AdvantagesListView: View {
             }
             
             Button("Add Advantage") {
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 showingAddAdvantage = true
             }
             .foregroundColor(.accentColor)
         }
         .sheet(isPresented: $showingAddAdvantage) {
             AddAdvantageView(selectedAdvantages: $selectedAdvantages)
-        }
-        .onChange(of: showingAddAdvantage) { _, newValue in
-            if newValue {
-                // Clear any focus when showing the sheet to prevent auto-scrolling
-                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-            }
         }
     }
 }
@@ -144,18 +139,13 @@ struct FlawsListView: View {
             }
             
             Button("Add Flaw") {
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 showingAddFlaw = true
             }
             .foregroundColor(.accentColor)
         }
         .sheet(isPresented: $showingAddFlaw) {
             AddFlawView(selectedFlaws: $selectedFlaws)
-        }
-        .onChange(of: showingAddFlaw) { _, newValue in
-            if newValue {
-                // Clear any focus when showing the sheet to prevent auto-scrolling
-                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-            }
         }
     }
 }
