@@ -321,7 +321,8 @@ struct AttributesSkillsTab: View {
                             isEditing: isEditing,
                             dynamicFontSize: dynamicFontSize,
                             titleFontSize: titleFontSize,
-                            headerFontSize: headerFontSize
+                            headerFontSize: headerFontSize,
+                            rowHeight: rowHeight
                         )
                     }
                 }
@@ -370,58 +371,79 @@ struct SpecializationsTableView: View {
     let dynamicFontSize: CGFloat
     let titleFontSize: CGFloat
     let headerFontSize: CGFloat
+    let rowHeight: CGFloat
     @State private var showingAddSpecialization = false
     @State private var selectedSkillForSpecialization = ""
+    @State private var editingSpecialization: Specialization?
+    @State private var editingSpecializationText = ""
     
     var body: some View {
         VStack(alignment: .leading, spacing: 15) {
             Text("Specializations")
                 .font(.system(size: titleFontSize, weight: .bold))
             
-            VStack(alignment: .leading, spacing: 8) {
-                // Group specializations by skill type
-                if !getPhysicalSpecializations().isEmpty {
-                    SpecializationCategoryView(
-                        title: "Physical",
-                        specializations: getPhysicalSpecializations(),
-                        isEditing: isEditing,
-                        dynamicFontSize: dynamicFontSize,
-                        headerFontSize: headerFontSize,
-                        onRemove: removeSpecialization
-                    )
-                }
+            // Calculate maximum rows needed across all columns
+            let maxRows = calculateMaxRows()
+            
+            // 3-column layout for specializations
+            HStack(alignment: .top, spacing: 12) {
+                SpecializationColumnView(
+                    title: "Physical",
+                    skills: V5Constants.physicalSkills,
+                    character: $character,
+                    isEditing: isEditing,
+                    dynamicFontSize: dynamicFontSize,
+                    headerFontSize: headerFontSize,
+                    rowHeight: rowHeight,
+                    maxRows: maxRows,
+                    onEdit: { specialization in
+                        editingSpecialization = specialization
+                        editingSpecializationText = specialization.name
+                    },
+                    onRemove: removeSpecialization
+                ).frame(maxWidth: .infinity)
                 
-                if !getSocialSpecializations().isEmpty {
-                    SpecializationCategoryView(
-                        title: "Social", 
-                        specializations: getSocialSpecializations(),
-                        isEditing: isEditing,
-                        dynamicFontSize: dynamicFontSize,
-                        headerFontSize: headerFontSize,
-                        onRemove: removeSpecialization
-                    )
-                }
+                SpecializationColumnView(
+                    title: "Social",
+                    skills: V5Constants.socialSkills,
+                    character: $character,
+                    isEditing: isEditing,
+                    dynamicFontSize: dynamicFontSize,
+                    headerFontSize: headerFontSize,
+                    rowHeight: rowHeight,
+                    maxRows: maxRows,
+                    onEdit: { specialization in
+                        editingSpecialization = specialization
+                        editingSpecializationText = specialization.name
+                    },
+                    onRemove: removeSpecialization
+                ).frame(maxWidth: .infinity)
                 
-                if !getMentalSpecializations().isEmpty {
-                    SpecializationCategoryView(
-                        title: "Mental",
-                        specializations: getMentalSpecializations(),
-                        isEditing: isEditing,
-                        dynamicFontSize: dynamicFontSize,
-                        headerFontSize: headerFontSize,
-                        onRemove: removeSpecialization
-                    )
+                SpecializationColumnView(
+                    title: "Mental",
+                    skills: V5Constants.mentalSkills,
+                    character: $character,
+                    isEditing: isEditing,
+                    dynamicFontSize: dynamicFontSize,
+                    headerFontSize: headerFontSize,
+                    rowHeight: rowHeight,
+                    maxRows: maxRows,
+                    onEdit: { specialization in
+                        editingSpecialization = specialization
+                        editingSpecializationText = specialization.name
+                    },
+                    onRemove: removeSpecialization
+                ).frame(maxWidth: .infinity)
+            }
+            
+            // Add specialization button in edit mode
+            if isEditing {
+                Button("+ Add Specialization") {
+                    showingAddSpecialization = true
                 }
-                
-                // Add specialization button in edit mode
-                if isEditing {
-                    Button("+ Add Specialization") {
-                        showingAddSpecialization = true
-                    }
-                    .font(.system(size: dynamicFontSize))
-                    .foregroundColor(.blue)
-                    .padding(.top, 8)
-                }
+                .font(.system(size: dynamicFontSize))
+                .foregroundColor(.blue)
+                .padding(.top, 8)
             }
         }
         .sheet(isPresented: $showingAddSpecialization) {
@@ -431,25 +453,45 @@ struct SpecializationsTableView: View {
                 isPresented: $showingAddSpecialization
             )
         }
-    }
-    
-    private func getPhysicalSpecializations() -> [(String, [Specialization])] {
-        return getSpecializationsForSkills(V5Constants.physicalSkills)
-    }
-    
-    private func getSocialSpecializations() -> [(String, [Specialization])] {
-        return getSpecializationsForSkills(V5Constants.socialSkills)
-    }
-    
-    private func getMentalSpecializations() -> [(String, [Specialization])] {
-        return getSpecializationsForSkills(V5Constants.mentalSkills)
-    }
-    
-    private func getSpecializationsForSkills(_ skills: [String]) -> [(String, [Specialization])] {
-        return skills.compactMap { skill in
-            let specializations = character.getSpecializations(for: skill)
-            return specializations.isEmpty ? nil : (skill, specializations)
+        .alert("Edit Specialization", isPresented: .constant(editingSpecialization != nil)) {
+            TextField("Specialization", text: $editingSpecializationText)
+            Button("Save") {
+                saveEditedSpecialization()
+            }
+            Button("Cancel") {
+                editingSpecialization = nil
+            }
         }
+    }
+    
+    private func calculateMaxRows() -> Int {
+        let physicalRows = getColumnRowCount(V5Constants.physicalSkills)
+        let socialRows = getColumnRowCount(V5Constants.socialSkills)
+        let mentalRows = getColumnRowCount(V5Constants.mentalSkills)
+        
+        return max(physicalRows, socialRows, mentalRows)
+    }
+    
+    private func getColumnRowCount(_ skills: [String]) -> Int {
+        var rows = 0
+        for skill in skills {
+            let specializations = character.getSpecializations(for: skill)
+            if !specializations.isEmpty {
+                rows += 1 + specializations.count // 1 for skill name + count of specializations
+            }
+        }
+        return rows
+    }
+    
+    private func saveEditedSpecialization() {
+        guard let editingSpec = editingSpecialization else { return }
+        
+        if let index = character.specializations.firstIndex(where: { $0.id == editingSpec.id }) {
+            character.specializations[index].name = editingSpecializationText.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        
+        editingSpecialization = nil
+        editingSpecializationText = ""
     }
     
     private func removeSpecialization(_ specialization: Specialization) {
@@ -457,33 +499,55 @@ struct SpecializationsTableView: View {
     }
 }
 
-struct SpecializationCategoryView: View {
+struct SpecializationColumnView: View {
     let title: String
-    let specializations: [(String, [Specialization])]
+    let skills: [String]
+    @Binding var character: Character
     let isEditing: Bool
     let dynamicFontSize: CGFloat
     let headerFontSize: CGFloat
+    let rowHeight: CGFloat
+    let maxRows: Int
+    let onEdit: (Specialization) -> Void
     let onRemove: (Specialization) -> Void
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.system(size: headerFontSize, weight: .semibold))
             
-            ForEach(specializations, id: \.0) { skillName, specs in
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(skillName)
-                        .font(.system(size: dynamicFontSize, weight: .medium))
-                    
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 4) {
-                        ForEach(specs) { specialization in
+            // Calculate the content for this column
+            let columnContent = getColumnContent()
+            
+            // Display content rows up to maxRows, filling with empty rows if needed
+            ForEach(0..<maxRows, id: \.self) { index in
+                HStack {
+                    if index < columnContent.count {
+                        let item = columnContent[index]
+                        
+                        switch item {
+                        case .skillName(let skillName):
+                            Text(skillName)
+                                .font(.system(size: dynamicFontSize, weight: .medium))
+                                .lineLimit(1)
+                            Spacer()
+                            
+                        case .specialization(let specialization):
                             HStack {
-                                Text(specialization.name)
+                                Text("• \(specialization.name)")
                                     .font(.system(size: dynamicFontSize - 1))
                                     .foregroundColor(.secondary)
                                     .lineLimit(1)
                                 
+                                Spacer()
+                                
                                 if isEditing {
+                                    Button("✎") {
+                                        onEdit(specialization)
+                                    }
+                                    .font(.system(size: dynamicFontSize - 2))
+                                    .foregroundColor(.blue)
+                                    
                                     Button("×") {
                                         onRemove(specialization)
                                     }
@@ -491,15 +555,37 @@ struct SpecializationCategoryView: View {
                                     .foregroundColor(.red)
                                 }
                             }
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color.gray.opacity(0.2))
-                            .cornerRadius(4)
+                            .padding(.leading, 16)
                         }
+                    } else {
+                        // Empty row to maintain consistent height
+                        Spacer()
                     }
-                    .padding(.leading, 16)
+                }
+                .frame(minHeight: rowHeight)
+            }
+        }
+    }
+    
+    // Enum to represent different types of content in the column
+    private enum ColumnItem {
+        case skillName(String)
+        case specialization(Specialization)
+    }
+    
+    private func getColumnContent() -> [ColumnItem] {
+        var items: [ColumnItem] = []
+        
+        for skill in skills {
+            let specializations = character.getSpecializations(for: skill)
+            if !specializations.isEmpty {
+                items.append(.skillName(skill))
+                for specialization in specializations {
+                    items.append(.specialization(specialization))
                 }
             }
         }
+        
+        return items
     }
 }
