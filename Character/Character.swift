@@ -51,6 +51,18 @@ struct SkillInfo: Codable, Hashable {
     }
 }
 
+// Character Type enumeration
+enum CharacterType: String, Codable, CaseIterable {
+    case vampire = "Vampire"
+    
+    var displayName: String {
+        switch self {
+        case .vampire:
+            return "Vampire"
+        }
+    }
+}
+
 
 
 // V5 Character System Constants
@@ -188,9 +200,75 @@ enum HumanityState: String, Codable, CaseIterable {
     case stained = "stained"
 }
 
-struct Character: Identifiable, Codable {
+// Base Character protocol defining common properties for all character types
+protocol BaseCharacter: Identifiable, Codable {
+    var id: UUID { get set }
+    var name: String { get set }
+    var characterType: CharacterType { get }
+    
+    // V5 Core Attributes (9 total)
+    var physicalAttributes: [String: Int] { get set }  // Strength, Dexterity, Stamina
+    var socialAttributes: [String: Int] { get set }   // Charisma, Manipulation, Composure
+    var mentalAttributes: [String: Int] { get set }   // Intelligence, Wits, Resolve
+    
+    // V5 Skills (27 total)
+    var physicalSkills: [String: Int] { get set }      // Athletics, Brawl, Craft, Drive, Firearms, Larceny, Melee, Stealth, Survival
+    var socialSkills: [String: Int] { get set }        // Animal Ken, Etiquette, Insight, Intimidation, Leadership, Performance, Persuasion, Streetwise, Subterfuge
+    var mentalSkills: [String: Int] { get set }        // Academics, Awareness, Finance, Investigation, Medicine, Occult, Politics, Science, Technology
+    
+    // Core base traits
+    var willpower: Int { get set }
+    var experience: Int { get set }
+    var spentExperience: Int { get set }
+    
+    // Multi-tab fields
+    var ambition: String { get set }
+    var desire: String { get set }
+    var chronicleName: String { get set }
+    
+    // Character Traits (these have different values per character type)
+    var advantages: [Background] { get set }
+    var flaws: [Background] { get set }
+    var convictions: [String] { get set }
+    var touchstones: [String] { get set }
+    var chronicleTenets: [String] { get set }
+    
+    // Skill Specializations
+    var specializations: [Specialization] { get set }
+    
+    // Data Tab - Session tracking and change log
+    var currentSession: Int { get set }
+    var changeLog: [ChangeLogEntry] { get set }
+    
+    // Base condition tracking
+    var health: Int { get set }
+    
+    // Multi-tab status tracking arrays
+    var healthStates: [HealthState] { get set }
+    var willpowerStates: [WillpowerState] { get set }
+    
+    // Common computed properties
+    var totalAdvantageCost: Int { get }
+    var totalFlawValue: Int { get }
+    var netAdvantageFlawCost: Int { get }
+    var availableExperience: Int { get }
+    var healthBoxCount: Int { get }
+    var willpowerBoxCount: Int { get }
+    
+    // Common methods
+    func getSpecializations(for skillName: String) -> [Specialization]
+    func getSkillsWithPoints() -> [String]
+    func getSkillsRequiringFreeSpecializationWithPoints() -> [String]
+    mutating func recalculateDerivedValues()
+    func getAttributeValue(attribute: String) -> Int
+    func getSkillValue(skill: String) -> Int
+    func generateChangeSummary(for updated: Character) -> String
+}
+
+struct Character: BaseCharacter {
     var id = UUID()
     var name: String
+    let characterType: CharacterType = .vampire  // For now, only vampire type is supported
     var clan: String
     var generation: Int
     
@@ -205,22 +283,16 @@ struct Character: Identifiable, Codable {
     var mentalSkills: [String: Int]        // Academics, Awareness, Finance, Investigation, Medicine, Occult, Politics, Science, Technology
     
     // V5 Core Traits
-    var bloodPotency: Int
-    var humanity: Int
     var willpower: Int
     var experience: Int
+    var spentExperience: Int
     
     // Multi-tab fields
-    var spentExperience: Int
     var ambition: String
     var desire: String
     var chronicleName: String
     
-    // V5 Disciplines
-    var disciplines: [String: Int]
-    
-
-    // V5 Character Traits
+    // Character Traits (vampire-specific values)
     var advantages: [Background]
     var flaws: [Background]
     var convictions: [String]
@@ -234,16 +306,21 @@ struct Character: Identifiable, Codable {
     var currentSession: Int
     var changeLog: [ChangeLogEntry]
     
-    // V5 Condition Tracking
-    var hunger: Int
+    // Base condition tracking
     var health: Int
     
     // Multi-tab status tracking arrays
     var healthStates: [HealthState]
     var willpowerStates: [WillpowerState]
+    
+    // VAMPIRE-SPECIFIC PROPERTIES
+    var bloodPotency: Int
+    var humanity: Int
+    var hunger: Int
+    var disciplines: [String: Int]
     var humanityStates: [HumanityState]
     
-    // Default initializer for new characters
+    // Default initializer for new vampire characters
     init(name: String = "", clan: String = "", generation: Int = 13) {
         self.name = name
         self.clan = clan
@@ -260,8 +337,6 @@ struct Character: Identifiable, Codable {
         self.mentalSkills = Dictionary(uniqueKeysWithValues: V5Constants.mentalSkills.map { ($0, 0) })
         
         // Initialize core traits with default values for character creation
-        self.bloodPotency = 1
-        self.humanity = 7
         // Willpower and health are calculated based on attributes
         let stamina = self.physicalAttributes["Stamina"] ?? 1
         let resolve = self.mentalAttributes["Resolve"] ?? 1
@@ -269,15 +344,12 @@ struct Character: Identifiable, Codable {
         self.willpower = resolve + composure
         self.health = stamina + 3
         self.experience = 0  // Always start at 0 for new characters
+        self.spentExperience = 0  // Always start at 0 for new characters
         
         // Multi-tab fields with defaults for character creation
-        self.spentExperience = 0  // Always start at 0 for new characters
         self.ambition = ""
         self.desire = ""
         self.chronicleName = ""
-        
-        // Initialize disciplines (empty by default)
-        self.disciplines = [:]
         
         // Initialize character traits
         self.advantages = []
@@ -291,16 +363,19 @@ struct Character: Identifiable, Codable {
         self.currentSession = 1
         self.changeLog = []
         
-        // Initialize condition tracking with defaults
-        self.hunger = 1  // Always start at 1 for new characters
-        
         // Initialize status tracking arrays based on calculated values
         self.healthStates = Array(repeating: .ok, count: self.health)
         self.willpowerStates = Array(repeating: .ok, count: self.willpower)
+        
+        // VAMPIRE-SPECIFIC INITIALIZATION
+        self.bloodPotency = 1
+        self.humanity = 7
+        self.hunger = 1  // Always start at 1 for new characters
+        self.disciplines = [:]
         self.humanityStates = Array(repeating: .unchecked, count: 10)
     }
     
-    // Full initializer for existing characters or manual creation
+    // Full initializer for existing vampire characters or manual creation
     init(name: String, clan: String, generation: Int, physicalAttributes: [String: Int], socialAttributes: [String: Int], mentalAttributes: [String: Int], physicalSkills: [String: Int], socialSkills: [String: Int], mentalSkills: [String: Int], bloodPotency: Int, humanity: Int, willpower: Int, experience: Int, disciplines: [String: Int], advantages: [Background], flaws: [Background], convictions: [String], touchstones: [String], chronicleTenets: [String], hunger: Int, health: Int, spentExperience: Int = 0, ambition: String = "", desire: String = "", chronicleName: String = "", specializations: [Specialization] = [], currentSession: Int = 1, changeLog: [ChangeLogEntry] = [], healthStates: [HealthState]? = nil, willpowerStates: [WillpowerState]? = nil, humanityStates: [HumanityState]? = nil) {
 
         self.name = name
@@ -312,22 +387,18 @@ struct Character: Identifiable, Codable {
         self.physicalSkills = physicalSkills
         self.socialSkills = socialSkills
         self.mentalSkills = mentalSkills
-        self.bloodPotency = bloodPotency
-        self.humanity = humanity
         self.willpower = willpower
         self.experience = experience
-        self.disciplines = disciplines
+        self.spentExperience = spentExperience
         self.advantages = advantages
         self.flaws = flaws
         self.convictions = convictions
         self.touchstones = touchstones
         self.chronicleTenets = chronicleTenets
         self.specializations = specializations
-        self.hunger = hunger
         self.health = health
         
         // Multi-tab fields
-        self.spentExperience = spentExperience
         self.ambition = ambition
         self.desire = desire
         self.chronicleName = chronicleName
@@ -339,6 +410,12 @@ struct Character: Identifiable, Codable {
         // Initialize status tracking arrays with defaults
         self.healthStates = healthStates ?? Array(repeating: .ok, count: max(health, 1))
         self.willpowerStates = willpowerStates ?? Array(repeating: .ok, count: max(willpower, 1))
+        
+        // VAMPIRE-SPECIFIC PROPERTIES
+        self.bloodPotency = bloodPotency
+        self.humanity = humanity
+        self.hunger = hunger
+        self.disciplines = disciplines
         self.humanityStates = humanityStates ?? Array(repeating: .unchecked, count: 10)
     }
     

@@ -122,12 +122,12 @@ struct CharacterTests {
     @Test func testCharacterWithDisciplinesAndAdvantages() async throws {
         // Test a character with some disciplines and advantages/flaws
         let testAdvantages = [
-            Advantage(name: "Beautiful", cost: 2),
-            Advantage(name: "Resources (Wealth)", cost: 3)
+            Background(name: "Beautiful", cost: 2),
+            Background(name: "Resources (Wealth)", cost: 3)
         ]
         let testFlaws = [
-            Flaw(name: "Obsession (Art)", cost: -2),
-            Flaw(name: "Enemy (Rival Artist)", cost: -1)
+            Background(name: "Obsession (Art)", cost: -2),
+            Background(name: "Enemy (Rival Artist)", cost: -1)
         ]
         
         let character = Character(
@@ -190,20 +190,20 @@ struct CharacterTests {
     
     @Test func testAdvantageFlawStructures() async throws {
         // Test advantage and flaw data structures
-        let advantage = Advantage(name: "Resources", cost: 3, isCustom: false)
+        let advantage = Background(name: "Resources", cost: 3, isCustom: false)
         #expect(advantage.name == "Resources")
         #expect(advantage.cost == 3)
         #expect(advantage.isCustom == false)
         
-        let customAdvantage = Advantage(name: "Special Ability", cost: 5, isCustom: true)
+        let customAdvantage = Background(name: "Special Ability", cost: 5, isCustom: true)
         #expect(customAdvantage.isCustom == true)
         
-        let flaw = Flaw(name: "Enemy", cost: -2, isCustom: false)
+        let flaw = Background(name: "Enemy", cost: -2, isCustom: false)
         #expect(flaw.name == "Enemy")
         #expect(flaw.cost == -2) // Should be negative
         #expect(flaw.isCustom == false)
         
-        let customFlaw = Flaw(name: "Custom Weakness", cost: -3, isCustom: true)
+        let customFlaw = Background(name: "Custom Weakness", cost: -3, isCustom: true)
         #expect(customFlaw.isCustom == true)
     }
     
@@ -229,16 +229,16 @@ struct CharacterTests {
         
         // Add some advantages
         character.advantages = [
-            Advantage(name: "Allies", cost: 3),
-            Advantage(name: "Resources", cost: 3),
-            Advantage(name: "Custom Advantage", cost: 2, isCustom: true)
+            Background(name: "Allies", cost: 3),
+            Background(name: "Resources", cost: 3),
+            Background(name: "Custom Advantage", cost: 2, isCustom: true)
         ]
         
         // Add some flaws
         character.flaws = [
-            Flaw(name: "Enemy", cost: -1),
-            Flaw(name: "Hunted", cost: -3),
-            Flaw(name: "Custom Flaw", cost: -2, isCustom: true)
+            Background(name: "Enemy", cost: -1),
+            Background(name: "Hunted", cost: -3),
+            Background(name: "Custom Flaw", cost: -2, isCustom: true)
         ]
         
         // Test cost calculations
