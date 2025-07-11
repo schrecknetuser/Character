@@ -19,6 +19,16 @@ struct ContentView: View {
                     NavigationLink(destination: CharacterDetailView(character: $store.characters[index], store: store)) {
                         VStack(alignment: .leading) {
                             Text(store.characters[index].name).font(.headline)
+                            HStack {
+                                Text(store.characters[index].characterType.displayName)
+                                    .font(.caption)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 2)
+                                    .background(Color.blue.opacity(0.1))
+                                    .foregroundColor(.blue)
+                                    .cornerRadius(4)
+                                Spacer()
+                            }
                             Text("\(store.characters[index].clan), Gen \(store.characters[index].generation)")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)

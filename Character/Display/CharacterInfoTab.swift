@@ -26,6 +26,17 @@ struct CharacterInfoTab: View {
                                 .font(.system(size: dynamicFontSize))
                         }
                     }
+                    
+                    HStack {
+                        Text("Character Type:")
+                            .fontWeight(.medium)
+                            .font(.system(size: dynamicFontSize))
+                        Spacer()
+                        Text(character.characterType.displayName)
+                            .font(.system(size: dynamicFontSize))
+                            .foregroundColor(.blue)
+                    }
+                    
                     HStack {
                         Text("Chronicle:")
                             .fontWeight(.medium)
