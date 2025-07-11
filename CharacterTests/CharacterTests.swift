@@ -273,3 +273,142 @@ struct CharacterTests {
         }
     }
 
+    @Test func testSpecializationDataStructure() async throws {
+        // Test specialization creation and properties
+        let specialization = Specialization(skillName: "Academics", name: "History")
+        
+        #expect(specialization.skillName == "Academics")
+        #expect(specialization.name == "History")
+        #expect(specialization.id != UUID()) // Should have a unique ID
+    }
+    
+    @Test func testSkillInfoDataStructure() async throws {
+        // Test SkillInfo structure
+        let skillInfo = SkillInfo(
+            name: "Academics",
+            specializationExamples: ["History", "Literature", "Art"],
+            requiresFreeSpecialization: true
+        )
+        
+        #expect(skillInfo.name == "Academics")
+        #expect(skillInfo.specializationExamples.count == 3)
+        #expect(skillInfo.requiresFreeSpecialization == true)
+        #expect(skillInfo.specializationExamples.contains("History"))
+    }
+    
+    @Test func testV5ConstantsSkillInfo() async throws {
+        // Test that skill info constants are properly structured
+        #expect(V5Constants.physicalSkillsInfo.count == 9)
+        #expect(V5Constants.socialSkillsInfo.count == 9)
+        #expect(V5Constants.mentalSkillsInfo.count == 9)
+        
+        // Test specific skills require free specializations
+        let skillsRequiringFree = V5Constants.getSkillsRequiringFreeSpecialization()
+        #expect(skillsRequiringFree.contains("Academics"))
+        #expect(skillsRequiringFree.contains("Craft"))
+        #expect(skillsRequiringFree.contains("Performance"))
+        #expect(skillsRequiringFree.contains("Science"))
+        #expect(skillsRequiringFree.count == 4)
+        
+        // Test skill info lookup
+        let academicsInfo = V5Constants.getSkillInfo(for: "Academics")
+        #expect(academicsInfo != nil)
+        #expect(academicsInfo?.requiresFreeSpecialization == true)
+        #expect(academicsInfo?.specializationExamples.contains("History") == true)
+        
+        let athleticsInfo = V5Constants.getSkillInfo(for: "Athletics")
+        #expect(athleticsInfo != nil)
+        #expect(athleticsInfo?.requiresFreeSpecialization == false)
+        #expect(athleticsInfo?.specializationExamples.contains("Running") == true)
+    }
+    
+    @Test func testCharacterSpecializations() async throws {
+        // Test character with specializations
+        var character = Character(name: "Test Scholar", clan: "Tremere", generation: 10)
+        
+        // Give character some skills
+        character.mentalSkills["Academics"] = 3
+        character.physicalSkills["Craft"] = 2
+        character.socialSkills["Performance"] = 1
+        character.mentalSkills["Science"] = 2
+        character.socialSkills["Persuasion"] = 3
+        
+        // Add specializations
+        let academicsSpec = Specialization(skillName: "Academics", name: "History")
+        let craftSpec = Specialization(skillName: "Craft", name: "Woodworking")
+        let performanceSpec = Specialization(skillName: "Performance", name: "Singing")
+        let scienceSpec = Specialization(skillName: "Science", name: "Chemistry")
+        let persuasionSpec = Specialization(skillName: "Persuasion", name: "Fast Talk")
+        
+        character.specializations = [academicsSpec, craftSpec, performanceSpec, scienceSpec, persuasionSpec]
+        
+        // Test specialization retrieval
+        let academicsSpecs = character.getSpecializations(for: "Academics")
+        #expect(academicsSpecs.count == 1)
+        #expect(academicsSpecs.first?.name == "History")
+        
+        let craftSpecs = character.getSpecializations(for: "Craft")
+        #expect(craftSpecs.count == 1)
+        #expect(craftSpecs.first?.name == "Woodworking")
+        
+        // Test skills with points
+        let skillsWithPoints = character.getSkillsWithPoints()
+        #expect(skillsWithPoints.contains("Academics"))
+        #expect(skillsWithPoints.contains("Craft"))
+        #expect(skillsWithPoints.contains("Performance"))
+        #expect(skillsWithPoints.contains("Science"))
+        #expect(skillsWithPoints.contains("Persuasion"))
+        #expect(skillsWithPoints.count == 5)
+        
+        // Test skills requiring free specializations with points
+        let requiredSpecs = character.getSkillsRequiringFreeSpecializationWithPoints()
+        #expect(requiredSpecs.contains("Academics"))
+        #expect(requiredSpecs.contains("Craft"))
+        #expect(requiredSpecs.contains("Performance"))
+        #expect(requiredSpecs.contains("Science"))
+        #expect(requiredSpecs.count == 4)
+        #expect(!requiredSpecs.contains("Persuasion")) // Persuasion doesn't require free specialization
+    }
+    
+    @Test func testCharacterSpecializationsInitialization() async throws {
+        // Test that specializations are properly initialized
+        let character = Character()
+        #expect(character.specializations.isEmpty)
+        
+        // Test full initializer with specializations
+        let testSpecializations = [
+            Specialization(skillName: "Academics", name: "History"),
+            Specialization(skillName: "Craft", name: "Painting")
+        ]
+        
+        let characterWithSpecs = Character(
+            name: "Test",
+            clan: "Toreador",
+            generation: 10,
+            physicalAttributes: ["Strength": 2, "Dexterity": 3, "Stamina": 2],
+            socialAttributes: ["Charisma": 3, "Manipulation": 2, "Composure": 3],
+            mentalAttributes: ["Intelligence": 4, "Wits": 3, "Resolve": 2],
+            physicalSkills: Dictionary(uniqueKeysWithValues: V5Constants.physicalSkills.map { ($0, 0) }),
+            socialSkills: Dictionary(uniqueKeysWithValues: V5Constants.socialSkills.map { ($0, 0) }),
+            mentalSkills: Dictionary(uniqueKeysWithValues: V5Constants.mentalSkills.map { ($0, 0) }),
+            bloodPotency: 1,
+            humanity: 7,
+            willpower: 5,
+            experience: 0,
+            disciplines: [:],
+            advantages: [],
+            flaws: [],
+            convictions: [],
+            touchstones: [],
+            chronicleTenets: [],
+            hunger: 1,
+            health: 5,
+            specializations: testSpecializations
+        )
+        
+        #expect(characterWithSpecs.specializations.count == 2)
+        #expect(characterWithSpecs.specializations.contains { $0.skillName == "Academics" && $0.name == "History" })
+        #expect(characterWithSpecs.specializations.contains { $0.skillName == "Craft" && $0.name == "Painting" })
+    }
+
+}

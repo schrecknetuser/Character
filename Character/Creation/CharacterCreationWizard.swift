@@ -23,10 +23,11 @@ enum CreationStage: Int, CaseIterable {
     case clan = 1
     case attributes = 2
     case skills = 3
-    case disciplines = 4
-    case meritsAndFlaws = 5
-    case convictionsAndTouchstones = 6
-    case ambitionAndDesire = 7
+    case specializations = 4
+    case disciplines = 5
+    case meritsAndFlaws = 6
+    case convictionsAndTouchstones = 7
+    case ambitionAndDesire = 8
     
     var title: String {
         switch self {
@@ -34,6 +35,7 @@ enum CreationStage: Int, CaseIterable {
         case .clan: return "Clan"
         case .attributes: return "Attributes"
         case .skills: return "Skills"
+        case .specializations: return "Specializations"
         case .disciplines: return "Disciplines"
         case .meritsAndFlaws: return "Merits & Flaws"
         case .convictionsAndTouchstones: return "Convictions & Touchstones"
@@ -72,6 +74,8 @@ struct CharacterCreationWizard: View {
                             AttributesStage(character: $character)
                         case .skills:
                             SkillsStage(character: $character)
+                        case .specializations:
+                            SpecializationsStage(character: $character)
                         case .disciplines:
                             DisciplinesStage(character: $character)
                         case .meritsAndFlaws:
@@ -137,6 +141,12 @@ struct CharacterCreationWizard: View {
             return AttributesStage.areAllAttributesAssigned(character: character)
         case .skills:
             return true // Skills can be left at 0
+        case .specializations:
+            // Check that all required specializations are filled
+            let requiredSkills = character.getSkillsRequiringFreeSpecializationWithPoints()
+            return requiredSkills.allSatisfy { skillName in
+                !character.getSpecializations(for: skillName).isEmpty
+            }
         case .disciplines:
             return true // Disciplines can be empty
         case .meritsAndFlaws:
