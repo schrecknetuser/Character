@@ -16,6 +16,10 @@ struct StatusTab: View {
                         EditableHumanityRowView(character: $character, availableWidth: geometry.size.width - 40)
                         
                         EditableHungerRowView(character: $character, availableWidth: geometry.size.width - 40)
+                        
+                        EditableGenerationRowView(character: $character)
+                        
+                        EditableBloodPotencyRowView(character: $character)
                     } else {
                         StatusRowView(title: "Health", healthStates: character.healthStates, availableWidth: geometry.size.width - 40)
                         
@@ -24,6 +28,10 @@ struct StatusTab: View {
                         StatusRowView(title: "Humanity", humanityStates: character.humanityStates, availableWidth: geometry.size.width - 40)
                         
                         HungerRowView(hunger: character.hunger, availableWidth: geometry.size.width - 40)
+                        
+                        GenerationRowView(generation: character.generation)
+                        
+                        BloodPotencyRowView(bloodPotency: character.bloodPotency)
                     }
                 }
                 .padding(.horizontal, 20)

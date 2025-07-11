@@ -591,3 +591,133 @@ struct EditableHungerRowView: View {
         }
     }
 }
+
+// Generation Row View for displaying generation
+struct GenerationRowView: View {
+    let generation: Int
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Generation")
+                .font(.headline)
+                .fontWeight(.semibold)
+            
+            Text("\(generation)")
+                .font(.title2)
+                .fontWeight(.bold)
+        }
+    }
+}
+
+// Editable Generation Row View
+struct EditableGenerationRowView: View {
+    @Binding var character: Character
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Generation")
+                .font(.headline)
+                .fontWeight(.semibold)
+            
+            Text("\(character.generation)")
+                .font(.title2)
+                .fontWeight(.bold)
+            
+            // Generation controls
+            HStack {
+                if character.generation > 4 {
+                    Button(action: {
+                        if character.generation > 4 {
+                            character.generation -= 1
+                        }
+                    }) {
+                        Image(systemName: "minus.circle")
+                            .foregroundColor(.red)
+                    }
+                }
+                
+                Text("Generation: \(character.generation)")
+                    .font(.body)
+                
+                Spacer()
+                
+                if character.generation < 16 {
+                    Button(action: {
+                        if character.generation < 16 {
+                            character.generation += 1
+                        }
+                    }) {
+                        Image(systemName: "plus.circle")
+                            .foregroundColor(.green)
+                    }
+                }
+            }
+            .padding(.top, 8)
+        }
+    }
+}
+
+// Blood Potency Row View for displaying blood potency
+struct BloodPotencyRowView: View {
+    let bloodPotency: Int
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Blood Potency")
+                .font(.headline)
+                .fontWeight(.semibold)
+            
+            Text("\(bloodPotency)")
+                .font(.title2)
+                .fontWeight(.bold)
+        }
+    }
+}
+
+// Editable Blood Potency Row View
+struct EditableBloodPotencyRowView: View {
+    @Binding var character: Character
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Blood Potency")
+                .font(.headline)
+                .fontWeight(.semibold)
+            
+            Text("\(character.bloodPotency)")
+                .font(.title2)
+                .fontWeight(.bold)
+            
+            // Blood Potency controls
+            HStack {
+                if character.bloodPotency > 0 {
+                    Button(action: {
+                        if character.bloodPotency > 0 {
+                            character.bloodPotency -= 1
+                        }
+                    }) {
+                        Image(systemName: "minus.circle")
+                            .foregroundColor(.red)
+                    }
+                }
+                
+                Text("Blood Potency: \(character.bloodPotency)")
+                    .font(.body)
+                
+                Spacer()
+                
+                if character.bloodPotency < 10 {
+                    Button(action: {
+                        if character.bloodPotency < 10 {
+                            character.bloodPotency += 1
+                        }
+                    }) {
+                        Image(systemName: "plus.circle")
+                            .foregroundColor(.green)
+                    }
+                }
+            }
+            .padding(.top, 8)
+        }
+    }
+}
