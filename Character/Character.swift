@@ -1,7 +1,7 @@
 import SwiftUI
 
 // Data structures for character traits with costs
-struct Advantage: Identifiable, Codable, Hashable {
+struct Background: Identifiable, Codable, Hashable {
     var id = UUID()
     var name: String
     var cost: Int
@@ -31,12 +31,10 @@ struct ChangeLogEntry: Identifiable, Codable, Hashable {
     var id = UUID()
     var timestamp: Date
     var summary: String
-    var session: Int
     
-    init(summary: String, session: Int) {
+    init(summary: String) {
         self.timestamp = Date()
         self.summary = summary
-        self.session = session
     }
 }
 
@@ -53,18 +51,7 @@ struct SkillInfo: Codable, Hashable {
     }
 }
 
-struct Flaw: Identifiable, Codable, Hashable {
-    var id = UUID()
-    var name: String
-    var cost: Int // Negative cost for flaws (points gained)
-    var isCustom: Bool = false
-    
-    init(name: String, cost: Int, isCustom: Bool = false) {
-        self.name = name
-        self.cost = cost
-        self.isCustom = isCustom
-    }
-}
+
 
 // V5 Character System Constants
 struct V5Constants {
@@ -145,42 +132,42 @@ struct V5Constants {
     
     // Predefined V5 Advantages with costs
     static let predefinedAdvantages = [
-        Advantage(name: "Allies", cost: 3),
-        Advantage(name: "Contacts", cost: 1),
-        Advantage(name: "Fame", cost: 1),
-        Advantage(name: "Herd", cost: 3),
-        Advantage(name: "Influence", cost: 2),
-        Advantage(name: "Resources", cost: 3),
-        Advantage(name: "Retainers", cost: 2),
-        Advantage(name: "Status", cost: 2),
-        Advantage(name: "Haven", cost: 2),
-        Advantage(name: "Feeding Grounds", cost: 1),
-        Advantage(name: "Iron Will", cost: 5),
-        Advantage(name: "Time Sense", cost: 1),
-        Advantage(name: "Eidetic Memory", cost: 2),
-        Advantage(name: "Linguistics", cost: 1),
-        Advantage(name: "Domain", cost: 2),
-        Advantage(name: "Thin-Blooded Alchemy", cost: 5)
+        Background(name: "Allies", cost: 3),
+        Background(name: "Contacts", cost: 1),
+        Background(name: "Fame", cost: 1),
+        Background(name: "Herd", cost: 3),
+        Background(name: "Influence", cost: 2),
+        Background(name: "Resources", cost: 3),
+        Background(name: "Retainers", cost: 2),
+        Background(name: "Status", cost: 2),
+        Background(name: "Haven", cost: 2),
+        Background(name: "Feeding Grounds", cost: 1),
+        Background(name: "Iron Will", cost: 5),
+        Background(name: "Time Sense", cost: 1),
+        Background(name: "Eidetic Memory", cost: 2),
+        Background(name: "Linguistics", cost: 1),
+        Background(name: "Domain", cost: 2),
+        Background(name: "Thin-Blooded Alchemy", cost: 5)
     ]
     
     // Predefined V5 Flaws with costs (negative values as they give points back)
     static let predefinedFlaws = [
-        Flaw(name: "Enemy", cost: -1),
-        Flaw(name: "Dark Secret", cost: -1),
-        Flaw(name: "Hunted", cost: -3),
-        Flaw(name: "Folkloric Block", cost: -2),
-        Flaw(name: "Clan Curse", cost: -2),
-        Flaw(name: "Feeding Restriction", cost: -1),
-        Flaw(name: "Obvious Predator", cost: -2),
-        Flaw(name: "Prey Exclusion", cost: -1),
-        Flaw(name: "Stigmata", cost: -2),
-        Flaw(name: "Thin-Blooded", cost: -4),
-        Flaw(name: "Caitiff", cost: -2),
-        Flaw(name: "Anachronism", cost: -1),
-        Flaw(name: "Archaic", cost: -1),
-        Flaw(name: "Disgraced", cost: -2),
-        Flaw(name: "Shunned", cost: -1),
-        Flaw(name: "Suspect", cost: -2)
+        Background(name: "Enemy", cost: -1),
+        Background(name: "Dark Secret", cost: -1),
+        Background(name: "Hunted", cost: -3),
+        Background(name: "Folkloric Block", cost: -2),
+        Background(name: "Clan Curse", cost: -2),
+        Background(name: "Feeding Restriction", cost: -1),
+        Background(name: "Obvious Predator", cost: -2),
+        Background(name: "Prey Exclusion", cost: -1),
+        Background(name: "Stigmata", cost: -2),
+        Background(name: "Thin-Blooded", cost: -4),
+        Background(name: "Caitiff", cost: -2),
+        Background(name: "Anachronism", cost: -1),
+        Background(name: "Archaic", cost: -1),
+        Background(name: "Disgraced", cost: -2),
+        Background(name: "Shunned", cost: -1),
+        Background(name: "Suspect", cost: -2)
     ]
 }
 
@@ -234,8 +221,8 @@ struct Character: Identifiable, Codable {
     
 
     // V5 Character Traits
-    var advantages: [Advantage]
-    var flaws: [Flaw]
+    var advantages: [Background]
+    var flaws: [Background]
     var convictions: [String]
     var touchstones: [String]
     var chronicleTenets: [String]
@@ -314,7 +301,7 @@ struct Character: Identifiable, Codable {
     }
     
     // Full initializer for existing characters or manual creation
-    init(name: String, clan: String, generation: Int, physicalAttributes: [String: Int], socialAttributes: [String: Int], mentalAttributes: [String: Int], physicalSkills: [String: Int], socialSkills: [String: Int], mentalSkills: [String: Int], bloodPotency: Int, humanity: Int, willpower: Int, experience: Int, disciplines: [String: Int], advantages: [Advantage], flaws: [Flaw], convictions: [String], touchstones: [String], chronicleTenets: [String], hunger: Int, health: Int, spentExperience: Int = 0, ambition: String = "", desire: String = "", chronicleName: String = "", specializations: [Specialization] = [], currentSession: Int = 1, changeLog: [ChangeLogEntry] = [], healthStates: [HealthState]? = nil, willpowerStates: [WillpowerState]? = nil, humanityStates: [HumanityState]? = nil) {
+    init(name: String, clan: String, generation: Int, physicalAttributes: [String: Int], socialAttributes: [String: Int], mentalAttributes: [String: Int], physicalSkills: [String: Int], socialSkills: [String: Int], mentalSkills: [String: Int], bloodPotency: Int, humanity: Int, willpower: Int, experience: Int, disciplines: [String: Int], advantages: [Background], flaws: [Background], convictions: [String], touchstones: [String], chronicleTenets: [String], hunger: Int, health: Int, spentExperience: Int = 0, ambition: String = "", desire: String = "", chronicleName: String = "", specializations: [Specialization] = [], currentSession: Int = 1, changeLog: [ChangeLogEntry] = [], healthStates: [HealthState]? = nil, willpowerStates: [WillpowerState]? = nil, humanityStates: [HumanityState]? = nil) {
 
         self.name = name
         self.clan = clan
@@ -458,6 +445,128 @@ struct Character: Identifiable, Codable {
                 willpowerStates = Array(willpowerStates.prefix(newWillpower))
             }
         }
+    }
+    
+    private func processBackgroundChanges(original: [Background], updated: [Background], name: String, changes: inout [String])
+    {
+        let originalSet = Set(original)
+        let updatedSet = Set(updated)
+
+        let removed = originalSet.subtracting(updatedSet)
+        let added = updatedSet.subtracting(originalSet)
+
+        if !removed.isEmpty || !added.isEmpty {
+            if !removed.isEmpty {
+                let removedNames = removed.map { $0.name }.joined(separator: ", ")
+                changes.append("\(name)s removed: \(removedNames)")
+            }
+            if !added.isEmpty {
+                let addedNames = added.map { $0.name }.joined(separator: ", ")
+                changes.append("\(name)s added: \(addedNames)")
+            }
+        }
+    }
+    
+    private func processSpecializationChanges(original: [Specialization], updated: [Specialization], changes: inout [String])
+    {
+        let originalSet = Set(original)
+        let updatedSet = Set(updated)
+
+        let removed = originalSet.subtracting(updatedSet)
+        let added = updatedSet.subtracting(originalSet)
+
+        if !removed.isEmpty || !added.isEmpty {
+            if !removed.isEmpty {
+                let removedNames = removed.map { $0.name }.joined(separator: ", ")
+                changes.append("specializations removed: \(removedNames)")
+            }
+            if !added.isEmpty {
+                let addedNames = added.map { $0.name }.joined(separator: ", ")
+                changes.append("specializations added: \(addedNames)")
+            }
+        }
+    }
+    
+    public func generateChangeSummary(for updated: Character) -> String {
+        var changes: [String] = []
+        
+        // Check basic information changes
+        if self.name != updated.name {
+            changes.append("name changed")
+        }
+        if self.clan != updated.clan {
+            changes.append("clan changed")
+        }
+        if self.generation != updated.generation {
+            changes.append("generation changed")
+        }
+        
+        // Check attribute changes
+        for attribute in V5Constants.physicalAttributes + V5Constants.socialAttributes + V5Constants.mentalAttributes {
+            let originalVal = self.getAttributeValue(attribute: attribute)
+            let updatedVal = updated.getAttributeValue(attribute: attribute)
+            if originalVal != updatedVal {
+                changes.append("\(attribute.lowercased()) \(originalVal)→\(updatedVal)")
+            }
+        }
+        
+        // Check skill changes
+        for skill in V5Constants.physicalSkills + V5Constants.socialSkills + V5Constants.mentalSkills {
+            let originalVal = self.getSkillValue(skill: skill)
+            let updatedVal = updated.getSkillValue(skill: skill)
+            if originalVal != updatedVal {
+                changes.append("\(skill.lowercased()) \(originalVal)→\(updatedVal)")
+            }
+        }
+        
+        // Check core traits
+        if self.bloodPotency != updated.bloodPotency {
+            changes.append("blood potency \(self.bloodPotency)→\(updated.bloodPotency)")
+        }
+        if self.humanity != updated.humanity {
+            changes.append("humanity \(self.humanity)→\(updated.humanity)")
+        }
+        if self.experience != updated.experience {
+            changes.append("experience \(self.experience)→\(updated.experience)")
+        }
+        if self.spentExperience != updated.spentExperience {
+            changes.append("spent experience \(self.spentExperience)→\(updated.spentExperience)")
+        }
+        
+        // Check discipline changes
+        let allDisciplines = Set(self.disciplines.keys).union(Set(updated.disciplines.keys))
+        for discipline in allDisciplines {
+            let originalVal = self.disciplines[discipline] ?? 0
+            let updatedVal = updated.disciplines[discipline] ?? 0
+            if originalVal != updatedVal {
+                changes.append("\(discipline.lowercased()) \(originalVal)→\(updatedVal)")
+            }
+        }
+        
+        //Check specialisations
+        processSpecializationChanges(original: self.specializations, updated: updated.specializations, changes: &changes)
+        
+        // Check advantages/flaws changes
+        processBackgroundChanges(original: self.advantages, updated: updated.advantages, name: "advantage", changes: &changes)
+        processBackgroundChanges(original: self.flaws, updated: updated.flaws, name: "flaw", changes: &changes)
+        
+        if changes.isEmpty {
+            return ""
+        } else {
+            return changes.joined(separator: "\n")
+        }
+    }
+    
+    public func getAttributeValue(attribute: String) -> Int {
+        return self.physicalAttributes[attribute] ??
+               self.socialAttributes[attribute] ??
+               self.mentalAttributes[attribute] ?? 0
+    }
+    
+    public func getSkillValue(skill: String) -> Int {
+        return self.physicalSkills[skill] ??
+               self.socialSkills[skill] ??
+               self.mentalSkills[skill] ?? 0
     }
 }
 

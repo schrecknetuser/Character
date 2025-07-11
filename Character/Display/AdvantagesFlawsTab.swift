@@ -2,7 +2,7 @@ import SwiftUI
 
 // Editable Merits List View
 struct EditableAdvantagesListView: View {
-    @Binding var selectedAdvantages: [Advantage]
+    @Binding var selectedAdvantages: [Background]
     @State private var showingAddAdvantage = false
     
     var body: some View {
@@ -18,7 +18,7 @@ struct EditableAdvantagesListView: View {
 
 // Editable Flaws List View
 struct EditableFlawsListView: View {
-    @Binding var selectedFlaws: [Flaw]
+    @Binding var selectedFlaws: [Background]
     @State private var showingAddFlaw = false
     
     var body: some View {
@@ -34,7 +34,7 @@ struct EditableFlawsListView: View {
 
 // Helper view for managing advantages list
 struct AdvantagesListView: View {
-    @Binding var selectedAdvantages: [Advantage]
+    @Binding var selectedAdvantages: [Background]
     @State private var showingAddAdvantage = false
     
     var body: some View {
@@ -80,9 +80,9 @@ struct AdvantagesListView: View {
 
 // Helper view for adding advantages
 struct AddAdvantageView: View {
-    @Binding var selectedAdvantages: [Advantage]
+    @Binding var selectedAdvantages: [Background]
     @Environment(\.dismiss) var dismiss
-    @State private var selectedPredefined: Advantage?
+    @State private var selectedPredefined: Background?
     @State private var customName = ""
     @State private var customCost = 1
     @State private var isCustom = false
@@ -98,7 +98,7 @@ struct AddAdvantageView: View {
                             Text("\(advantage.cost) pts")
                                 .foregroundColor(.secondary)
                             Button("Add") {
-                                let newAdvantage = Advantage(name: advantage.name, cost: advantage.cost, isCustom: advantage.isCustom)
+                                let newAdvantage = Background(name: advantage.name, cost: advantage.cost, isCustom: advantage.isCustom)
                                 selectedAdvantages.append(newAdvantage)
                                 // Small delay to ensure state update is processed
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -114,7 +114,7 @@ struct AddAdvantageView: View {
                     TextField("Name", text: $customName)
                     Stepper("Cost: \(customCost)", value: $customCost, in: 1...10)
                     Button("Add Custom") {
-                        let customAdvantage = Advantage(name: customName, cost: customCost, isCustom: true)
+                        let customAdvantage = Background(name: customName, cost: customCost, isCustom: true)
                         selectedAdvantages.append(customAdvantage)
                         // Small delay to ensure state update is processed
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -138,7 +138,7 @@ struct AddAdvantageView: View {
 
 // Helper view for managing flaws list
 struct FlawsListView: View {
-    @Binding var selectedFlaws: [Flaw]
+    @Binding var selectedFlaws: [Background]
     @State private var showingAddFlaw = false
     
     var body: some View {
@@ -184,7 +184,7 @@ struct FlawsListView: View {
 
 // Helper view for adding flaws
 struct AddFlawView: View {
-    @Binding var selectedFlaws: [Flaw]
+    @Binding var selectedFlaws: [Background]
     @Environment(\.dismiss) var dismiss
     @State private var customName = ""
     @State private var customCost = 1
@@ -200,7 +200,7 @@ struct AddFlawView: View {
                             Text("\(abs(flaw.cost)) pts")
                                 .foregroundColor(.secondary)
                             Button("Add") {
-                                let newFlaw = Flaw(name: flaw.name, cost: flaw.cost, isCustom: flaw.isCustom)
+                                let newFlaw = Background(name: flaw.name, cost: flaw.cost, isCustom: flaw.isCustom)
                                 selectedFlaws.append(newFlaw)
                                 // Small delay to ensure state update is processed
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -216,7 +216,7 @@ struct AddFlawView: View {
                     TextField("Name", text: $customName)
                     Stepper("Value: \(customCost)", value: $customCost, in: 1...10)
                     Button("Add Custom") {
-                        let customFlaw = Flaw(name: customName, cost: -customCost, isCustom: true) // Negative cost for flaws
+                        let customFlaw = Background(name: customName, cost: -customCost, isCustom: true) // Negative cost for flaws
                         selectedFlaws.append(customFlaw)
                         // Small delay to ensure state update is processed
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {

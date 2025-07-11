@@ -55,12 +55,6 @@ struct DataTab: View {
                         ForEach(character.changeLog.reversed()) { entry in
                             VStack(alignment: .leading, spacing: 4) {
                                 HStack {
-                                    Text("Session \(entry.session)")
-                                        .font(.caption)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.blue)
-                                    
-                                    Spacer()
                                     
                                     Text(formatDate(entry.timestamp))
                                         .font(.caption)

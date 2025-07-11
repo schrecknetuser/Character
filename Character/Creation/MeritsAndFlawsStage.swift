@@ -77,7 +77,7 @@ struct MeritsAndFlawsStage: View {
 }
 
 struct CreationMeritsListView: View {
-    @Binding var selectedMerits: [Advantage]
+    @Binding var selectedMerits: [Background]
     @State private var showingAddMerit = false
     
     var body: some View {
@@ -92,7 +92,7 @@ struct CreationMeritsListView: View {
 }
 
 struct CreationFlawsListView: View {
-    @Binding var selectedFlaws: [Flaw]
+    @Binding var selectedFlaws: [Background]
     @State private var showingAddFlaw = false
     
     var body: some View {
