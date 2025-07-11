@@ -71,6 +71,18 @@ struct HumanityBoxView: View {
     }
 }
 
+// Blood Drop View for Hunger tracking
+struct BloodDropView: View {
+    let isFilled: Bool
+    
+    var body: some View {
+        Image(systemName: isFilled ? "drop.fill" : "drop")
+            .font(.system(size: statusBoxSize - 5))
+            .foregroundColor(isFilled ? .red : .gray)
+            .frame(width: statusBoxSize, height: statusBoxSize)
+    }
+}
+
 // Status Row View for displaying a row of boxes
 struct StatusRowView: View {
     let title: String
@@ -496,5 +508,208 @@ struct EditableHumanityRowView: View {
         reorderedStates.append(contentsOf: Array(repeating: .stained, count: stainedCount))
         
         return reorderedStates
+    }
+}
+
+// Hunger Row View for displaying hunger as blood drops
+struct HungerRowView: View {
+    let hunger: Int
+    let availableWidth: CGFloat
+    
+    private var boxesPerRow: Int {
+        let boxWithSpacing = statusBoxSize + 5
+        return max(1, Int(availableWidth / boxWithSpacing))
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Hunger")
+                .font(.headline)
+                .fontWeight(.semibold)
+            
+            LazyVGrid(columns: Array(repeating: GridItem(.fixed(statusBoxSize), spacing: 5), count: boxesPerRow), spacing: 5) {
+                ForEach(0..<5, id: \.self) { index in
+                    BloodDropView(isFilled: index < hunger)
+                }
+            }
+        }
+    }
+}
+
+// Editable Hunger Row View
+struct EditableHungerRowView: View {
+    @Binding var character: Character
+    let availableWidth: CGFloat
+    
+    private var boxesPerRow: Int {
+        let boxWithSpacing = statusBoxSize + 5
+        return max(1, Int(availableWidth / boxWithSpacing))
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Hunger")
+                .font(.headline)
+                .fontWeight(.semibold)
+            
+            LazyVGrid(columns: Array(repeating: GridItem(.fixed(statusBoxSize), spacing: 5), count: boxesPerRow), spacing: 5) {
+                ForEach(0..<5, id: \.self) { index in
+                    BloodDropView(isFilled: index < character.hunger)
+                }
+            }
+            
+            // Hunger controls
+            HStack {
+                if character.hunger > 0 {
+                    Button(action: {
+                        if character.hunger > 0 {
+                            character.hunger -= 1
+                        }
+                    }) {
+                        Image(systemName: "minus.circle")
+                            .foregroundColor(.red)
+                    }
+                }
+                
+                Text("Hunger Level: \(character.hunger)")
+                    .font(.body)
+                
+                Spacer()
+                
+                if character.hunger < 5 {
+                    Button(action: {
+                        if character.hunger < 5 {
+                            character.hunger += 1
+                        }
+                    }) {
+                        Image(systemName: "plus.circle")
+                            .foregroundColor(.green)
+                    }
+                }
+            }
+            .padding(.top, 8)
+        }
+    }
+}
+
+// Generation Row View for displaying generation
+struct GenerationRowView: View {
+    let generation: Int
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Generation")
+                .font(.headline)
+                .fontWeight(.semibold)
+            
+            Text("\(generation)")
+                .font(.title2)
+                .fontWeight(.bold)
+        }
+    }
+}
+
+// Editable Generation Row View
+struct EditableGenerationRowView: View {
+    @Binding var character: Character
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Generation")
+                .font(.headline)
+                .fontWeight(.semibold)
+            
+            // Generation controls
+            HStack {
+                if character.generation > 4 {
+                    Button(action: {
+                        if character.generation > 4 {
+                            character.generation -= 1
+                        }
+                    }) {
+                        Image(systemName: "minus.circle")
+                            .foregroundColor(.red)
+                    }
+                }
+                
+                Text("Generation: \(character.generation)")
+                    .font(.body)
+                
+                Spacer()
+                
+                if character.generation < 16 {
+                    Button(action: {
+                        if character.generation < 16 {
+                            character.generation += 1
+                        }
+                    }) {
+                        Image(systemName: "plus.circle")
+                            .foregroundColor(.green)
+                    }
+                }
+            }
+            .padding(.top, 8)
+        }
+    }
+}
+
+// Blood Potency Row View for displaying blood potency
+struct BloodPotencyRowView: View {
+    let bloodPotency: Int
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Blood Potency")
+                .font(.headline)
+                .fontWeight(.semibold)
+            
+            Text("\(bloodPotency)")
+                .font(.title2)
+                .fontWeight(.bold)
+        }
+    }
+}
+
+// Editable Blood Potency Row View
+struct EditableBloodPotencyRowView: View {
+    @Binding var character: Character
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Blood Potency")
+                .font(.headline)
+                .fontWeight(.semibold)
+            
+            // Blood Potency controls
+            HStack {
+                if character.bloodPotency > 0 {
+                    Button(action: {
+                        if character.bloodPotency > 0 {
+                            character.bloodPotency -= 1
+                        }
+                    }) {
+                        Image(systemName: "minus.circle")
+                            .foregroundColor(.red)
+                    }
+                }
+                
+                Text("Blood Potency: \(character.bloodPotency)")
+                    .font(.body)
+                
+                Spacer()
+                
+                if character.bloodPotency < 10 {
+                    Button(action: {
+                        if character.bloodPotency < 10 {
+                            character.bloodPotency += 1
+                        }
+                    }) {
+                        Image(systemName: "plus.circle")
+                            .foregroundColor(.green)
+                    }
+                }
+            }
+            .padding(.top, 8)
+        }
     }
 }

@@ -13,7 +13,25 @@ struct NameAndChronicleStage: View {
                 TextField("Chronicle Name", text: $character.chronicleName)
             }
             
-            Section(footer: Text("Both name and chronicle are required to proceed.")) {
+            Section(header: Text("Character Details")) {
+                HStack {
+                    Text("Generation:")
+                    Spacer()
+                    Stepper(value: $character.generation, in: 4...16) {
+                        Text("\(character.generation)")
+                    }
+                }
+                
+                HStack {
+                    Text("Blood Potency:")
+                    Spacer()
+                    Stepper(value: $character.bloodPotency, in: 0...10) {
+                        Text("\(character.bloodPotency)")
+                    }
+                }
+            }
+            
+            Section(footer: Text("All fields are required to proceed.")) {
                 EmptyView()
             }
         }
