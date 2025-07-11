@@ -19,18 +19,20 @@ struct AttributeDragData: Transferable, Codable {
 }
 
 enum CreationStage: Int, CaseIterable {
-    case nameAndChronicle = 0
-    case clan = 1
-    case attributes = 2
-    case skills = 3
-    case specializations = 4
-    case disciplines = 5
-    case meritsAndFlaws = 6
-    case convictionsAndTouchstones = 7
-    case ambitionAndDesire = 8
+    case characterType = 0
+    case nameAndChronicle = 1
+    case clan = 2
+    case attributes = 3
+    case skills = 4
+    case specializations = 5
+    case disciplines = 6
+    case meritsAndFlaws = 7
+    case convictionsAndTouchstones = 8
+    case ambitionAndDesire = 9
     
     var title: String {
         switch self {
+        case .characterType: return "Character Type"
         case .nameAndChronicle: return "Name & Chronicle"
         case .clan: return "Clan"
         case .attributes: return "Attributes"
@@ -48,8 +50,9 @@ struct CharacterCreationWizard: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var store: CharacterStore
     
-    @State private var currentStage: CreationStage = .nameAndChronicle
+    @State private var currentStage: CreationStage = .characterType
     @State private var character = Character()
+    @State private var selectedCharacterType: CharacterType = .vampire
     
     var body: some View {
         NavigationView {
@@ -66,6 +69,8 @@ struct CharacterCreationWizard: View {
                 // Current stage content
                 Group {
                     switch currentStage {
+                        case .characterType:
+                            CharacterTypeSelectionStage(selectedCharacterType: $selectedCharacterType)
                         case .nameAndChronicle:
                             NameAndChronicleStage(character: $character)
                         case .clan:
@@ -92,10 +97,10 @@ struct CharacterCreationWizard: View {
                 HStack {
                     Button("Back") {
                         if currentStage.rawValue > 0 {
-                            currentStage = CreationStage(rawValue: currentStage.rawValue - 1) ?? .nameAndChronicle
+                            currentStage = CreationStage(rawValue: currentStage.rawValue - 1) ?? .characterType
                         }
                     }
-                    .disabled(currentStage == .nameAndChronicle)
+                    .disabled(currentStage == .characterType)
                     
                     Spacer()
                     
@@ -132,6 +137,8 @@ struct CharacterCreationWizard: View {
     
     private func canProceedFromCurrentStage() -> Bool {
         switch currentStage {
+        case .characterType:
+            return true // Character type is always valid (currently only vampire available)
         case .nameAndChronicle:
             return !character.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
                    !character.chronicleName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
