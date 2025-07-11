@@ -1,5 +1,100 @@
 import SwiftUI
 
+struct SkillColumnView: View {
+    let title: String
+    let skills: [String]
+    @Binding var skillValues: [String: Int]
+    let isEditing: Bool
+    let dynamicFontSize: CGFloat
+    let headerFontSize: CGFloat
+    let rowHeight: CGFloat
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.system(size: headerFontSize, weight: .semibold))
+
+            ForEach(skills, id: \.self) { skill in
+                HStack(spacing: 6) {
+                    Text(skill)
+                        .font(.system(size: dynamicFontSize))
+                        .lineLimit(1)
+
+                    Spacer()
+
+                    if isEditing {
+                        Picker("", selection: Binding(
+                            get: { skillValues[skill] ?? 0 },
+                            set: { skillValues[skill] = $0 }
+                        )) {
+                            ForEach(0...5, id: \.self) { value in
+                                Text("\(value)")
+                                    .font(.system(size: dynamicFontSize))
+                                    .tag(value)
+                            }
+                        }
+                        .pickerStyle(MenuPickerStyle())
+                        .frame(width: 55)
+                        .clipped()
+                    } else {
+                        Text("\(skillValues[skill] ?? 0)")
+                            .font(.system(size: dynamicFontSize, weight: .medium))
+                            .frame(width: 25, alignment: .center)
+                    }
+                }
+                .frame(minHeight: rowHeight)
+            }
+        }
+    }
+}
+
+struct AttributeColumnView: View {
+    let title: String
+    let attributes: [String]
+    @Binding var attributeValues: [String: Int]
+    let isEditing: Bool
+    let dynamicFontSize: CGFloat
+    let headerFontSize: CGFloat
+    let rowHeight: CGFloat
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.system(size: headerFontSize, weight: .semibold))
+
+            ForEach(attributes, id: \.self) { attribute in
+                HStack(spacing: 6) {
+                    Text(attribute)
+                        .font(.system(size: dynamicFontSize))
+                        .lineLimit(1)
+
+                    Spacer()
+
+                    if isEditing {
+                        Picker("", selection: Binding(
+                            get: { attributeValues[attribute] ?? 1 },
+                            set: { attributeValues[attribute] = $0 }
+                        )) {
+                            ForEach(0...5, id: \.self) { value in
+                                Text("\(value)")
+                                    .font(.system(size: dynamicFontSize))
+                                    .tag(value)
+                            }
+                        }
+                        .pickerStyle(MenuPickerStyle())
+                        .frame(width: 55)
+                        .clipped()
+                    } else {
+                        Text("\(attributeValues[attribute] ?? 1)")
+                            .font(.system(size: dynamicFontSize, weight: .medium))
+                            .frame(width: 25, alignment: .center)
+                    }
+                }
+                .frame(minHeight: rowHeight)
+            }
+        }
+    }
+}
 
 struct AttributesSkillsTab: View {
     @Binding var character: Character
@@ -19,113 +114,35 @@ struct AttributesSkillsTab: View {
                             .font(.system(size: titleFontSize, weight: .bold))
                         
                         HStack(alignment: .top, spacing: 12) {
-                            // Physical Attributes Column
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("Physical")
-                                    .font(.system(size: headerFontSize, weight: .semibold))
-                                
-                                ForEach(V5Constants.physicalAttributes, id: \.self) { attribute in
-                                    HStack(spacing: 6) {
-                                        Text(attribute)
-                                            .font(.system(size: dynamicFontSize))
-                                            .lineLimit(1)
-                                        Spacer()
-                                        if isEditing {
-                                            Picker("", selection: Binding(
-                                                get: { character.physicalAttributes[attribute] ?? 1 },
-                                                set: { character.physicalAttributes[attribute] = $0 }
-                                            )) {
-                                                ForEach(0...10, id: \.self) { value in
-                                                    Text("\(value)")
-                                                        .font(.system(size: dynamicFontSize))
-                                                        .tag(value)
-                                                }
-                                            }
-                                            .pickerStyle(MenuPickerStyle())
-                                            .frame(width: 55)
-                                            .clipped()
-                                        } else {
-                                            Text("\(character.physicalAttributes[attribute] ?? 0)")
-                                                .font(.system(size: dynamicFontSize, weight: .medium))
-                                                .frame(width: 25, alignment: .center)
-                                        }
-                                    }
-                                    .frame(minHeight: rowHeight)
-                                }
-                            }
-                            .frame(maxWidth: .infinity)
+                            AttributeColumnView(
+                                title: "Physical",
+                                attributes: V5Constants.physicalAttributes,
+                                attributeValues: $character.physicalAttributes,
+                                isEditing: isEditing,
+                                dynamicFontSize: dynamicFontSize,
+                                headerFontSize: headerFontSize,
+                                rowHeight: rowHeight
+                            ).frame(maxWidth: .infinity)
                             
-                            // Social Attributes Column
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("Social")
-                                    .font(.system(size: headerFontSize, weight: .semibold))
-                                
-                                ForEach(V5Constants.socialAttributes, id: \.self) { attribute in
-                                    HStack(spacing: 6) {
-                                        Text(attribute)
-                                            .font(.system(size: dynamicFontSize))
-                                            .lineLimit(1)
-                                        Spacer()
-                                        if isEditing {
-                                            Picker("", selection: Binding(
-                                                get: { character.socialAttributes[attribute] ?? 1 },
-                                                set: { character.socialAttributes[attribute] = $0 }
-                                            )) {
-                                                ForEach(0...10, id: \.self) { value in
-                                                    Text("\(value)")
-                                                        .font(.system(size: dynamicFontSize))
-                                                        .tag(value)
-                                                }
-                                            }
-                                            .pickerStyle(MenuPickerStyle())
-                                            .frame(width: 55)
-                                            .clipped()
-                                        } else {
-                                            Text("\(character.socialAttributes[attribute] ?? 0)")
-                                                .font(.system(size: dynamicFontSize, weight: .medium))
-                                                .frame(width: 25, alignment: .center)
-                                        }
-                                    }
-                                    .frame(minHeight: rowHeight)
-                                }
-                            }
-                            .frame(maxWidth: .infinity)
+                            AttributeColumnView(
+                                title: "Mental",
+                                attributes: V5Constants.mentalAttributes,
+                                attributeValues: $character.mentalAttributes,
+                                isEditing: isEditing,
+                                dynamicFontSize: dynamicFontSize,
+                                headerFontSize: headerFontSize,
+                                rowHeight: rowHeight
+                            ).frame(maxWidth: .infinity)
                             
-                            // Mental Attributes Column
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("Mental")
-                                    .font(.system(size: headerFontSize, weight: .semibold))
-                                
-                                ForEach(V5Constants.mentalAttributes, id: \.self) { attribute in
-                                    HStack(spacing: 6) {
-                                        Text(attribute)
-                                            .font(.system(size: dynamicFontSize))
-                                            .lineLimit(1)
-                                        Spacer()
-                                        if isEditing {
-                                            Picker("", selection: Binding(
-                                                get: { character.mentalAttributes[attribute] ?? 1 },
-                                                set: { character.mentalAttributes[attribute] = $0 }
-                                            )) {
-                                                ForEach(0...10, id: \.self) { value in
-                                                    Text("\(value)")
-                                                        .font(.system(size: dynamicFontSize))
-                                                        .tag(value)
-                                                }
-                                            }
-                                            .pickerStyle(MenuPickerStyle())
-                                            .frame(width: 55)
-                                            .clipped()
-                                        } else {
-                                            Text("\(character.mentalAttributes[attribute] ?? 0)")
-                                                .font(.system(size: dynamicFontSize, weight: .medium))
-                                                .frame(width: 25, alignment: .center)
-                                        }
-                                    }
-                                    .frame(minHeight: rowHeight)
-                                }
-                            }
-                            .frame(maxWidth: .infinity)
+                            AttributeColumnView(
+                                title: "Social",
+                                attributes: V5Constants.socialAttributes,
+                                attributeValues: $character.socialAttributes,
+                                isEditing: isEditing,
+                                dynamicFontSize: dynamicFontSize,
+                                headerFontSize: headerFontSize,
+                                rowHeight: rowHeight
+                            ).frame(maxWidth: .infinity)
                         }
                     }
                     
@@ -136,112 +153,36 @@ struct AttributesSkillsTab: View {
                         
                         HStack(alignment: .top, spacing: 12) {
                             // Physical Skills Column
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("Physical")
-                                    .font(.system(size: headerFontSize, weight: .semibold))
-                                
-                                ForEach(V5Constants.physicalSkills, id: \.self) { skill in
-                                    HStack(spacing: 6) {
-                                        Text(skill)
-                                            .font(.system(size: dynamicFontSize))
-                                            .lineLimit(1)
-                                        Spacer()
-                                        if isEditing {
-                                            Picker("", selection: Binding(
-                                                get: { character.physicalSkills[skill] ?? 0 },
-                                                set: { character.physicalSkills[skill] = $0 }
-                                            )) {
-                                                ForEach(0...10, id: \.self) { value in
-                                                    Text("\(value)")
-                                                        .font(.system(size: dynamicFontSize))
-                                                        .tag(value)
-                                                }
-                                            }
-                                            .pickerStyle(MenuPickerStyle())
-                                            .frame(width: 55)
-                                            .clipped()
-                                        } else {
-                                            Text("\(character.physicalSkills[skill] ?? 0)")
-                                                .font(.system(size: dynamicFontSize, weight: .medium))
-                                                .frame(width: 25, alignment: .center)
-                                        }
-                                    }
-                                    .frame(minHeight: rowHeight)
-                                }
-                            }
-                            .frame(maxWidth: .infinity)
                             
-                            // Social Skills Column
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("Social")
-                                    .font(.system(size: headerFontSize, weight: .semibold))
-                                
-                                ForEach(V5Constants.socialSkills, id: \.self) { skill in
-                                    HStack(spacing: 6) {
-                                        Text(skill)
-                                            .font(.system(size: dynamicFontSize))
-                                            .lineLimit(1)
-                                        Spacer()
-                                        if isEditing {
-                                            Picker("", selection: Binding(
-                                                get: { character.socialSkills[skill] ?? 0 },
-                                                set: { character.socialSkills[skill] = $0 }
-                                            )) {
-                                                ForEach(0...10, id: \.self) { value in
-                                                    Text("\(value)")
-                                                        .font(.system(size: dynamicFontSize))
-                                                        .tag(value)
-                                                }
-                                            }
-                                            .pickerStyle(MenuPickerStyle())
-                                            .frame(width: 55)
-                                            .clipped()
-                                        } else {
-                                            Text("\(character.socialSkills[skill] ?? 0)")
-                                                .font(.system(size: dynamicFontSize, weight: .medium))
-                                                .frame(width: 25, alignment: .center)
-                                        }
-                                    }
-                                    .frame(minHeight: rowHeight)
-                                }
-                            }
-                            .frame(maxWidth: .infinity)
+                            SkillColumnView(
+                                title: "Physical",
+                                skills: V5Constants.physicalSkills,
+                                skillValues: $character.physicalSkills,
+                                isEditing: isEditing,
+                                dynamicFontSize: dynamicFontSize,
+                                headerFontSize: headerFontSize,
+                                rowHeight: rowHeight
+                            ).frame(maxWidth: .infinity)
                             
-                            // Mental Skills Column
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("Mental")
-                                    .font(.system(size: headerFontSize, weight: .semibold))
-                                
-                                ForEach(V5Constants.mentalSkills, id: \.self) { skill in
-                                    HStack(spacing: 6) {
-                                        Text(skill)
-                                            .font(.system(size: dynamicFontSize))
-                                            .lineLimit(1)
-                                        Spacer()
-                                        if isEditing {
-                                            Picker("", selection: Binding(
-                                                get: { character.mentalSkills[skill] ?? 0 },
-                                                set: { character.mentalSkills[skill] = $0 }
-                                            )) {
-                                                ForEach(0...10, id: \.self) { value in
-                                                    Text("\(value)")
-                                                        .font(.system(size: dynamicFontSize))
-                                                        .tag(value)
-                                                }
-                                            }
-                                            .pickerStyle(MenuPickerStyle())
-                                            .frame(width: 55)
-                                            .clipped()
-                                        } else {
-                                            Text("\(character.mentalSkills[skill] ?? 0)")
-                                                .font(.system(size: dynamicFontSize, weight: .medium))
-                                                .frame(width: 25, alignment: .center)
-                                        }
-                                    }
-                                    .frame(minHeight: rowHeight)
-                                }
-                            }
-                            .frame(maxWidth: .infinity)
+                            SkillColumnView(
+                                title: "Social",
+                                skills: V5Constants.socialSkills,
+                                skillValues: $character.socialSkills,
+                                isEditing: isEditing,
+                                dynamicFontSize: dynamicFontSize,
+                                headerFontSize: headerFontSize,
+                                rowHeight: rowHeight
+                            ).frame(maxWidth: .infinity)
+                            
+                            SkillColumnView(
+                                title: "Mental",
+                                skills: V5Constants.mentalSkills,
+                                skillValues: $character.mentalSkills,
+                                isEditing: isEditing,
+                                dynamicFontSize: dynamicFontSize,
+                                headerFontSize: headerFontSize,
+                                rowHeight: rowHeight
+                            ).frame(maxWidth: .infinity)
                         }
                     }
                 }
