@@ -14,6 +14,31 @@ struct Advantage: Identifiable, Codable, Hashable {
     }
 }
 
+// Data structure for skill specializations
+struct Specialization: Identifiable, Codable, Hashable {
+    var id = UUID()
+    var skillName: String
+    var name: String
+    
+    init(skillName: String, name: String) {
+        self.skillName = skillName
+        self.name = name
+    }
+}
+
+// Data structure for skills with specialization information
+struct SkillInfo: Codable, Hashable {
+    var name: String
+    var specializationExamples: [String]
+    var requiresFreeSpecialization: Bool
+    
+    init(name: String, specializationExamples: [String] = [], requiresFreeSpecialization: Bool = false) {
+        self.name = name
+        self.specializationExamples = specializationExamples
+        self.requiresFreeSpecialization = requiresFreeSpecialization
+    }
+}
+
 struct Flaw: Identifiable, Codable, Hashable {
     var id = UUID()
     var name: String
@@ -38,14 +63,65 @@ struct V5Constants {
     // Mental Attributes
     static let mentalAttributes = ["Intelligence", "Wits", "Resolve"]
     
-    // Physical Skills
+    // Physical Skills (for backward compatibility)
     static let physicalSkills = ["Athletics", "Brawl", "Craft", "Drive", "Firearms", "Larceny", "Melee", "Stealth", "Survival"]
     
-    // Social Skills
+    // Social Skills (for backward compatibility)
     static let socialSkills = ["Animal Ken", "Etiquette", "Insight", "Intimidation", "Leadership", "Performance", "Persuasion", "Streetwise", "Subterfuge"]
     
-    // Mental Skills
+    // Mental Skills (for backward compatibility)
     static let mentalSkills = ["Academics", "Awareness", "Finance", "Investigation", "Medicine", "Occult", "Politics", "Science", "Technology"]
+    
+    // Detailed skill information with specialization examples
+    static let physicalSkillsInfo = [
+        SkillInfo(name: "Athletics", specializationExamples: ["Climbing", "Running", "Swimming", "Parkour", "Acrobatics"]),
+        SkillInfo(name: "Brawl", specializationExamples: ["Boxing", "Wrestling", "Martial Arts", "Grappling", "Dirty Fighting"]),
+        SkillInfo(name: "Craft", specializationExamples: ["Woodworking", "Metalworking", "Painting", "Sculpture", "Electronics"], requiresFreeSpecialization: true),
+        SkillInfo(name: "Drive", specializationExamples: ["Cars", "Motorcycles", "Trucks", "Racing", "Off-road"]),
+        SkillInfo(name: "Firearms", specializationExamples: ["Pistols", "Rifles", "Shotguns", "Archery", "Thrown Weapons"]),
+        SkillInfo(name: "Larceny", specializationExamples: ["Lockpicking", "Pickpocketing", "Security Systems", "Safecracking", "Sleight of Hand"]),
+        SkillInfo(name: "Melee", specializationExamples: ["Swords", "Knives", "Clubs", "Improvised Weapons", "Fencing"]),
+        SkillInfo(name: "Stealth", specializationExamples: ["Hiding", "Moving Silently", "Camouflage", "Crowds", "Shadows"]),
+        SkillInfo(name: "Survival", specializationExamples: ["Tracking", "Foraging", "Navigation", "Weather Prediction", "Urban Survival"])
+    ]
+    
+    static let socialSkillsInfo = [
+        SkillInfo(name: "Animal Ken", specializationExamples: ["Dogs", "Cats", "Horses", "Wild Animals", "Rats"]),
+        SkillInfo(name: "Etiquette", specializationExamples: ["High Society", "Corporate", "Street", "Academic", "Criminal"]),
+        SkillInfo(name: "Insight", specializationExamples: ["Emotions", "Lies", "Fear", "Desires", "Motivations"]),
+        SkillInfo(name: "Intimidation", specializationExamples: ["Physical Threats", "Stare Down", "Verbal Abuse", "Torture", "Social Pressure"]),
+        SkillInfo(name: "Leadership", specializationExamples: ["Military", "Corporate", "Gang", "Cult", "Noble"]),
+        SkillInfo(name: "Performance", specializationExamples: ["Acting", "Singing", "Dancing", "Comedy", "Oratory"], requiresFreeSpecialization: true),
+        SkillInfo(name: "Persuasion", specializationExamples: ["Fast Talk", "Seduction", "Sales", "Oratory", "Lies"]),
+        SkillInfo(name: "Streetwise", specializationExamples: ["Rumors", "Black Market", "Drugs", "Gangs", "Fence"]),
+        SkillInfo(name: "Subterfuge", specializationExamples: ["Lying", "Misdirection", "Innocent Face", "Changing Subject", "Long Con"])
+    ]
+    
+    static let mentalSkillsInfo = [
+        SkillInfo(name: "Academics", specializationExamples: ["History", "Literature", "Anthropology", "Art", "Law"], requiresFreeSpecialization: true),
+        SkillInfo(name: "Awareness", specializationExamples: ["Ambushes", "Crowds", "Supernatural", "Details", "Eavesdropping"]),
+        SkillInfo(name: "Finance", specializationExamples: ["Accounting", "Investment", "Banking", "Appraisal", "Forgery"]),
+        SkillInfo(name: "Investigation", specializationExamples: ["Crime Scenes", "Research", "Surveillance", "Forensics", "Internet"]),
+        SkillInfo(name: "Medicine", specializationExamples: ["First Aid", "Surgery", "Pathology", "Pharmacy", "Veterinary"]),
+        SkillInfo(name: "Occult", specializationExamples: ["Kindred Lore", "Rituals", "Ghosts", "Witchcraft", "Mythology"]),
+        SkillInfo(name: "Politics", specializationExamples: ["City", "Kindred", "Corporate", "Church", "Anarchs"]),
+        SkillInfo(name: "Science", specializationExamples: ["Biology", "Chemistry", "Physics", "Psychology", "Computer Science"], requiresFreeSpecialization: true),
+        SkillInfo(name: "Technology", specializationExamples: ["Computers", "Electronics", "Programming", "Hacking", "Data Recovery"])
+    ]
+    
+    // Helper methods to access skill information
+    static func getSkillInfo(for skillName: String) -> SkillInfo? {
+        let allSkills = physicalSkillsInfo + socialSkillsInfo + mentalSkillsInfo
+        return allSkills.first { $0.name == skillName }
+    }
+    
+    static func getAllSkillsInfo() -> [SkillInfo] {
+        return physicalSkillsInfo + socialSkillsInfo + mentalSkillsInfo
+    }
+    
+    static func getSkillsRequiringFreeSpecialization() -> [String] {
+        return getAllSkillsInfo().filter { $0.requiresFreeSpecialization }.map { $0.name }
+    }
     
     // Major V5 Disciplines
     static let disciplines = ["Animalism", "Auspex", "Blood Sorcery", "Celerity", "Dominate", "Fortitude", "Obfuscate", "Potence", "Presence", "Protean", "Hecata Sorcery", "Lasombra Oblivion", "Oblivion", "Obeah", "Quietus", "Serpentis", "Vicissitude"]
@@ -150,6 +226,9 @@ struct Character: Identifiable, Codable {
     var touchstones: [String]
     var chronicleTenets: [String]
     
+    // Skill Specializations
+    var specializations: [Specialization]
+    
     // V5 Condition Tracking
     var hunger: Int
     var health: Int
@@ -201,6 +280,7 @@ struct Character: Identifiable, Codable {
         self.convictions = []
         self.touchstones = []
         self.chronicleTenets = []
+        self.specializations = []
         
         // Initialize condition tracking with defaults
         self.hunger = 1  // Always start at 1 for new characters
@@ -212,7 +292,7 @@ struct Character: Identifiable, Codable {
     }
     
     // Full initializer for existing characters or manual creation
-    init(name: String, clan: String, generation: Int, physicalAttributes: [String: Int], socialAttributes: [String: Int], mentalAttributes: [String: Int], physicalSkills: [String: Int], socialSkills: [String: Int], mentalSkills: [String: Int], bloodPotency: Int, humanity: Int, willpower: Int, experience: Int, disciplines: [String: Int], advantages: [Advantage], flaws: [Flaw], convictions: [String], touchstones: [String], chronicleTenets: [String], hunger: Int, health: Int, spentExperience: Int = 0, ambition: String = "", desire: String = "", chronicleName: String = "", healthStates: [HealthState]? = nil, willpowerStates: [WillpowerState]? = nil, humanityStates: [HumanityState]? = nil) {
+    init(name: String, clan: String, generation: Int, physicalAttributes: [String: Int], socialAttributes: [String: Int], mentalAttributes: [String: Int], physicalSkills: [String: Int], socialSkills: [String: Int], mentalSkills: [String: Int], bloodPotency: Int, humanity: Int, willpower: Int, experience: Int, disciplines: [String: Int], advantages: [Advantage], flaws: [Flaw], convictions: [String], touchstones: [String], chronicleTenets: [String], hunger: Int, health: Int, spentExperience: Int = 0, ambition: String = "", desire: String = "", chronicleName: String = "", specializations: [Specialization] = [], healthStates: [HealthState]? = nil, willpowerStates: [WillpowerState]? = nil, humanityStates: [HumanityState]? = nil) {
 
         self.name = name
         self.clan = clan
@@ -233,6 +313,7 @@ struct Character: Identifiable, Codable {
         self.convictions = convictions
         self.touchstones = touchstones
         self.chronicleTenets = chronicleTenets
+        self.specializations = specializations
         self.hunger = hunger
         self.health = health
         
@@ -284,6 +365,33 @@ struct Character: Identifiable, Codable {
     
     var availableExperience: Int {
         experience - spentExperience
+    }
+    
+    // Computed properties for specializations
+    func getSpecializations(for skillName: String) -> [Specialization] {
+        return specializations.filter { $0.skillName == skillName }
+    }
+    
+    func getSkillsWithPoints() -> [String] {
+        var skillsWithPoints: [String] = []
+        
+        for (skill, value) in physicalSkills where value > 0 {
+            skillsWithPoints.append(skill)
+        }
+        for (skill, value) in socialSkills where value > 0 {
+            skillsWithPoints.append(skill)
+        }
+        for (skill, value) in mentalSkills where value > 0 {
+            skillsWithPoints.append(skill)
+        }
+        
+        return skillsWithPoints
+    }
+    
+    func getSkillsRequiringFreeSpecializationWithPoints() -> [String] {
+        let skillsWithPoints = getSkillsWithPoints()
+        let skillsRequiringFree = V5Constants.getSkillsRequiringFreeSpecialization()
+        return skillsWithPoints.filter { skillsRequiringFree.contains($0) }
     }
     
     // Computed properties for dynamic box counts
