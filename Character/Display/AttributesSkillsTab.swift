@@ -9,9 +9,6 @@ struct SkillColumnView: View {
     let dynamicFontSize: CGFloat
     let headerFontSize: CGFloat
     let rowHeight: CGFloat
-    @State private var showingAddSpecialization = false
-    @State private var selectedSkillForSpecialization = ""
-    @State private var newSpecializationText = ""
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -48,38 +45,8 @@ struct SkillColumnView: View {
                         }
                     }
                     .frame(minHeight: rowHeight)
-                    
-                    // Display specializations for this skill
-                    let specializations = character.getSpecializations(for: skill)
-                    if !specializations.isEmpty {
-                        SpecializationsDisplayView(
-                            specializations: specializations,
-                            isEditing: isEditing,
-                            dynamicFontSize: dynamicFontSize,
-                            onRemove: { specialization in
-                                character.specializations.removeAll { $0.id == specialization.id }
-                            }
-                        )
-                    }
-                    
-                    // Add specialization button in edit mode
-                    if isEditing && (skillValues[skill] ?? 0) > 0 {
-                        Button("+ Add Specialization") {
-                            selectedSkillForSpecialization = skill
-                            showingAddSpecialization = true
-                        }
-                        .font(.system(size: dynamicFontSize - 2))
-                        .foregroundColor(.blue)
-                    }
                 }
             }
-        }
-        .sheet(isPresented: $showingAddSpecialization) {
-            AddSpecializationSheet(
-                skillName: selectedSkillForSpecialization,
-                character: $character,
-                isPresented: $showingAddSpecialization
-            )
         }
     }
 }
@@ -124,19 +91,42 @@ struct AddSpecializationSheet: View {
     @Binding var character: Character
     @Binding var isPresented: Bool
     @State private var specializationText = ""
+    @State private var selectedSkill = ""
+    
+    private var skillsWithPoints: [String] {
+        return character.getSkillsWithPoints()
+    }
     
     var body: some View {
         NavigationView {
             VStack(alignment: .leading, spacing: 20) {
-                Text("Add Specialization for \(skillName)")
+                Text("Add Specialization")
                     .font(.title2)
                     .fontWeight(.bold)
                 
                 VStack(alignment: .leading, spacing: 8) {
+                    Text("Select Skill:")
+                        .font(.headline)
+                    
+                    Picker("Skill", selection: $selectedSkill) {
+                        Text("Select a skill...").tag("")
+                        ForEach(skillsWithPoints, id: \.self) { skill in
+                            Text(skill).tag(skill)
+                        }
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Specialization:")
+                        .font(.headline)
+                    
                     TextField("Enter specialization", text: $specializationText)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                     
-                    if let skillInfo = V5Constants.getSkillInfo(for: skillName),
+                    if !selectedSkill.isEmpty,
+                       let skillInfo = V5Constants.getSkillInfo(for: selectedSkill),
                        !skillInfo.specializationExamples.isEmpty {
                         Text("Examples: \(skillInfo.specializationExamples.joined(separator: ", "))")
                             .font(.caption)
@@ -159,17 +149,24 @@ struct AddSpecializationSheet: View {
                     Button("Add") {
                         addSpecialization()
                     }
-                    .disabled(specializationText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .disabled(selectedSkill.isEmpty || specializationText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
+            }
+        }
+        .onAppear {
+            if !skillName.isEmpty && skillsWithPoints.contains(skillName) {
+                selectedSkill = skillName
+            } else if skillsWithPoints.count == 1 {
+                selectedSkill = skillsWithPoints[0]
             }
         }
     }
     
     private func addSpecialization() {
         let trimmedText = specializationText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedText.isEmpty else { return }
+        guard !trimmedText.isEmpty && !selectedSkill.isEmpty else { return }
         
-        let newSpecialization = Specialization(skillName: skillName, name: trimmedText)
+        let newSpecialization = Specialization(skillName: selectedSkill, name: trimmedText)
         character.specializations.append(newSpecialization)
         
         isPresented = false
@@ -316,6 +313,17 @@ struct AttributesSkillsTab: View {
                             ).frame(maxWidth: .infinity)
                         }
                     }
+                    
+                    // Specializations Section
+                    if !character.specializations.isEmpty || isEditing {
+                        SpecializationsTableView(
+                            character: $character,
+                            isEditing: isEditing,
+                            dynamicFontSize: dynamicFontSize,
+                            titleFontSize: titleFontSize,
+                            headerFontSize: headerFontSize
+                        )
+                    }
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
@@ -353,5 +361,145 @@ struct AttributesSkillsTab: View {
         titleFontSize = max(15, min(19, baseTitleSize * scaleFactor))
         headerFontSize = max(12, min(16, baseHeaderSize * scaleFactor))
         rowHeight = max(22, min(28, baseRowHeight * scaleFactor))
+    }
+}
+
+struct SpecializationsTableView: View {
+    @Binding var character: Character
+    let isEditing: Bool
+    let dynamicFontSize: CGFloat
+    let titleFontSize: CGFloat
+    let headerFontSize: CGFloat
+    @State private var showingAddSpecialization = false
+    @State private var selectedSkillForSpecialization = ""
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 15) {
+            Text("Specializations")
+                .font(.system(size: titleFontSize, weight: .bold))
+            
+            VStack(alignment: .leading, spacing: 8) {
+                // Group specializations by skill type
+                if !getPhysicalSpecializations().isEmpty {
+                    SpecializationCategoryView(
+                        title: "Physical",
+                        specializations: getPhysicalSpecializations(),
+                        isEditing: isEditing,
+                        dynamicFontSize: dynamicFontSize,
+                        headerFontSize: headerFontSize,
+                        onRemove: removeSpecialization
+                    )
+                }
+                
+                if !getSocialSpecializations().isEmpty {
+                    SpecializationCategoryView(
+                        title: "Social", 
+                        specializations: getSocialSpecializations(),
+                        isEditing: isEditing,
+                        dynamicFontSize: dynamicFontSize,
+                        headerFontSize: headerFontSize,
+                        onRemove: removeSpecialization
+                    )
+                }
+                
+                if !getMentalSpecializations().isEmpty {
+                    SpecializationCategoryView(
+                        title: "Mental",
+                        specializations: getMentalSpecializations(),
+                        isEditing: isEditing,
+                        dynamicFontSize: dynamicFontSize,
+                        headerFontSize: headerFontSize,
+                        onRemove: removeSpecialization
+                    )
+                }
+                
+                // Add specialization button in edit mode
+                if isEditing {
+                    Button("+ Add Specialization") {
+                        showingAddSpecialization = true
+                    }
+                    .font(.system(size: dynamicFontSize))
+                    .foregroundColor(.blue)
+                    .padding(.top, 8)
+                }
+            }
+        }
+        .sheet(isPresented: $showingAddSpecialization) {
+            AddSpecializationSheet(
+                skillName: selectedSkillForSpecialization,
+                character: $character,
+                isPresented: $showingAddSpecialization
+            )
+        }
+    }
+    
+    private func getPhysicalSpecializations() -> [(String, [Specialization])] {
+        return getSpecializationsForSkills(V5Constants.physicalSkills)
+    }
+    
+    private func getSocialSpecializations() -> [(String, [Specialization])] {
+        return getSpecializationsForSkills(V5Constants.socialSkills)
+    }
+    
+    private func getMentalSpecializations() -> [(String, [Specialization])] {
+        return getSpecializationsForSkills(V5Constants.mentalSkills)
+    }
+    
+    private func getSpecializationsForSkills(_ skills: [String]) -> [(String, [Specialization])] {
+        return skills.compactMap { skill in
+            let specializations = character.getSpecializations(for: skill)
+            return specializations.isEmpty ? nil : (skill, specializations)
+        }
+    }
+    
+    private func removeSpecialization(_ specialization: Specialization) {
+        character.specializations.removeAll { $0.id == specialization.id }
+    }
+}
+
+struct SpecializationCategoryView: View {
+    let title: String
+    let specializations: [(String, [Specialization])]
+    let isEditing: Bool
+    let dynamicFontSize: CGFloat
+    let headerFontSize: CGFloat
+    let onRemove: (Specialization) -> Void
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.system(size: headerFontSize, weight: .semibold))
+            
+            ForEach(specializations, id: \.0) { skillName, specs in
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(skillName)
+                        .font(.system(size: dynamicFontSize, weight: .medium))
+                    
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 4) {
+                        ForEach(specs) { specialization in
+                            HStack {
+                                Text(specialization.name)
+                                    .font(.system(size: dynamicFontSize - 1))
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(1)
+                                
+                                if isEditing {
+                                    Button("×") {
+                                        onRemove(specialization)
+                                    }
+                                    .font(.system(size: dynamicFontSize - 2))
+                                    .foregroundColor(.red)
+                                }
+                            }
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.gray.opacity(0.2))
+                            .cornerRadius(4)
+                        }
+                    }
+                    .padding(.leading, 16)
+                }
+            }
+        }
     }
 }
