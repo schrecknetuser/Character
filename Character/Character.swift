@@ -26,6 +26,20 @@ struct Specialization: Identifiable, Codable, Hashable {
     }
 }
 
+// Data structure for change log entries
+struct ChangeLogEntry: Identifiable, Codable, Hashable {
+    var id = UUID()
+    var timestamp: Date
+    var summary: String
+    var session: Int
+    
+    init(summary: String, session: Int) {
+        self.timestamp = Date()
+        self.summary = summary
+        self.session = session
+    }
+}
+
 // Data structure for skills with specialization information
 struct SkillInfo: Codable, Hashable {
     var name: String
@@ -229,6 +243,10 @@ struct Character: Identifiable, Codable {
     // Skill Specializations
     var specializations: [Specialization]
     
+    // Data Tab - Session tracking and change log
+    var currentSession: Int
+    var changeLog: [ChangeLogEntry]
+    
     // V5 Condition Tracking
     var hunger: Int
     var health: Int
@@ -282,6 +300,10 @@ struct Character: Identifiable, Codable {
         self.chronicleTenets = []
         self.specializations = []
         
+        // Initialize Data Tab properties
+        self.currentSession = 1
+        self.changeLog = []
+        
         // Initialize condition tracking with defaults
         self.hunger = 1  // Always start at 1 for new characters
         
@@ -292,7 +314,7 @@ struct Character: Identifiable, Codable {
     }
     
     // Full initializer for existing characters or manual creation
-    init(name: String, clan: String, generation: Int, physicalAttributes: [String: Int], socialAttributes: [String: Int], mentalAttributes: [String: Int], physicalSkills: [String: Int], socialSkills: [String: Int], mentalSkills: [String: Int], bloodPotency: Int, humanity: Int, willpower: Int, experience: Int, disciplines: [String: Int], advantages: [Advantage], flaws: [Flaw], convictions: [String], touchstones: [String], chronicleTenets: [String], hunger: Int, health: Int, spentExperience: Int = 0, ambition: String = "", desire: String = "", chronicleName: String = "", specializations: [Specialization] = [], healthStates: [HealthState]? = nil, willpowerStates: [WillpowerState]? = nil, humanityStates: [HumanityState]? = nil) {
+    init(name: String, clan: String, generation: Int, physicalAttributes: [String: Int], socialAttributes: [String: Int], mentalAttributes: [String: Int], physicalSkills: [String: Int], socialSkills: [String: Int], mentalSkills: [String: Int], bloodPotency: Int, humanity: Int, willpower: Int, experience: Int, disciplines: [String: Int], advantages: [Advantage], flaws: [Flaw], convictions: [String], touchstones: [String], chronicleTenets: [String], hunger: Int, health: Int, spentExperience: Int = 0, ambition: String = "", desire: String = "", chronicleName: String = "", specializations: [Specialization] = [], currentSession: Int = 1, changeLog: [ChangeLogEntry] = [], healthStates: [HealthState]? = nil, willpowerStates: [WillpowerState]? = nil, humanityStates: [HumanityState]? = nil) {
 
         self.name = name
         self.clan = clan
@@ -322,6 +344,10 @@ struct Character: Identifiable, Codable {
         self.ambition = ambition
         self.desire = desire
         self.chronicleName = chronicleName
+        
+        // Data Tab fields
+        self.currentSession = currentSession
+        self.changeLog = changeLog
         
         // Initialize status tracking arrays with defaults
         self.healthStates = healthStates ?? Array(repeating: .ok, count: max(health, 1))
