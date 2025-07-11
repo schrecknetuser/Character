@@ -14,12 +14,16 @@ struct StatusTab: View {
                         EditableStatusRowView(character: $character, title: "Willpower", type: .willpower, availableWidth: geometry.size.width - 40)
                         
                         EditableHumanityRowView(character: $character, availableWidth: geometry.size.width - 40)
+                        
+                        EditableHungerRowView(character: $character, availableWidth: geometry.size.width - 40)
                     } else {
                         StatusRowView(title: "Health", healthStates: character.healthStates, availableWidth: geometry.size.width - 40)
                         
                         StatusRowView(title: "Willpower", healthStates: character.willpowerStates, availableWidth: geometry.size.width - 40)
                         
                         StatusRowView(title: "Humanity", humanityStates: character.humanityStates, availableWidth: geometry.size.width - 40)
+                        
+                        HungerRowView(hunger: character.hunger, availableWidth: geometry.size.width - 40)
                     }
                 }
                 .padding(.horizontal, 20)
