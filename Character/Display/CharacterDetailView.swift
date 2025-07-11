@@ -4,6 +4,7 @@ struct CharacterDetailView: View {
     @Binding var character: Character
     @ObservedObject var store: CharacterStore
     @State private var isEditing = false
+    @State private var originalCharacter: Character?
 
     var body: some View {
         TabView {
@@ -41,6 +42,13 @@ struct CharacterDetailView: View {
                     Image(systemName: "star.fill")
                     Text("Merits & Flaws")
                 }
+            
+            // Sixth Tab - Data
+            DataTab(character: $character, isEditing: $isEditing)
+                .tabItem {
+                    Image(systemName: "doc.text.fill")
+                    Text("Data")
+                }
 
         }
         .navigationTitle(character.name)
@@ -49,12 +57,25 @@ struct CharacterDetailView: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(isEditing ? "Save" : "Edit") {
                     if isEditing {
+                        // Generate change summary and log it
+                        if let original = originalCharacter {
+                            let changeSummary = original.generateChangeSummary(for: character)
+                            if !changeSummary.isEmpty {
+                                let logEntry = ChangeLogEntry(summary: changeSummary)
+                                character.changeLog.append(logEntry)
+                            }
+                        }
                         // Save changes
                         store.updateCharacter(character)
+                        originalCharacter = nil
+                    } else {
+                        // Starting edit - capture original state
+                        originalCharacter = character
                     }
                     isEditing.toggle()
                 }
             }
         }
     }
+    
 }
