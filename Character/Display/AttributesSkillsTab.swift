@@ -175,6 +175,8 @@ struct AddSpecializationSheet: View {
         isPresented = false
     }
 }
+
+struct AttributeColumnView: View {
     let title: String
     let attributes: [String]
     @Binding var attributeValues: [String: Int]
