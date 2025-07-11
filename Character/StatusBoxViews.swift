@@ -619,10 +619,6 @@ struct EditableGenerationRowView: View {
                 .font(.headline)
                 .fontWeight(.semibold)
             
-            Text("\(character.generation)")
-                .font(.title2)
-                .fontWeight(.bold)
-            
             // Generation controls
             HStack {
                 if character.generation > 4 {
@@ -683,10 +679,6 @@ struct EditableBloodPotencyRowView: View {
             Text("Blood Potency")
                 .font(.headline)
                 .fontWeight(.semibold)
-            
-            Text("\(character.bloodPotency)")
-                .font(.title2)
-                .fontWeight(.bold)
             
             // Blood Potency controls
             HStack {
