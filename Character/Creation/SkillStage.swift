@@ -69,18 +69,23 @@ struct SkillCategoryView: View {
     let skills: [String]
     @Binding var characterSkills: [String: Int]
     let availableValues: [Int]
+    let dynamicFontSize: CGFloat
+    let headerFontSize: CGFloat
+    let rowHeight: CGFloat
     
     var body: some View {
         VStack(alignment: .leading) {
             Text(title)
-                .font(.subheadline)
-                .fontWeight(.semibold)
+                .font(.system(size: headerFontSize, weight: .semibold))
                 .foregroundColor(.secondary)
             
             ForEach(skills, id: \.self) { skill in
                 HStack {
                     Text(skill)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .font(.system(size: dynamicFontSize))
+                        .lineLimit(1)
+                    
+                    Spacer()
                     
                     Picker("", selection: Binding(
                         get: { characterSkills[skill] ?? 0 },
@@ -91,12 +96,15 @@ struct SkillCategoryView: View {
                         let uniqueValues = Set(availableValues + [currentValue])
                         
                         ForEach(uniqueValues.sorted(by: >), id: \.self) { value in
-                            Text("\(value)").tag(value)
+                            Text("\(value)")
+                                .font(.system(size: dynamicFontSize))
+                                .tag(value)
                         }
                     }
                     .pickerStyle(MenuPickerStyle())
-                    .frame(width: 60)
+                    .frame(width: 55)
                 }
+                .frame(minHeight: rowHeight)
             }
         }
     }
@@ -107,6 +115,11 @@ struct SkillsStage: View {
     @Binding var character: Character
     @State private var selectedPresetValues: [SkillPreset: [Int]] = [:]
     @State private var availablePresets: Set<SkillPreset> = [.jackOfAllTrades, .balanced, .specialist]
+    
+    @State private var dynamicFontSize: CGFloat = 14
+    @State private var titleFontSize: CGFloat = 20
+    @State private var headerFontSize: CGFloat = 17
+    @State private var rowHeight: CGFloat = 20
     
     private var allSkills: [String] {
         V5Constants.physicalSkills + V5Constants.socialSkills + V5Constants.mentalSkills
@@ -130,65 +143,77 @@ struct SkillsStage: View {
     }
     
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                // Presets section
-                VStack(alignment: .leading) {
-                    Text("Skill Presets")
-                        .font(.headline)
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    // Presets section
+                    VStack(alignment: .leading) {
+                        Text("Skill Presets")
+                            .font(.headline)
+                        
+                        ForEach(SkillPreset.allCases, id: \.self) { preset in
+                            PresetView(
+                                preset: preset,
+                                presetValues: getPresetValues(for: preset),
+                                selectedValues: allSkillValues,
+                                isPresetAvailable: availablePresets.contains(preset)
+                            )
+                        }
+                    }
+                    .padding()
+                    .background(Color.secondary.opacity(0.1))
+                    .cornerRadius(10)
                     
-                    ForEach(SkillPreset.allCases, id: \.self) { preset in
-                        PresetView(
-                            preset: preset,
-                            presetValues: getPresetValues(for: preset),
-                            selectedValues: allSkillValues,
-                            isPresetAvailable: availablePresets.contains(preset)
-                        )
+                    // Skills section
+                    VStack(alignment: .leading) {
+                        Text("Skills")
+                            .font(.headline)
+                        
+                        HStack(spacing: 15) {
+                            // Physical Skills
+                            SkillCategoryView(
+                                title: "Physical",
+                                skills: V5Constants.physicalSkills,
+                                characterSkills: $character.physicalSkills,
+                                availableValues: getAvailableValuesForSelection(),
+                                dynamicFontSize: dynamicFontSize,
+                                headerFontSize: headerFontSize,
+                                rowHeight: rowHeight
+                            ).frame(maxWidth: .infinity)
+                            
+                            // Social Skills
+                            SkillCategoryView(
+                                title: "Social",
+                                skills: V5Constants.socialSkills,
+                                characterSkills: $character.socialSkills,
+                                availableValues: getAvailableValuesForSelection(),
+                                dynamicFontSize: dynamicFontSize,
+                                headerFontSize: headerFontSize,
+                                rowHeight: rowHeight
+                            ).frame(maxWidth: .infinity)
+                            
+                            // Mental Skills
+                            SkillCategoryView(
+                                title: "Mental",
+                                skills: V5Constants.mentalSkills,
+                                characterSkills: $character.mentalSkills,
+                                availableValues: getAvailableValuesForSelection(),
+                                dynamicFontSize: dynamicFontSize,
+                                headerFontSize: headerFontSize,
+                                rowHeight: rowHeight
+                            ).frame(maxWidth: .infinity)
+                        }
                     }
                 }
                 .padding()
-                .background(Color.secondary.opacity(0.1))
-                .cornerRadius(10)
-                
-                // Skills section
-                VStack(alignment: .leading) {
-                    Text("Skills")
-                        .font(.headline)
-                    
-                    VStack(spacing: 15) {
-                        // Physical Skills
-                        SkillCategoryView(
-                            title: "Physical",
-                            skills: V5Constants.physicalSkills,
-                            characterSkills: $character.physicalSkills,
-                            availableValues: getAvailableValuesForSelection()
-                        )
-                        
-                        // Social Skills
-                        SkillCategoryView(
-                            title: "Social",
-                            skills: V5Constants.socialSkills,
-                            characterSkills: $character.socialSkills,
-                            availableValues: getAvailableValuesForSelection()
-                        )
-                        
-                        // Mental Skills
-                        SkillCategoryView(
-                            title: "Mental",
-                            skills: V5Constants.mentalSkills,
-                            characterSkills: $character.mentalSkills,
-                            availableValues: getAvailableValuesForSelection()
-                        )
-                    }
-                }
             }
-            .padding()
-        }
-        .onAppear {
-            initializePresetValues()
-        }
-        .onChange(of: allSkillValues) {
-            updateAvailablePresets()
+            .onAppear {
+                initializePresetValues()
+                calculateOptimalFontSizes(for: geometry.size)
+            }
+            .onChange(of: allSkillValues) {
+                updateAvailablePresets()
+            }
         }
     }
     
@@ -252,5 +277,30 @@ struct SkillsStage: View {
         }
         
         return true
+    }
+    
+    private func calculateOptimalFontSizes(for size: CGSize) {
+        // Calculate based on screen width and available space
+        let availableWidth = (size.width - 120) / 3 // Account for padding and 3 columns, more conservative
+        
+        // Find the longest text among all displayed values
+        let allDisplayedTexts = V5Constants.physicalSkills + V5Constants.socialSkills + V5Constants.mentalSkills +
+                               ["Physical", "Social", "Mental", "Skills"]
+        let longestText = allDisplayedTexts.max(by: { $0.count < $1.count }) ?? "Subterfuge"
+        
+        // Determine optimal font size based on available width per column
+        let scaleFactor = min(1.0, availableWidth / (CGFloat(longestText.count) * 8)) // More conservative character width estimate
+        
+        // Base font sizes adjusted for actual content - more conservative
+        let baseDynamicSize: CGFloat = 11
+        let baseTitleSize: CGFloat = 17
+        let baseHeaderSize: CGFloat = 14
+        let baseRowHeight: CGFloat = 24
+        
+        // Calculate scaled sizes with more conservative scaling
+        dynamicFontSize = max(9, min(13, baseDynamicSize * scaleFactor))
+        titleFontSize = max(15, min(19, baseTitleSize * scaleFactor))
+        headerFontSize = max(12, min(16, baseHeaderSize * scaleFactor))
+        rowHeight = max(22, min(28, baseRowHeight * scaleFactor))
     }
 }
