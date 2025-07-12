@@ -21,11 +21,16 @@ struct ContentView: View {
                     NavigationLink(destination: CharacterDetailView(character: characterBinding, store: store)) {
                         VStack(alignment: .leading) {
                             Text(character.name).font(.headline)
-                            Text("\(character.characterType.displayName)")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                            HStack {
+                                Text("\(character.characterType.displayName)")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                if !character.concept.isEmpty {
+                                    Text("• \(character.concept)")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
                         }
                     }
                 }

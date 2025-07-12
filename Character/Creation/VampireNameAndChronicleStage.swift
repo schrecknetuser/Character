@@ -11,6 +11,8 @@ struct VampireNameAndChronicleStage: View {
                     .focused($isNameFieldFocused)
                 
                 TextField("Chronicle Name", text: $character.chronicleName)
+                
+                TextField("Character Concept", text: $character.concept)
             }
             
             Section(header: Text("Character Details")) {
