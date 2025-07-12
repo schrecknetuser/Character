@@ -267,8 +267,8 @@ class MageCharacter: CharacterBase {
         self.hubris = 0
         self.quiet = 0
         self.arete = 2
-        self.hubrisStates = Array(repeating: .unchecked, count: 6)
-        self.quietStates = Array(repeating: .unchecked, count: 6)
+        self.hubrisStates = Array(repeating: .unchecked, count: 5)
+        self.quietStates = Array(repeating: .unchecked, count: 5)
         super.init(characterType: characterType)
     }
 

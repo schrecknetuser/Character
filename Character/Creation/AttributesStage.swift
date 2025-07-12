@@ -265,6 +265,10 @@ struct AttributesStage: View {
     }
     
     private func initializeAttributeValues() {
+        // Reset assigned values and available values
+        assignedValues.removeAll()
+        availableValues = [(4, UUID()), (3, UUID()), (3, UUID()), (3, UUID()), (2, UUID()), (2, UUID()), (2, UUID()), (2, UUID()), (1, UUID())]
+        
         // Initialize from character's current attribute values if any are not 1
         for attribute in allAttributes {
             var currentValue = 1
