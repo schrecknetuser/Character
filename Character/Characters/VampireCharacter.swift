@@ -1,7 +1,7 @@
 import SwiftUI
 
 // MARK: - Vampire
-class VampireCharacter: CharacterBase {
+class VampireCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHumanity {
     @Published var clan: String
     @Published var generation: Int
     @Published var bloodPotency: Int
@@ -139,7 +139,7 @@ class VampireCharacter: CharacterBase {
 }
 
 // MARK: - Ghoul
-class GhoulCharacter: CharacterBase {
+class GhoulCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHumanity {
     @Published var humanity: Int
     @Published var disciplines: [String: Int]
     @Published var humanityStates: [HumanityState]
@@ -327,9 +327,6 @@ class MageCharacter: CharacterBase {
         // Check core traits
         if self.arete != other.arete {
             changes.append("arete \(self.arete)→\(other.arete)")
-        }
-        if self.paradox != other.paradox {
-            changes.append("paradox \(self.paradox)→\(other.paradox)")
         }
         if self.hubris != other.hubris {
             changes.append("hubris \(self.hubris)→\(other.hubris)")

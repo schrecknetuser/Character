@@ -20,6 +20,17 @@ enum CharacterType: String, Codable, CaseIterable {
     }
 }
 
+// MARK: - Character with Disciplines Protocol
+protocol CharacterWithDisciplines: BaseCharacter {
+    var disciplines: [String: Int] { get set }
+}
+
+// MARK: - Character with Humanity Protocol
+protocol CharacterWithHumanity: BaseCharacter {
+    var humanity: Int { get set }
+    var humanityStates: [HumanityState] { get set }
+}
+
 // MARK: - Base Character Protocol
 protocol BaseCharacter: AnyObject, Identifiable, Codable, ObservableObject {
     var id: UUID { get set }

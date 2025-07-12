@@ -407,8 +407,8 @@ struct EditableStatusRowView: View {
 }
 
 // Editable Humanity Row View
-struct EditableHumanityRowView: View {
-    @Binding var character: VampireCharacter
+struct EditableHumanityRowView<T: CharacterWithHumanity>: View {
+    @Binding var character: T
     let availableWidth: CGFloat
     var onChange: (() -> Void)? = nil
     

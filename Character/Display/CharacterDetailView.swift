@@ -79,7 +79,7 @@ struct CharacterDetailView: View {
                     set: { character = $0 }
                 )
                 
-                GhoulDisciplinesTab(character: ghoulBinding, isEditing: $isEditing)
+                DisciplinesTab(character: ghoulBinding, isEditing: $isEditing)
                     .tabItem {
                         Image(systemName: "flame.fill")
                         Text("Disciplines")
