@@ -83,6 +83,41 @@ struct BloodDropView: View {
     }
 }
 
+// Magic Symbol View for Paradox tracking
+struct MagicSymbolView: View {
+    let isFilled: Bool
+    
+    var body: some View {
+        Image(systemName: isFilled ? "star.fill" : "star")
+            .font(.system(size: statusBoxSize - 5))
+            .foregroundColor(isFilled ? .purple : .gray)
+            .frame(width: statusBoxSize, height: statusBoxSize)
+    }
+}
+
+// Mage Trait Box View (for hubris and quiet - no stains)
+struct MageTraitBoxView: View {
+    let state: MageTraitState
+    
+    var body: some View {
+        ZStack {
+            Rectangle()
+                .stroke(Color.primary, lineWidth: 1)
+                .frame(width: statusBoxSize, height: statusBoxSize)
+            
+            switch state {
+            case .unchecked:
+                EmptyView()
+            case .checked:
+                Rectangle()
+                    .fill(Color.primary)
+                    .frame(width: statusBoxSize - 2, height: statusBoxSize - 2)
+            }
+        }
+        .frame(width: statusBoxSize, height: statusBoxSize)
+    }
+}
+
 // Status Row View for displaying a row of boxes
 struct StatusRowView: View {
     let title: String

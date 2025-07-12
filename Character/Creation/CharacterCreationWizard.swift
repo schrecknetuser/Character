@@ -75,13 +75,22 @@ struct CharacterCreationWizard: View {
                     case .nameAndChronicle:
                         if selectedCharacterType == .vampire, let binding = viewModel.vampireBinding {
                             VampireNameAndChronicleStage(character: binding)
+                        } else if selectedCharacterType == .ghoul, let binding = viewModel.ghoulBinding {
+                            GhoulNameAndChronicleStage(character: binding)
+                        } else if selectedCharacterType == .mage, let binding = viewModel.mageBinding {
+                            MageNameAndChronicleStage(character: binding)
                         } else {
-                            Text("Not yet implemented")
+                            Text("Character type not yet implemented")
                         }
                     case .clan:
-                        ClanSelectionStage(character: viewModel.asVampireForced, onChange: {
-                            triggerRefresh.toggle()
-                        })
+                        if selectedCharacterType == .vampire {
+                            ClanSelectionStage(character: viewModel.asVampireForced, onChange: {
+                                triggerRefresh.toggle()
+                            })
+                        } else {
+                            // Skip clan selection for non-vampires
+                            EmptyView()
+                        }
                     case .attributes:
                         AttributesStage(character: viewModel.baseBinding)
                     case .skills:
@@ -91,7 +100,13 @@ struct CharacterCreationWizard: View {
                             triggerRefresh.toggle()
                         })
                     case .disciplines:
-                        DisciplinesStage(character: viewModel.asVampireForced)
+                        if selectedCharacterType == .vampire {
+                            DisciplinesStage(character: viewModel.asVampireForced)
+                        } else if selectedCharacterType == .ghoul {
+                            DisciplinesStage(character: viewModel.asGhoulForced)
+                        } else if selectedCharacterType == .mage {
+                            SpheresStage(character: viewModel.asMageForced)
+                        }
                     case .meritsAndFlaws:
                         MeritsAndFlawsStage(character: viewModel.baseBinding)
                     case .convictionsAndTouchstones:
@@ -107,11 +122,16 @@ struct CharacterCreationWizard: View {
                     Button("Back") {
                         if currentStage.rawValue > 0 {
                             if selectedCharacterType != .vampire && currentStage == .attributes {
-                                currentStage = .characterType
+                                currentStage = .nameAndChronicle
                             } else if selectedCharacterType != .vampire && currentStage == .specializations {
                                 currentStage = .meritsAndFlaws
                             } else {
-                                currentStage = CreationStage(rawValue: currentStage.rawValue - 1) ?? .characterType
+                                let previousStage = CreationStage(rawValue: currentStage.rawValue - 1) ?? .characterType
+                                if selectedCharacterType != .vampire && previousStage == .clan {
+                                    currentStage = .nameAndChronicle
+                                } else {
+                                    currentStage = previousStage
+                                }
                             }
                         }
                     }
@@ -136,12 +156,17 @@ struct CharacterCreationWizard: View {
                             
                             if currentStage.rawValue < CreationStage.allCases.count - 1 {
                                 
-                                if selectedCharacterType != .vampire && currentStage == .characterType {
+                                if selectedCharacterType != .vampire && currentStage == .nameAndChronicle {
                                     currentStage = .attributes
                                 } else if selectedCharacterType != .vampire && currentStage == .meritsAndFlaws {
                                     currentStage = .specializations
                                 } else {
-                                    currentStage = CreationStage(rawValue: currentStage.rawValue + 1) ?? .ambitionAndDesire
+                                    let nextStage = CreationStage(rawValue: currentStage.rawValue + 1) ?? .ambitionAndDesire
+                                    if selectedCharacterType != .vampire && nextStage == .clan {
+                                        currentStage = .attributes
+                                    } else {
+                                        currentStage = nextStage
+                                    }
                                 }
                             }
                         }
@@ -173,7 +198,7 @@ struct CharacterCreationWizard: View {
                 return !viewModel.character.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
                        !viewModel.character.chronicleName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             case .clan:
-                return (viewModel.asVampire?.clan.isEmpty == false)
+                return selectedCharacterType != .vampire || (viewModel.asVampire?.clan.isEmpty == false)
             case .attributes:
                 return AttributesStage.areAllAttributesAssigned(character: viewModel.character)
             case .skills:
