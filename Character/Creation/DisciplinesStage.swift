@@ -1,7 +1,16 @@
 import SwiftUI
 
-struct DisciplinesStage: View {
-    @ObservedObject var character: VampireCharacter
+// Protocol for characters that have disciplines
+protocol DisciplineCapable: ObservableObject {
+    var disciplines: [String: Int] { get set }
+}
+
+// Extend character classes to conform to the protocol
+extension VampireCharacter: DisciplineCapable {}
+extension GhoulCharacter: DisciplineCapable {}
+
+struct DisciplinesStage<T: DisciplineCapable>: View {
+    @ObservedObject var character: T
     @State private var showingAddDiscipline = false
     
     var availableDisciplines: [String] {
@@ -54,8 +63,8 @@ struct DisciplinesStage: View {
     }
 }
 
-struct CreationAddDisciplineView: View {
-    @ObservedObject var character: VampireCharacter
+struct CreationAddDisciplineView<T: DisciplineCapable>: View {
+    @ObservedObject var character: T
     @Environment(\.dismiss) var dismiss
     
     var availableDisciplines: [String] {

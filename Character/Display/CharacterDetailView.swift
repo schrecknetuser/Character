@@ -27,6 +27,28 @@ struct CharacterDetailView: View {
                         Image(systemName: "heart.fill")
                         Text("Status")
                     }
+            } else if character.characterType == .ghoul {
+                let ghoulBinding = Binding<GhoulCharacter>(
+                    get: { character as! GhoulCharacter },
+                    set: { character = $0 }
+                )
+                
+                GhoulStatusTab(character: ghoulBinding, isEditing: $isEditing)
+                    .tabItem {
+                        Image(systemName: "heart.fill")
+                        Text("Status")
+                    }
+            } else if character.characterType == .mage {
+                let mageBinding = Binding<MageCharacter>(
+                    get: { character as! MageCharacter },
+                    set: { character = $0 }
+                )
+                
+                MageStatusTab(character: mageBinding, isEditing: $isEditing)
+                    .tabItem {
+                        Image(systemName: "star.circle.fill")
+                        Text("Status")
+                    }
             }
             
             
@@ -37,7 +59,7 @@ struct CharacterDetailView: View {
                     Text("Attributes & Skills")
                 }
             
-            // Fourth Tab - Disciplines
+            // Fourth Tab - Disciplines/Spheres
             if character.characterType == .vampire {
                 
                 let vampireBinding = Binding<VampireCharacter>(
@@ -49,6 +71,30 @@ struct CharacterDetailView: View {
                     .tabItem {
                         Image(systemName: "flame.fill")
                         Text("Disciplines")
+                    }
+            } else if character.characterType == .ghoul {
+                
+                let ghoulBinding = Binding<GhoulCharacter>(
+                    get: { character as! GhoulCharacter },
+                    set: { character = $0 }
+                )
+                
+                DisciplinesTab(character: ghoulBinding, isEditing: $isEditing)
+                    .tabItem {
+                        Image(systemName: "flame.fill")
+                        Text("Disciplines")
+                    }
+            } else if character.characterType == .mage {
+                
+                let mageBinding = Binding<MageCharacter>(
+                    get: { character as! MageCharacter },
+                    set: { character = $0 }
+                )
+                
+                MageSpheresTab(character: mageBinding, isEditing: $isEditing)
+                    .tabItem {
+                        Image(systemName: "sparkles")
+                        Text("Spheres")
                     }
             }
             

@@ -1,27 +1,27 @@
 import SwiftUI
 
-// Generic Add Discipline View
-struct AddDisciplineView<T: CharacterWithDisciplines>: View {
-    @Binding var character: T
+// Add Sphere View for Mages
+struct AddMageSphereView: View {
+    @Binding var character: MageCharacter
     @Environment(\.dismiss) var dismiss
     
-    var availableDisciplines: [String] {
-        V5Constants.disciplines.filter { !character.disciplines.keys.contains($0) }
+    var availableSpheres: [String] {
+        V5Constants.mageSpheres.filter { (character.spheres[$0] ?? 0) == 0 }
     }
     
     var body: some View {
         NavigationView {
             Form {
-                Section("Available Disciplines") {
-                    ForEach(availableDisciplines, id: \.self) { discipline in
-                        Button(discipline) {
-                            character.disciplines[discipline] = 1
+                Section("Available Spheres") {
+                    ForEach(availableSpheres, id: \.self) { sphere in
+                        Button(sphere) {
+                            character.spheres[sphere] = 1
                             dismiss()
                         }
                     }
                 }
             }
-            .navigationTitle("Add Discipline")
+            .navigationTitle("Add Sphere")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
@@ -33,41 +33,40 @@ struct AddDisciplineView<T: CharacterWithDisciplines>: View {
     }
 }
 
-// Generic Disciplines Tab
-struct DisciplinesTab<T: CharacterWithDisciplines>: View {
-    @Binding var character: T
+struct MageSpheresTab: View {
+    @Binding var character: MageCharacter
     @Binding var isEditing: Bool
     @State private var dynamicFontSize: CGFloat = 16
-    @State private var showingAddDiscipline = false
+    @State private var showingAddSphere = false
     @State private var refreshID: UUID = UUID()
+    
+    var learnedSpheres: [(String, Int)] {
+        character.spheres.filter { $0.value > 0 }.sorted { $0.key < $1.key }
+    }
     
     var body: some View {
         GeometryReader { geometry in
             Form {
-                Section(header: Text("Disciplines")) {
-                    if character.disciplines.isEmpty {
-                        Text("No disciplines learned")
+                Section(header: Text("Spheres")) {
+                    if learnedSpheres.isEmpty {
+                        Text("No spheres learned")
                             .foregroundColor(.secondary)
                             .font(.system(size: dynamicFontSize))
                             .lineLimit(1)
                             .minimumScaleFactor(0.6)
                     } else {
-                        ForEach(character.disciplines.sorted(by: { $0.key < $1.key }), id: \.key) { discipline, level in
+                        ForEach(learnedSpheres, id: \.0) { sphere, level in
                             HStack {
-                                Text(discipline)
+                                Text(sphere)
                                     .font(.system(size: dynamicFontSize))
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.5)
                                 Spacer()
                                 if isEditing {
                                     Picker("", selection: Binding(
-                                        get: { character.disciplines[discipline] ?? 0 },
+                                        get: { character.spheres[sphere] ?? 0 },
                                         set: { newValue in
-                                            if newValue == 0 {
-                                                character.disciplines.removeValue(forKey: discipline)
-                                            } else {
-                                                character.disciplines[discipline] = newValue
-                                            }
+                                            character.spheres[sphere] = newValue
                                             refreshID = UUID()
                                         }
                                     )) {
@@ -88,10 +87,26 @@ struct DisciplinesTab<T: CharacterWithDisciplines>: View {
                     }
                     
                     if isEditing {
-                        Button("Add Discipline") {
-                            showingAddDiscipline = true
+                        Button("Add Sphere") {
+                            showingAddSphere = true
                         }
                         .foregroundColor(.accentColor)
+                    }
+                }
+                
+                if isEditing {
+                    Section(header: Text("Arete Configuration")) {
+                        HStack {
+                            Text("Arete")
+                                .font(.system(size: dynamicFontSize))
+                            Spacer()
+                            Picker("", selection: $character.arete) {
+                                ForEach(0...5, id: \.self) { value in
+                                    Text("Level \(value)").tag(value)
+                                }
+                            }
+                            .pickerStyle(MenuPickerStyle())
+                        }
                     }
                 }
             }
@@ -101,8 +116,8 @@ struct DisciplinesTab<T: CharacterWithDisciplines>: View {
             .onChange(of: geometry.size) { _, newSize in
                 calculateOptimalFontSize(for: newSize)
             }
-            .sheet(isPresented: $showingAddDiscipline) {
-                AddDisciplineView(character: $character)
+            .sheet(isPresented: $showingAddSphere) {
+                AddMageSphereView(character: $character)
             }
         }
     }
