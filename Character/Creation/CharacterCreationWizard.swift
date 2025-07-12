@@ -183,8 +183,7 @@ struct CharacterCreationWizard: View {
                 return true
             case .nameAndChronicle:
                 return !viewModel.character.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
-                       !viewModel.character.chronicleName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
-                       !viewModel.character.concept.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                       !viewModel.character.chronicleName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             case .clan:
                 return selectedCharacterType != .vampire || (viewModel.asVampire?.clan.isEmpty == false)
             case .attributes:
