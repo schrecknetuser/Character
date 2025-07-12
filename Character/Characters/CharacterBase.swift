@@ -52,6 +52,7 @@ protocol BaseCharacter: AnyObject, Identifiable, Codable, ObservableObject {
     var ambition: String { get set }
     var desire: String { get set }
     var chronicleName: String { get set }
+    var concept: String { get set }
 
     var advantages: [Background] { get set }
     var flaws: [Background] { get set }
@@ -104,6 +105,7 @@ class CharacterBase: BaseCharacter {
     @Published var ambition: String = ""
     @Published var desire: String = ""
     @Published var chronicleName: String = ""
+    @Published var concept: String = ""
 
     @Published var advantages: [Background] = []
     @Published var flaws: [Background] = []
@@ -123,7 +125,7 @@ class CharacterBase: BaseCharacter {
              physicalAttributes, socialAttributes, mentalAttributes,
              physicalSkills, socialSkills, mentalSkills,
              willpower, experience, spentExperience,
-             ambition, desire, chronicleName,
+             ambition, desire, chronicleName, concept,
              advantages, flaws, convictions, touchstones, chronicleTenets,
              specializations, currentSession, changeLog,
              health, healthStates, willpowerStates
@@ -146,6 +148,7 @@ class CharacterBase: BaseCharacter {
         ambition = try container.decode(String.self, forKey: .ambition)
         desire = try container.decode(String.self, forKey: .desire)
         chronicleName = try container.decode(String.self, forKey: .chronicleName)
+        concept = try container.decodeIfPresent(String.self, forKey: .concept) ?? ""
         advantages = try container.decode([Background].self, forKey: .advantages)
         flaws = try container.decode([Background].self, forKey: .flaws)
         convictions = try container.decode([String].self, forKey: .convictions)
@@ -175,6 +178,7 @@ class CharacterBase: BaseCharacter {
         try container.encode(ambition, forKey: .ambition)
         try container.encode(desire, forKey: .desire)
         try container.encode(chronicleName, forKey: .chronicleName)
+        try container.encode(concept, forKey: .concept)
         try container.encode(advantages, forKey: .advantages)
         try container.encode(flaws, forKey: .flaws)
         try container.encode(convictions, forKey: .convictions)
@@ -358,6 +362,7 @@ class CharacterBase: BaseCharacter {
         copy.ambition = self.ambition
         copy.desire = self.desire
         copy.chronicleName = self.chronicleName
+        copy.concept = self.concept
         copy.advantages = self.advantages
         copy.flaws = self.flaws
         copy.convictions = self.convictions

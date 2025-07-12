@@ -24,6 +24,13 @@ struct GhoulNameAndChronicleStage: View {
                     TextField("Enter chronicle name", text: $character.chronicleName)
                         .textFieldStyle(.roundedBorder)
                 }
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Character Concept")
+                        .font(.headline)
+                    TextField("Enter character concept", text: $character.concept)
+                        .textFieldStyle(.roundedBorder)
+                }
             }
             
             Spacer()

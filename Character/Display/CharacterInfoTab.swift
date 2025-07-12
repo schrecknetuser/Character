@@ -39,6 +39,27 @@ struct CharacterInfoTab: View {
                     }
                     
                     HStack {
+                        Text("Concept:")
+                            .fontWeight(.medium)
+                            .font(.system(size: dynamicFontSize))
+                        Spacer()
+                        if isEditing {
+                            TextField("Concept", text: $character.concept)
+                                .font(.system(size: dynamicFontSize))
+                                .multilineTextAlignment(.trailing)
+                        } else {
+                            if !character.concept.isEmpty {
+                                Text(character.concept)
+                                    .font(.system(size: dynamicFontSize))
+                            } else {
+                                Text("Not set")
+                                    .foregroundColor(.secondary)
+                                    .font(.system(size: dynamicFontSize))
+                            }
+                        }
+                    }
+                    
+                    HStack {
                         Text("Chronicle:")
                             .fontWeight(.medium)
                             .font(.system(size: dynamicFontSize))
