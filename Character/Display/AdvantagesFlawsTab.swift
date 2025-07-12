@@ -239,10 +239,11 @@ struct AddFlawView: View {
 }
 
 struct AdvantagesFlawsTab: View {
-    @Binding var character: Character
+    @Binding var character: any BaseCharacter
     @Binding var isEditing: Bool
     @State private var dynamicFontSize: CGFloat = 16
     @State private var captionFontSize: CGFloat = 12
+    @State private var refreshID: UUID = UUID()
     
     var body: some View {
         GeometryReader { geometry in
@@ -277,6 +278,7 @@ struct AdvantagesFlawsTab: View {
                                 if isEditing {
                                     Button("Remove") {
                                         character.advantages.removeAll { $0.id == advantage.id }
+                                        refreshID = UUID()
                                     }
                                     .font(.caption)
                                     .foregroundColor(.red)
@@ -331,6 +333,7 @@ struct AdvantagesFlawsTab: View {
                                 if isEditing {
                                     Button("Remove") {
                                         character.flaws.removeAll { $0.id == flaw.id }
+                                        refreshID = UUID()
                                     }
                                     .font(.caption)
                                     .foregroundColor(.red)

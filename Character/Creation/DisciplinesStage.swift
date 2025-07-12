@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct DisciplinesStage: View {
-    @Binding var character: Character
+    @ObservedObject var character: Vampire
     @State private var showingAddDiscipline = false
     
     var availableDisciplines: [String] {
@@ -49,13 +49,13 @@ struct DisciplinesStage: View {
             }
         }
         .sheet(isPresented: $showingAddDiscipline) {
-            CreationAddDisciplineView(character: $character)
+            CreationAddDisciplineView(character: character)
         }
     }
 }
 
 struct CreationAddDisciplineView: View {
-    @Binding var character: Character
+    @ObservedObject var character: Vampire
     @Environment(\.dismiss) var dismiss
     
     var availableDisciplines: [String] {

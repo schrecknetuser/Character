@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct MeritsAndFlawsStage: View {
-    @Binding var character: Character
+    @Binding var character: any BaseCharacter
+    @State private var refreshID = UUID()
     
     var body: some View {
         Form {
@@ -19,6 +20,7 @@ struct MeritsAndFlawsStage: View {
                                 .foregroundColor(.secondary)
                             Button("Remove") {
                                 character.advantages.removeAll { $0.id == merit.id }
+                                refresh()
                             }
                             .font(.caption)
                             .foregroundColor(.red)
@@ -51,6 +53,7 @@ struct MeritsAndFlawsStage: View {
                                 .foregroundColor(.secondary)
                             Button("Remove") {
                                 character.flaws.removeAll { $0.id == flaw.id }
+                                refresh()
                             }
                             .font(.caption)
                             .foregroundColor(.red)
@@ -73,6 +76,11 @@ struct MeritsAndFlawsStage: View {
                 EmptyView()
             }
         }
+        .id(refreshID)
+    }
+    
+    private func refresh() {
+        refreshID = UUID()
     }
 }
 

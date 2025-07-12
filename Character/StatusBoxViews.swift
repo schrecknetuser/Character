@@ -141,10 +141,11 @@ enum StatusType {
 
 // Editable Status Row View for Health and Willpower
 struct EditableStatusRowView: View {
-    @Binding var character: Character
+    @Binding var character: any BaseCharacter
     let title: String
     let type: StatusType
     let availableWidth: CGFloat
+    var onChange: (() -> Void)? = nil
     
     private var states: [HealthState] {
         switch type {
@@ -309,6 +310,8 @@ struct EditableStatusRowView: View {
         // Reorder states: aggravated first, then superficial, then ok
         newStates = reorderHealthStates(newStates)
         updateStates(newStates)
+        
+        onChange?()
     }
     
     private func increaseSuperficial() {
@@ -325,6 +328,8 @@ struct EditableStatusRowView: View {
         // Reorder states: aggravated first, then superficial, then ok
         newStates = reorderHealthStates(newStates)
         updateStates(newStates)
+        
+        onChange?()
     }
     
     // Aggravated damage logic
@@ -346,6 +351,8 @@ struct EditableStatusRowView: View {
         // Reorder states: aggravated first, then superficial, then ok
         newStates = reorderHealthStates(newStates)
         updateStates(newStates)
+        
+        onChange?()
     }
     
     private func increaseAggravated() {
@@ -359,13 +366,16 @@ struct EditableStatusRowView: View {
         // Reorder states: aggravated first, then superficial, then ok
         newStates = reorderHealthStates(newStates)
         updateStates(newStates)
+        
+        onChange?()
     }
 }
 
 // Editable Humanity Row View
 struct EditableHumanityRowView: View {
-    @Binding var character: Character
+    @Binding var character: Vampire
     let availableWidth: CGFloat
+    var onChange: (() -> Void)? = nil
     
     private var boxesPerRow: Int {
         let boxWithSpacing = statusBoxSize + 5
@@ -456,6 +466,7 @@ struct EditableHumanityRowView: View {
         
         // Reorder humanity states: checked first, then unchecked, then stained on the right
         character.humanityStates = reorderHumanityStates(character.humanityStates)
+        onChange?()
     }
     
     private func increaseHumanity() {
@@ -465,6 +476,7 @@ struct EditableHumanityRowView: View {
         
         // Reorder humanity states: checked first, then unchecked, then stained on the right
         character.humanityStates = reorderHumanityStates(character.humanityStates)
+        onChange?()
     }
     
     // Stains logic
@@ -484,6 +496,7 @@ struct EditableHumanityRowView: View {
         
         // Reorder humanity states: checked first, then unchecked, then stained on the right
         character.humanityStates = reorderHumanityStates(character.humanityStates)
+        onChange?()
     }
     
     private func increaseStains() {
@@ -494,6 +507,7 @@ struct EditableHumanityRowView: View {
         
         // Reorder humanity states: checked first, then unchecked, then stained on the right
         character.humanityStates = reorderHumanityStates(character.humanityStates)
+        onChange?()
     }
     
     // Helper function to reorder humanity states: checked first, then unchecked, then stained on the right
@@ -538,8 +552,9 @@ struct HungerRowView: View {
 
 // Editable Hunger Row View
 struct EditableHungerRowView: View {
-    @Binding var character: Character
+    @Binding var character: Vampire
     let availableWidth: CGFloat
+    var onChange: (() -> Void)? = nil
     
     private var boxesPerRow: Int {
         let boxWithSpacing = statusBoxSize + 5
@@ -564,6 +579,7 @@ struct EditableHungerRowView: View {
                     Button(action: {
                         if character.hunger > 0 {
                             character.hunger -= 1
+                            onChange?()
                         }
                     }) {
                         Image(systemName: "minus.circle")
@@ -580,6 +596,7 @@ struct EditableHungerRowView: View {
                     Button(action: {
                         if character.hunger < 5 {
                             character.hunger += 1
+                            onChange?()
                         }
                     }) {
                         Image(systemName: "plus.circle")
@@ -611,7 +628,8 @@ struct GenerationRowView: View {
 
 // Editable Generation Row View
 struct EditableGenerationRowView: View {
-    @Binding var character: Character
+    @Binding var character: Vampire
+    var onChange: (() -> Void)? = nil
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -621,10 +639,11 @@ struct EditableGenerationRowView: View {
             
             // Generation controls
             HStack {
-                if character.generation > 4 {
+                if character.generation > 0 {
                     Button(action: {
-                        if character.generation > 4 {
+                        if character.generation > 0 {
                             character.generation -= 1
+                            onChange?()
                         }
                     }) {
                         Image(systemName: "minus.circle")
@@ -641,6 +660,7 @@ struct EditableGenerationRowView: View {
                     Button(action: {
                         if character.generation < 16 {
                             character.generation += 1
+                            onChange?()
                         }
                     }) {
                         Image(systemName: "plus.circle")
@@ -672,7 +692,8 @@ struct BloodPotencyRowView: View {
 
 // Editable Blood Potency Row View
 struct EditableBloodPotencyRowView: View {
-    @Binding var character: Character
+    @Binding var character: Vampire
+    var onChange: (() -> Void)? = nil
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -686,6 +707,7 @@ struct EditableBloodPotencyRowView: View {
                     Button(action: {
                         if character.bloodPotency > 0 {
                             character.bloodPotency -= 1
+                            onChange?()
                         }
                     }) {
                         Image(systemName: "minus.circle")
@@ -702,6 +724,7 @@ struct EditableBloodPotencyRowView: View {
                     Button(action: {
                         if character.bloodPotency < 10 {
                             character.bloodPotency += 1
+                            onChange?()
                         }
                     }) {
                         Image(systemName: "plus.circle")

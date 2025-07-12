@@ -2,11 +2,12 @@ import SwiftUI
 
 
 struct ConvictionsAndTouchstonesStage: View {
-    @Binding var character: Character
+    @Binding var character: any BaseCharacter
     @State private var newConviction = ""
     @State private var newTouchstone = ""
     @State private var showingAddConviction = false
     @State private var showingAddTouchstone = false
+    @State private var refreshID = UUID()
     
     var body: some View {
         Form {
@@ -21,6 +22,7 @@ struct ConvictionsAndTouchstonesStage: View {
                             Spacer()
                             Button("Remove") {
                                 character.convictions.remove(at: index)
+                                refresh()
                             }
                             .font(.caption)
                             .foregroundColor(.red)
@@ -45,6 +47,7 @@ struct ConvictionsAndTouchstonesStage: View {
                             Spacer()
                             Button("Remove") {
                                 character.touchstones.remove(at: index)
+                                refresh()
                             }
                             .font(.caption)
                             .foregroundColor(.red)
@@ -86,5 +89,10 @@ struct ConvictionsAndTouchstonesStage: View {
                 newTouchstone = ""
             }
         }
+        .id(refreshID)
+    }
+    
+    private func refresh() {
+        refreshID = UUID()
     }
 }

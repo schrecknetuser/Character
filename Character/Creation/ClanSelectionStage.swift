@@ -1,26 +1,26 @@
 import SwiftUI
 
 struct ClanSelectionStage: View {
-    @Binding var character: Character
+    @ObservedObject var character: Vampire
+    var onChange: (() -> Void)? = nil
     
     var body: some View {
         Form {
             Section(header: Text("Select Clan")) {
                 ForEach(V5Constants.clans, id: \.self) { clan in
-                    HStack {
-                        Button(action: {
-                            character.clan = clan
-                        }) {
-                            HStack {
-                                Image(systemName: character.clan == clan ? "circle.fill" : "circle")
-                                    .foregroundColor(character.clan == clan ? .accentColor : .secondary)
-                                Text(clan)
-                                    .foregroundColor(.primary)
-                                Spacer()
-                            }
+                    Button(action: {
+                        character.clan = clan
+                        onChange?()
+                    }) {
+                        HStack {
+                            Image(systemName: character.clan == clan ? "circle.fill" : "circle")
+                                .foregroundColor(character.clan == clan ? .accentColor : .secondary)
+                            Text(clan)
+                                .foregroundColor(.primary)
+                            Spacer()
                         }
-                        .buttonStyle(PlainButtonStyle())
                     }
+                    .buttonStyle(PlainButtonStyle())
                 }
             }
             

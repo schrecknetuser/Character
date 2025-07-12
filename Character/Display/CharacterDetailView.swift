@@ -1,10 +1,10 @@
 import SwiftUI
 
 struct CharacterDetailView: View {
-    @Binding var character: Character
+    @Binding var character: any BaseCharacter
     @ObservedObject var store: CharacterStore
     @State private var isEditing = false
-    @State private var originalCharacter: Character?
+    @State private var originalCharacter: BaseCharacter?
 
     var body: some View {
         TabView {
@@ -16,11 +16,19 @@ struct CharacterDetailView: View {
                 }
             
             // Second Tab - Status
-            StatusTab(character: $character, isEditing: $isEditing)
-                .tabItem {
-                    Image(systemName: "heart.fill")
-                    Text("Status")
-                }
+            if character.characterType == .vampire {
+                let vampireBinding = Binding<Vampire>(
+                    get: { character as! Vampire },
+                    set: { character = $0 }
+                )
+                
+                VampireStatusTab(character: vampireBinding, isEditing: $isEditing)
+                    .tabItem {
+                        Image(systemName: "heart.fill")
+                        Text("Status")
+                    }
+            }
+            
             
             // Third Tab - Attributes and Skills
             AttributesSkillsTab(character: $character, isEditing: $isEditing)
@@ -30,11 +38,19 @@ struct CharacterDetailView: View {
                 }
             
             // Fourth Tab - Disciplines
-            DisciplinesTab(character: $character, isEditing: $isEditing)
-                .tabItem {
-                    Image(systemName: "flame.fill")
-                    Text("Disciplines")
-                }
+            if character.characterType == .vampire {
+                
+                let vampireBinding = Binding<Vampire>(
+                    get: { character as! Vampire },
+                    set: { character = $0 }
+                )
+                
+                DisciplinesTab(character: vampireBinding, isEditing: $isEditing)
+                    .tabItem {
+                        Image(systemName: "flame.fill")
+                        Text("Disciplines")
+                    }
+            }
             
             // Fifth Tab - Merits and Flaws
             AdvantagesFlawsTab(character: $character, isEditing: $isEditing)
@@ -70,7 +86,7 @@ struct CharacterDetailView: View {
                         originalCharacter = nil
                     } else {
                         // Starting edit - capture original state
-                        originalCharacter = character
+                        originalCharacter = character.clone()
                     }
                     isEditing.toggle()
                 }

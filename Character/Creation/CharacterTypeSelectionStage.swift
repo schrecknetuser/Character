@@ -82,7 +82,11 @@ extension CharacterType {
     var description: String {
         switch self {
         case .vampire:
-            return "A Kindred creature of the night from Vampire: The Masquerade 5th Edition, possessing supernatural disciplines, struggling with humanity, and driven by the hunger for blood."
+            return "A Kindred creature of the night, possessing supernatural disciplines, struggling with humanity, and driven by the hunger for blood."
+        case .ghoul:
+            return "A mortal bound to a vampire through the vitae, granted longevity and limited supernatural abilities, struggling with addiction, servitude, and the thirst for power."
+        case .mage:
+            return "A reality-warping Awakened being, wielding spheres of magic through will and belief, struggling with paradox, identity, and the price of enlightened power."
         }
     }
 }

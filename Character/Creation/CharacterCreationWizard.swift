@@ -49,9 +49,10 @@ enum CreationStage: Int, CaseIterable {
 struct CharacterCreationWizard: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var store: CharacterStore
+    @State private var triggerRefresh = false
     
     @State private var currentStage: CreationStage = .characterType
-    @State private var character = Character()
+    @StateObject private var viewModel = CharacterCreationViewModel(characterType: .vampire)
     @State private var selectedCharacterType: CharacterType = .vampire
     
     var body: some View {
@@ -67,37 +68,51 @@ struct CharacterCreationWizard: View {
                     .padding(.bottom)
                 
                 // Current stage content
-                Group {
-                    switch currentStage {
-                        case .characterType:
-                            CharacterTypeSelectionStage(selectedCharacterType: $selectedCharacterType)
-                        case .nameAndChronicle:
-                            NameAndChronicleStage(character: $character)
-                        case .clan:
-                            ClanSelectionStage(character: $character)
-                        case .attributes:
-                            AttributesStage(character: $character)
-                        case .skills:
-                            SkillsStage(character: $character)
-                        case .specializations:
-                            SpecializationsStage(character: $character)
-                        case .disciplines:
-                            DisciplinesStage(character: $character)
-                        case .meritsAndFlaws:
-                            MeritsAndFlawsStage(character: $character)
-                        case .convictionsAndTouchstones:
-                            ConvictionsAndTouchstonesStage(character: $character)
-                        case .ambitionAndDesire:
-                            AmbitionAndDesireStage(character: $character)
-                    }
+
+                switch currentStage {
+                    case .characterType:
+                        CharacterTypeSelectionStage(selectedCharacterType: $selectedCharacterType)
+                    case .nameAndChronicle:
+                        if selectedCharacterType == .vampire, let binding = viewModel.vampireBinding {
+                            VampireNameAndChronicleStage(character: binding)
+                        } else {
+                            Text("Not yet implemented")
+                        }
+                    case .clan:
+                        ClanSelectionStage(character: viewModel.asVampireForced, onChange: {
+                            triggerRefresh.toggle()
+                        })
+                    case .attributes:
+                        AttributesStage(character: viewModel.baseBinding)
+                    case .skills:
+                        SkillsStage(character: viewModel.baseBinding)
+                    case .specializations:
+                        SpecializationsStage(character: viewModel.baseBinding, onChange: {
+                            triggerRefresh.toggle()
+                        })
+                    case .disciplines:
+                        DisciplinesStage(character: viewModel.asVampireForced)
+                    case .meritsAndFlaws:
+                        MeritsAndFlawsStage(character: viewModel.baseBinding)
+                    case .convictionsAndTouchstones:
+                        ConvictionsAndTouchstonesStage(character: viewModel.baseBinding)
+                    case .ambitionAndDesire:
+                        AmbitionAndDesireStage(character: viewModel.baseBinding)
                 }
-                .frame(maxWidth: .infinity)
+
+                //.frame(maxWidth: .infinity)
                 
                 // Navigation buttons
                 HStack {
                     Button("Back") {
                         if currentStage.rawValue > 0 {
-                            currentStage = CreationStage(rawValue: currentStage.rawValue - 1) ?? .characterType
+                            if selectedCharacterType != .vampire && currentStage == .attributes {
+                                currentStage = .characterType
+                            } else if selectedCharacterType != .vampire && currentStage == .specializations {
+                                currentStage = .meritsAndFlaws
+                            } else {
+                                currentStage = CreationStage(rawValue: currentStage.rawValue - 1) ?? .characterType
+                            }
                         }
                     }
                     .disabled(currentStage == .characterType)
@@ -107,18 +122,33 @@ struct CharacterCreationWizard: View {
                     if currentStage == .ambitionAndDesire {
                         Button("Create Character") {
                             // Recalculate derived values before saving
-                            character.recalculateDerivedValues()
-                            store.addCharacter(character)
+                            viewModel.character.recalculateDerivedValues()
+                            store.addCharacter(viewModel.character)
                             dismiss()
                         }
                         .disabled(!canProceedFromCurrentStage())
                     } else {
                         Button("Next") {
+                            
+                            if currentStage == .characterType {
+                                viewModel.setCharacterType(selectedCharacterType)
+                            }
+                            
                             if currentStage.rawValue < CreationStage.allCases.count - 1 {
-                                currentStage = CreationStage(rawValue: currentStage.rawValue + 1) ?? .ambitionAndDesire
+                                
+                                if selectedCharacterType != .vampire && currentStage == .characterType {
+                                    currentStage = .attributes
+                                } else if selectedCharacterType != .vampire && currentStage == .meritsAndFlaws {
+                                    currentStage = .specializations
+                                } else {
+                                    currentStage = CreationStage(rawValue: currentStage.rawValue + 1) ?? .ambitionAndDesire
+                                }
                             }
                         }
-                        .disabled(!canProceedFromCurrentStage())
+                        .disabled({
+                            _ = triggerRefresh
+                            return !canProceedFromCurrentStage()
+                        }())
                     }
                 }
                 .padding()
@@ -136,32 +166,25 @@ struct CharacterCreationWizard: View {
     }
     
     private func canProceedFromCurrentStage() -> Bool {
-        switch currentStage {
-        case .characterType:
-            return true // Character type is always valid (currently only vampire available)
-        case .nameAndChronicle:
-            return !character.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
-                   !character.chronicleName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        case .clan:
-            return !character.clan.isEmpty
-        case .attributes:
-            return AttributesStage.areAllAttributesAssigned(character: character)
-        case .skills:
-            return true // Skills can be left at 0
-        case .specializations:
-            // Check that all required specializations are filled
-            let requiredSkills = character.getSkillsRequiringFreeSpecializationWithPoints()
-            return requiredSkills.allSatisfy { skillName in
-                !character.getSpecializations(for: skillName).isEmpty
+            switch currentStage {
+            case .characterType:
+                return true
+            case .nameAndChronicle:
+                return !viewModel.character.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+                       !viewModel.character.chronicleName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            case .clan:
+                return (viewModel.asVampire?.clan.isEmpty == false)
+            case .attributes:
+                return AttributesStage.areAllAttributesAssigned(character: viewModel.character)
+            case .skills:
+                return true
+            case .specializations:
+                let requiredSkills = viewModel.character.getSkillsRequiringFreeSpecializationWithPoints()
+                return requiredSkills.allSatisfy { skill in
+                    !viewModel.character.getSpecializations(for: skill).isEmpty
+                }
+            case .disciplines, .meritsAndFlaws, .convictionsAndTouchstones, .ambitionAndDesire:
+                return true
             }
-        case .disciplines:
-            return true // Disciplines can be empty
-        case .meritsAndFlaws:
-            return true // Merits and flaws can be empty
-        case .convictionsAndTouchstones:
-            return true // Convictions and touchstones can be empty
-        case .ambitionAndDesire:
-            return true // Ambition and desire can be empty
         }
-    }
 }

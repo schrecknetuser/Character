@@ -12,7 +12,7 @@ struct CharacterTests {
 
     @Test func testCharacterDefaultInitialization() async throws {
         // Test that a new character has proper V5 defaults
-        let character = Character(name: "Test Character", clan: "Brujah", generation: 12)
+        let character = Vampire(name: "Test Character", clan: "Brujah", generation: 12)
         
         #expect(character.name == "Test Character")
         #expect(character.clan == "Brujah")
@@ -130,7 +130,7 @@ struct CharacterTests {
             Background(name: "Enemy (Rival Artist)", cost: -1)
         ]
         
-        let character = Character(
+        let character = Vampire(
             name: "Test Vampire",
             clan: "Toreador",
             generation: 10,
@@ -225,7 +225,7 @@ struct CharacterTests {
 
     @Test func testAdvantageFlawCosts() async throws {
         // Test advantage and flaw cost calculations
-        var character = Character(name: "Test", clan: "Brujah", generation: 12)
+        var character = Vampire(name: "Test", clan: "Brujah", generation: 12)
         
         // Add some advantages
         character.advantages = [
@@ -324,7 +324,7 @@ struct CharacterTests {
     
     @Test func testCharacterSpecializations() async throws {
         // Test character with specializations
-        var character = Character(name: "Test Scholar", clan: "Tremere", generation: 10)
+        var character = Vampire(name: "Test Scholar", clan: "Tremere", generation: 10)
         
         // Give character some skills
         character.mentalSkills["Academics"] = 3
@@ -372,7 +372,7 @@ struct CharacterTests {
     
     @Test func testCharacterSpecializationsInitialization() async throws {
         // Test that specializations are properly initialized
-        let character = Character()
+        let character = Vampire()
         #expect(character.specializations.isEmpty)
         
         // Test full initializer with specializations
@@ -381,7 +381,7 @@ struct CharacterTests {
             Specialization(skillName: "Craft", name: "Painting")
         ]
         
-        let characterWithSpecs = Character(
+        let characterWithSpecs = Vampire(
             name: "Test",
             clan: "Toreador",
             generation: 10,

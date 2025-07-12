@@ -3,7 +3,7 @@ import SwiftUI
 
 // Add Discipline View
 struct AddDisciplineView: View {
-    @Binding var character: Character
+    @Binding var character: Vampire
     @Environment(\.dismiss) var dismiss
     
     var availableDisciplines: [String] {
@@ -36,10 +36,11 @@ struct AddDisciplineView: View {
 
 
 struct DisciplinesTab: View {
-    @Binding var character: Character
+    @Binding var character: Vampire
     @Binding var isEditing: Bool
     @State private var dynamicFontSize: CGFloat = 16
     @State private var showingAddDiscipline = false
+    @State private var refreshID: UUID = UUID()
     
     var body: some View {
         GeometryReader { geometry in
@@ -68,6 +69,7 @@ struct DisciplinesTab: View {
                                             } else {
                                                 character.disciplines[discipline] = newValue
                                             }
+                                            refreshID = UUID()
                                         }
                                     )) {
                                         ForEach(0...5, id: \.self) { value in

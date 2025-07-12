@@ -1,10 +1,12 @@
 import SwiftUI
 
 struct SpecializationsStage: View {
-    @Binding var character: Character
+    @Binding var character: any BaseCharacter
     @State private var newSpecializationText: [String: String] = [:]
     @State private var selectedSkillForAdditional: String = ""
     @State private var additionalSpecializationText: String = ""
+    @State private var refreshID = UUID()
+    var onChange: (() -> Void)? = nil
     
     var body: some View {
         ScrollView {
@@ -31,7 +33,10 @@ struct SpecializationsStage: View {
                                 skillName: skillName,
                                 character: $character,
                                 newSpecializationText: $newSpecializationText,
-                                isRequired: true
+                                isRequired: true,
+                                onChange: {
+                                    triggerRefresh()
+                                }
                             )
                         }
                     }
@@ -123,6 +128,7 @@ struct SpecializationsStage: View {
             }
             .padding()
         }
+        .id(refreshID)
     }
     
     private func addAdditionalSpecialization() {
@@ -135,18 +141,29 @@ struct SpecializationsStage: View {
         // Reset the form
         additionalSpecializationText = ""
         selectedSkillForAdditional = ""
+        
+        triggerRefresh()
+        
     }
     
     private func removeSpecialization(_ specialization: Specialization) {
         character.specializations.removeAll { $0.id == specialization.id }
+        
+        triggerRefresh()
+    }
+    
+    private func triggerRefresh() {
+        refreshID = UUID()
+        onChange?()
     }
 }
 
 struct SpecializationInputView: View {
     let skillName: String
-    @Binding var character: Character
+    @Binding var character: any BaseCharacter
     @Binding var newSpecializationText: [String: String]
     let isRequired: Bool
+    var onChange: (() -> Void)? = nil
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -202,5 +219,7 @@ struct SpecializationInputView: View {
         
         // Clear the text field
         newSpecializationText[skillName] = ""
+        
+        onChange?()
     }
 }

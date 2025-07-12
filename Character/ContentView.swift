@@ -16,27 +16,14 @@ struct ContentView: View {
         NavigationView {
             List {
                 ForEach(store.characters.indices, id: \.self) { index in
-                    NavigationLink(destination: CharacterDetailView(character: $store.characters[index], store: store)) {
+                    let character = store.characters[index].character
+                    let characterBinding = $store.characters[index].character
+                    NavigationLink(destination: CharacterDetailView(character: characterBinding, store: store)) {
                         VStack(alignment: .leading) {
-                            Text(store.characters[index].name).font(.headline)
-                            HStack {
-                                Text(store.characters[index].characterType.displayName)
-                                    .font(.caption)
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 2)
-                                    .background(Color.blue.opacity(0.1))
-                                    .foregroundColor(.blue)
-                                    .cornerRadius(4)
-                                Spacer()
-                            }
-                            Text("\(store.characters[index].clan), Gen \(store.characters[index].generation)")
+                            Text(character.name).font(.headline)
+                            Text("\(character.characterType.displayName)")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
-                            HStack {
-                                Text("BP: \(store.characters[index].bloodPotency)")
-                                Text("Humanity: \(store.characters[index].humanity)")
-                                Text("Hunger: \(store.characters[index].hunger)")
-                            }
                             .font(.caption)
                             .foregroundColor(.secondary)
                         }
@@ -44,7 +31,7 @@ struct ContentView: View {
                 }
                 .onDelete(perform: store.deleteCharacter)
             }
-            .navigationTitle("V5 Characters")
+            .navigationTitle("Characters")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showingAddSheet = true }) {

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AttributesSkillsTab: View {
-    @Binding var character: Character
+    @Binding var character: any BaseCharacter
     @Binding var isEditing: Bool
     @State private var dynamicFontSize: CGFloat = 14
     @State private var titleFontSize: CGFloat = 20

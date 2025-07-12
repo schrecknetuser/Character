@@ -32,7 +32,7 @@ struct AttributeDropRow: View {
     @Binding var assignedValues: [String: Int]
     @Binding var availableValues: [(Int, UUID)]
     @Binding var characterAttributes: [String: Int]
-    @Binding var character: Character
+    @Binding var character: any BaseCharacter
     @State private var isTargeted = false
     
     var body: some View {
@@ -125,7 +125,7 @@ struct AttributeDropRow: View {
 }
 
 struct AttributesStage: View {
-    @Binding var character: Character
+    @Binding var character: any BaseCharacter
     @State private var availableValues: [(Int, UUID)] = [(4, UUID()), (3, UUID()), (3, UUID()), (3, UUID()), (2, UUID()), (2, UUID()), (2, UUID()), (2, UUID()), (1, UUID())]
     @State private var assignedValues: [String: Int] = [:]
     
@@ -285,7 +285,7 @@ struct AttributesStage: View {
         }
     }
     
-    static func areAllAttributesAssigned(character: Character) -> Bool {
+    static func areAllAttributesAssigned(character: any BaseCharacter) -> Bool {
         let allAttributes = V5Constants.physicalAttributes + V5Constants.socialAttributes + V5Constants.mentalAttributes
         
         // Check if all attributes have values > 1 (meaning they were assigned)
