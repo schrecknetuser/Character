@@ -3,7 +3,7 @@ import SwiftUI
 
 // Add Discipline View
 struct AddDisciplineView: View {
-    @Binding var character: Vampire
+    @Binding var character: VampireCharacter
     @Environment(\.dismiss) var dismiss
     
     var availableDisciplines: [String] {
@@ -36,7 +36,7 @@ struct AddDisciplineView: View {
 
 
 struct DisciplinesTab: View {
-    @Binding var character: Vampire
+    @Binding var character: VampireCharacter
     @Binding var isEditing: Bool
     @State private var dynamicFontSize: CGFloat = 16
     @State private var showingAddDiscipline = false

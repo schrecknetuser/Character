@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct DisciplinesStage: View {
-    @ObservedObject var character: Vampire
+    @ObservedObject var character: VampireCharacter
     @State private var showingAddDiscipline = false
     
     var availableDisciplines: [String] {
@@ -55,7 +55,7 @@ struct DisciplinesStage: View {
 }
 
 struct CreationAddDisciplineView: View {
-    @ObservedObject var character: Vampire
+    @ObservedObject var character: VampireCharacter
     @Environment(\.dismiss) var dismiss
     
     var availableDisciplines: [String] {

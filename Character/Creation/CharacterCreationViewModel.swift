@@ -22,18 +22,18 @@ class CharacterCreationViewModel: ObservableObject {
     static func createCharacter(of type: CharacterType) -> any BaseCharacter {
         switch type {
         case .vampire:
-            return Vampire()
+            return VampireCharacter()
         case .mage:
-            return Vampire()
+            return VampireCharacter()
         case .ghoul:
-            return Vampire()
+            return VampireCharacter()
         }
     }
 
     // MARK: - Type-safe downcasts
 
-    var asVampire: Vampire? {
-        character as? Vampire
+    var asVampire: VampireCharacter? {
+        character as? VampireCharacter
     }
 
     /*var asMage: Mage? {
@@ -44,14 +44,14 @@ class CharacterCreationViewModel: ObservableObject {
         character as? Ghoul
     }*/
     
-    var asVampireForced: Vampire {
-        character as! Vampire
+    var asVampireForced: VampireCharacter {
+        character as! VampireCharacter
     }
 
     // MARK: - SwiftUI Bindings
 
-    var vampireBinding: Binding<Vampire>? {
-        guard let vampire = character as? Vampire else { return nil }
+    var vampireBinding: Binding<VampireCharacter>? {
+        guard let vampire = character as? VampireCharacter else { return nil }
         return Binding(
             get: { vampire },
             set: { [weak self] newValue in

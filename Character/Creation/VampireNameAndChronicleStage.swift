@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct VampireNameAndChronicleStage: View {
-    @Binding var character: Vampire
+    @Binding var character: VampireCharacter
     @FocusState private var isNameFieldFocused: Bool
     
     var body: some View {

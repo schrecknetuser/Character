@@ -17,8 +17,8 @@ struct CharacterDetailView: View {
             
             // Second Tab - Status
             if character.characterType == .vampire {
-                let vampireBinding = Binding<Vampire>(
-                    get: { character as! Vampire },
+                let vampireBinding = Binding<VampireCharacter>(
+                    get: { character as! VampireCharacter },
                     set: { character = $0 }
                 )
                 
@@ -40,8 +40,8 @@ struct CharacterDetailView: View {
             // Fourth Tab - Disciplines
             if character.characterType == .vampire {
                 
-                let vampireBinding = Binding<Vampire>(
-                    get: { character as! Vampire },
+                let vampireBinding = Binding<VampireCharacter>(
+                    get: { character as! VampireCharacter },
                     set: { character = $0 }
                 )
                 

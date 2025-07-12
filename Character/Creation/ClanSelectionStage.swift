@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ClanSelectionStage: View {
-    @ObservedObject var character: Vampire
+    @ObservedObject var character: VampireCharacter
     var onChange: (() -> Void)? = nil
     
     var body: some View {

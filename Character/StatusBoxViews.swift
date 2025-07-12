@@ -373,7 +373,7 @@ struct EditableStatusRowView: View {
 
 // Editable Humanity Row View
 struct EditableHumanityRowView: View {
-    @Binding var character: Vampire
+    @Binding var character: VampireCharacter
     let availableWidth: CGFloat
     var onChange: (() -> Void)? = nil
     
@@ -552,7 +552,7 @@ struct HungerRowView: View {
 
 // Editable Hunger Row View
 struct EditableHungerRowView: View {
-    @Binding var character: Vampire
+    @Binding var character: VampireCharacter
     let availableWidth: CGFloat
     var onChange: (() -> Void)? = nil
     
@@ -628,7 +628,7 @@ struct GenerationRowView: View {
 
 // Editable Generation Row View
 struct EditableGenerationRowView: View {
-    @Binding var character: Vampire
+    @Binding var character: VampireCharacter
     var onChange: (() -> Void)? = nil
     
     var body: some View {
@@ -692,7 +692,7 @@ struct BloodPotencyRowView: View {
 
 // Editable Blood Potency Row View
 struct EditableBloodPotencyRowView: View {
-    @Binding var character: Vampire
+    @Binding var character: VampireCharacter
     var onChange: (() -> Void)? = nil
     
     var body: some View {

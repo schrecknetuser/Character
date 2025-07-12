@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct VampireStatusTab: View {
-    @Binding var character: Vampire
+    @Binding var character: VampireCharacter
     @Binding var isEditing: Bool
     @State private var refreshID = UUID()
     
@@ -12,7 +12,7 @@ struct VampireStatusTab: View {
                 let baseBinding: Binding<any BaseCharacter> = Binding<any BaseCharacter>(
                     get: { character },
                     set: { newValue in
-                        if let newVampire = newValue as? Vampire {
+                        if let newVampire = newValue as? VampireCharacter {
                             character = newVampire
                         }
                     }
