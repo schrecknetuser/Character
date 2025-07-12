@@ -18,10 +18,19 @@ class VampireCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHu
         self.clan = ""
         self.generation = 13
         self.bloodPotency = 1
-        self.humanity = 7
         self.hunger = 1
         self.disciplines = [:]
-        self.humanityStates = Array(repeating: .unchecked, count: 10)
+        
+        let defaultHumanity: Int = 7
+        self.humanity = defaultHumanity
+        
+        var humanityArray = Array(repeating: HumanityState.unchecked, count: 10)
+        for i in 0...(defaultHumanity - 1) {
+            humanityArray[i] = HumanityState.checked
+        }
+        
+        self.humanityStates = humanityArray
+        
         super.init(characterType: characterType)
     }
 
@@ -149,10 +158,21 @@ class GhoulCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHuma
     }
 
     override init(characterType: CharacterType = .ghoul) {
-        self.humanity = 7
         self.disciplines = [:]
-        self.humanityStates = Array(repeating: .unchecked, count: 10)
+        
+        let defaultHumanity: Int = 7
+        self.humanity = defaultHumanity
+        
+        var humanityArray = Array(repeating: HumanityState.unchecked, count: 10)
+        for i in 0...(defaultHumanity - 1) {
+            humanityArray[i] = HumanityState.checked
+        }
+        
+        self.humanityStates = humanityArray
+        
         super.init(characterType: characterType)
+        
+        
     }
 
     required init(from decoder: Decoder) throws {
