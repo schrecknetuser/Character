@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SpheresStage: View {
-    @Binding var character: MageCharacter
+    @ObservedObject var character: MageCharacter
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {

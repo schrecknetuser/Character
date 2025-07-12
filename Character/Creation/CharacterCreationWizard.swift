@@ -121,17 +121,11 @@ struct CharacterCreationWizard: View {
                 HStack {
                     Button("Back") {
                         if currentStage.rawValue > 0 {
-                            if selectedCharacterType != .vampire && currentStage == .attributes {
+                            let previousStage = CreationStage(rawValue: currentStage.rawValue - 1) ?? .characterType
+                            if selectedCharacterType != .vampire && previousStage == .clan {
                                 currentStage = .nameAndChronicle
-                            } else if selectedCharacterType != .vampire && currentStage == .specializations {
-                                currentStage = .meritsAndFlaws
                             } else {
-                                let previousStage = CreationStage(rawValue: currentStage.rawValue - 1) ?? .characterType
-                                if selectedCharacterType != .vampire && previousStage == .clan {
-                                    currentStage = .nameAndChronicle
-                                } else {
-                                    currentStage = previousStage
-                                }
+                                currentStage = previousStage
                             }
                         }
                     }
@@ -155,18 +149,11 @@ struct CharacterCreationWizard: View {
                             }
                             
                             if currentStage.rawValue < CreationStage.allCases.count - 1 {
-                                
-                                if selectedCharacterType != .vampire && currentStage == .nameAndChronicle {
+                                let nextStage = CreationStage(rawValue: currentStage.rawValue + 1) ?? .ambitionAndDesire
+                                if selectedCharacterType != .vampire && nextStage == .clan {
                                     currentStage = .attributes
-                                } else if selectedCharacterType != .vampire && currentStage == .meritsAndFlaws {
-                                    currentStage = .specializations
                                 } else {
-                                    let nextStage = CreationStage(rawValue: currentStage.rawValue + 1) ?? .ambitionAndDesire
-                                    if selectedCharacterType != .vampire && nextStage == .clan {
-                                        currentStage = .attributes
-                                    } else {
-                                        currentStage = nextStage
-                                    }
+                                    currentStage = nextStage
                                 }
                             }
                         }
