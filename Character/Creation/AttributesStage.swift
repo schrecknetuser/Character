@@ -269,7 +269,8 @@ struct AttributesStage: View {
         assignedValues.removeAll()
         availableValues = [(4, UUID()), (3, UUID()), (3, UUID()), (3, UUID()), (2, UUID()), (2, UUID()), (2, UUID()), (2, UUID()), (1, UUID())]
         
-        // Initialize from character's current attribute values if any are not 1
+        // Check if any attributes have been assigned (any attribute with value != 1)
+        var hasAnyAssignments = false
         for attribute in allAttributes {
             var currentValue = 1
             if V5Constants.physicalAttributes.contains(attribute) {
@@ -280,10 +281,43 @@ struct AttributesStage: View {
                 currentValue = character.mentalAttributes[attribute] ?? 1
             }
             
-            if currentValue > 1 {
-                assignedValues[attribute] = currentValue
-                if let index = availableValues.firstIndex(where: { $0.0 == currentValue }) {
-                    availableValues.remove(at: index)
+            if currentValue != 1 {
+                hasAnyAssignments = true
+                break
+            }
+        }
+        
+        // If we have assignments, restore the full state by calculating what should be assigned
+        if hasAnyAssignments {
+            // Get all current attribute values
+            var allCurrentValues: [String: Int] = [:]
+            for attribute in allAttributes {
+                if V5Constants.physicalAttributes.contains(attribute) {
+                    allCurrentValues[attribute] = character.physicalAttributes[attribute] ?? 1
+                } else if V5Constants.socialAttributes.contains(attribute) {
+                    allCurrentValues[attribute] = character.socialAttributes[attribute] ?? 1
+                } else if V5Constants.mentalAttributes.contains(attribute) {
+                    allCurrentValues[attribute] = character.mentalAttributes[attribute] ?? 1
+                }
+            }
+            
+            // Determine which values were assigned based on what's available in the standard pool
+            let standardPool = [4, 3, 3, 3, 2, 2, 2, 2, 1]
+            var poolCopy = standardPool
+            
+            // Sort attributes by value (highest first) to assign them in logical order
+            let sortedAttributes = allCurrentValues.sorted { $0.value > $1.value }
+            
+            for (attribute, value) in sortedAttributes {
+                if let poolIndex = poolCopy.firstIndex(of: value) {
+                    // This value exists in the standard pool, so it was assigned
+                    assignedValues[attribute] = value
+                    poolCopy.remove(at: poolIndex)
+                    
+                    // Remove from available values
+                    if let availableIndex = availableValues.firstIndex(where: { $0.0 == value }) {
+                        availableValues.remove(at: availableIndex)
+                    }
                 }
             }
         }
