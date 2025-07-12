@@ -1,24 +1,17 @@
 import SwiftUI
 
-// MARK: - Vampire
-class VampireCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHumanity {
-    @Published var clan: String
-    @Published var generation: Int
-    @Published var bloodPotency: Int
+
+// MARK: - Ghoul
+class GhoulCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHumanity {
     @Published var humanity: Int
-    @Published var hunger: Int
     @Published var disciplines: [String: Int]
     @Published var humanityStates: [HumanityState]
 
     enum CodingKeys: String, CodingKey {
-        case clan, generation, bloodPotency, humanity, hunger, disciplines, humanityStates
+        case humanity, disciplines, humanityStates
     }
 
-    override init(characterType: CharacterType = .vampire) {
-        self.clan = ""
-        self.generation = 13
-        self.bloodPotency = 1
-        self.hunger = 1
+    override init(characterType: CharacterType = .ghoul) {
         self.disciplines = [:]
         
         let defaultHumanity: Int = 7
@@ -32,15 +25,13 @@ class VampireCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHu
         self.humanityStates = humanityArray
         
         super.init(characterType: characterType)
+        
+        
     }
 
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.clan = try container.decode(String.self, forKey: .clan)
-        self.generation = try container.decode(Int.self, forKey: .generation)
-        self.bloodPotency = try container.decode(Int.self, forKey: .bloodPotency)
         self.humanity = try container.decode(Int.self, forKey: .humanity)
-        self.hunger = try container.decode(Int.self, forKey: .hunger)
         self.disciplines = try container.decode([String: Int].self, forKey: .disciplines)
         self.humanityStates = try container.decode([HumanityState].self, forKey: .humanityStates)
         try super.init(from: decoder)
@@ -49,11 +40,7 @@ class VampireCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHu
     override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(clan, forKey: .clan)
-        try container.encode(generation, forKey: .generation)
-        try container.encode(bloodPotency, forKey: .bloodPotency)
         try container.encode(humanity, forKey: .humanity)
-        try container.encode(hunger, forKey: .hunger)
         try container.encode(disciplines, forKey: .disciplines)
         try container.encode(humanityStates, forKey: .humanityStates)
     }
@@ -61,17 +48,11 @@ class VampireCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHu
     override func generateChangeSummary(for updated: any BaseCharacter) -> String {
         var changes: [String] = []
         
-        let other = updated as! VampireCharacter
+        let other = updated as! GhoulCharacter
                 
         // Check basic information changes
         if self.name != other.name {
-            changes.append("clan \(self.name)→\(other.name)")
-        }
-        if self.clan != other.clan {
-            changes.append("clan \(self.clan)→\(other.clan)")
-        }
-        if self.generation != other.generation {
-            changes.append("generation \(self.generation)→\(other.generation)")
+            changes.append("name \(self.name)→\(other.name)")
         }
         
         // Check attribute changes
@@ -93,9 +74,6 @@ class VampireCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHu
         }
         
         // Check core traits
-        if self.bloodPotency != other.bloodPotency {
-            changes.append("blood potency \(self.bloodPotency)→\(other.bloodPotency)")
-        }
         if self.humanity != other.humanity {
             changes.append("humanity \(self.humanity)→\(other.humanity)")
         }
@@ -131,16 +109,12 @@ class VampireCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHu
     }
     
     override func clone() -> any BaseCharacter {
-        let copy = VampireCharacter()
+        let copy = GhoulCharacter()
         cloneBase(into: copy)
 
-        // Copy Vampire-specific properties
-        copy.clan = self.clan
-        copy.generation = self.generation
-        copy.bloodPotency = self.bloodPotency
+        // Copy Ghoul-specific properties
         copy.humanity = self.humanity
         copy.humanityStates = self.humanityStates
-        copy.hunger = self.hunger
         copy.disciplines = self.disciplines
 
         return copy
