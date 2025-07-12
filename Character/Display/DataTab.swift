@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct DataTab: View {
-    @Binding var character: Character
+    @Binding var character: any BaseCharacter
     @Binding var isEditing: Bool
     @State private var dynamicFontSize: CGFloat = 16
     

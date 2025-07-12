@@ -2,7 +2,7 @@ import SwiftUI
 
 struct AddSpecializationSheet: View {
     let skillName: String
-    @Binding var character: Character
+    @Binding var character: any BaseCharacter
     @Binding var isPresented: Bool
     @State private var specializationText = ""
     @State private var selectedSkill = ""

@@ -112,7 +112,7 @@ struct SkillCategoryView: View {
 
 
 struct SkillsStage: View {
-    @Binding var character: Character
+    @Binding var character: any BaseCharacter
     @State private var selectedPresetValues: [SkillPreset: [Int]] = [:]
     @State private var availablePresets: Set<SkillPreset> = [.jackOfAllTrades, .balanced, .specialist]
     

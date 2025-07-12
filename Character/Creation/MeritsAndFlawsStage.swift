@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct MeritsAndFlawsStage: View {
-    @Binding var character: Character
+    @Binding var character: any BaseCharacter
+    @State private var refreshID = UUID()
     
     var body: some View {
         Form {
@@ -19,6 +20,7 @@ struct MeritsAndFlawsStage: View {
                                 .foregroundColor(.secondary)
                             Button("Remove") {
                                 character.advantages.removeAll { $0.id == merit.id }
+                                refresh()
                             }
                             .font(.caption)
                             .foregroundColor(.red)
@@ -34,7 +36,7 @@ struct MeritsAndFlawsStage: View {
                     }
                 }
                 
-                CreationMeritsListView(selectedMerits: $character.advantages)
+                CreationMeritsListView(selectedMerits: $character.advantages, characterType: character.characterType)
             }
             
             Section(header: Text("Flaws")) {
@@ -51,6 +53,7 @@ struct MeritsAndFlawsStage: View {
                                 .foregroundColor(.secondary)
                             Button("Remove") {
                                 character.flaws.removeAll { $0.id == flaw.id }
+                                refresh()
                             }
                             .font(.caption)
                             .foregroundColor(.red)
@@ -66,18 +69,24 @@ struct MeritsAndFlawsStage: View {
                     }
                 }
                 
-                CreationFlawsListView(selectedFlaws: $character.flaws)
+                CreationFlawsListView(selectedFlaws: $character.flaws, characterType: character.characterType)
             }
             
             Section(footer: Text("Merits and flaws are optional for character creation.")) {
                 EmptyView()
             }
         }
+        .id(refreshID)
+    }
+    
+    private func refresh() {
+        refreshID = UUID()
     }
 }
 
 struct CreationMeritsListView: View {
     @Binding var selectedMerits: [Background]
+    let characterType: CharacterType
     @State private var showingAddMerit = false
     
     var body: some View {
@@ -86,13 +95,14 @@ struct CreationMeritsListView: View {
         }
         .foregroundColor(.accentColor)
         .sheet(isPresented: $showingAddMerit) {
-            AddAdvantageView(selectedAdvantages: $selectedMerits)
+            AddAdvantageView(selectedAdvantages: $selectedMerits, characterType: characterType)
         }
     }
 }
 
 struct CreationFlawsListView: View {
     @Binding var selectedFlaws: [Background]
+    let characterType: CharacterType
     @State private var showingAddFlaw = false
     
     var body: some View {
@@ -101,7 +111,7 @@ struct CreationFlawsListView: View {
         }
         .foregroundColor(.accentColor)
         .sheet(isPresented: $showingAddFlaw) {
-            AddFlawView(selectedFlaws: $selectedFlaws)
+            AddFlawView(selectedFlaws: $selectedFlaws, characterType: characterType)
         }
     }
 }

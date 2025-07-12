@@ -4,7 +4,7 @@ struct SkillColumnView: View {
     let title: String
     let skills: [String]
     @Binding var skillValues: [String: Int]
-    @Binding var character: Character
+    @Binding var character: any BaseCharacter
     let isEditing: Bool
     let dynamicFontSize: CGFloat
     let headerFontSize: CGFloat

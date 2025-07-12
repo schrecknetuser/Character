@@ -2,11 +2,12 @@ import SwiftUI
 
 
 struct CharacterInfoTab: View {
-    @Binding var character: Character
+    @Binding var character: any BaseCharacter
     @Binding var isEditing: Bool
     @State private var dynamicFontSize: CGFloat = 16
     @State private var newConviction: String = ""
     @State private var newTouchstone: String = ""
+    @State private var refreshID: UUID = UUID()
     
     var body: some View {
         GeometryReader { geometry in
@@ -26,6 +27,17 @@ struct CharacterInfoTab: View {
                                 .font(.system(size: dynamicFontSize))
                         }
                     }
+                    
+                    HStack {
+                        Text("Character Type:")
+                            .fontWeight(.medium)
+                            .font(.system(size: dynamicFontSize))
+                        Spacer()
+                        Text(character.characterType.displayName)
+                            .font(.system(size: dynamicFontSize))
+                            .foregroundColor(.blue)
+                    }
+                    
                     HStack {
                         Text("Chronicle:")
                             .fontWeight(.medium)
@@ -105,6 +117,7 @@ struct CharacterInfoTab: View {
                                 if isEditing {
                                     Button("Remove") {
                                         character.convictions.remove(at: index)
+                                        refreshID = UUID()
                                     }
                                     .font(.caption)
                                     .foregroundColor(.red)
@@ -142,6 +155,7 @@ struct CharacterInfoTab: View {
                                 if isEditing {
                                     Button("Remove") {
                                         character.touchstones.remove(at: index)
+                                        refreshID = UUID()
                                     }
                                     .font(.caption)
                                     .foregroundColor(.red)

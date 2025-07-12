@@ -2,7 +2,7 @@ import SwiftUI
 
 
 struct AmbitionAndDesireStage: View {
-    @Binding var character: Character
+    @Binding var character: any BaseCharacter
     
     var body: some View {
         Form {

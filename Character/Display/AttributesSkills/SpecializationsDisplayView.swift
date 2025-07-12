@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SpecializationsTableView: View {
-    @Binding var character: Character
+    @Binding var character: any BaseCharacter
     let isEditing: Bool
     let dynamicFontSize: CGFloat
     let titleFontSize: CGFloat
@@ -12,6 +12,7 @@ struct SpecializationsTableView: View {
     @State private var selectedSkillForSpecialization = ""
     @State private var editingSpecialization: Specialization?
     @State private var editingSpecializationText = ""
+    @State private var refreshID: UUID = UUID()
 
     private enum ColumnItem {
         case skillName(String)
@@ -196,5 +197,6 @@ struct SpecializationsTableView: View {
 
     private func removeSpecialization(_ specialization: Specialization) {
         character.specializations.removeAll { $0.id == specialization.id }
+        refreshID = UUID()
     }
 }
