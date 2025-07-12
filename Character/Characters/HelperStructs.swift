@@ -6,11 +6,13 @@ struct Background: Identifiable, Codable, Hashable {
     var name: String
     var cost: Int
     var isCustom: Bool = false
+    var suitableCharacterTypes: Set<CharacterType> = Set(CharacterType.allCases)
     
-    init(name: String, cost: Int, isCustom: Bool = false) {
+    init(name: String, cost: Int, isCustom: Bool = false, suitableCharacterTypes: Set<CharacterType> = Set(CharacterType.allCases)) {
         self.name = name
         self.cost = cost
         self.isCustom = isCustom
+        self.suitableCharacterTypes = suitableCharacterTypes
     }
 }
 

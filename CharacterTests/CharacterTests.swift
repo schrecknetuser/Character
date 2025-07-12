@@ -189,22 +189,32 @@ struct CharacterTests {
     }
     
     @Test func testAdvantageFlawStructures() async throws {
-        // Test advantage and flaw data structures
+        // Test advantage and flaw data structures with default character types
         let advantage = Background(name: "Resources", cost: 3, isCustom: false)
         #expect(advantage.name == "Resources")
         #expect(advantage.cost == 3)
         #expect(advantage.isCustom == false)
+        #expect(advantage.suitableCharacterTypes == Set(CharacterType.allCases)) // Default to all types
         
         let customAdvantage = Background(name: "Special Ability", cost: 5, isCustom: true)
         #expect(customAdvantage.isCustom == true)
+        #expect(customAdvantage.suitableCharacterTypes == Set(CharacterType.allCases))
         
         let flaw = Background(name: "Enemy", cost: -2, isCustom: false)
         #expect(flaw.name == "Enemy")
         #expect(flaw.cost == -2) // Should be negative
         #expect(flaw.isCustom == false)
+        #expect(flaw.suitableCharacterTypes == Set(CharacterType.allCases))
         
         let customFlaw = Background(name: "Custom Weakness", cost: -3, isCustom: true)
         #expect(customFlaw.isCustom == true)
+        #expect(customFlaw.suitableCharacterTypes == Set(CharacterType.allCases))
+        
+        // Test background with specific character types
+        let vampireOnlyAdvantage = Background(name: "Herd", cost: 3, suitableCharacterTypes: [.vampire])
+        #expect(vampireOnlyAdvantage.suitableCharacterTypes == [.vampire])
+        #expect(vampireOnlyAdvantage.suitableCharacterTypes.contains(.vampire))
+        #expect(!vampireOnlyAdvantage.suitableCharacterTypes.contains(.mage))
     }
     
     @Test func testPredefinedAdvantagesAndFlaws() async throws {
@@ -368,6 +378,61 @@ struct CharacterTests {
         #expect(requiredSpecs.contains("Science"))
         #expect(requiredSpecs.count == 4)
         #expect(!requiredSpecs.contains("Persuasion")) // Persuasion doesn't require free specialization
+    }
+
+    @Test func testCharacterTypeFilteringForBackgrounds() async throws {
+        // Test that character type filtering works for advantages
+        let vampireAdvantages = V5Constants.getAdvantagesForCharacterType(.vampire)
+        let ghoulAdvantages = V5Constants.getAdvantagesForCharacterType(.ghoul)
+        let mageAdvantages = V5Constants.getAdvantagesForCharacterType(.mage)
+        
+        // Vampire should have access to vampire-specific backgrounds
+        #expect(vampireAdvantages.contains { $0.name == "Herd" })
+        #expect(vampireAdvantages.contains { $0.name == "Haven" })
+        #expect(vampireAdvantages.contains { $0.name == "Feeding Grounds" })
+        #expect(vampireAdvantages.contains { $0.name == "Thin-Blooded Alchemy" })
+        
+        // Vampire should also have access to universal backgrounds
+        #expect(vampireAdvantages.contains { $0.name == "Allies" })
+        #expect(vampireAdvantages.contains { $0.name == "Resources" })
+        
+        // Ghoul should have access to universal backgrounds but not vampire-specific
+        #expect(ghoulAdvantages.contains { $0.name == "Allies" })
+        #expect(ghoulAdvantages.contains { $0.name == "Resources" })
+        #expect(!ghoulAdvantages.contains { $0.name == "Herd" })
+        #expect(!ghoulAdvantages.contains { $0.name == "Haven" })
+        
+        // Mage should have access to universal backgrounds but not vampire-specific
+        #expect(mageAdvantages.contains { $0.name == "Allies" })
+        #expect(mageAdvantages.contains { $0.name == "Resources" })
+        #expect(!mageAdvantages.contains { $0.name == "Herd" })
+        #expect(!mageAdvantages.contains { $0.name == "Haven" })
+        
+        // Test flaw filtering
+        let vampireFlaws = V5Constants.getFlawsForCharacterType(.vampire)
+        let ghoulFlaws = V5Constants.getFlawsForCharacterType(.ghoul)
+        let mageFlaws = V5Constants.getFlawsForCharacterType(.mage)
+        
+        // Vampire should have access to vampire-specific flaws
+        #expect(vampireFlaws.contains { $0.name == "Clan Curse" })
+        #expect(vampireFlaws.contains { $0.name == "Feeding Restriction" })
+        #expect(vampireFlaws.contains { $0.name == "Thin-Blooded" })
+        
+        // Vampire should also have access to universal flaws
+        #expect(vampireFlaws.contains { $0.name == "Enemy" })
+        #expect(vampireFlaws.contains { $0.name == "Dark Secret" })
+        
+        // Ghoul should have access to universal flaws but not vampire-specific
+        #expect(ghoulFlaws.contains { $0.name == "Enemy" })
+        #expect(ghoulFlaws.contains { $0.name == "Dark Secret" })
+        #expect(!ghoulFlaws.contains { $0.name == "Clan Curse" })
+        #expect(!ghoulFlaws.contains { $0.name == "Feeding Restriction" })
+        
+        // Mage should have access to universal flaws but not vampire-specific
+        #expect(mageFlaws.contains { $0.name == "Enemy" })
+        #expect(mageFlaws.contains { $0.name == "Dark Secret" })
+        #expect(!mageFlaws.contains { $0.name == "Clan Curse" })
+        #expect(!mageFlaws.contains { $0.name == "Feeding Restriction" })
     }
     
     @Test func testCharacterSpecializationsInitialization() async throws {

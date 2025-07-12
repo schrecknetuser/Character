@@ -36,7 +36,7 @@ struct MeritsAndFlawsStage: View {
                     }
                 }
                 
-                CreationMeritsListView(selectedMerits: $character.advantages)
+                CreationMeritsListView(selectedMerits: $character.advantages, characterType: character.characterType)
             }
             
             Section(header: Text("Flaws")) {
@@ -69,7 +69,7 @@ struct MeritsAndFlawsStage: View {
                     }
                 }
                 
-                CreationFlawsListView(selectedFlaws: $character.flaws)
+                CreationFlawsListView(selectedFlaws: $character.flaws, characterType: character.characterType)
             }
             
             Section(footer: Text("Merits and flaws are optional for character creation.")) {
@@ -86,6 +86,7 @@ struct MeritsAndFlawsStage: View {
 
 struct CreationMeritsListView: View {
     @Binding var selectedMerits: [Background]
+    let characterType: CharacterType
     @State private var showingAddMerit = false
     
     var body: some View {
@@ -94,13 +95,14 @@ struct CreationMeritsListView: View {
         }
         .foregroundColor(.accentColor)
         .sheet(isPresented: $showingAddMerit) {
-            AddAdvantageView(selectedAdvantages: $selectedMerits)
+            AddAdvantageView(selectedAdvantages: $selectedMerits, characterType: characterType)
         }
     }
 }
 
 struct CreationFlawsListView: View {
     @Binding var selectedFlaws: [Background]
+    let characterType: CharacterType
     @State private var showingAddFlaw = false
     
     var body: some View {
@@ -109,7 +111,7 @@ struct CreationFlawsListView: View {
         }
         .foregroundColor(.accentColor)
         .sheet(isPresented: $showingAddFlaw) {
-            AddFlawView(selectedFlaws: $selectedFlaws)
+            AddFlawView(selectedFlaws: $selectedFlaws, characterType: characterType)
         }
     }
 }
