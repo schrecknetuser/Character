@@ -389,9 +389,9 @@ struct AnyCharacter: Codable, Identifiable {
         case .vampire:
             character = try container.decode(VampireCharacter.self, forKey: .data)
         case .ghoul:
-            character = try container.decode(VampireCharacter.self, forKey: .data)
+            character = try container.decode(GhoulCharacter.self, forKey: .data)
         case .mage:
-            character = try container.decode(VampireCharacter.self, forKey: .data)
+            character = try container.decode(MageCharacter.self, forKey: .data)
         }
     }
 
@@ -401,10 +401,13 @@ struct AnyCharacter: Codable, Identifiable {
         if let vampire = character as? VampireCharacter {
             try container.encode(CharacterType.vampire, forKey: .type)
             try container.encode(vampire, forKey: .data)
-        }/* else if let mage = character as? MageCharacter {
+        } else if let ghoul = character as? GhoulCharacter {
+            try container.encode(CharacterType.ghoul, forKey: .type)
+            try container.encode(ghoul, forKey: .data)
+        } else if let mage = character as? MageCharacter {
             try container.encode(CharacterType.mage, forKey: .type)
             try container.encode(mage, forKey: .data)
-        } */else {
+        } else {
             throw EncodingError.invalidValue(character, .init(
                 codingPath: [],
                 debugDescription: "Unsupported character type"

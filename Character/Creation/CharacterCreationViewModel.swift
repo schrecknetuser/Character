@@ -23,10 +23,10 @@ class CharacterCreationViewModel: ObservableObject {
         switch type {
         case .vampire:
             return VampireCharacter()
-        case .mage:
-            return VampireCharacter()
         case .ghoul:
-            return VampireCharacter()
+            return GhoulCharacter()
+        case .mage:
+            return MageCharacter()
         }
     }
 
@@ -36,16 +36,24 @@ class CharacterCreationViewModel: ObservableObject {
         character as? VampireCharacter
     }
 
-    /*var asMage: Mage? {
-        character as? Mage
+    var asGhoul: GhoulCharacter? {
+        character as? GhoulCharacter
     }
 
-    var asGhoul: Ghoul? {
-        character as? Ghoul
-    }*/
+    var asMage: MageCharacter? {
+        character as? MageCharacter
+    }
     
     var asVampireForced: VampireCharacter {
         character as! VampireCharacter
+    }
+
+    var asGhoulForced: GhoulCharacter {
+        character as! GhoulCharacter
+    }
+
+    var asMageForced: MageCharacter {
+        character as! MageCharacter
     }
 
     // MARK: - SwiftUI Bindings
@@ -60,13 +68,25 @@ class CharacterCreationViewModel: ObservableObject {
         )
     }
 
-    /*var mageBinding: Binding<Mage>? {
-        binding(as: Mage.self)
+    var ghoulBinding: Binding<GhoulCharacter>? {
+        guard let ghoul = character as? GhoulCharacter else { return nil }
+        return Binding(
+            get: { ghoul },
+            set: { [weak self] newValue in
+                self?.character = newValue
+            }
+        )
     }
 
-    var ghoulBinding: Binding<Ghoul>? {
-        binding(as: Ghoul.self)
-    }*/
+    var mageBinding: Binding<MageCharacter>? {
+        guard let mage = character as? MageCharacter else { return nil }
+        return Binding(
+            get: { mage },
+            set: { [weak self] newValue in
+                self?.character = newValue
+            }
+        )
+    }
 
     private func binding<T: BaseCharacter>(as type: T.Type) -> Binding<T>? {
         guard let casted = character as? T else { return nil }

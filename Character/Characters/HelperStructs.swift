@@ -69,3 +69,9 @@ enum HumanityState: String, Codable, CaseIterable {
     case unchecked = "unchecked"
     case stained = "stained"
 }
+
+// Hubris and Quiet tracking states (for mages - no stains)
+enum MageTraitState: String, Codable, CaseIterable {
+    case checked = "checked"
+    case unchecked = "unchecked"
+}
