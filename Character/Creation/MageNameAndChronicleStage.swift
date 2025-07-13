@@ -37,6 +37,26 @@ struct MageNameAndChronicleStage: View {
                 }
                 
                 VStack(alignment: .leading, spacing: 8) {
+                    Text("Date of Birth")
+                        .font(.headline)
+                    DatePicker("Date of Birth", selection: Binding(
+                        get: { character.dateOfBirth ?? Date() },
+                        set: { character.dateOfBirth = $0 }
+                    ), displayedComponents: .date)
+                    .labelsHidden()
+                }
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Date of Awakening")
+                        .font(.headline)
+                    DatePicker("Date of Awakening", selection: Binding(
+                        get: { character.dateOfAwakening ?? Date() },
+                        set: { character.dateOfAwakening = $0 }
+                    ), displayedComponents: .date)
+                    .labelsHidden()
+                }
+                
+                VStack(alignment: .leading, spacing: 8) {
                     Text("Paradigm")
                         .font(.headline)
                     TextField("Enter paradigm", text: $character.paradigm, axis: .vertical)

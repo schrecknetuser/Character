@@ -31,6 +31,26 @@ struct GhoulNameAndChronicleStage: View {
                     TextField("Enter character concept", text: $character.concept)
                         .textFieldStyle(.roundedBorder)
                 }
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Date of Birth")
+                        .font(.headline)
+                    DatePicker("Date of Birth", selection: Binding(
+                        get: { character.dateOfBirth ?? Date() },
+                        set: { character.dateOfBirth = $0 }
+                    ), displayedComponents: .date)
+                    .labelsHidden()
+                }
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Date of Ghouling")
+                        .font(.headline)
+                    DatePicker("Date of Ghouling", selection: Binding(
+                        get: { character.dateOfGhouling ?? Date() },
+                        set: { character.dateOfGhouling = $0 }
+                    ), displayedComponents: .date)
+                    .labelsHidden()
+                }
             }
             
             Spacer()

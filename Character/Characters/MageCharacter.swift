@@ -13,9 +13,10 @@ class MageCharacter: CharacterBase {
     @Published var paradigm: String
     @Published var practice: String
     @Published var instruments: [Instrument]
+    @Published var dateOfAwakening: Date? = nil
 
     enum CodingKeys: String, CodingKey {
-        case spheres, paradox, hubris, quiet, arete, hubrisStates, quietStates, paradigm, practice, instruments
+        case spheres, paradox, hubris, quiet, arete, hubrisStates, quietStates, paradigm, practice, instruments, dateOfAwakening
     }
 
     override init(characterType: CharacterType = .mage) {
@@ -44,6 +45,7 @@ class MageCharacter: CharacterBase {
         self.paradigm = try container.decodeIfPresent(String.self, forKey: .paradigm) ?? ""
         self.practice = try container.decodeIfPresent(String.self, forKey: .practice) ?? ""
         self.instruments = try container.decodeIfPresent([Instrument].self, forKey: .instruments) ?? []
+        self.dateOfAwakening = try container.decodeIfPresent(Date.self, forKey: .dateOfAwakening)
         try super.init(from: decoder)
     }
 
@@ -60,6 +62,7 @@ class MageCharacter: CharacterBase {
         try container.encode(paradigm, forKey: .paradigm)
         try container.encode(practice, forKey: .practice)
         try container.encode(instruments, forKey: .instruments)
+        try container.encodeIfPresent(dateOfAwakening, forKey: .dateOfAwakening)
     }
     
     override func generateChangeSummary(for updated: any BaseCharacter) -> String {
@@ -171,6 +174,7 @@ class MageCharacter: CharacterBase {
         copy.paradigm = self.paradigm
         copy.practice = self.practice
         copy.instruments = self.instruments
+        copy.dateOfAwakening = self.dateOfAwakening
 
         return copy
     }

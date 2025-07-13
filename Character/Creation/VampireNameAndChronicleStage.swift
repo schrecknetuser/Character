@@ -13,6 +13,16 @@ struct VampireNameAndChronicleStage: View {
                 TextField("Chronicle Name", text: $character.chronicleName)
                 
                 TextField("Character Concept", text: $character.concept)
+                
+                DatePicker("Date of Birth", selection: Binding(
+                    get: { character.dateOfBirth ?? Date() },
+                    set: { character.dateOfBirth = $0 }
+                ), displayedComponents: .date)
+                
+                DatePicker("Date of Embrace", selection: Binding(
+                    get: { character.dateOfEmbrace ?? Date() },
+                    set: { character.dateOfEmbrace = $0 }
+                ), displayedComponents: .date)
             }
             
             Section(header: Text("Character Details")) {
