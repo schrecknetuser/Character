@@ -54,6 +54,22 @@ class GhoulCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHuma
         if self.name != other.name {
             changes.append("name \(self.name)→\(other.name)")
         }
+        if self.concept != other.concept {
+            changes.append("concept \(self.concept)→\(other.concept)")
+        }
+        if self.chronicleName != other.chronicleName {
+            changes.append("chronicle name \(self.chronicleName)→\(other.chronicleName)")
+        }
+        if self.ambition != other.ambition {
+            changes.append("ambition \(self.ambition)→\(other.ambition)")
+        }
+        if self.desire != other.desire {
+            changes.append("desire \(self.desire)→\(other.desire)")
+        }
+        
+        // Check convictions and touchstones changes
+        processStringArrayChanges(original: self.convictions, updated: other.convictions, name: "convictions", changes: &changes)
+        processStringArrayChanges(original: self.touchstones, updated: other.touchstones, name: "touchstones", changes: &changes)
         
         // Check attribute changes
         for attribute in V5Constants.physicalAttributes + V5Constants.socialAttributes + V5Constants.mentalAttributes {
