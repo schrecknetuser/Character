@@ -121,16 +121,28 @@ struct AttributesStage: View {
     }
     
     private var allAttributeValues: [Int] {
-        allAttributes.compactMap { attribute in
+        var assignedValues: [Int] = []
+        var usedPresetValues: [Int] = AttributePreset.standard.values
+        
+        // Get all current attribute values
+        for attribute in allAttributes {
+            var currentValue = 1
             if V5Constants.physicalAttributes.contains(attribute) {
-                return character.physicalAttributes[attribute]
+                currentValue = character.physicalAttributes[attribute] ?? 1
             } else if V5Constants.socialAttributes.contains(attribute) {
-                return character.socialAttributes[attribute]
+                currentValue = character.socialAttributes[attribute] ?? 1
             } else if V5Constants.mentalAttributes.contains(attribute) {
-                return character.mentalAttributes[attribute]
+                currentValue = character.mentalAttributes[attribute] ?? 1
             }
-            return 1
-        }.filter { $0 > 1 } // Only count assigned values (> 1)
+            
+            // If this value exists in the preset and hasn't been counted yet, count it
+            if let index = usedPresetValues.firstIndex(of: currentValue) {
+                assignedValues.append(currentValue)
+                usedPresetValues.remove(at: index)
+            }
+        }
+        
+        return assignedValues
     }
 
     var body: some View {
@@ -236,15 +248,15 @@ struct AttributesStage: View {
     private func getAvailableValuesForSelection() -> [Int] {
         var availableValues: [Int] = AttributePreset.standard.values
         
-        // Remove already used values (but keep 1 always available)
+        // Remove already used values from the preset
         let usedValues = allAttributeValues
         for usedValue in usedValues {
-            if usedValue > 1, let index = availableValues.firstIndex(of: usedValue) {
+            if let index = availableValues.firstIndex(of: usedValue) {
                 availableValues.remove(at: index)
             }
         }
         
-        // Always include 1 as it's unlimited (base value)
+        // Always include 1 as it's unlimited (can be used for any unassigned attribute)
         if !availableValues.contains(1) {
             availableValues.append(1)
         }
@@ -279,9 +291,10 @@ struct AttributesStage: View {
     
     static func areAllAttributesAssigned(character: any BaseCharacter) -> Bool {
         let allAttributes = V5Constants.physicalAttributes + V5Constants.socialAttributes + V5Constants.mentalAttributes
+        let presetValues = AttributePreset.standard.values
+        var usedPresetValues: [Int] = presetValues
         
-        // Count how many attributes have values > 1 (assigned from the pool)
-        var assignedCount = 0
+        // Check how many preset values have been assigned
         for attribute in allAttributes {
             var currentValue = 1
             if V5Constants.physicalAttributes.contains(attribute) {
@@ -292,12 +305,13 @@ struct AttributesStage: View {
                 currentValue = character.mentalAttributes[attribute] ?? 1
             }
             
-            if currentValue > 1 {
-                assignedCount += 1
+            // If this value exists in the remaining preset values, mark it as used
+            if let index = usedPresetValues.firstIndex(of: currentValue) {
+                usedPresetValues.remove(at: index)
             }
         }
         
-        // All 9 values from the preset must be assigned
-        return assignedCount == AttributePreset.standard.values.count
+        // All 9 values from the preset must be assigned (no values left unused)
+        return usedPresetValues.isEmpty
     }
 }
