@@ -228,7 +228,7 @@ class VampireCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHu
     }
     
     // Add or update a V5 discipline
-    mutating func setV5DisciplineLevel(_ disciplineName: String, to level: Int) {
+    func setV5DisciplineLevel(_ disciplineName: String, to level: Int) {
         if var progress = v5Disciplines[disciplineName] {
             progress.currentLevel = level
             v5Disciplines[disciplineName] = progress
@@ -238,12 +238,12 @@ class VampireCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHu
     }
     
     // Remove a V5 discipline
-    mutating func removeV5Discipline(_ disciplineName: String) {
+    func removeV5Discipline(_ disciplineName: String) {
         v5Disciplines.removeValue(forKey: disciplineName)
     }
     
     // Toggle a power selection for a discipline at a specific level
-    mutating func toggleV5Power(_ powerId: UUID, for disciplineName: String, at level: Int) {
+    func toggleV5Power(_ powerId: UUID, for disciplineName: String, at level: Int) {
         if var progress = v5Disciplines[disciplineName] {
             progress.togglePower(powerId, at: level)
             v5Disciplines[disciplineName] = progress
@@ -269,7 +269,7 @@ class VampireCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHu
     }
     
     // Migrate legacy disciplines to V5 format
-    mutating func migrateLegacyDisciplinesToV5() {
+    func migrateLegacyDisciplinesToV5() {
         for (disciplineName, level) in disciplines {
             if v5Disciplines[disciplineName] == nil {
                 v5Disciplines[disciplineName] = V5DisciplineProgress(disciplineName: disciplineName, currentLevel: level)
@@ -278,7 +278,7 @@ class VampireCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHu
     }
     
     // Add a custom discipline
-    mutating func addCustomV5Discipline(_ discipline: V5Discipline) {
+    func addCustomV5Discipline(_ discipline: V5Discipline) {
         if !customV5Disciplines.contains(where: { $0.name == discipline.name }) {
             customV5Disciplines.append(discipline)
         }

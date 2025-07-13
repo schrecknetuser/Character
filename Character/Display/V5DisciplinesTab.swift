@@ -23,6 +23,7 @@ struct V5DisciplinePowersView: View {
                                 Image(systemName: selectedPowerIds.contains(power.id) ? "checkmark.circle.fill" : "circle")
                                     .foregroundColor(selectedPowerIds.contains(power.id) ? .accentColor : .secondary)
                             }
+                            .buttonStyle(.borderless)
                         } else {
                             if selectedPowerIds.contains(power.id) {
                                 Image(systemName: "checkmark.circle.fill")
@@ -63,6 +64,7 @@ struct V5DisciplineDetailView: View {
     let disciplineName: String
     @Binding var isEditing: Bool
     @Environment(\.dismiss) var dismiss
+    @State var refreshID: UUID = UUID()
     
     private var discipline: V5Discipline? {
         character.getV5Discipline(named: disciplineName)
@@ -113,6 +115,7 @@ struct V5DisciplineDetailView: View {
                                 isEditing: isEditing,
                                 onPowerToggle: { powerId in
                                     character.toggleV5Power(powerId, for: disciplineName, at: level)
+                                    refreshID = UUID()
                                 }
                             )
                         }

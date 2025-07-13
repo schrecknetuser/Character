@@ -88,7 +88,7 @@ struct CharacterDetailView: View {
                             get: { vampire },
                             set: { updated in draftCharacter = updated }
                         )
-                        DisciplinesTab(character: binding, isEditing: $isEditing)
+                        V5DisciplinesTab(character: binding, isEditing: $isEditing)
                             .tabItem {
                                 Image(systemName: "flame.fill")
                                 Text("Disciplines")
