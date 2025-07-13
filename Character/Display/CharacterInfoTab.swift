@@ -223,6 +223,50 @@ struct CharacterInfoTab: View {
                     .padding(.vertical, 4)
                 }
                 
+                Section(header: Text("Description & Notes")) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Character Description:")
+                            .fontWeight(.medium)
+                            .font(.system(size: dynamicFontSize))
+                        if isEditing {
+                            TextField("Character Description", text: $character.characterDescription, axis: .vertical)
+                                .font(.system(size: dynamicFontSize))
+                                .lineLimit(3...10)
+                        } else {
+                            if !character.characterDescription.isEmpty {
+                                Text(character.characterDescription)
+                                    .font(.system(size: dynamicFontSize))
+                            } else {
+                                Text("Not set")
+                                    .foregroundColor(.secondary)
+                                    .font(.system(size: dynamicFontSize))
+                            }
+                        }
+                    }
+                    .padding(.vertical, 4)
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Notes:")
+                            .fontWeight(.medium)
+                            .font(.system(size: dynamicFontSize))
+                        if isEditing {
+                            TextField("Notes", text: $character.notes, axis: .vertical)
+                                .font(.system(size: dynamicFontSize))
+                                .lineLimit(3...10)
+                        } else {
+                            if !character.notes.isEmpty {
+                                Text(character.notes)
+                                    .font(.system(size: dynamicFontSize))
+                            } else {
+                                Text("Not set")
+                                    .foregroundColor(.secondary)
+                                    .font(.system(size: dynamicFontSize))
+                            }
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
+                
                 // Add mage-specific fields
                 if let mageCharacter = character as? MageCharacter {
                     Section(header: Text("Mage Information")) {

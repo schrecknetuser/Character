@@ -53,6 +53,8 @@ protocol BaseCharacter: AnyObject, Identifiable, Codable, ObservableObject {
     var desire: String { get set }
     var chronicleName: String { get set }
     var concept: String { get set }
+    var characterDescription: String { get set }
+    var notes: String { get set }
     
     var dateOfBirth: Date? { get set }
 
@@ -108,6 +110,8 @@ class CharacterBase: BaseCharacter {
     @Published var desire: String = ""
     @Published var chronicleName: String = ""
     @Published var concept: String = ""
+    @Published var characterDescription: String = ""
+    @Published var notes: String = ""
     
     @Published var dateOfBirth: Date? = nil
 
@@ -129,7 +133,7 @@ class CharacterBase: BaseCharacter {
              physicalAttributes, socialAttributes, mentalAttributes,
              physicalSkills, socialSkills, mentalSkills,
              willpower, experience, spentExperience,
-             ambition, desire, chronicleName, concept, dateOfBirth,
+             ambition, desire, chronicleName, concept, characterDescription, notes, dateOfBirth,
              advantages, flaws, convictions, touchstones, chronicleTenets,
              specializations, currentSession, changeLog,
              health, healthStates, willpowerStates
@@ -153,6 +157,8 @@ class CharacterBase: BaseCharacter {
         desire = try container.decode(String.self, forKey: .desire)
         chronicleName = try container.decode(String.self, forKey: .chronicleName)
         concept = try container.decodeIfPresent(String.self, forKey: .concept) ?? ""
+        characterDescription = try container.decodeIfPresent(String.self, forKey: .characterDescription) ?? ""
+        notes = try container.decodeIfPresent(String.self, forKey: .notes) ?? ""
         dateOfBirth = try container.decodeIfPresent(Date.self, forKey: .dateOfBirth)
         advantages = try container.decode([Background].self, forKey: .advantages)
         flaws = try container.decode([Background].self, forKey: .flaws)
@@ -184,6 +190,8 @@ class CharacterBase: BaseCharacter {
         try container.encode(desire, forKey: .desire)
         try container.encode(chronicleName, forKey: .chronicleName)
         try container.encode(concept, forKey: .concept)
+        try container.encode(characterDescription, forKey: .characterDescription)
+        try container.encode(notes, forKey: .notes)
         try container.encodeIfPresent(dateOfBirth, forKey: .dateOfBirth)
         try container.encode(advantages, forKey: .advantages)
         try container.encode(flaws, forKey: .flaws)
