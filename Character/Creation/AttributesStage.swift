@@ -1,276 +1,287 @@
 import SwiftUI
 
-struct DraggableValueBox: View {
-    let value: Int
-    let id: UUID
-    @State private var isDragging = false
+// Attribute preset - similar to SkillPreset but for attributes
+enum AttributePreset: CaseIterable {
+    case standard
     
-    var body: some View {
-        Text("\(value)")
-            .font(.title2)
-            .fontWeight(.bold)
-            .frame(width: 50, height: 50)
-            .background(Color.blue.opacity(isDragging ? 0.6 : 0.8))
-            .foregroundColor(.white)
-            .cornerRadius(8)
-            .scaleEffect(isDragging ? 1.1 : 1.0)
-            .animation(.easeInOut(duration: 0.1), value: isDragging)
-            .draggable(AttributeDragData(value: value, sourceAttribute: nil)) {
-                Text("\(value)")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .frame(width: 50, height: 50)
-                    .background(Color.blue.opacity(0.8))
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
-            }
+    var name: String {
+        switch self {
+        case .standard: return "Standard Attribute Set"
+        }
+    }
+    
+    var values: [Int] {
+        switch self {
+        case .standard: return [4, 3, 3, 3, 2, 2, 2, 2, 1]
+        }
     }
 }
 
-struct AttributeDropRow: View {
-    let attribute: String
-    @Binding var assignedValues: [String: Int]
-    @Binding var availableValues: [(Int, UUID)]
-    @Binding var characterAttributes: [String: Int]
-    @Binding var character: any BaseCharacter
-    @State private var isTargeted = false
+struct AttributePresetView: View {
+    let preset: AttributePreset
+    let presetValues: [Int]
+    let selectedValues: [Int]
     
     var body: some View {
-        VStack {
-            Text(attribute)
-                .font(.caption)
-                .frame(maxWidth: .infinity, alignment: .center)
+        VStack(alignment: .leading) {
+            Text(preset.name)
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .foregroundColor(.primary)
             
-            // Drop zone - made much larger and more responsive
-            ZStack {
-                Rectangle()
-                    .stroke(isTargeted ? Color.blue : Color.gray, lineWidth: isTargeted ? 2 : 1)
-                    .frame(height: 80) // Large drop zone
-                    .background(
-                        Group {
-                            if isTargeted {
-                                Color.blue.opacity(0.3)
-                            } else if assignedValues[attribute] != nil {
-                                Color.green.opacity(0.2)
-                            } else {
-                                Color.gray.opacity(0.1)
-                            }
-                        }
-                    )
-                    .animation(.easeInOut(duration: 0.1), value: isTargeted)
+            let valuesWithStatus: [(Int, Bool)] = {
+                var statusList: [(Int, Bool)] = presetValues.map { ($0, false) }
                 
-                if let value = assignedValues[attribute] {
-                    Text("\(value)")
-                        .font(.title3)
-                        .fontWeight(.bold)
-                        .draggable(AttributeDragData(value: value, sourceAttribute: attribute)) {
-                            Text("\(value)")
-                                .font(.title3)
-                                .fontWeight(.bold)
-                                .frame(width: 50, height: 50)
-                                .background(Color.green.opacity(0.8))
-                                .foregroundColor(.white)
-                                .cornerRadius(8)
-                        }
-                } else {
-                    Text("—")
-                        .foregroundColor(.gray)
-                        .font(.title2)
+                for i in selectedValues {
+                    if let matchIndex = statusList.firstIndex(where: { $0.0 == i && !$0.1 }) {
+                        statusList[matchIndex].1 = true
+                    }
+                }
+
+                return statusList
+            }()
+                
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 0), count: 9), spacing: 6) {
+                ForEach(Array(valuesWithStatus.enumerated()), id: \.offset) { index, value in
+                    Text("\(value.0)")
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .padding(4)
+                        .background(Color.blue.opacity(0.3))
+                        .cornerRadius(4)
+                        .strikethrough(value.1)
                 }
             }
-            .dropDestination(for: AttributeDragData.self) { items, location in
-                guard let draggedItem = items.first else { return false }
-                assignValueToAttribute(attribute: attribute, dragData: draggedItem)
-                return true
-            } isTargeted: { targeted in
-                isTargeted = targeted
-            }
         }
-    }
-    
-    private func assignValueToAttribute(attribute: String, dragData: AttributeDragData) {
-        let value = dragData.value
-        let sourceAttribute = dragData.sourceAttribute
-        
-        // If this attribute already has a value, return it to available values
-        if let currentValue = assignedValues[attribute] {
-            availableValues.append((currentValue, UUID()))
-            availableValues.sort { $0.0 > $1.0 }
-        }
-        
-        // Handle the source of the drag
-        if let sourceAttr = sourceAttribute {
-            // Dragged from another attribute - remove from source
-            assignedValues.removeValue(forKey: sourceAttr)
-            
-            // Reset source attribute to base value in the correct character attribute category
-            if V5Constants.physicalAttributes.contains(sourceAttr) {
-                character.physicalAttributes[sourceAttr] = 1
-            } else if V5Constants.socialAttributes.contains(sourceAttr) {
-                character.socialAttributes[sourceAttr] = 1
-            } else if V5Constants.mentalAttributes.contains(sourceAttr) {
-                character.mentalAttributes[sourceAttr] = 1
-            }
-        } else {
-            // Dragged from unassigned pool - remove from available values
-            if let index = availableValues.firstIndex(where: { $0.0 == value }) {
-                availableValues.remove(at: index)
-            }
-        }
-        
-        // Assign the new value
-        assignedValues[attribute] = value
-        characterAttributes[attribute] = value
     }
 }
+
+struct AttributeCategoryView: View {
+    let title: String
+    let attributes: [String]
+    @Binding var characterAttributes: [String: Int]
+    let availableValues: [Int]
+    let dynamicFontSize: CGFloat
+    let headerFontSize: CGFloat
+    let rowHeight: CGFloat
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(title)
+                .font(.system(size: headerFontSize, weight: .semibold))
+                .foregroundColor(.secondary)
+            
+            ForEach(attributes, id: \.self) { attribute in
+                HStack {
+                    Text(attribute)
+                        .font(.system(size: dynamicFontSize))
+                        .lineLimit(1)
+                    
+                    Spacer()
+                    
+                    Picker("", selection: Binding(
+                        get: { characterAttributes[attribute] ?? 1 },
+                        set: { characterAttributes[attribute] = $0 }
+                    )) {
+                        let currentValue = characterAttributes[attribute] ?? 1
+                        let uniqueValues = Set(availableValues + [currentValue])
+                        
+                        ForEach(uniqueValues.sorted(by: >), id: \.self) { value in
+                            Text("\(value)")
+                                .font(.system(size: dynamicFontSize))
+                                .tag(value)
+                        }
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                    .frame(width: 55)
+                }
+                .frame(minHeight: rowHeight)
+            }
+        }
+    }
+}
+
+
 
 struct AttributesStage: View {
     @Binding var character: any BaseCharacter
-    @State private var availableValues: [(Int, UUID)] = [(4, UUID()), (3, UUID()), (3, UUID()), (3, UUID()), (2, UUID()), (2, UUID()), (2, UUID()), (2, UUID()), (1, UUID())]
-    @State private var assignedValues: [String: Int] = [:]
+    @State private var selectedPresetValues: [AttributePreset: [Int]] = [:]
+    
+    @State private var dynamicFontSize: CGFloat = 14
+    @State private var titleFontSize: CGFloat = 20
+    @State private var headerFontSize: CGFloat = 17
+    @State private var rowHeight: CGFloat = 20
     
     private var allAttributes: [String] {
         V5Constants.physicalAttributes + V5Constants.socialAttributes + V5Constants.mentalAttributes
     }
     
+    private func getPresetValues(for preset: AttributePreset) -> [Int] {
+        selectedPresetValues[preset] ?? preset.values
+    }
+    
+    private var allAttributeValues: [Int] {
+        allAttributes.compactMap { attribute in
+            if V5Constants.physicalAttributes.contains(attribute) {
+                return character.physicalAttributes[attribute]
+            } else if V5Constants.socialAttributes.contains(attribute) {
+                return character.socialAttributes[attribute]
+            } else if V5Constants.mentalAttributes.contains(attribute) {
+                return character.mentalAttributes[attribute]
+            }
+            return 1
+        }.filter { $0 > 1 } // Only count assigned values (> 1)
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            // Available values section
-            VStack(alignment: .leading) {
-                Text("Unassigned Values")
-                    .font(.headline)
-                
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 5), spacing: 10) {
-                    ForEach(availableValues, id: \.1) { valueWithId in
-                        DraggableValueBox(value: valueWithId.0, id: valueWithId.1)
-                    }
-                }
-                .dropDestination(for: AttributeDragData.self) { items, location in
-                    guard let draggedItem = items.first else { return false }
-                    
-                    // Find the attribute that had this value and remove it
-                    if let sourceAttribute = draggedItem.sourceAttribute {
-                        availableValues.append((draggedItem.value, UUID()))
-                        availableValues.sort { $0.0 > $1.0 }
-                        assignedValues.removeValue(forKey: sourceAttribute)
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    // Presets section
+                    VStack(alignment: .leading) {
+                        Text("Attribute Preset")
+                            .font(.headline)
                         
-                        // Reset the character attribute to base value
-                        if V5Constants.physicalAttributes.contains(sourceAttribute) {
-                            character.physicalAttributes[sourceAttribute] = 1
-                        } else if V5Constants.socialAttributes.contains(sourceAttribute) {
-                            character.socialAttributes[sourceAttribute] = 1
-                        } else if V5Constants.mentalAttributes.contains(sourceAttribute) {
-                            character.mentalAttributes[sourceAttribute] = 1
+                        ForEach(AttributePreset.allCases, id: \.self) { preset in
+                            AttributePresetView(
+                                preset: preset,
+                                presetValues: getPresetValues(for: preset),
+                                selectedValues: allAttributeValues
+                            )
                         }
                     }
-                    return true
-                } isTargeted: { targeted in
-                    // Add visual feedback for targeting the unassigned area
-                    // This could be used to change the background color when hovering
-                }
-            }
-            .padding()
-            .background(Color.secondary.opacity(0.1))
-            .cornerRadius(10)
-            
-            // Attributes table
-            VStack(alignment: .leading) {
-                Text("Attributes")
-                    .font(.headline)
-                
-                // Table header
-                HStack {
-                    Text("Physical")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.secondary)
-                        .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.secondary.opacity(0.1))
+                    .cornerRadius(10)
                     
-                    Text("Social")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.secondary)
-                        .frame(maxWidth: .infinity)
-                    
-                    Text("Mental")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.secondary)
-                        .frame(maxWidth: .infinity)
-                }
-                .padding(.bottom, 10)
-                
-                // Attribute rows
-                ForEach(0..<3, id: \.self) { rowIndex in
-                    HStack {
-                        // Physical attribute
-                        AttributeDropRow(
-                            attribute: V5Constants.physicalAttributes[rowIndex],
-                            assignedValues: $assignedValues,
-                            availableValues: $availableValues,
-                            characterAttributes: $character.physicalAttributes,
-                            character: $character
-                        )
-                        .frame(maxWidth: .infinity)
+                    // Attributes section
+                    VStack(alignment: .leading) {
+                        Text("Attributes")
+                            .font(.headline)
                         
-                        // Social attribute
-                        AttributeDropRow(
-                            attribute: V5Constants.socialAttributes[rowIndex],
-                            assignedValues: $assignedValues,
-                            availableValues: $availableValues,
-                            characterAttributes: $character.socialAttributes,
-                            character: $character
-                        )
-                        .frame(maxWidth: .infinity)
-                        
-                        // Mental attribute
-                        AttributeDropRow(
-                            attribute: V5Constants.mentalAttributes[rowIndex],
-                            assignedValues: $assignedValues,
-                            availableValues: $availableValues,
-                            characterAttributes: $character.mentalAttributes,
-                            character: $character
-                        )
-                        .frame(maxWidth: .infinity)
+                        HStack(spacing: 15) {
+                            // Physical Attributes
+                            AttributeCategoryView(
+                                title: "Physical",
+                                attributes: V5Constants.physicalAttributes,
+                                characterAttributes: $character.physicalAttributes,
+                                availableValues: getAvailableValuesForSelection(),
+                                dynamicFontSize: dynamicFontSize,
+                                headerFontSize: headerFontSize,
+                                rowHeight: rowHeight
+                            ).frame(maxWidth: .infinity)
+                            
+                            // Social Attributes
+                            AttributeCategoryView(
+                                title: "Social",
+                                attributes: V5Constants.socialAttributes,
+                                characterAttributes: $character.socialAttributes,
+                                availableValues: getAvailableValuesForSelection(),
+                                dynamicFontSize: dynamicFontSize,
+                                headerFontSize: headerFontSize,
+                                rowHeight: rowHeight
+                            ).frame(maxWidth: .infinity)
+                            
+                            // Mental Attributes
+                            AttributeCategoryView(
+                                title: "Mental",
+                                attributes: V5Constants.mentalAttributes,
+                                characterAttributes: $character.mentalAttributes,
+                                availableValues: getAvailableValuesForSelection(),
+                                dynamicFontSize: dynamicFontSize,
+                                headerFontSize: headerFontSize,
+                                rowHeight: rowHeight
+                            ).frame(maxWidth: .infinity)
+                        }
                     }
-                    .padding(.vertical, 2)
+                    
+                    // Progress indicator
+                    VStack(alignment: .leading) {
+                        Text("Progress: \(allAttributeValues.count) of \(AttributePreset.standard.values.count) values assigned")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        
+                        let remainingValues = AttributePreset.standard.values.count - allAttributeValues.count
+                        Text("Remaining values: \(remainingValues)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        
+                        if allAttributeValues.count < AttributePreset.standard.values.count {
+                            Text("Assign all attribute values to proceed.")
+                                .font(.caption)
+                                .foregroundColor(.orange)
+                        } else {
+                            Text("All values assigned! You can proceed to the next stage.")
+                                .font(.caption)
+                                .foregroundColor(.green)
+                        }
+                    }
                 }
+                .padding()
             }
-            
-            // Progress indicator
-            VStack(alignment: .leading) {
-                Text("Progress: \(assignedValues.count) of \(allAttributes.count) attributes assigned")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                
-                Text("Remaining values: \(availableValues.count)")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                
-                if assignedValues.count < allAttributes.count || !availableValues.isEmpty {
-                    Text("Assign all attribute values to proceed.")
-                        .font(.caption)
-                        .foregroundColor(.orange)
-                } else {
-                    Text("All values assigned! You can proceed to the next stage.")
-                        .font(.caption)
-                        .foregroundColor(.green)
-                }
+            .onAppear {
+                initializePresetValues()
+                calculateOptimalFontSizes(for: geometry.size)
             }
-        }
-        .padding()
-        .onAppear {
-            initializeAttributeValues()
+            .onChange(of: allAttributeValues) {
+                // Update is automatic with new system
+            }
         }
     }
     
-    private func initializeAttributeValues() {
-        // Reset assigned values and available values
-        assignedValues.removeAll()
-        availableValues = [(4, UUID()), (3, UUID()), (3, UUID()), (3, UUID()), (2, UUID()), (2, UUID()), (2, UUID()), (2, UUID()), (1, UUID())]
+    private func initializePresetValues() {
+        selectedPresetValues[.standard] = AttributePreset.standard.values
+    }
+    
+    private func getAvailableValuesForSelection() -> [Int] {
+        var availableValues: [Int] = AttributePreset.standard.values
         
-        // Check if any attributes have been assigned (any attribute with value != 1)
-        var hasAnyAssignments = false
+        // Remove already used values (but keep 1 always available)
+        let usedValues = allAttributeValues
+        for usedValue in usedValues {
+            if usedValue > 1, let index = availableValues.firstIndex(of: usedValue) {
+                availableValues.remove(at: index)
+            }
+        }
+        
+        // Always include 1 as it's unlimited (base value)
+        if !availableValues.contains(1) {
+            availableValues.append(1)
+        }
+        
+        return Array(Set(availableValues)).sorted(by: >)
+    }
+    
+    private func calculateOptimalFontSizes(for size: CGSize) {
+        // Calculate based on screen width and available space
+        let availableWidth = (size.width - 120) / 3 // Account for padding and 3 columns
+        
+        // Find the longest text among all displayed values
+        let allDisplayedTexts = V5Constants.physicalAttributes + V5Constants.socialAttributes + V5Constants.mentalAttributes +
+                               ["Physical", "Social", "Mental", "Attributes"]
+        let longestText = allDisplayedTexts.max(by: { $0.count < $1.count }) ?? "Intelligence"
+        
+        // Determine optimal font size based on available width per column
+        let scaleFactor = min(1.0, availableWidth / (CGFloat(longestText.count) * 8))
+        
+        // Base font sizes
+        let baseDynamicSize: CGFloat = 11
+        let baseTitleSize: CGFloat = 17
+        let baseHeaderSize: CGFloat = 14
+        let baseRowHeight: CGFloat = 24
+        
+        // Calculate scaled sizes
+        dynamicFontSize = max(9, min(13, baseDynamicSize * scaleFactor))
+        titleFontSize = max(15, min(19, baseTitleSize * scaleFactor))
+        headerFontSize = max(12, min(16, baseHeaderSize * scaleFactor))
+        rowHeight = max(22, min(28, baseRowHeight * scaleFactor))
+    }
+    
+    static func areAllAttributesAssigned(character: any BaseCharacter) -> Bool {
+        let allAttributes = V5Constants.physicalAttributes + V5Constants.socialAttributes + V5Constants.mentalAttributes
+        
+        // Count how many attributes have values > 1 (assigned from the pool)
+        var assignedCount = 0
         for attribute in allAttributes {
             var currentValue = 1
             if V5Constants.physicalAttributes.contains(attribute) {
@@ -281,69 +292,12 @@ struct AttributesStage: View {
                 currentValue = character.mentalAttributes[attribute] ?? 1
             }
             
-            if currentValue != 1 {
-                hasAnyAssignments = true
-                break
-            }
-        }
-        
-        // If we have assignments, restore the full state by calculating what should be assigned
-        if hasAnyAssignments {
-            // Get all current attribute values
-            var allCurrentValues: [String: Int] = [:]
-            for attribute in allAttributes {
-                if V5Constants.physicalAttributes.contains(attribute) {
-                    allCurrentValues[attribute] = character.physicalAttributes[attribute] ?? 1
-                } else if V5Constants.socialAttributes.contains(attribute) {
-                    allCurrentValues[attribute] = character.socialAttributes[attribute] ?? 1
-                } else if V5Constants.mentalAttributes.contains(attribute) {
-                    allCurrentValues[attribute] = character.mentalAttributes[attribute] ?? 1
-                }
-            }
-            
-            // Determine which values were assigned based on what's available in the standard pool
-            let standardPool = [4, 3, 3, 3, 2, 2, 2, 2, 1]
-            var poolCopy = standardPool
-            
-            // Sort attributes by value (highest first) to assign them in logical order
-            let sortedAttributes = allCurrentValues.sorted { $0.value > $1.value }
-            
-            for (attribute, value) in sortedAttributes {
-                if let poolIndex = poolCopy.firstIndex(of: value) {
-                    // This value exists in the standard pool, so it was assigned
-                    assignedValues[attribute] = value
-                    poolCopy.remove(at: poolIndex)
-                    
-                    // Remove from available values
-                    if let availableIndex = availableValues.firstIndex(where: { $0.0 == value }) {
-                        availableValues.remove(at: availableIndex)
-                    }
-                }
-            }
-        }
-    }
-    
-    static func areAllAttributesAssigned(character: any BaseCharacter) -> Bool {
-        let allAttributes = V5Constants.physicalAttributes + V5Constants.socialAttributes + V5Constants.mentalAttributes
-        
-        // Check if all attributes have values > 1 (meaning they were assigned)
-        var assignedCount = 0
-        for attribute in allAttributes {
-            var currentValue = 0
-            if V5Constants.physicalAttributes.contains(attribute) {
-                currentValue = character.physicalAttributes[attribute] ?? 0
-            } else if V5Constants.socialAttributes.contains(attribute) {
-                currentValue = character.socialAttributes[attribute] ?? 0
-            } else if V5Constants.mentalAttributes.contains(attribute) {
-                currentValue = character.mentalAttributes[attribute] ?? 0
-            }
-            
-            if currentValue > 0 {
+            if currentValue > 1 {
                 assignedCount += 1
             }
         }
         
-        // All 9 attributes must be assigned and we must have used all 9 available values
-        return assignedCount == allAttributes.count
+        // All 9 values from the preset must be assigned
+        return assignedCount == AttributePreset.standard.values.count
     }
 }
