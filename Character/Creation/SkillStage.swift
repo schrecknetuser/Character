@@ -228,10 +228,20 @@ struct SkillsStage: View {
         
         // Collect values from all available presets
         for preset in availablePresets {
+            var presetValues: [Int] = []
             if let values = selectedPresetValues[preset] {
-                availableValues.append(contentsOf: values)
+                presetValues.append(contentsOf: values)
             }
+            
+            for value in availableValues {
+                if let index = presetValues.firstIndex(of: value) {
+                    presetValues.remove(at: index)
+                }
+            }
+            
+            availableValues.append(contentsOf: presetValues)
         }
+                
         
         // Remove already used values
         let usedValues = allSkillValues
