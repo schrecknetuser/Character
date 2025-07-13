@@ -4,6 +4,7 @@ struct DataModalView: View {
     @Binding var character: any BaseCharacter
     @Binding var isPresented: Bool
     @State private var dynamicFontSize: CGFloat = 16
+    @State var refreshID: UUID = UUID()
     
     var body: some View {
         NavigationView {
@@ -15,11 +16,13 @@ struct DataModalView: View {
                                 Button(action: {
                                     if character.currentSession > 1 {
                                         character.currentSession -= 1
+                                        refreshID = UUID()
                                     }
                                 }) {
                                     Image(systemName: "minus.circle")
                                         .foregroundColor(.red)
                                 }
+                                .buttonStyle(.borderless)
                             }
                             
                             Text("Current Session: \(character.currentSession)")
@@ -30,10 +33,12 @@ struct DataModalView: View {
                             
                             Button(action: {
                                 character.currentSession += 1
+                                refreshID = UUID()
                             }) {
                                 Image(systemName: "plus.circle")
                                     .foregroundColor(.green)
                             }
+                            .buttonStyle(.borderless)
                         }
                     }
                     
