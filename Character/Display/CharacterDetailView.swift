@@ -138,6 +138,87 @@ struct CharacterDetailView: View {
                 }
             }
         }
+        .onDisappear {
+            // If user leaves the character detail view while editing without saving,
+            // discard unsaved changes by restoring the original character
+            if isEditing && originalCharacter != nil {
+                discardUnsavedChanges()
+            }
+        }
     }
     
+    private func discardUnsavedChanges() {
+        guard let original = originalCharacter else { return }
+        
+        // Restore the character to its original state
+        restoreCharacter(from: original)
+        
+        // Clear the original character reference and exit editing mode
+        originalCharacter = nil
+        isEditing = false
+    }
+    
+    private func restoreCharacter(from original: any BaseCharacter) {
+        // Restore all basic properties from the original character
+        character.name = original.name
+        character.physicalAttributes = original.physicalAttributes
+        character.socialAttributes = original.socialAttributes
+        character.mentalAttributes = original.mentalAttributes
+        character.physicalSkills = original.physicalSkills
+        character.socialSkills = original.socialSkills
+        character.mentalSkills = original.mentalSkills
+        character.willpower = original.willpower
+        character.experience = original.experience
+        character.spentExperience = original.spentExperience
+        character.ambition = original.ambition
+        character.desire = original.desire
+        character.chronicleName = original.chronicleName
+        character.concept = original.concept
+        character.advantages = original.advantages
+        character.flaws = original.flaws
+        character.convictions = original.convictions
+        character.touchstones = original.touchstones
+        character.specializations = original.specializations
+        character.currentSession = original.currentSession
+        character.changeLog = original.changeLog
+        character.health = original.health
+        character.healthStates = original.healthStates
+        character.willpowerStates = original.willpowerStates
+        
+        // Handle character-type specific properties
+        switch character.characterType {
+        case .vampire:
+            if let vampireChar = character as? VampireCharacter,
+               let originalVampire = original as? VampireCharacter {
+                vampireChar.clan = originalVampire.clan
+                vampireChar.generation = originalVampire.generation
+                vampireChar.bloodPotency = originalVampire.bloodPotency
+                vampireChar.hunger = originalVampire.hunger
+                vampireChar.humanity = originalVampire.humanity
+                vampireChar.humanityStates = originalVampire.humanityStates
+                vampireChar.disciplines = originalVampire.disciplines
+            }
+        case .mage:
+            if let mageChar = character as? MageCharacter,
+               let originalMage = original as? MageCharacter {
+                mageChar.spheres = originalMage.spheres
+                mageChar.paradox = originalMage.paradox
+                mageChar.hubris = originalMage.hubris
+                mageChar.quiet = originalMage.quiet
+                mageChar.arete = originalMage.arete
+                mageChar.hubrisStates = originalMage.hubrisStates
+                mageChar.quietStates = originalMage.quietStates
+                mageChar.paradigm = originalMage.paradigm
+                mageChar.practice = originalMage.practice
+                mageChar.instruments = originalMage.instruments
+            }
+        case .ghoul:
+            if let ghoulChar = character as? GhoulCharacter,
+               let originalGhoul = original as? GhoulCharacter {
+                ghoulChar.humanity = originalGhoul.humanity
+                ghoulChar.humanityStates = originalGhoul.humanityStates
+                ghoulChar.disciplines = originalGhoul.disciplines
+            }
+        }
+    }
 }
