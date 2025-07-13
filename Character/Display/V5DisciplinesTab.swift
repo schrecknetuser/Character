@@ -17,43 +17,70 @@ struct V5DisciplinePowersView: View {
                     .font(.caption)
             } else {
                 ForEach(powers) { power in
-                    HStack(alignment: .top) {
-                        if isEditing {
-                            Button(action: { onPowerToggle(power.id) }) {
-                                Image(systemName: selectedPowerIds.contains(power.id) ? "checkmark.circle.fill" : "circle")
-                                    .foregroundColor(selectedPowerIds.contains(power.id) ? .accentColor : .secondary)
-                            }
-                            .buttonStyle(.borderless)
-                        } else {
-                            if selectedPowerIds.contains(power.id) {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundColor(.accentColor)
-                            }
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(power.name)
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                            Text(power.description)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                        
-                        Spacer()
-                        
-                        if power.isCustom {
-                            Text("Custom")
-                                .font(.caption2)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(Color.orange.opacity(0.2))
-                                .foregroundColor(.orange)
-                                .cornerRadius(4)
-                        }
-                    }
+                    V5PowerRowView(
+                        power: power,
+                        isSelected: selectedPowerIds.contains(power.id),
+                        isEditing: isEditing,
+                        onToggle: { onPowerToggle(power.id) }
+                    )
                 }
             }
+        }
+    }
+}
+
+// Enhanced power row view with tap and hold gesture for descriptions
+struct V5PowerRowView: View {
+    let power: V5DisciplinePower
+    let isSelected: Bool
+    let isEditing: Bool
+    let onToggle: () -> Void
+    @State private var showingDescription = false
+    
+    var body: some View {
+        HStack(alignment: .top) {
+            if isEditing {
+                Button(action: onToggle) {
+                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                        .foregroundColor(isSelected ? .accentColor : .secondary)
+                }
+                .buttonStyle(.borderless)
+            } else {
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.accentColor)
+                }
+            }
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(power.name)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                Text(power.description)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .contentShape(Rectangle())
+            .onLongPressGesture {
+                showingDescription = true
+            }
+            
+            Spacer()
+            
+            if power.isCustom {
+                Text("Custom")
+                    .font(.caption2)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Color.orange.opacity(0.2))
+                    .foregroundColor(.orange)
+                    .cornerRadius(4)
+            }
+        }
+        .alert(power.name, isPresented: $showingDescription) {
+            Button("OK") { }
+        } message: {
+            Text(power.description)
         }
     }
 }
@@ -65,6 +92,8 @@ struct V5DisciplineDetailView: View {
     @Binding var isEditing: Bool
     @Environment(\.dismiss) var dismiss
     @State var refreshID: UUID = UUID()
+    @State private var showingCustomPowerCreation = false
+    @State private var selectedLevelForCustomPower = 1
     
     private var discipline: V5Discipline? {
         character.getV5Discipline(named: disciplineName)
@@ -124,11 +153,23 @@ struct V5DisciplineDetailView: View {
                     // Add custom power section if editing
                     if isEditing {
                         Section("Custom Powers") {
-                            Button("Add Custom Power") {
-                                // TODO: Implement add custom power functionality
-                                // This would open CustomPowerCreationView
+                            if progress.currentLevel > 0 {
+                                Picker("Level for Custom Power", selection: $selectedLevelForCustomPower) {
+                                    ForEach(1...progress.currentLevel, id: \.self) { level in
+                                        Text("Level \(level)").tag(level)
+                                    }
+                                }
+                                .pickerStyle(MenuPickerStyle())
+                                
+                                Button("Add Custom Power to Level \(selectedLevelForCustomPower)") {
+                                    showingCustomPowerCreation = true
+                                }
+                                .foregroundColor(.accentColor)
+                            } else {
+                                Text("Increase discipline level to add custom powers")
+                                    .foregroundColor(.secondary)
+                                    .font(.caption)
                             }
-                            .foregroundColor(.accentColor)
                         }
                     }
                 } else {
@@ -144,6 +185,19 @@ struct V5DisciplineDetailView: View {
                     Button("Done") {
                         dismiss()
                     }
+                }
+            }
+            .sheet(isPresented: $showingCustomPowerCreation) {
+                CustomPowerCreationView(
+                    disciplineName: disciplineName,
+                    level: selectedLevelForCustomPower,
+                    character: $character
+                )
+            }
+            .onAppear {
+                // Set default level for custom power creation
+                if let progress = progress, progress.currentLevel > 0 {
+                    selectedLevelForCustomPower = progress.currentLevel
                 }
             }
         }
@@ -298,15 +352,13 @@ struct V5DisciplinesTab: View {
                                 }
                             }
                             
-                            // Show selected powers count
-                            let totalSelectedPowers = (1...progress.currentLevel).reduce(0) { total, level in
-                                total + progress.getSelectedPowers(for: level).count
-                            }
-                            
-                            if totalSelectedPowers > 0 {
-                                Text("\(totalSelectedPowers) powers selected")
-                                    .font(.caption2)
-                                    .foregroundColor(.secondary)
+                            // Show selected powers as a list
+                            let allSelectedPowers = getAllSelectedPowers(for: disciplineName, progress: progress)
+                            if !allSelectedPowers.isEmpty {
+                                ForEach(allSelectedPowers, id: \.id) { power in
+                                    PowerRowView(power: power)
+                                        .padding(.leading, 8)
+                                }
                             }
                         }
                         .padding(.vertical, 2)
@@ -348,6 +400,62 @@ struct V5DisciplinesTab: View {
                     isEditing: $isEditing
                 )
             }
+        }
+    }
+    
+    // Helper function to get all selected powers for a discipline
+    private func getAllSelectedPowers(for disciplineName: String, progress: V5DisciplineProgress) -> [V5DisciplinePower] {
+        guard let discipline = character.getV5Discipline(named: disciplineName) else {
+            return []
+        }
+        
+        var allPowers: [V5DisciplinePower] = []
+        for level in 1...progress.currentLevel {
+            let selectedIds = progress.getSelectedPowers(for: level)
+            let levelPowers = discipline.getPowers(for: level)
+            let selectedPowers = levelPowers.filter { selectedIds.contains($0.id) }
+            allPowers.append(contentsOf: selectedPowers)
+        }
+        
+        return allPowers.sorted { $0.level < $1.level }
+    }
+}
+
+// Power row view with tap and hold gesture for description popup
+struct PowerRowView: View {
+    let power: V5DisciplinePower
+    @State private var showingDescription = false
+    
+    var body: some View {
+        HStack {
+            Text("• \(power.name)")
+                .font(.caption)
+                .fontWeight(.medium)
+            
+            Text("(Level \(power.level))")
+                .font(.caption2)
+                .foregroundColor(.secondary)
+            
+            Spacer()
+            
+            if power.isCustom {
+                Text("Custom")
+                    .font(.caption2)
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 1)
+                    .background(Color.orange.opacity(0.2))
+                    .foregroundColor(.orange)
+                    .cornerRadius(3)
+            }
+        }
+        .contentShape(Rectangle())
+        .onLongPressGesture {
+            showingDescription = true
+        }
+        .alert(power.name, isPresented: $showingDescription) {
+            Button("OK") { }
+        } message: {
+            Text(power.description)
         }
     }
 }
