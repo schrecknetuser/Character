@@ -336,7 +336,7 @@ struct AttributesStage: View {
     
     private func calculateTotalHealth() -> Int {
         let stamina = character.physicalAttributes["Stamina"] ?? 1
-        return stamina + 1
+        return stamina + 3
     }
     
     static func areAllAttributesAssigned(character: any BaseCharacter) -> Bool {
