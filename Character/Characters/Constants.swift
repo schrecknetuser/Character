@@ -69,8 +69,184 @@ struct V5Constants {
         return getAllSkillsInfo().filter { $0.requiresFreeSpecialization }.map { $0.name }
     }
     
-    // Major V5 Disciplines
+    // Major V5 Disciplines (legacy - for backward compatibility)
     static let disciplines = ["Animalism", "Auspex", "Blood Sorcery", "Celerity", "Dominate", "Fortitude", "Obfuscate", "Potence", "Presence", "Protean", "Hecata Sorcery", "Lasombra Oblivion", "Oblivion", "Obeah", "Quietus", "Serpentis", "Vicissitude"]
+    
+    // MARK: - V5 Discipline System
+    
+    // Predefined V5 Disciplines with powers per level
+    static let v5Disciplines: [V5Discipline] = [
+        // Animalism
+        V5Discipline(
+            name: "Animalism",
+            powers: [
+                1: [
+                    V5DisciplinePower(name: "Feral Whispers", description: "Communicate with animals through growls, barks, and other animal sounds", level: 1),
+                    V5DisciplinePower(name: "Bond Famulus", description: "Create a blood bond with an animal, making it a loyal servant", level: 1)
+                ],
+                2: [
+                    V5DisciplinePower(name: "Animal Succulence", description: "Gain more sustenance from feeding on animal blood", level: 2),
+                    V5DisciplinePower(name: "Sense the Beast", description: "Feel the emotional state and basic nature of animals and humans", level: 2)
+                ],
+                3: [
+                    V5DisciplinePower(name: "Animal Messenger", description: "Send simple messages through animals", level: 3),
+                    V5DisciplinePower(name: "Subsume the Spirit", description: "Possess an animal, controlling its body while your own lies dormant", level: 3)
+                ],
+                4: [
+                    V5DisciplinePower(name: "Animalistic Reprisal", description: "Transform into a hybrid beast form with enhanced combat abilities", level: 4),
+                    V5DisciplinePower(name: "Raise the Familiar", description: "Grant supernatural intelligence and abilities to a bound animal", level: 4)
+                ],
+                5: [
+                    V5DisciplinePower(name: "Drawing Out the Beast", description: "Transfer your Beast to another, making them frenzied while you become calm", level: 5),
+                    V5DisciplinePower(name: "Conquer the Beast", description: "Dominate and control the beasts within others, preventing frenzy or forcing it", level: 5)
+                ]
+            ]
+        ),
+        
+        // Auspex
+        V5Discipline(
+            name: "Auspex",
+            powers: [
+                1: [
+                    V5DisciplinePower(name: "Heightened Senses", description: "Dramatically enhance all five senses", level: 1),
+                    V5DisciplinePower(name: "Sense the Unseen", description: "Perceive supernatural beings and energies that are hidden", level: 1)
+                ],
+                2: [
+                    V5DisciplinePower(name: "Premonition", description: "Gain flashes of insight about immediate future dangers", level: 2),
+                    V5DisciplinePower(name: "Scry the Soul", description: "Learn about a person's nature, emotions, and supernatural traits by studying them", level: 2)
+                ],
+                3: [
+                    V5DisciplinePower(name: "Share the Senses", description: "Experience what one of your familiars or ghouled animals senses", level: 3),
+                    V5DisciplinePower(name: "Spirit's Touch", description: "Learn the history of an object by touching it", level: 3)
+                ],
+                4: [
+                    V5DisciplinePower(name: "Telepathy", description: "Read surface thoughts and communicate mentally with others", level: 4),
+                    V5DisciplinePower(name: "Clairvoyance", description: "Project your senses to distant locations you've visited before", level: 4)
+                ],
+                5: [
+                    V5DisciplinePower(name: "Possession", description: "Enter and control another person's body while your own lies dormant", level: 5),
+                    V5DisciplinePower(name: "Insight", description: "Understand complex situations and predict behavioral patterns", level: 5)
+                ]
+            ]
+        ),
+        
+        // Celerity
+        V5Discipline(
+            name: "Celerity",
+            powers: [
+                1: [
+                    V5DisciplinePower(name: "Cat's Grace", description: "Gain supernatural balance and coordination", level: 1),
+                    V5DisciplinePower(name: "Rapid Reflexes", description: "React with supernatural speed to danger", level: 1)
+                ],
+                2: [
+                    V5DisciplinePower(name: "Fleetness", description: "Move at supernatural speeds for extended periods", level: 2),
+                    V5DisciplinePower(name: "Blur of Motion", description: "Move so fast you become difficult to see and target", level: 2)
+                ],
+                3: [
+                    V5DisciplinePower(name: "Traversal", description: "Move through small spaces and across difficult terrain with ease", level: 3),
+                    V5DisciplinePower(name: "Draught of Elegance", description: "Share your supernatural grace with others through blood", level: 3)
+                ],
+                4: [
+                    V5DisciplinePower(name: "Blink", description: "Move instantly from one position to another nearby location", level: 4),
+                    V5DisciplinePower(name: "Grace", description: "Perform impossible feats of agility and movement", level: 4)
+                ],
+                5: [
+                    V5DisciplinePower(name: "Split Second", description: "Act multiple times in the span of a single moment", level: 5),
+                    V5DisciplinePower(name: "Lightning Strike", description: "Attack with such speed that defense is nearly impossible", level: 5)
+                ]
+            ]
+        ),
+        
+        // Dominate
+        V5Discipline(
+            name: "Dominate",
+            powers: [
+                1: [
+                    V5DisciplinePower(name: "Compel", description: "Force a simple, single-word command upon a mortal", level: 1),
+                    V5DisciplinePower(name: "Cloud Memory", description: "Alter or erase specific memories from a mortal's mind", level: 1)
+                ],
+                2: [
+                    V5DisciplinePower(name: "Mesmerize", description: "Implant a complex command that activates under specific conditions", level: 2),
+                    V5DisciplinePower(name: "Dementation", description: "Inflict temporary madness or confusion upon a victim", level: 2)
+                ],
+                3: [
+                    V5DisciplinePower(name: "The Forgetful Mind", description: "Extensively rewrite memories and personality traits", level: 3),
+                    V5DisciplinePower(name: "Submerged Directive", description: "Implant deep, long-term commands that can remain dormant for years", level: 3)
+                ],
+                4: [
+                    V5DisciplinePower(name: "Rationalize", description: "Make victims accept and rationalize impossible or contradictory ideas", level: 4),
+                    V5DisciplinePower(name: "Mass Manipulation", description: "Dominate multiple individuals simultaneously", level: 4)
+                ],
+                5: [
+                    V5DisciplinePower(name: "Terminal Decree", description: "Issue commands that can cause a victim to harm or kill themselves", level: 5),
+                    V5DisciplinePower(name: "Vessel", description: "Turn a mortal into a perfect, unthinking servant", level: 5)
+                ]
+            ]
+        ),
+        
+        // Fortitude
+        V5Discipline(
+            name: "Fortitude",
+            powers: [
+                1: [
+                    V5DisciplinePower(name: "Resilience", description: "Reduce damage from physical attacks", level: 1),
+                    V5DisciplinePower(name: "Unswayable Mind", description: "Resist mental intrusion and emotional manipulation", level: 1)
+                ],
+                2: [
+                    V5DisciplinePower(name: "Toughness", description: "Ignore wound penalties and continue fighting despite injury", level: 2),
+                    V5DisciplinePower(name: "Enduring Beasts", description: "Resist the effects of frenzy and maintain control", level: 2)
+                ],
+                3: [
+                    V5DisciplinePower(name: "Defy Bane", description: "Reduce damage from your clan's specific weaknesses", level: 3),
+                    V5DisciplinePower(name: "Fortify the Inner Self", description: "Become immune to supernatural fear and emotional control", level: 3)
+                ],
+                4: [
+                    V5DisciplinePower(name: "Draught of Endurance", description: "Share your supernatural toughness with others through blood", level: 4),
+                    V5DisciplinePower(name: "Flesh of Marble", description: "Transform your skin into stone-like hardness", level: 4)
+                ],
+                5: [
+                    V5DisciplinePower(name: "Prowess from Pain", description: "Gain strength and speed from taking damage", level: 5),
+                    V5DisciplinePower(name: "Defy Death", description: "Survive otherwise fatal injuries and continue functioning", level: 5)
+                ]
+            ]
+        ),
+        
+        // Presence
+        V5Discipline(
+            name: "Presence",
+            powers: [
+                1: [
+                    V5DisciplinePower(name: "Awe", description: "Become supernaturally charismatic and captivating", level: 1),
+                    V5DisciplinePower(name: "Daunt", description: "Project an aura of menace that intimidates others", level: 1)
+                ],
+                2: [
+                    V5DisciplinePower(name: "Lingering Kiss", description: "Make feeding pleasurable for mortals, creating addiction", level: 2),
+                    V5DisciplinePower(name: "Dread Gaze", description: "Paralyze victims with supernatural terror", level: 2)
+                ],
+                3: [
+                    V5DisciplinePower(name: "Entrancement", description: "Create powerful emotional bonds and obsession in others", level: 3),
+                    V5DisciplinePower(name: "Irresistible Voice", description: "Make your words supernaturally persuasive", level: 3)
+                ],
+                4: [
+                    V5DisciplinePower(name: "Summon", description: "Call specific individuals to your location across great distances", level: 4),
+                    V5DisciplinePower(name: "Star Magnetism", description: "Become irresistibly attractive to everyone around you", level: 4)
+                ],
+                5: [
+                    V5DisciplinePower(name: "Majesty", description: "Become so magnificent that others dare not harm you", level: 5),
+                    V5DisciplinePower(name: "Mass Manipulation", description: "Affect entire crowds with your presence", level: 5)
+                ]
+            ]
+        )
+    ]
+    
+    // Helper methods for V5 Disciplines
+    static func getV5Discipline(named name: String) -> V5Discipline? {
+        return v5Disciplines.first { $0.name == name }
+    }
+    
+    static func getAllV5DisciplineNames() -> [String] {
+        return v5Disciplines.map { $0.name }
+    }
     
     // Mage Spheres (nine spheres of magic)
     static let mageSpheres = ["Correspondence", "Entropy", "Forces", "Life", "Matter", "Mind", "Prime", "Spirit", "Time"]
