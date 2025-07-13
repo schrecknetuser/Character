@@ -149,6 +149,52 @@ struct V5DisciplineTests {
         #expect(auspexDiscipline?.currentLevel == 2)
     }
     
+    @Test func testGhoulCharacterV5Disciplines() async throws {
+        var character = GhoulCharacter()
+        
+        // Initially no V5 disciplines
+        #expect(character.v5Disciplines.isEmpty)
+        #expect(!character.isUsingV5Disciplines)
+        
+        // Test adding a discipline
+        character.setV5DisciplineLevel("Animalism", to: 2)
+        #expect(character.v5Disciplines.count == 1)
+        #expect(character.isUsingV5Disciplines)
+        
+        let discipline = character.getV5DisciplineProgress(for: "Animalism")
+        #expect(discipline != nil)
+        #expect(discipline?.currentLevel == 2)
+        #expect(discipline?.name == "Animalism")
+        
+        // Test power selection
+        if let animalism = V5Constants.getV5Discipline(named: "Animalism") {
+            let level1Powers = animalism.getPowers(for: 1)
+            if let firstPower = level1Powers.first {
+                character.toggleV5Power(firstPower.id, for: "Animalism", at: 1)
+                
+                let selectedPowers = character.getSelectedV5Powers(for: "Animalism", at: 1)
+                #expect(selectedPowers.count == 1)
+                #expect(selectedPowers.first?.id == firstPower.id)
+            }
+        }
+        
+        // Test legacy migration for ghouls
+        character.disciplines["Potence"] = 1
+        character.migrateLegacyDisciplinesToV5()
+        #expect(character.v5Disciplines.count == 2) // Animalism + Potence
+        
+        let potenceDiscipline = character.getV5DisciplineProgress(for: "Potence")
+        #expect(potenceDiscipline?.currentLevel == 1)
+        
+        // Test removing discipline
+        character.removeV5Discipline("Animalism")
+        #expect(character.v5Disciplines.count == 1) // Only Potence remains
+        
+        character.removeV5Discipline("Potence")
+        #expect(character.v5Disciplines.isEmpty)
+        #expect(!character.isUsingV5Disciplines)
+    }
+    
     @Test func testVampireCharacterCustomDisciplines() async throws {
         var character = VampireCharacter()
         
