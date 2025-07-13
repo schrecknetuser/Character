@@ -188,8 +188,8 @@ struct CharacterDetailView: View {
         .gesture(
             DragGesture()
                 .onEnded { value in
-                    let horizontalAmount = value.translation.x
-                    let verticalAmount = value.translation.y
+                    let horizontalAmount = value.translation.width
+                    let verticalAmount = value.translation.height
                     
                     // Only process horizontal swipes (more horizontal than vertical movement)
                     if abs(horizontalAmount) > abs(verticalAmount) {
