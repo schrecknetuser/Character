@@ -1,8 +1,8 @@
 import SwiftUI
 
 // V5 Disciplines Creation Stage
-struct V5DisciplinesStage: View {
-    @Binding var character: VampireCharacter
+struct V5DisciplinesStage<T: DisciplineCapable>: View {
+    @ObservedObject var character: T
     @State private var showingAddDiscipline = false
     @State private var selectedDiscipline: String?
     @State private var showingDisciplineDetail = false
@@ -91,12 +91,12 @@ struct V5DisciplinesStage: View {
             }
         }
         .sheet(isPresented: $showingAddDiscipline) {
-            EnhancedV5CreationAddDisciplineView(character: $character)
+            EnhancedV5CreationAddDisciplineView(character: character)
         }
         .sheet(isPresented: $showingDisciplineDetail) {
             if let disciplineName = selectedDiscipline {
                 V5CreationDisciplineDetailView(
-                    character: $character,
+                    character: character,
                     disciplineName: disciplineName
                 )
             }
@@ -105,8 +105,8 @@ struct V5DisciplinesStage: View {
 }
 
 // V5 Add Discipline View for Character Creation
-struct V5CreationAddDisciplineView: View {
-    @Binding var character: VampireCharacter
+struct V5CreationAddDisciplineView<T: DisciplineCapable>: View {
+    @ObservedObject var character: T
     @Environment(\.dismiss) var dismiss
     
     private var availableDisciplines: [V5Discipline] {
@@ -189,8 +189,8 @@ struct V5CreationAddDisciplineView: View {
 }
 
 // V5 Discipline Detail View for Character Creation
-struct V5CreationDisciplineDetailView: View {
-    @Binding var character: VampireCharacter
+struct V5CreationDisciplineDetailView<T: DisciplineCapable>: View {
+    @ObservedObject var character: T
     let disciplineName: String
     @Environment(\.dismiss) var dismiss
     
@@ -293,8 +293,8 @@ struct V5CreationDisciplineDetailView: View {
 }
 
 // Enhanced V5 Add Discipline View for Character Creation
-struct EnhancedV5CreationAddDisciplineView: View {
-    @Binding var character: VampireCharacter
+struct EnhancedV5CreationAddDisciplineView<T: DisciplineCapable>: View {
+    @ObservedObject var character: T
     @Environment(\.dismiss) var dismiss
     @State private var showingCustomCreation = false
     
@@ -342,7 +342,7 @@ struct EnhancedV5CreationAddDisciplineView: View {
                 }
             }
             .sheet(isPresented: $showingCustomCreation) {
-                CustomDisciplineCreationView(character: $character)
+                CustomDisciplineCreationView(character: character)
             }
         }
     }

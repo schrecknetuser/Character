@@ -101,9 +101,9 @@ struct CharacterCreationWizard: View {
                         })
                     case .disciplines:
                         if selectedCharacterType == .vampire {
-                            DisciplinesStage(character: viewModel.asVampireForced)
+                            V5DisciplinesStage(character: viewModel.asVampireForced)
                         } else if selectedCharacterType == .ghoul {
-                            DisciplinesStage(character: viewModel.asGhoulForced)
+                            V5DisciplinesStage(character: viewModel.asGhoulForced)
                         } else if selectedCharacterType == .mage {
                             SpheresStage(character: viewModel.asMageForced)
                         }

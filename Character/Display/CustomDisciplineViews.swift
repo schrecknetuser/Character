@@ -1,8 +1,8 @@
 import SwiftUI
 
 // Custom Discipline Creation View
-struct CustomDisciplineCreationView: View {
-    @Binding var character: VampireCharacter
+struct CustomDisciplineCreationView<T: DisciplineCapable>: View {
+    @ObservedObject var character: T
     @Environment(\.dismiss) var dismiss
     
     @State private var disciplineName: String = ""
@@ -172,10 +172,10 @@ struct CustomDisciplineCreationView: View {
 }
 
 // Custom Power Creation View (for existing disciplines)
-struct CustomPowerCreationView: View {
+struct CustomPowerCreationView<T: DisciplineCapable>: View {
     let disciplineName: String
     let level: Int
-    @Binding var character: VampireCharacter
+    @ObservedObject var character: T
     @Environment(\.dismiss) var dismiss
     
     @State private var powerName: String = ""

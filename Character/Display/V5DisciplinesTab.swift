@@ -86,8 +86,8 @@ struct V5PowerRowView: View {
 }
 
 // V5 Discipline Detail View
-struct V5DisciplineDetailView: View {
-    @Binding var character: VampireCharacter
+struct V5DisciplineDetailView<T: DisciplineCapable>: View {
+    @Binding var character: T
     let disciplineName: String
     @Binding var isEditing: Bool
     @Environment(\.dismiss) var dismiss
@@ -187,7 +187,7 @@ struct V5DisciplineDetailView: View {
                 CustomPowerCreationView(
                     disciplineName: disciplineName,
                     level: selectedLevelForCustomPower,
-                    character: $character
+                    character: character
                 )
             }
             .onAppear {
@@ -201,8 +201,8 @@ struct V5DisciplineDetailView: View {
 }
 
 // V5 Add Discipline View
-struct V5AddDisciplineView: View {
-    @Binding var character: VampireCharacter
+struct V5AddDisciplineView<T: DisciplineCapable>: View {
+    @Binding var character: T
     @Environment(\.dismiss) var dismiss
     
     private var availableDisciplines: [V5Discipline] {
@@ -269,8 +269,8 @@ struct V5AddDisciplineView: View {
 }
 
 // V5 Disciplines Tab
-struct V5DisciplinesTab: View {
-    @Binding var character: VampireCharacter
+struct V5DisciplinesTab<T: DisciplineCapable>: View {
+    @Binding var character: T
     @Binding var isEditing: Bool
     @State private var showingAddDiscipline = false
     @State private var selectedDiscipline: String?
