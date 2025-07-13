@@ -9,9 +9,10 @@ class VampireCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHu
     @Published var hunger: Int
     @Published var disciplines: [String: Int]
     @Published var humanityStates: [HumanityState]
+    @Published var dateOfEmbrace: Date? = nil
 
     enum CodingKeys: String, CodingKey {
-        case clan, generation, bloodPotency, humanity, hunger, disciplines, humanityStates
+        case clan, generation, bloodPotency, humanity, hunger, disciplines, humanityStates, dateOfEmbrace
     }
 
     override init(characterType: CharacterType = .vampire) {
@@ -43,6 +44,7 @@ class VampireCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHu
         self.hunger = try container.decode(Int.self, forKey: .hunger)
         self.disciplines = try container.decode([String: Int].self, forKey: .disciplines)
         self.humanityStates = try container.decode([HumanityState].self, forKey: .humanityStates)
+        self.dateOfEmbrace = try container.decodeIfPresent(Date.self, forKey: .dateOfEmbrace)
         try super.init(from: decoder)
     }
 
@@ -56,6 +58,7 @@ class VampireCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHu
         try container.encode(hunger, forKey: .hunger)
         try container.encode(disciplines, forKey: .disciplines)
         try container.encode(humanityStates, forKey: .humanityStates)
+        try container.encodeIfPresent(dateOfEmbrace, forKey: .dateOfEmbrace)
     }
     
     override func generateChangeSummary(for updated: any BaseCharacter) -> String {
@@ -158,6 +161,7 @@ class VampireCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHu
         copy.humanityStates = self.humanityStates
         copy.hunger = self.hunger
         copy.disciplines = self.disciplines
+        copy.dateOfEmbrace = self.dateOfEmbrace
 
         return copy
     }

@@ -6,9 +6,10 @@ class GhoulCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHuma
     @Published var humanity: Int
     @Published var disciplines: [String: Int]
     @Published var humanityStates: [HumanityState]
+    @Published var dateOfGhouling: Date? = nil
 
     enum CodingKeys: String, CodingKey {
-        case humanity, disciplines, humanityStates
+        case humanity, disciplines, humanityStates, dateOfGhouling
     }
 
     override init(characterType: CharacterType = .ghoul) {
@@ -34,6 +35,7 @@ class GhoulCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHuma
         self.humanity = try container.decode(Int.self, forKey: .humanity)
         self.disciplines = try container.decode([String: Int].self, forKey: .disciplines)
         self.humanityStates = try container.decode([HumanityState].self, forKey: .humanityStates)
+        self.dateOfGhouling = try container.decodeIfPresent(Date.self, forKey: .dateOfGhouling)
         try super.init(from: decoder)
     }
 
@@ -43,6 +45,7 @@ class GhoulCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHuma
         try container.encode(humanity, forKey: .humanity)
         try container.encode(disciplines, forKey: .disciplines)
         try container.encode(humanityStates, forKey: .humanityStates)
+        try container.encodeIfPresent(dateOfGhouling, forKey: .dateOfGhouling)
     }
     
     override func generateChangeSummary(for updated: any BaseCharacter) -> String {
@@ -132,6 +135,7 @@ class GhoulCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHuma
         copy.humanity = self.humanity
         copy.humanityStates = self.humanityStates
         copy.disciplines = self.disciplines
+        copy.dateOfGhouling = self.dateOfGhouling
 
         return copy
     }
