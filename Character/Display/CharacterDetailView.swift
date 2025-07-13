@@ -192,7 +192,7 @@ struct CharacterDetailView: View {
         }
         .navigationTitle(character.name)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
+        .toolbar {            
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(isEditing ? "Save" : "Edit") {
                     if isEditing {
