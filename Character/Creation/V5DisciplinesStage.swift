@@ -92,7 +92,7 @@ struct V5DisciplinesStage: View {
             }
         }
         .sheet(isPresented: $showingAddDiscipline) {
-            V5CreationAddDisciplineView(character: $character)
+            EnhancedV5CreationAddDisciplineView(character: $character)
         }
         .sheet(isPresented: $showingDisciplineDetail) {
             if let disciplineName = selectedDiscipline {
@@ -294,5 +294,123 @@ struct V5CreationDisciplineDetailView: View {
                 }
             }
         }
+    }
+}
+
+// Enhanced V5 Add Discipline View for Character Creation
+struct EnhancedV5CreationAddDisciplineView: View {
+    @Binding var character: VampireCharacter
+    @Environment(\.dismiss) var dismiss
+    @State private var showingCustomCreation = false
+    
+    private var availableDisciplines: [V5Discipline] {
+        let existingNames = Set(character.v5Disciplines.keys)
+        return character.getAllAvailableV5Disciplines().filter { !existingNames.contains($0.name) }
+    }
+    
+    var body: some View {
+        NavigationView {
+            Form {
+                Section("Standard V5 Disciplines") {
+                    ForEach(availableDisciplines.filter { !$0.isCustom }) { discipline in
+                        CreationDisciplineRow(discipline: discipline) {
+                            character.setV5DisciplineLevel(discipline.name, to: 1)
+                            dismiss()
+                        }
+                    }
+                }
+                
+                if !availableDisciplines.filter({ $0.isCustom }).isEmpty {
+                    Section("Custom Disciplines") {
+                        ForEach(availableDisciplines.filter { $0.isCustom }) { discipline in
+                            CreationDisciplineRow(discipline: discipline) {
+                                character.setV5DisciplineLevel(discipline.name, to: 1)
+                                dismiss()
+                            }
+                        }
+                    }
+                }
+                
+                Section {
+                    Button("Create Custom Discipline") {
+                        showingCustomCreation = true
+                    }
+                    .foregroundColor(.accentColor)
+                }
+            }
+            .navigationTitle("Add Discipline")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+            }
+            .sheet(isPresented: $showingCustomCreation) {
+                CustomDisciplineCreationView(character: $character)
+            }
+        }
+    }
+}
+
+// Helper view for discipline rows in creation
+struct CreationDisciplineRow: View {
+    let discipline: V5Discipline
+    let onAdd: () -> Void
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text(discipline.name)
+                    .font(.headline)
+                Spacer()
+                if discipline.isCustom {
+                    Text("Custom")
+                        .font(.caption2)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.orange.opacity(0.2))
+                        .foregroundColor(.orange)
+                        .cornerRadius(4)
+                }
+            }
+            
+            // Show level 1 powers
+            let level1Powers = discipline.getPowers(for: 1)
+            if !level1Powers.isEmpty {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Level 1 Powers:")
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .foregroundColor(.secondary)
+                    
+                    ForEach(level1Powers) { power in
+                        VStack(alignment: .leading, spacing: 2) {
+                            HStack {
+                                Text("• \(power.name)")
+                                    .font(.caption)
+                                    .fontWeight(.medium)
+                                if power.isCustom {
+                                    Text("Custom")
+                                        .font(.caption2)
+                                        .foregroundColor(.orange)
+                                }
+                            }
+                            Text(power.description)
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+                .padding(.leading, 8)
+            }
+            
+            Button("Add \(discipline.name)") {
+                onAdd()
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.small)
+        }
+        .padding(.vertical, 8)
     }
 }

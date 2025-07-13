@@ -122,7 +122,8 @@ struct V5DisciplineDetailView: View {
                     if isEditing {
                         Section("Custom Powers") {
                             Button("Add Custom Power") {
-                                // TODO: Implement add custom power
+                                // TODO: Implement add custom power functionality
+                                // This would open CustomPowerCreationView
                             }
                             .foregroundColor(.accentColor)
                         }
@@ -334,7 +335,7 @@ struct V5DisciplinesTab: View {
             }
         }
         .sheet(isPresented: $showingAddDiscipline) {
-            V5AddDisciplineView(character: $character)
+            EnhancedV5AddDisciplineView(character: $character)
         }
         .sheet(isPresented: $showingDisciplineDetail) {
             if let disciplineName = selectedDiscipline {

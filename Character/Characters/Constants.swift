@@ -236,6 +236,114 @@ struct V5Constants {
                     V5DisciplinePower(name: "Mass Manipulation", description: "Affect entire crowds with your presence", level: 5)
                 ]
             ]
+        ),
+        
+        // Blood Sorcery
+        V5Discipline(
+            name: "Blood Sorcery",
+            powers: [
+                1: [
+                    V5DisciplinePower(name: "Corrosive Vitae", description: "Transform your blood into a caustic acid", level: 1),
+                    V5DisciplinePower(name: "A Taste for Blood", description: "Learn about someone by tasting their blood", level: 1)
+                ],
+                2: [
+                    V5DisciplinePower(name: "Extinguish Vitae", description: "Destroy a portion of another vampire's blood", level: 2),
+                    V5DisciplinePower(name: "Blood of Potency", description: "Temporarily increase your blood potency", level: 2)
+                ],
+                3: [
+                    V5DisciplinePower(name: "Scorpion's Touch", description: "Turn your blood into a deadly poison", level: 3),
+                    V5DisciplinePower(name: "Blood Tempering", description: "Strengthen objects with vampiric blood", level: 3)
+                ],
+                4: [
+                    V5DisciplinePower(name: "Theft of Vitae", description: "Steal blood from a distance", level: 4),
+                    V5DisciplinePower(name: "Cauldron of Blood", description: "Boil the blood within a victim's veins", level: 4)
+                ],
+                5: [
+                    V5DisciplinePower(name: "Blood of Acid", description: "Transform all your blood into destructive acid", level: 5),
+                    V5DisciplinePower(name: "Ritual of Blood", description: "Perform powerful blood magic rituals", level: 5)
+                ]
+            ]
+        ),
+        
+        // Obfuscate
+        V5Discipline(
+            name: "Obfuscate",
+            powers: [
+                1: [
+                    V5DisciplinePower(name: "Cloak of Shadows", description: "Become invisible in darkness and shadow", level: 1),
+                    V5DisciplinePower(name: "Silence of Death", description: "Move without making any sound", level: 1)
+                ],
+                2: [
+                    V5DisciplinePower(name: "Unseen Passage", description: "Become invisible while moving slowly", level: 2),
+                    V5DisciplinePower(name: "Mask of a Thousand Faces", description: "Alter your appearance to look like someone else", level: 2)
+                ],
+                3: [
+                    V5DisciplinePower(name: "Chimerstry", description: "Create simple illusions that affect multiple senses", level: 3),
+                    V5DisciplinePower(name: "Ghost in the Machine", description: "Become invisible to electronic surveillance", level: 3)
+                ],
+                4: [
+                    V5DisciplinePower(name: "Vanish from the Mind's Eye", description: "Vanish from sight even while being observed", level: 4),
+                    V5DisciplinePower(name: "Fata Morgana", description: "Create complex, interactive illusions", level: 4)
+                ],
+                5: [
+                    V5DisciplinePower(name: "Cloak the Gathering", description: "Make an entire group invisible", level: 5),
+                    V5DisciplinePower(name: "Impose Reality", description: "Make illusions temporarily real", level: 5)
+                ]
+            ]
+        ),
+        
+        // Potence
+        V5Discipline(
+            name: "Potence",
+            powers: [
+                1: [
+                    V5DisciplinePower(name: "Lethal Body", description: "Your unarmed attacks become supernaturally deadly", level: 1),
+                    V5DisciplinePower(name: "Soaring Leap", description: "Jump incredible distances with supernatural strength", level: 1)
+                ],
+                2: [
+                    V5DisciplinePower(name: "Prowess", description: "Gain supernatural might in all physical endeavors", level: 2),
+                    V5DisciplinePower(name: "Brutal Feed", description: "Feed violently and efficiently from victims", level: 2)
+                ],
+                3: [
+                    V5DisciplinePower(name: "Uncanny Grip", description: "Climb any surface and never lose your hold", level: 3),
+                    V5DisciplinePower(name: "Spark of Rage", description: "Channel anger into devastating attacks", level: 3)
+                ],
+                4: [
+                    V5DisciplinePower(name: "Draught of Might", description: "Share your supernatural strength with others through blood", level: 4),
+                    V5DisciplinePower(name: "Fists of Caine", description: "Your punches can damage even vampires", level: 4)
+                ],
+                5: [
+                    V5DisciplinePower(name: "Earthshock", description: "Strike the ground to create devastating tremors", level: 5),
+                    V5DisciplinePower(name: "Flick", description: "Instantly incapacitate foes with casual gestures", level: 5)
+                ]
+            ]
+        ),
+        
+        // Protean
+        V5Discipline(
+            name: "Protean",
+            powers: [
+                1: [
+                    V5DisciplinePower(name: "Eyes of the Beast", description: "See perfectly in total darkness", level: 1),
+                    V5DisciplinePower(name: "Weight of the Feather", description: "Become incredibly light and graceful", level: 1)
+                ],
+                2: [
+                    V5DisciplinePower(name: "Feral Weapons", description: "Transform your hands into claws or fangs", level: 2),
+                    V5DisciplinePower(name: "Earth Meld", description: "Merge with the earth for protection and rest", level: 2)
+                ],
+                3: [
+                    V5DisciplinePower(name: "Shapechange", description: "Transform into an animal form", level: 3),
+                    V5DisciplinePower(name: "Metamorphosis", description: "Partially transform, gaining animal traits", level: 3)
+                ],
+                4: [
+                    V5DisciplinePower(name: "Horrid Form", description: "Transform into a monstrous combat form", level: 4),
+                    V5DisciplinePower(name: "Fleshcraft", description: "Reshape your body in unnatural ways", level: 4)
+                ],
+                5: [
+                    V5DisciplinePower(name: "Mist Form", description: "Transform into insubstantial mist", level: 5),
+                    V5DisciplinePower(name: "One with the Land", description: "Merge with and control the natural environment", level: 5)
+                ]
+            ]
         )
     ]
     
