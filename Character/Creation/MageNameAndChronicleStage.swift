@@ -41,7 +41,6 @@ struct MageNameAndChronicleStage: View {
                         .font(.headline)
                     TextField("Enter paradigm", text: $character.paradigm, axis: .vertical)
                         .textFieldStyle(.roundedBorder)
-                        .lineLimit(3...6)
                 }
                 
                 VStack(alignment: .leading, spacing: 8) {
@@ -117,6 +116,5 @@ struct MageNameAndChronicleStage: View {
     
     private func refresh() {
         refreshID = UUID()
-    }
     }
 }

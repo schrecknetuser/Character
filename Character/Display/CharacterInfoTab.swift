@@ -141,8 +141,7 @@ struct CharacterInfoTab: View {
                                     get: { mageCharacter.paradigm },
                                     set: { mageCharacter.paradigm = $0 }
                                 ), axis: .vertical)
-                                    .font(.system(size: dynamicFontSize))
-                                    .lineLimit(3...6)
+                                .font(.system(size: dynamicFontSize))
                             } else {
                                 if !mageCharacter.paradigm.isEmpty {
                                     Text(mageCharacter.paradigm)
@@ -167,7 +166,7 @@ struct CharacterInfoTab: View {
                                     get: { mageCharacter.practice },
                                     set: { mageCharacter.practice = $0 }
                                 ))
-                                    .font(.system(size: dynamicFontSize))
+                                .font(.system(size: dynamicFontSize))
                             } else {
                                 if !mageCharacter.practice.isEmpty {
                                     Text(mageCharacter.practice)
