@@ -11,16 +11,29 @@ struct DataModalView: View {
                 Form {
                     Section(header: Text("Session Management")) {
                         HStack {
-                            Text("Current Session:")
+                            if character.currentSession > 1 {
+                                Button(action: {
+                                    if character.currentSession > 1 {
+                                        character.currentSession -= 1
+                                    }
+                                }) {
+                                    Image(systemName: "minus.circle")
+                                        .foregroundColor(.red)
+                                }
+                            }
+                            
+                            Text("Current Session: \(character.currentSession)")
                                 .fontWeight(.medium)
                                 .font(.system(size: dynamicFontSize))
                             
                             Spacer()
                             
-                            TextField("Session", value: $character.currentSession, format: .number)
-                                .font(.system(size: dynamicFontSize))
-                                .multilineTextAlignment(.trailing)
-                                .keyboardType(.numberPad)
+                            Button(action: {
+                                character.currentSession += 1
+                            }) {
+                                Image(systemName: "plus.circle")
+                                    .foregroundColor(.green)
+                            }
                         }
                     }
                     
