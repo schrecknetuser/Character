@@ -25,7 +25,6 @@ struct MageSpheresTab: View {
                                         Button(action: {
                                             let currentLevel = character.spheres[sphere] ?? 0
                                             if currentLevel > 0 {
-                                                print("Decreasing \(sphere) from \(currentLevel) to \(currentLevel - 1)")
                                                 character.spheres[sphere] = currentLevel - 1
                                                 refresh()
                                             }
@@ -42,7 +41,6 @@ struct MageSpheresTab: View {
                                         Button(action: {
                                             let currentLevel = character.spheres[sphere] ?? 0
                                             if currentLevel < 5 {
-                                                print("Increasing \(sphere) from \(currentLevel) to \(currentLevel + 1)")
                                                 character.spheres[sphere] = currentLevel + 1
                                                 refresh()
                                             }
