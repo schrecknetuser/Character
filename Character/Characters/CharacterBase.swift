@@ -66,6 +66,7 @@ protocol BaseCharacter: AnyObject, Identifiable, Codable, ObservableObject {
     var specializations: [Specialization] { get set }
     var currentSession: Int { get set }
     var changeLog: [ChangeLogEntry] { get set }
+    var isArchived: Bool { get set }
 
     var health: Int { get set }
     var healthStates: [HealthState] { get set }
@@ -123,6 +124,7 @@ class CharacterBase: BaseCharacter {
     @Published var specializations: [Specialization] = []
     @Published var currentSession: Int = 1
     @Published var changeLog: [ChangeLogEntry] = []
+    @Published var isArchived: Bool = false
 
     @Published var health: Int
     @Published var healthStates: [HealthState]
@@ -135,7 +137,7 @@ class CharacterBase: BaseCharacter {
              willpower, experience, spentExperience,
              ambition, desire, chronicleName, concept, characterDescription, notes, dateOfBirth,
              advantages, flaws, convictions, touchstones, chronicleTenets,
-             specializations, currentSession, changeLog,
+             specializations, currentSession, changeLog, isArchived,
              health, healthStates, willpowerStates
     }
 
@@ -167,6 +169,7 @@ class CharacterBase: BaseCharacter {
         specializations = try container.decode([Specialization].self, forKey: .specializations)
         currentSession = try container.decode(Int.self, forKey: .currentSession)
         changeLog = try container.decode([ChangeLogEntry].self, forKey: .changeLog)
+        isArchived = try container.decodeIfPresent(Bool.self, forKey: .isArchived) ?? false
         health = try container.decode(Int.self, forKey: .health)
         healthStates = try container.decode([HealthState].self, forKey: .healthStates)
         willpowerStates = try container.decode([WillpowerState].self, forKey: .willpowerStates)
@@ -200,6 +203,7 @@ class CharacterBase: BaseCharacter {
         try container.encode(specializations, forKey: .specializations)
         try container.encode(currentSession, forKey: .currentSession)
         try container.encode(changeLog, forKey: .changeLog)
+        try container.encode(isArchived, forKey: .isArchived)
         try container.encode(health, forKey: .health)
         try container.encode(healthStates, forKey: .healthStates)
         try container.encode(willpowerStates, forKey: .willpowerStates)
@@ -405,6 +409,7 @@ class CharacterBase: BaseCharacter {
         copy.specializations = self.specializations
         copy.currentSession = self.currentSession
         copy.changeLog = self.changeLog
+        copy.isArchived = self.isArchived
         copy.health = self.health
         copy.healthStates = self.healthStates
         copy.willpowerStates = self.willpowerStates
@@ -501,5 +506,17 @@ class CharacterStore: ObservableObject {
         if let index = characters.firstIndex(where: { $0.id == updatedCharacter.id }) {
             characters[index] = AnyCharacter(updatedCharacter)
         }
+    }
+    
+    func archiveCharacter(_ character: any BaseCharacter) {
+        var updatedCharacter = character
+        updatedCharacter.isArchived = true
+        updateCharacter(updatedCharacter)
+    }
+    
+    func unarchiveCharacter(_ character: any BaseCharacter) {
+        var updatedCharacter = character
+        updatedCharacter.isArchived = false
+        updateCharacter(updatedCharacter)
     }
 }
