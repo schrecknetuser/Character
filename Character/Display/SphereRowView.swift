@@ -2,7 +2,10 @@ import SwiftUI
 
 struct SphereRowView: View {
     let sphereName: String
-    @Binding var sphereLevel: Int
+    let initialLevel: Int
+    let onChange: (Int) -> Void
+    
+    @State private var localLevel: Int = 0
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -10,46 +13,53 @@ struct SphereRowView: View {
                 Text(sphereName)
                     .font(.headline)
                     .frame(minWidth: 120, alignment: .leading)
-                
+
                 Spacer()
-                
+
                 HStack(spacing: 8) {
                     Button(action: {
-                        if sphereLevel > 0 {
-                            sphereLevel -= 1
+                        if localLevel > 0 {
+                            localLevel -= 1
+                            onChange(localLevel)
                         }
                     }) {
                         Image(systemName: "minus.circle")
-                            .foregroundColor(sphereLevel > 0 ? .red : .gray)
+                            .foregroundColor(localLevel > 0 ? .red : .gray)
                     }
-                    .disabled(sphereLevel <= 0)
-                    
-                    Text("\(sphereLevel)")
+                    .disabled(localLevel <= 0)
+                    .buttonStyle(.borderless)
+
+                    Text("\(localLevel)")
                         .font(.headline)
                         .frame(minWidth: 30)
-                    
+
                     Button(action: {
-                        if sphereLevel < 5 {
-                            sphereLevel += 1
+                        if localLevel < 5 {
+                            localLevel += 1
+                            onChange(localLevel)
                         }
                     }) {
                         Image(systemName: "plus.circle")
-                            .foregroundColor(sphereLevel < 5 ? .green : .gray)
+                            .foregroundColor(localLevel < 5 ? .green : .gray)
                     }
-                    .disabled(sphereLevel >= 5)
+                    .disabled(localLevel >= 5)
+                    .buttonStyle(.borderless)
                 }
             }
-            
+
             // Dots visualization
             HStack(spacing: 4) {
-                ForEach(0..<5) { index in
+                ForEach(0..<5, id: \.self) { index in
                     Circle()
-                        .fill(index < sphereLevel ? Color.primary : Color.clear)
+                        .fill(index < localLevel ? Color.primary : Color.clear)
                         .stroke(Color.primary, lineWidth: 1)
                         .frame(width: 12, height: 12)
                 }
             }
         }
         .padding(.vertical, 4)
+        .onAppear {
+            self.localLevel = initialLevel
+        }
     }
 }

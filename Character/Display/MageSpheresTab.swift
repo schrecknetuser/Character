@@ -14,15 +14,12 @@ struct MageSpheresTab: View {
                         ForEach(V5Constants.mageSpheres, id: \.self) { sphere in
                             SphereRowView(
                                 sphereName: sphere,
-                                sphereLevel: Binding(
-                                    get: { character.spheres[sphere] ?? 0 },
-                                    set: { newValue in
-                                        // Create a new dictionary to trigger @Published
-                                        var newSpheres = character.spheres
-                                        newSpheres[sphere] = newValue
-                                        character.spheres = newSpheres
-                                    }
-                                )
+                                initialLevel: character.spheres[sphere] ?? 0,
+                                onChange: { newValue in
+                                    var newSpheres = character.spheres
+                                    newSpheres[sphere] = newValue
+                                    character.spheres = newSpheres
+                                }
                             )
                         }
                     } else {
