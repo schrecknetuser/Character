@@ -4,7 +4,6 @@ struct MageSpheresTab: View {
     @Binding var character: MageCharacter
     @Binding var isEditing: Bool
     @State private var dynamicFontSize: CGFloat = 16
-    @State private var refreshID: UUID = UUID()
     
     var body: some View {
         GeometryReader { geometry in
@@ -18,8 +17,10 @@ struct MageSpheresTab: View {
                                 sphereLevel: Binding(
                                     get: { character.spheres[sphere] ?? 0 },
                                     set: { newValue in
-                                        character.spheres[sphere] = newValue
-                                        refresh()
+                                        // Create a new dictionary to trigger @Published
+                                        var newSpheres = character.spheres
+                                        newSpheres[sphere] = newValue
+                                        character.spheres = newSpheres
                                     }
                                 )
                             )
@@ -68,7 +69,6 @@ struct MageSpheresTab: View {
                     }
                 }
             }
-            .id(refreshID)
             .onAppear {
                 calculateOptimalFontSize(for: geometry.size)
             }
@@ -89,9 +89,5 @@ struct MageSpheresTab: View {
         let calculatedSize = baseSize * scaleFactor
         
         dynamicFontSize = max(minSize, min(maxSize, calculatedSize))
-    }
-    
-    private func refresh() {
-        refreshID = UUID()
     }
 }
