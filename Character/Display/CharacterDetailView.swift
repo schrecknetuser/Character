@@ -7,6 +7,8 @@ struct CharacterDetailView: View {
     @State private var isEditing = false
     @State private var draftCharacter: BaseCharacter?
     @State private var selectedTab = 0
+    @State private var showingStatusModal = false
+    @State private var showingDataModal = false
 
     var activeCharacterBinding: Binding<any BaseCharacter> {
         Binding(
@@ -21,18 +23,9 @@ struct CharacterDetailView: View {
         )
     }
     
-    // Helper function to get available tabs for the current character type
+    // Helper function to get available tabs for the current character type (excluding Status and Data)
     private var availableTabs: [String] {
         var tabs = ["Character"]
-        
-        switch character.characterType {
-        case .vampire:
-            tabs.append("Status")
-        case .ghoul:
-            tabs.append("Status")
-        case .mage:
-            tabs.append("Status")
-        }
         
         tabs.append("Attributes & Skills")
         
@@ -46,7 +39,6 @@ struct CharacterDetailView: View {
         }
         
         tabs.append("Merits & Flaws")
-        tabs.append("Data")
         
         return tabs
     }
@@ -74,135 +66,126 @@ struct CharacterDetailView: View {
     }
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            CharacterInfoTab(character: activeCharacterBinding, isEditing: $isEditing)
-                .tabItem {
-                    Image(systemName: "person.fill")
-                    Text("Character")
-                }
-                .tag(0)
+        ZStack {
+            TabView(selection: $selectedTab) {
+                CharacterInfoTab(character: activeCharacterBinding, isEditing: $isEditing)
+                    .tabItem {
+                        Image(systemName: "person.fill")
+                        Text("Character")
+                    }
+                    .tag(0)
 
-            if character.characterType == .vampire {
-                if let vampire = (isEditing ? draftCharacter : character) as? VampireCharacter {
-                    let binding = Binding<VampireCharacter>(
-                        get: { vampire },
-                        set: { updated in draftCharacter = updated }
-                    )
-                    VampireStatusTab(character: binding, isEditing: $isEditing)
-                        .tabItem {
-                            Image(systemName: "heart.fill")
-                            Text("Status")
-                        }
-                        .tag(1)
-                }
-            } else if character.characterType == .ghoul {
-                if let ghoul = (isEditing ? draftCharacter : character) as? GhoulCharacter {
-                    let binding = Binding<GhoulCharacter>(
-                        get: { ghoul },
-                        set: { updated in draftCharacter = updated }
-                    )
-                    GhoulStatusTab(character: binding, isEditing: $isEditing)
-                        .tabItem {
-                            Image(systemName: "heart.fill")
-                            Text("Status")
-                        }
-                        .tag(1)
-                }
-            } else if character.characterType == .mage {
-                if let mage = (isEditing ? draftCharacter : character) as? MageCharacter {
-                    let binding = Binding<MageCharacter>(
-                        get: { mage },
-                        set: { updated in draftCharacter = updated }
-                    )
-                    MageStatusTab(character: binding, isEditing: $isEditing)
-                        .tabItem {
-                            Image(systemName: "star.circle.fill")
-                            Text("Status")
-                        }
-                        .tag(1)
-                }
-            }
+                AttributesSkillsTab(character: activeCharacterBinding, isEditing: $isEditing)
+                    .tabItem {
+                        Image(systemName: "brain.head.profile")
+                        Text("Attributes & Skills")
+                    }
+                    .tag(1)
 
-            AttributesSkillsTab(character: activeCharacterBinding, isEditing: $isEditing)
-                .tabItem {
-                    Image(systemName: "brain.head.profile")
-                    Text("Attributes & Skills")
-                }
-                .tag(2)
-
-            if character.characterType == .vampire {
-                if let vampire = (isEditing ? draftCharacter : character) as? VampireCharacter {
-                    let binding = Binding<VampireCharacter>(
-                        get: { vampire },
-                        set: { updated in draftCharacter = updated }
-                    )
-                    DisciplinesTab(character: binding, isEditing: $isEditing)
-                        .tabItem {
-                            Image(systemName: "flame.fill")
-                            Text("Disciplines")
-                        }
-                        .tag(3)
-                }
-            } else if character.characterType == .ghoul {
-                if let ghoul = (isEditing ? draftCharacter : character) as? GhoulCharacter {
-                    let binding = Binding<GhoulCharacter>(
-                        get: { ghoul },
-                        set: { updated in draftCharacter = updated }
-                    )
-                    DisciplinesTab(character: binding, isEditing: $isEditing)
-                        .tabItem {
-                            Image(systemName: "flame.fill")
-                            Text("Disciplines")
-                        }
-                        .tag(3)
-                }
-            } else if character.characterType == .mage {
-                if let mage = (isEditing ? draftCharacter : character) as? MageCharacter {
-                    let binding = Binding<MageCharacter>(
-                        get: { mage },
-                        set: { updated in draftCharacter = updated }
-                    )
-                    MageSpheresTab(character: binding, isEditing: $isEditing)
-                        .tabItem {
-                            Image(systemName: "sparkles")
-                            Text("Spheres")
-                        }
-                        .tag(3)
-                }
-            }
-
-            AdvantagesFlawsTab(character: activeCharacterBinding, isEditing: $isEditing)
-                .tabItem {
-                    Image(systemName: "star.fill")
-                    Text("Merits & Flaws")
-                }
-                .tag(4)
-
-            DataTab(character: activeCharacterBinding, isEditing: $isEditing)
-                .tabItem {
-                    Image(systemName: "doc.text.fill")
-                    Text("Data")
-                }
-                .tag(5)
-        }
-        .gesture(
-            DragGesture()
-                .onEnded { value in
-                    let horizontalAmount = value.translation.width
-                    let verticalAmount = value.translation.height
-                    
-                    // Only process horizontal swipes (more horizontal than vertical movement)
-                    if abs(horizontalAmount) > abs(verticalAmount) {
-                        if horizontalAmount > 50 {
-                            // Swipe right (previous tab)
-                            handleSwipe(direction: .right)
-                        } else if horizontalAmount < -50 {
-                            // Swipe left (next tab)
-                            handleSwipe(direction: .left)
-                        }
+                if character.characterType == .vampire {
+                    if let vampire = (isEditing ? draftCharacter : character) as? VampireCharacter {
+                        let binding = Binding<VampireCharacter>(
+                            get: { vampire },
+                            set: { updated in draftCharacter = updated }
+                        )
+                        DisciplinesTab(character: binding, isEditing: $isEditing)
+                            .tabItem {
+                                Image(systemName: "flame.fill")
+                                Text("Disciplines")
+                            }
+                            .tag(2)
+                    }
+                } else if character.characterType == .ghoul {
+                    if let ghoul = (isEditing ? draftCharacter : character) as? GhoulCharacter {
+                        let binding = Binding<GhoulCharacter>(
+                            get: { ghoul },
+                            set: { updated in draftCharacter = updated }
+                        )
+                        DisciplinesTab(character: binding, isEditing: $isEditing)
+                            .tabItem {
+                                Image(systemName: "flame.fill")
+                                Text("Disciplines")
+                            }
+                            .tag(2)
+                    }
+                } else if character.characterType == .mage {
+                    if let mage = (isEditing ? draftCharacter : character) as? MageCharacter {
+                        let binding = Binding<MageCharacter>(
+                            get: { mage },
+                            set: { updated in draftCharacter = updated }
+                        )
+                        MageSpheresTab(character: binding, isEditing: $isEditing)
+                            .tabItem {
+                                Image(systemName: "sparkles")
+                                Text("Spheres")
+                            }
+                            .tag(2)
                     }
                 }
-        )
+
+                AdvantagesFlawsTab(character: activeCharacterBinding, isEditing: $isEditing)
+                    .tabItem {
+                        Image(systemName: "star.fill")
+                        Text("Merits & Flaws")
+                    }
+                    .tag(3)
+            }
+            .gesture(
+                DragGesture()
+                    .onEnded { value in
+                        let horizontalAmount = value.translation.width
+                        let verticalAmount = value.translation.height
+                        
+                        // Only process horizontal swipes (more horizontal than vertical movement)
+                        if abs(horizontalAmount) > abs(verticalAmount) {
+                            if horizontalAmount > 50 {
+                                // Swipe right (previous tab)
+                                handleSwipe(direction: .right)
+                            } else if horizontalAmount < -50 {
+                                // Swipe left (next tab)
+                                handleSwipe(direction: .left)
+                            }
+                        }
+                    }
+            )
+            
+            // Floating Action Buttons
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    VStack(spacing: 16) {
+                        // Status Button
+                        Button(action: {
+                            showingStatusModal = true
+                        }) {
+                            Image(systemName: "heart.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(.white)
+                                .frame(width: 56, height: 56)
+                                .background(Color.red)
+                                .clipShape(Circle())
+                                .shadow(radius: 4)
+                        }
+                        
+                        // Data Button
+                        Button(action: {
+                            showingDataModal = true
+                        }) {
+                            Image(systemName: "doc.text.fill")
+                                .font(.title2)
+                                .foregroundColor(.white)
+                                .frame(width: 56, height: 56)
+                                .background(Color.blue)
+                                .clipShape(Circle())
+                                .shadow(radius: 4)
+                        }
+                    }
+                    .padding(.trailing, 20)
+                    .padding(.bottom, 100) // Account for tab bar
+                }
+            }
+        }
         .navigationTitle(character.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -225,6 +208,12 @@ struct CharacterDetailView: View {
                     isEditing.toggle()
                 }
             }
+        }
+        .fullScreenCover(isPresented: $showingStatusModal) {
+            StatusModalView(character: activeCharacterBinding, isPresented: $showingStatusModal, store: store)
+        }
+        .sheet(isPresented: $showingDataModal) {
+            DataModalView(character: activeCharacterBinding, isPresented: $showingDataModal)
         }
         .onDisappear {
             if isEditing {
