@@ -9,6 +9,7 @@ struct SkillColumnView: View {
     let dynamicFontSize: CGFloat
     let headerFontSize: CGFloat
     let rowHeight: CGFloat
+    @State private var refreshID: UUID = UUID()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -27,7 +28,10 @@ struct SkillColumnView: View {
                         if isEditing {
                             Picker("", selection: Binding(
                                 get: { skillValues[skill] ?? 0 },
-                                set: { skillValues[skill] = $0 }
+                                set: {
+                                    skillValues[skill] = $0
+                                    refreshID = UUID()
+                                }
                             )) {
                                 ForEach(0...5, id: \.self) { value in
                                     Text("\(value)")

@@ -8,6 +8,7 @@ struct AttributeColumnView: View {
     let dynamicFontSize: CGFloat
     let headerFontSize: CGFloat
     let rowHeight: CGFloat
+    @State private var refreshID: UUID = UUID()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -25,7 +26,10 @@ struct AttributeColumnView: View {
                     if isEditing {
                         Picker("", selection: Binding(
                             get: { attributeValues[attribute] ?? 1 },
-                            set: { attributeValues[attribute] = $0 }
+                            set: {
+                                attributeValues[attribute] = $0
+                                refreshID = UUID()
+                            }
                         )) {
                             ForEach(0...5, id: \.self) { value in
                                 Text("\(value)")
