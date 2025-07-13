@@ -5,8 +5,6 @@ struct ConvictionsAndTouchstonesStage: View {
     @Binding var character: any BaseCharacter
     @State private var newConviction = ""
     @State private var newTouchstone = ""
-    @State private var showingAddConviction = false
-    @State private var showingAddTouchstone = false
     @State private var refreshID = UUID()
     
     var body: some View {
@@ -30,10 +28,19 @@ struct ConvictionsAndTouchstonesStage: View {
                     }
                 }
                 
-                Button("Add Conviction") {
-                    showingAddConviction = true
+                VStack(alignment: .leading, spacing: 8) {
+                    TextField("Enter new conviction", text: $newConviction, axis: .vertical)
+                        .textFieldStyle(.roundedBorder)
+                        .lineLimit(2...4)
+                    Button("Add Conviction") {
+                        if !newConviction.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            character.convictions.append(newConviction.trimmingCharacters(in: .whitespacesAndNewlines))
+                            newConviction = ""
+                            refresh()
+                        }
+                    }
+                    .disabled(newConviction.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
-                .foregroundColor(.accentColor)
             }
             
             Section(header: Text("Touchstones")) {
@@ -55,38 +62,23 @@ struct ConvictionsAndTouchstonesStage: View {
                     }
                 }
                 
-                Button("Add Touchstone") {
-                    showingAddTouchstone = true
+                VStack(alignment: .leading, spacing: 8) {
+                    TextField("Enter new touchstone", text: $newTouchstone, axis: .vertical)
+                        .textFieldStyle(.roundedBorder)
+                        .lineLimit(2...4)
+                    Button("Add Touchstone") {
+                        if !newTouchstone.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            character.touchstones.append(newTouchstone.trimmingCharacters(in: .whitespacesAndNewlines))
+                            newTouchstone = ""
+                            refresh()
+                        }
+                    }
+                    .disabled(newTouchstone.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
-                .foregroundColor(.accentColor)
             }
             
             Section(footer: Text("Convictions and touchstones are optional for character creation.")) {
                 EmptyView()
-            }
-        }
-        .alert("Add Conviction", isPresented: $showingAddConviction) {
-            TextField("Enter conviction", text: $newConviction)
-            Button("Add") {
-                if !newConviction.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    character.convictions.append(newConviction.trimmingCharacters(in: .whitespacesAndNewlines))
-                    newConviction = ""
-                }
-            }
-            Button("Cancel", role: .cancel) {
-                newConviction = ""
-            }
-        }
-        .alert("Add Touchstone", isPresented: $showingAddTouchstone) {
-            TextField("Enter touchstone", text: $newTouchstone)
-            Button("Add") {
-                if !newTouchstone.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    character.touchstones.append(newTouchstone.trimmingCharacters(in: .whitespacesAndNewlines))
-                    newTouchstone = ""
-                }
-            }
-            Button("Cancel", role: .cancel) {
-                newTouchstone = ""
             }
         }
         .id(refreshID)

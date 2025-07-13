@@ -627,4 +627,53 @@ struct CharacterTests {
         #expect(changeSummary.contains("touchstones added: New Ghoul Touchstone"))
     }
 
+    @Test func testMultilineTextFieldsDoNotBreakCharacterData() async throws {
+        // Test that multi-line text in ambition, desire, convictions, and touchstones
+        // doesn't break character data handling
+        let testAmbition = "This is a multi-line ambition\nthat spans multiple lines\nwith proper line breaks"
+        let testDesire = "This is a multi-line desire\nwith line breaks\nand formatting"
+        let testConvictions = [
+            "This is a conviction\nwith multiple lines",
+            "Another conviction\nwith line breaks\nand more text"
+        ]
+        let testTouchstones = [
+            "Touchstone one\nwith description\nand details",
+            "Touchstone two\nwith multiple\nlines of text"
+        ]
+        
+        var character = VampireCharacter()
+        character.name = "Test Character"
+        character.ambition = testAmbition
+        character.desire = testDesire
+        character.convictions = testConvictions
+        character.touchstones = testTouchstones
+        
+        // Verify the data is stored correctly
+        #expect(character.ambition == testAmbition)
+        #expect(character.desire == testDesire)
+        #expect(character.convictions.count == 2)
+        #expect(character.convictions[0] == testConvictions[0])
+        #expect(character.convictions[1] == testConvictions[1])
+        #expect(character.touchstones.count == 2)
+        #expect(character.touchstones[0] == testTouchstones[0])
+        #expect(character.touchstones[1] == testTouchstones[1])
+        
+        // Test that serialization/deserialization works with multi-line text
+        let encoder = JSONEncoder()
+        let encoded = try encoder.encode(character)
+        
+        let decoder = JSONDecoder()
+        let decoded = try decoder.decode(VampireCharacter.self, from: encoded)
+        
+        // Verify the decoded character has the same multi-line text
+        #expect(decoded.ambition == testAmbition)
+        #expect(decoded.desire == testDesire)
+        #expect(decoded.convictions.count == 2)
+        #expect(decoded.convictions[0] == testConvictions[0])
+        #expect(decoded.convictions[1] == testConvictions[1])
+        #expect(decoded.touchstones.count == 2)
+        #expect(decoded.touchstones[0] == testTouchstones[0])
+        #expect(decoded.touchstones[1] == testTouchstones[1])
+    }
+
 }
