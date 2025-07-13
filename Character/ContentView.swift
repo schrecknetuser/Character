@@ -12,6 +12,8 @@ struct CharacterGroupSection: View {
     @ObservedObject var store: CharacterStore
     @Binding var isExpanded: Bool
     let isArchiveSection: Bool
+    @State private var characterToDelete: (any BaseCharacter)? = nil
+    @State private var showingDeleteConfirmation = false
 
     var body: some View {
         if group.chronicleName.isEmpty {
@@ -27,6 +29,14 @@ struct CharacterGroupSection: View {
                             CharacterRow(character: character, displayInfo: displayInfo)
                         }
                         .swipeActions(edge: .trailing) {
+                            Button {
+                                characterToDelete = character
+                                showingDeleteConfirmation = true
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                            .tint(.red)
+                            
                             if !character.isArchived {
                                 Button {
                                     store.archiveCharacter(character)
@@ -70,6 +80,14 @@ struct CharacterGroupSection: View {
                             CharacterRow(character: character, displayInfo: displayInfo)
                         }
                         .swipeActions(edge: .trailing) {
+                            Button {
+                                characterToDelete = character
+                                showingDeleteConfirmation = true
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                            .tint(.red)
+                            
                             if !character.isArchived {
                                 Button {
                                     store.archiveCharacter(character)
@@ -110,6 +128,27 @@ struct CharacterGroupSection: View {
                         .clipShape(Capsule())
                 }
             }
+        }
+        .alert("Delete Character", isPresented: $showingDeleteConfirmation) {
+            Button("Delete", role: .destructive) {
+                if let character = characterToDelete {
+                    deleteCharacter(character)
+                }
+                characterToDelete = nil
+            }
+            Button("Cancel", role: .cancel) {
+                characterToDelete = nil
+            }
+        } message: {
+            if let character = characterToDelete {
+                Text("Are you sure you want to delete \(character.name)? This action cannot be undone.")
+            }
+        }
+    }
+    
+    private func deleteCharacter(_ character: any BaseCharacter) {
+        if let index = store.characters.firstIndex(where: { $0.id == character.id }) {
+            store.deleteCharacter(at: IndexSet([index]))
         }
     }
 
@@ -162,6 +201,7 @@ struct CharacterListView: View {
     @ObservedObject var store: CharacterStore
     @Binding var expandedChronicles: [String: Bool]
     @State private var showArchived: Bool = false
+    @State private var expandedArchivedChronicles: [String: Bool] = [:]
     let getCharacterDisplayInfo: (any BaseCharacter) -> (symbol: String, additionalInfo: String)
 
     var body: some View {
@@ -183,35 +223,23 @@ struct CharacterListView: View {
             }
             
             // Archive section
-            let archivedCharacters = groupedArchivedCharacters()
-            if !archivedCharacters.isEmpty {
+            let archivedCharacterGroups = groupedArchivedCharacters()
+            if !archivedCharacterGroups.isEmpty {
+                let totalArchivedCount = archivedCharacterGroups.reduce(0) { $0 + $1.characters.count }
                 DisclosureGroup(isExpanded: $showArchived) {
-                    ForEach(archivedCharacters.indices, id: \.self) { index in
-                        let characterId = archivedCharacters[index].id
-                        if let characterIndex = store.characters.firstIndex(where: { $0.id == characterId }) {
-                            let character = store.characters[characterIndex].character
-                            let characterBinding = $store.characters[characterIndex].character
-                            let displayInfo = getCharacterDisplayInfo(character)
-
-                            NavigationLink(destination: CharacterDetailView(character: characterBinding, store: store)) {
-                                CharacterRow(character: character, displayInfo: displayInfo)
-                            }
-                            .swipeActions(edge: .trailing) {
-                                Button {
-                                    store.unarchiveCharacter(character)
-                                } label: {
-                                    Label("Unarchive", systemImage: "archivebox.fill")
-                                }
-                                .tint(.green)
-                            }
-                        }
-                    }
-                    .onDelete { offsets in
-                        let charactersToDelete = offsets.map { archivedCharacters[$0].id }
-                        let indicesToDelete = IndexSet(store.characters.enumerated().compactMap { index, character in
-                            charactersToDelete.contains(character.id) ? index : nil
-                        })
-                        store.deleteCharacter(at: indicesToDelete)
+                    ForEach(archivedCharacterGroups, id: \.chronicleName) { group in
+                        // Ensure default expanded state for archived chronicles
+                        let _ = ensureArchivedChronicleHasDefaultState(group.chronicleName)
+                        
+                        CharacterGroupSection(
+                            group: group,
+                            store: store,
+                            isExpanded: Binding(
+                                get: { expandedArchivedChronicles[group.chronicleName] ?? true },
+                                set: { expandedArchivedChronicles[group.chronicleName] = $0 }
+                            ),
+                            isArchiveSection: true
+                        )
                     }
                 } label: {
                     HStack {
@@ -219,7 +247,7 @@ struct CharacterListView: View {
                             .font(.headline)
                             .foregroundColor(.secondary)
                         Spacer()
-                        Text("\(archivedCharacters.count)")
+                        Text("\(totalArchivedCount)")
                             .font(.caption)
                             .foregroundColor(.secondary)
                             .padding(.horizontal, 8)
@@ -240,14 +268,24 @@ struct CharacterListView: View {
         }
         return false
     }
+    
+    @discardableResult
+    private func ensureArchivedChronicleHasDefaultState(_ chronicleName: String) -> Bool {
+        if expandedArchivedChronicles[chronicleName] == nil {
+            expandedArchivedChronicles[chronicleName] = true
+            return true
+        }
+        return false
+    }
 
     private func groupedActiveCharacters() -> [(chronicleName: String, characters: [AnyCharacter])] {
         let activeCharacters = store.characters.filter { !$0.character.isArchived }
         return groupCharacters(activeCharacters)
     }
     
-    private func groupedArchivedCharacters() -> [AnyCharacter] {
-        return store.characters.filter { $0.character.isArchived }.sorted { $0.character.name < $1.character.name }
+    private func groupedArchivedCharacters() -> [(chronicleName: String, characters: [AnyCharacter])] {
+        let archivedCharacters = store.characters.filter { $0.character.isArchived }
+        return groupCharacters(archivedCharacters)
     }
     
     private func groupCharacters(_ characters: [AnyCharacter]) -> [(chronicleName: String, characters: [AnyCharacter])] {
