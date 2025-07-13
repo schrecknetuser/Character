@@ -519,4 +519,112 @@ struct CharacterTests {
         #expect(updatedHealth == 4) // Our calculation: Stamina (3) + 1 = 4
     }
 
+    @Test func testCharacterInfoChangeLogging() async throws {
+        // Test that changes to character info are properly logged
+        let originalCharacter = VampireCharacter()
+        originalCharacter.name = "Original Name"
+        originalCharacter.concept = "Original Concept"
+        originalCharacter.chronicleName = "Original Chronicle"
+        originalCharacter.ambition = "Original Ambition"
+        originalCharacter.desire = "Original Desire"
+        originalCharacter.convictions = ["Original Conviction 1", "Original Conviction 2"]
+        originalCharacter.touchstones = ["Original Touchstone 1", "Original Touchstone 2"]
+        originalCharacter.experience = 10
+        originalCharacter.spentExperience = 5
+        
+        let updatedCharacter = originalCharacter.clone() as! VampireCharacter
+        updatedCharacter.name = "New Name"
+        updatedCharacter.concept = "New Concept"
+        updatedCharacter.chronicleName = "New Chronicle"
+        updatedCharacter.ambition = "New Ambition"
+        updatedCharacter.desire = "New Desire"
+        updatedCharacter.convictions = ["New Conviction 1", "Original Conviction 2"]
+        updatedCharacter.touchstones = ["New Touchstone 1", "Original Touchstone 2"]
+        updatedCharacter.experience = 15
+        updatedCharacter.spentExperience = 8
+        
+        let changeSummary = originalCharacter.generateChangeSummary(for: updatedCharacter)
+        
+        #expect(!changeSummary.isEmpty)
+        #expect(changeSummary.contains("name Original Name→New Name"))
+        #expect(changeSummary.contains("concept Original Concept→New Concept"))
+        #expect(changeSummary.contains("chronicle name Original Chronicle→New Chronicle"))
+        #expect(changeSummary.contains("ambition Original Ambition→New Ambition"))
+        #expect(changeSummary.contains("desire Original Desire→New Desire"))
+        #expect(changeSummary.contains("convictions removed: Original Conviction 1"))
+        #expect(changeSummary.contains("convictions added: New Conviction 1"))
+        #expect(changeSummary.contains("touchstones removed: Original Touchstone 1"))
+        #expect(changeSummary.contains("touchstones added: New Touchstone 1"))
+        #expect(changeSummary.contains("experience 10→15"))
+        #expect(changeSummary.contains("spent experience 5→8"))
+    }
+    
+    @Test func testMageCharacterInfoChangeLogging() async throws {
+        // Test that changes to mage character info are properly logged
+        let originalCharacter = MageCharacter()
+        originalCharacter.name = "Mage Name"
+        originalCharacter.concept = "Mage Concept"
+        originalCharacter.chronicleName = "Mage Chronicle"
+        originalCharacter.ambition = "Mage Ambition"
+        originalCharacter.desire = "Mage Desire"
+        originalCharacter.convictions = ["Mage Conviction"]
+        originalCharacter.touchstones = ["Mage Touchstone"]
+        
+        let updatedCharacter = originalCharacter.clone() as! MageCharacter
+        updatedCharacter.name = "New Mage Name"
+        updatedCharacter.concept = "New Mage Concept"
+        updatedCharacter.chronicleName = "New Mage Chronicle"
+        updatedCharacter.ambition = "New Mage Ambition"
+        updatedCharacter.desire = "New Mage Desire"
+        updatedCharacter.convictions = ["New Mage Conviction"]
+        updatedCharacter.touchstones = ["New Mage Touchstone"]
+        
+        let changeSummary = originalCharacter.generateChangeSummary(for: updatedCharacter)
+        
+        #expect(!changeSummary.isEmpty)
+        #expect(changeSummary.contains("name Mage Name→New Mage Name"))
+        #expect(changeSummary.contains("concept Mage Concept→New Mage Concept"))
+        #expect(changeSummary.contains("chronicle name Mage Chronicle→New Mage Chronicle"))
+        #expect(changeSummary.contains("ambition Mage Ambition→New Mage Ambition"))
+        #expect(changeSummary.contains("desire Mage Desire→New Mage Desire"))
+        #expect(changeSummary.contains("convictions removed: Mage Conviction"))
+        #expect(changeSummary.contains("convictions added: New Mage Conviction"))
+        #expect(changeSummary.contains("touchstones removed: Mage Touchstone"))
+        #expect(changeSummary.contains("touchstones added: New Mage Touchstone"))
+    }
+    
+    @Test func testGhoulCharacterInfoChangeLogging() async throws {
+        // Test that changes to ghoul character info are properly logged
+        let originalCharacter = GhoulCharacter()
+        originalCharacter.name = "Ghoul Name"
+        originalCharacter.concept = "Ghoul Concept"
+        originalCharacter.chronicleName = "Ghoul Chronicle"
+        originalCharacter.ambition = "Ghoul Ambition"
+        originalCharacter.desire = "Ghoul Desire"
+        originalCharacter.convictions = ["Ghoul Conviction"]
+        originalCharacter.touchstones = ["Ghoul Touchstone"]
+        
+        let updatedCharacter = originalCharacter.clone() as! GhoulCharacter
+        updatedCharacter.name = "New Ghoul Name"
+        updatedCharacter.concept = "New Ghoul Concept"
+        updatedCharacter.chronicleName = "New Ghoul Chronicle"
+        updatedCharacter.ambition = "New Ghoul Ambition"
+        updatedCharacter.desire = "New Ghoul Desire"
+        updatedCharacter.convictions = ["New Ghoul Conviction"]
+        updatedCharacter.touchstones = ["New Ghoul Touchstone"]
+        
+        let changeSummary = originalCharacter.generateChangeSummary(for: updatedCharacter)
+        
+        #expect(!changeSummary.isEmpty)
+        #expect(changeSummary.contains("name Ghoul Name→New Ghoul Name"))
+        #expect(changeSummary.contains("concept Ghoul Concept→New Ghoul Concept"))
+        #expect(changeSummary.contains("chronicle name Ghoul Chronicle→New Ghoul Chronicle"))
+        #expect(changeSummary.contains("ambition Ghoul Ambition→New Ghoul Ambition"))
+        #expect(changeSummary.contains("desire Ghoul Desire→New Ghoul Desire"))
+        #expect(changeSummary.contains("convictions removed: Ghoul Conviction"))
+        #expect(changeSummary.contains("convictions added: New Ghoul Conviction"))
+        #expect(changeSummary.contains("touchstones removed: Ghoul Touchstone"))
+        #expect(changeSummary.contains("touchstones added: New Ghoul Touchstone"))
+    }
+
 }

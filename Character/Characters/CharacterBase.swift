@@ -347,6 +347,26 @@ class CharacterBase: BaseCharacter {
         }
     }
     
+    func processStringArrayChanges(original: [String], updated: [String], name: String, changes: inout [String])
+    {
+        let originalSet = Set(original)
+        let updatedSet = Set(updated)
+
+        let removed = originalSet.subtracting(updatedSet)
+        let added = updatedSet.subtracting(originalSet)
+
+        if !removed.isEmpty || !added.isEmpty {
+            if !removed.isEmpty {
+                let removedItems = removed.joined(separator: ", ")
+                changes.append("\(name) removed: \(removedItems)")
+            }
+            if !added.isEmpty {
+                let addedItems = added.joined(separator: ", ")
+                changes.append("\(name) added: \(addedItems)")
+            }
+        }
+    }
+    
     func cloneBase<T: CharacterBase>(into copy: T) {
         copy.id = self.id
         copy.name = self.name
