@@ -167,6 +167,8 @@ struct CharacterDetailView: View {
                                 .clipShape(Circle())
                                 .shadow(radius: 4)
                         }
+                        .accessibilityLabel("Status")
+                        .accessibilityHint("Opens character status for editing")
                         
                         // Data Button
                         Button(action: {
@@ -180,6 +182,8 @@ struct CharacterDetailView: View {
                                 .clipShape(Circle())
                                 .shadow(radius: 4)
                         }
+                        .accessibilityLabel("Data")
+                        .accessibilityHint("Shows character data and change log")
                     }
                     .padding(.trailing, 20)
                     .padding(.bottom, 100) // Account for tab bar
