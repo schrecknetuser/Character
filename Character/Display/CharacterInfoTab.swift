@@ -84,15 +84,14 @@ struct CharacterInfoTab: View {
                 }
                 
                 Section(header: Text("Character Background")) {
-                    HStack {
+                    VStack(alignment: .leading, spacing: 8) {
                         Text("Ambition:")
                             .fontWeight(.medium)
                             .font(.system(size: dynamicFontSize))
-                        Spacer()
                         if isEditing {
-                            TextField("Ambition", text: $character.ambition)
+                            TextField("Ambition", text: $character.ambition, axis: .vertical)
                                 .font(.system(size: dynamicFontSize))
-                                .multilineTextAlignment(.trailing)
+                                .lineLimit(3...6)
                         } else {
                             if !character.ambition.isEmpty {
                                 Text(character.ambition)
@@ -104,15 +103,16 @@ struct CharacterInfoTab: View {
                             }
                         }
                     }
-                    HStack {
+                    .padding(.vertical, 4)
+                    
+                    VStack(alignment: .leading, spacing: 8) {
                         Text("Desire:")
                             .fontWeight(.medium)
                             .font(.system(size: dynamicFontSize))
-                        Spacer()
                         if isEditing {
-                            TextField("Desire", text: $character.desire)
+                            TextField("Desire", text: $character.desire, axis: .vertical)
                                 .font(.system(size: dynamicFontSize))
-                                .multilineTextAlignment(.trailing)
+                                .lineLimit(3...6)
                         } else {
                             if !character.desire.isEmpty {
                                 Text(character.desire)
@@ -124,6 +124,7 @@ struct CharacterInfoTab: View {
                             }
                         }
                     }
+                    .padding(.vertical, 4)
                 }
                 
                 // Add mage-specific fields
@@ -206,9 +207,10 @@ struct CharacterInfoTab: View {
                     }
                     
                     if isEditing {
-                        HStack {
-                            TextField("New conviction", text: $newConviction)
+                        VStack(alignment: .leading, spacing: 8) {
+                            TextField("New conviction", text: $newConviction, axis: .vertical)
                                 .font(.system(size: dynamicFontSize))
+                                .lineLimit(2...4)
                             Button("Add") {
                                 if !newConviction.trim().isEmpty {
                                     character.convictions.append(newConviction.trim())
@@ -244,9 +246,10 @@ struct CharacterInfoTab: View {
                     }
                     
                     if isEditing {
-                        HStack {
-                            TextField("New touchstone", text: $newTouchstone)
+                        VStack(alignment: .leading, spacing: 8) {
+                            TextField("New touchstone", text: $newTouchstone, axis: .vertical)
                                 .font(.system(size: dynamicFontSize))
+                                .lineLimit(2...4)
                             Button("Add") {
                                 if !newTouchstone.trim().isEmpty {
                                     character.touchstones.append(newTouchstone.trim())
