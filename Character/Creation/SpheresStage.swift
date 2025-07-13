@@ -18,10 +18,12 @@ struct SpheresStage: View {
                     ForEach(V5Constants.mageSpheres, id: \.self) { sphere in
                         SphereRowView(
                             sphereName: sphere,
-                            sphereLevel: Binding(
-                                get: { character.spheres[sphere] ?? 0 },
-                                set: { character.spheres[sphere] = $0 }
-                            )
+                            initialLevel: character.spheres[sphere] ?? 0,
+                            onChange: { newValue in
+                                var newSpheres = character.spheres
+                                newSpheres[sphere] = newValue
+                                character.spheres = newSpheres
+                            }
                         )
                     }
                 }

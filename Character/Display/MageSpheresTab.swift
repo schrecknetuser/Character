@@ -4,7 +4,6 @@ struct MageSpheresTab: View {
     @Binding var character: MageCharacter
     @Binding var isEditing: Bool
     @State private var dynamicFontSize: CGFloat = 16
-    @State private var refreshID: UUID = UUID()
     
     var body: some View {
         GeometryReader { geometry in
@@ -15,10 +14,12 @@ struct MageSpheresTab: View {
                         ForEach(V5Constants.mageSpheres, id: \.self) { sphere in
                             SphereRowView(
                                 sphereName: sphere,
-                                sphereLevel: Binding(
-                                    get: { character.spheres[sphere] ?? 0 },
-                                    set: { character.spheres[sphere] = $0 }
-                                )
+                                initialLevel: character.spheres[sphere] ?? 0,
+                                onChange: { newValue in
+                                    var newSpheres = character.spheres
+                                    newSpheres[sphere] = newValue
+                                    character.spheres = newSpheres
+                                }
                             )
                         }
                     } else {
