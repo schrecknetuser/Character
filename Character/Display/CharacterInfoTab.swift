@@ -352,9 +352,11 @@ struct CharacterInfoTab: View {
                         Text("Available Experience:")
                             .fontWeight(.medium)
                             .font(.system(size: dynamicFontSize))
+                            .foregroundColor(isEditing ? .secondary : .primary)
                         Spacer()
                         Text("\(character.experience - character.spentExperience)")
                             .font(.system(size: dynamicFontSize))
+                            .foregroundColor(isEditing ? .secondary : .primary)
                     }
                 }
             }
