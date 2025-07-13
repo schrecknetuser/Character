@@ -207,6 +207,45 @@ struct AttributesStage: View {
                         }
                     }
                     
+                    // Calculated Stats section
+                    VStack(alignment: .leading) {
+                        Text("Calculated Stats")
+                            .font(.headline)
+                        
+                        HStack(spacing: 30) {
+                            // Total Willpower
+                            VStack(alignment: .leading) {
+                                Text("Total Willpower")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.secondary)
+                                
+                                Text("\(calculateTotalWillpower())")
+                                    .font(.title2)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.primary)
+                            }
+                            
+                            // Total Health
+                            VStack(alignment: .leading) {
+                                Text("Total Health")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.secondary)
+                                
+                                Text("\(calculateTotalHealth())")
+                                    .font(.title2)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.primary)
+                            }
+                            
+                            Spacer()
+                        }
+                    }
+                    .padding()
+                    .background(Color.blue.opacity(0.1))
+                    .cornerRadius(10)
+                    
                     // Progress indicator
                     VStack(alignment: .leading) {
                         Text("Progress: \(allAttributeValues.count) of \(AttributePreset.standard.values.count) values assigned")
@@ -287,6 +326,17 @@ struct AttributesStage: View {
         titleFontSize = max(15, min(19, baseTitleSize * scaleFactor))
         headerFontSize = max(12, min(16, baseHeaderSize * scaleFactor))
         rowHeight = max(22, min(28, baseRowHeight * scaleFactor))
+    }
+    
+    private func calculateTotalWillpower() -> Int {
+        let resolve = character.mentalAttributes["Resolve"] ?? 1
+        let composure = character.socialAttributes["Composure"] ?? 1
+        return resolve + composure
+    }
+    
+    private func calculateTotalHealth() -> Int {
+        let stamina = character.physicalAttributes["Stamina"] ?? 1
+        return stamina + 3
     }
     
     static func areAllAttributesAssigned(character: any BaseCharacter) -> Bool {
