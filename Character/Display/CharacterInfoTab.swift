@@ -7,6 +7,8 @@ struct CharacterInfoTab: View {
     @State private var dynamicFontSize: CGFloat = 16
     @State private var newConviction: String = ""
     @State private var newTouchstone: String = ""
+    @State private var newInstrumentDescription: String = ""
+    @State private var newInstrumentUsage: String = ""
     @State private var refreshID: UUID = UUID()
     
     var body: some View {
@@ -124,6 +126,61 @@ struct CharacterInfoTab: View {
                     }
                 }
                 
+                // Add mage-specific fields
+                if let mageCharacter = character as? MageCharacter {
+                    Section(header: Text("Mage Information")) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text("Paradigm:")
+                                    .fontWeight(.medium)
+                                    .font(.system(size: dynamicFontSize))
+                                Spacer()
+                            }
+                            if isEditing {
+                                TextField("Paradigm", text: Binding(
+                                    get: { mageCharacter.paradigm },
+                                    set: { mageCharacter.paradigm = $0 }
+                                ), axis: .vertical)
+                                    .font(.system(size: dynamicFontSize))
+                                    .lineLimit(3...6)
+                            } else {
+                                if !mageCharacter.paradigm.isEmpty {
+                                    Text(mageCharacter.paradigm)
+                                        .font(.system(size: dynamicFontSize))
+                                } else {
+                                    Text("Not set")
+                                        .foregroundColor(.secondary)
+                                        .font(.system(size: dynamicFontSize))
+                                }
+                            }
+                        }
+                        
+                        HStack {
+                            Text("Practice:")
+                                .fontWeight(.medium)
+                                .font(.system(size: dynamicFontSize))
+                            Spacer()
+                            if isEditing {
+                                TextField("Practice", text: Binding(
+                                    get: { mageCharacter.practice },
+                                    set: { mageCharacter.practice = $0 }
+                                ))
+                                    .font(.system(size: dynamicFontSize))
+                                    .multilineTextAlignment(.trailing)
+                            } else {
+                                if !mageCharacter.practice.isEmpty {
+                                    Text(mageCharacter.practice)
+                                        .font(.system(size: dynamicFontSize))
+                                } else {
+                                    Text("Not set")
+                                        .foregroundColor(.secondary)
+                                        .font(.system(size: dynamicFontSize))
+                                }
+                            }
+                        }
+                    }
+                }
+                
                 Section(header: Text("Convictions")) {
                     if character.convictions.isEmpty {
                         Text("No convictions recorded")
@@ -196,6 +253,62 @@ struct CharacterInfoTab: View {
                                 }
                             }
                             .disabled(newTouchstone.trim().isEmpty)
+                        }
+                    }
+                }
+                
+                // Add instruments section for mage characters
+                if let mageCharacter = character as? MageCharacter {
+                    Section(header: Text("Instruments")) {
+                        if mageCharacter.instruments.isEmpty {
+                            Text("No instruments recorded")
+                                .foregroundColor(.secondary)
+                                .font(.system(size: dynamicFontSize))
+                        } else {
+                            ForEach(mageCharacter.instruments.indices, id: \.self) { index in
+                                VStack(alignment: .leading, spacing: 4) {
+                                    HStack {
+                                        Text(mageCharacter.instruments[index].description)
+                                            .font(.system(size: dynamicFontSize))
+                                            .fontWeight(.medium)
+                                        Spacer()
+                                        if isEditing {
+                                            Button("Remove") {
+                                                mageCharacter.instruments.remove(at: index)
+                                                refreshID = UUID()
+                                            }
+                                            .font(.caption)
+                                            .foregroundColor(.red)
+                                        }
+                                    }
+                                    if !mageCharacter.instruments[index].usage.isEmpty {
+                                        Text("Usage: \(mageCharacter.instruments[index].usage)")
+                                            .font(.system(size: dynamicFontSize - 2))
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
+                            }
+                        }
+                        
+                        if isEditing {
+                            VStack(alignment: .leading, spacing: 8) {
+                                TextField("Description (required)", text: $newInstrumentDescription)
+                                    .font(.system(size: dynamicFontSize))
+                                TextField("Usage (optional)", text: $newInstrumentUsage)
+                                    .font(.system(size: dynamicFontSize))
+                                Button("Add Instrument") {
+                                    if !newInstrumentDescription.trim().isEmpty {
+                                        let instrument = Instrument(
+                                            description: newInstrumentDescription.trim(),
+                                            usage: newInstrumentUsage.trim()
+                                        )
+                                        mageCharacter.instruments.append(instrument)
+                                        newInstrumentDescription = ""
+                                        newInstrumentUsage = ""
+                                    }
+                                }
+                                .disabled(newInstrumentDescription.trim().isEmpty)
+                            }
                         }
                     }
                 }

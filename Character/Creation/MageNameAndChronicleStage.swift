@@ -31,6 +31,21 @@ struct MageNameAndChronicleStage: View {
                     TextField("Enter character concept", text: $character.concept)
                         .textFieldStyle(.roundedBorder)
                 }
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Paradigm")
+                        .font(.headline)
+                    TextField("Enter paradigm", text: $character.paradigm, axis: .vertical)
+                        .textFieldStyle(.roundedBorder)
+                        .lineLimit(3...6)
+                }
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Practice")
+                        .font(.headline)
+                    TextField("Enter practice", text: $character.practice)
+                        .textFieldStyle(.roundedBorder)
+                }
             }
             
             Spacer()

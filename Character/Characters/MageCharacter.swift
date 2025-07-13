@@ -10,9 +10,12 @@ class MageCharacter: CharacterBase {
     @Published var arete: Int
     @Published var hubrisStates: [MageTraitState]
     @Published var quietStates: [MageTraitState]
+    @Published var paradigm: String
+    @Published var practice: String
+    @Published var instruments: [Instrument]
 
     enum CodingKeys: String, CodingKey {
-        case spheres, paradox, hubris, quiet, arete, hubrisStates, quietStates
+        case spheres, paradox, hubris, quiet, arete, hubrisStates, quietStates, paradigm, practice, instruments
     }
 
     override init(characterType: CharacterType = .mage) {
@@ -23,6 +26,9 @@ class MageCharacter: CharacterBase {
         self.arete = 2
         self.hubrisStates = Array(repeating: .unchecked, count: 5)
         self.quietStates = Array(repeating: .unchecked, count: 5)
+        self.paradigm = ""
+        self.practice = ""
+        self.instruments = []
         super.init(characterType: characterType)
     }
 
@@ -35,6 +41,9 @@ class MageCharacter: CharacterBase {
         self.arete = try container.decode(Int.self, forKey: .arete)
         self.hubrisStates = try container.decode([MageTraitState].self, forKey: .hubrisStates)
         self.quietStates = try container.decode([MageTraitState].self, forKey: .quietStates)
+        self.paradigm = try container.decodeIfPresent(String.self, forKey: .paradigm) ?? ""
+        self.practice = try container.decodeIfPresent(String.self, forKey: .practice) ?? ""
+        self.instruments = try container.decodeIfPresent([Instrument].self, forKey: .instruments) ?? []
         try super.init(from: decoder)
     }
 
@@ -48,6 +57,9 @@ class MageCharacter: CharacterBase {
         try container.encode(arete, forKey: .arete)
         try container.encode(hubrisStates, forKey: .hubrisStates)
         try container.encode(quietStates, forKey: .quietStates)
+        try container.encode(paradigm, forKey: .paradigm)
+        try container.encode(practice, forKey: .practice)
+        try container.encode(instruments, forKey: .instruments)
     }
     
     override func generateChangeSummary(for updated: any BaseCharacter) -> String {
@@ -71,10 +83,19 @@ class MageCharacter: CharacterBase {
         if self.desire != other.desire {
             changes.append("desire \(self.desire)→\(other.desire)")
         }
+        if self.paradigm != other.paradigm {
+            changes.append("paradigm \(self.paradigm)→\(other.paradigm)")
+        }
+        if self.practice != other.practice {
+            changes.append("practice \(self.practice)→\(other.practice)")
+        }
         
         // Check convictions and touchstones changes
         processStringArrayChanges(original: self.convictions, updated: other.convictions, name: "convictions", changes: &changes)
         processStringArrayChanges(original: self.touchstones, updated: other.touchstones, name: "touchstones", changes: &changes)
+        
+        // Check instruments changes
+        processInstrumentChanges(original: self.instruments, updated: other.instruments, changes: &changes)
         
         // Check attribute changes
         for attribute in V5Constants.physicalAttributes + V5Constants.socialAttributes + V5Constants.mentalAttributes {
@@ -147,7 +168,29 @@ class MageCharacter: CharacterBase {
         copy.arete = self.arete
         copy.hubrisStates = self.hubrisStates
         copy.quietStates = self.quietStates
+        copy.paradigm = self.paradigm
+        copy.practice = self.practice
+        copy.instruments = self.instruments
 
         return copy
+    }
+    
+    private func processInstrumentChanges(original: [Instrument], updated: [Instrument], changes: inout [String]) {
+        let originalSet = Set(original)
+        let updatedSet = Set(updated)
+
+        let removed = originalSet.subtracting(updatedSet)
+        let added = updatedSet.subtracting(originalSet)
+
+        if !removed.isEmpty || !added.isEmpty {
+            if !removed.isEmpty {
+                let removedNames = removed.map { $0.description }.joined(separator: ", ")
+                changes.append("instruments removed: \(removedNames)")
+            }
+            if !added.isEmpty {
+                let addedNames = added.map { $0.description }.joined(separator: ", ")
+                changes.append("instruments added: \(addedNames)")
+            }
+        }
     }
 }

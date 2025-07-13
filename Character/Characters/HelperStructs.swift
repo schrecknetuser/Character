@@ -75,3 +75,15 @@ enum MageTraitState: String, Codable, CaseIterable {
     case checked = "checked"
     case unchecked = "unchecked"
 }
+
+// Data structure for mage instruments
+struct Instrument: Identifiable, Codable, Hashable {
+    var id = UUID()
+    var description: String
+    var usage: String
+    
+    init(description: String, usage: String = "") {
+        self.description = description
+        self.usage = usage
+    }
+}
