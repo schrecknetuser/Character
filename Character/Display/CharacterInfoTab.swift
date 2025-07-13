@@ -155,18 +155,19 @@ struct CharacterInfoTab: View {
                             }
                         }
                         
-                        HStack {
-                            Text("Practice:")
-                                .fontWeight(.medium)
-                                .font(.system(size: dynamicFontSize))
-                            Spacer()
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text("Practice:")
+                                    .fontWeight(.medium)
+                                    .font(.system(size: dynamicFontSize))
+                                Spacer()
+                            }
                             if isEditing {
                                 TextField("Practice", text: Binding(
                                     get: { mageCharacter.practice },
                                     set: { mageCharacter.practice = $0 }
                                 ))
                                     .font(.system(size: dynamicFontSize))
-                                    .multilineTextAlignment(.trailing)
                             } else {
                                 if !mageCharacter.practice.isEmpty {
                                     Text(mageCharacter.practice)
