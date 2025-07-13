@@ -30,7 +30,7 @@ enum CreationStage: Int, CaseIterable {
     case convictionsAndTouchstones = 8
     case ambitionAndDesire = 9
     
-    var title: String {
+    func title(for characterType: CharacterType) -> String {
         switch self {
         case .characterType: return "Character Type"
         case .nameAndChronicle: return "Name & Chronicle"
@@ -38,7 +38,7 @@ enum CreationStage: Int, CaseIterable {
         case .attributes: return "Attributes"
         case .skills: return "Skills"
         case .specializations: return "Specializations"
-        case .disciplines: return "Disciplines"
+        case .disciplines: return characterType == .mage ? "Spheres" : "Disciplines"
         case .meritsAndFlaws: return "Merits & Flaws"
         case .convictionsAndTouchstones: return "Convictions & Touchstones"
         case .ambitionAndDesire: return "Ambition & Desire"
@@ -62,7 +62,7 @@ struct CharacterCreationWizard: View {
                 ProgressView(value: Double(currentStage.rawValue + 1), total: Double(CreationStage.allCases.count))
                     .padding(.horizontal)
                 
-                Text("\(currentStage.rawValue + 1) of \(CreationStage.allCases.count): \(currentStage.title)")
+                Text("\(currentStage.rawValue + 1) of \(CreationStage.allCases.count): \(currentStage.title(for: selectedCharacterType))")
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .padding(.bottom)
