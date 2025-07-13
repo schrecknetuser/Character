@@ -264,16 +264,15 @@ struct CustomPowerCreationView: View {
             isCustom: true
         )
         
-        // Find the discipline (custom or standard) and add the power
-        if let customIndex = character.customV5Disciplines.firstIndex(where: { $0.name == disciplineName }) {
-            character.customV5Disciplines[customIndex].addPower(power, to: level)
+        // Find the discipline in the character's list and add the power
+        if let disciplineIndex = character.v5Disciplines.firstIndex(where: { $0.name == disciplineName }) {
+            character.v5Disciplines[disciplineIndex].addPower(power, to: level)
         } else {
-            // Create a custom version of a standard discipline
+            // Create a new discipline instance from standard template if it exists
             if let standardDiscipline = V5Constants.getV5Discipline(named: disciplineName) {
-                var customDiscipline = standardDiscipline
-                customDiscipline.isCustom = true
-                customDiscipline.addPower(power, to: level)
-                character.addCustomV5Discipline(customDiscipline)
+                var newDiscipline = standardDiscipline
+                newDiscipline.addPower(power, to: level)
+                character.v5Disciplines.append(newDiscipline)
             }
         }
         
@@ -288,7 +287,7 @@ struct EnhancedV5AddDisciplineView: View {
     @State private var showingCustomCreation = false
     
     private var availableDisciplines: [V5Discipline] {
-        let existingNames = Set(character.v5Disciplines.keys)
+        let existingNames = Set(character.v5Disciplines.map(\.name))
         return character.getAllAvailableV5Disciplines().filter { !existingNames.contains($0.name) }
     }
     

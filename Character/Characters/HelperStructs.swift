@@ -106,17 +106,20 @@ struct V5DisciplinePower: Identifiable, Codable, Hashable {
     }
 }
 
-// Data structure for a complete V5 discipline with powers per level
+// Data structure for a complete V5 discipline with powers per level and progress tracking
 struct V5Discipline: Identifiable, Codable, Hashable {
     var id = UUID()
     var name: String
     var powers: [Int: [V5DisciplinePower]] // Level -> Powers
     var isCustom: Bool = false
+    var currentLevel: Int = 0
+    var selectedPowers: [Int: Set<UUID>] = [:] // Level -> Selected Power IDs
     
-    init(name: String, powers: [Int: [V5DisciplinePower]] = [:], isCustom: Bool = false) {
+    init(name: String, powers: [Int: [V5DisciplinePower]] = [:], isCustom: Bool = false, currentLevel: Int = 0) {
         self.name = name
         self.powers = powers
         self.isCustom = isCustom
+        self.currentLevel = currentLevel
     }
     
     // Get all powers for a specific level
@@ -130,19 +133,6 @@ struct V5Discipline: Identifiable, Codable, Hashable {
             powers[level] = []
         }
         powers[level]?.append(power)
-    }
-}
-
-// Data structure to track a character's progress in a discipline
-struct V5DisciplineProgress: Identifiable, Codable, Hashable {
-    var id = UUID()
-    var disciplineName: String
-    var currentLevel: Int = 0
-    var selectedPowers: [Int: Set<UUID>] = [:] // Level -> Selected Power IDs
-    
-    init(disciplineName: String, currentLevel: Int = 0) {
-        self.disciplineName = disciplineName
-        self.currentLevel = currentLevel
     }
     
     // Check if a power is selected at a specific level
@@ -173,3 +163,5 @@ struct V5DisciplineProgress: Identifiable, Codable, Hashable {
         return Array(1...max(1, currentLevel))
     }
 }
+
+

@@ -96,22 +96,18 @@ struct V5DisciplineDetailView: View {
     @State private var selectedLevelForCustomPower = 1
     
     private var discipline: V5Discipline? {
-        character.getV5Discipline(named: disciplineName)
-    }
-    
-    private var progress: V5DisciplineProgress? {
-        character.getV5DisciplineProgress(for: disciplineName)
+        character.v5Disciplines.first { $0.name == disciplineName }
     }
     
     var body: some View {
         NavigationView {
             Form {
-                if let discipline = discipline, let progress = progress {
+                if let discipline = discipline {
                     // Level selector
                     if isEditing {
                         Section("Discipline Level") {
                             Picker("Level", selection: Binding(
-                                get: { progress.currentLevel },
+                                get: { discipline.currentLevel },
                                 set: { newLevel in
                                     character.setV5DisciplineLevel(disciplineName, to: newLevel)
                                 }
@@ -127,20 +123,20 @@ struct V5DisciplineDetailView: View {
                             HStack {
                                 Text("Discipline Level")
                                 Spacer()
-                                Text("\(progress.currentLevel)")
+                                Text("\(discipline.currentLevel)")
                                     .foregroundColor(.secondary)
                             }
                         }
                     }
                     
                     // Powers for each level
-                    ForEach(1...progress.currentLevel, id: \.self) { level in
+                    ForEach(1...discipline.currentLevel, id: \.self) { level in
                         Section("Level \(level) Powers") {
                             V5DisciplinePowersView(
                                 disciplineName: disciplineName,
                                 level: level,
                                 powers: discipline.getPowers(for: level),
-                                selectedPowerIds: progress.getSelectedPowers(for: level),
+                                selectedPowerIds: discipline.getSelectedPowers(for: level),
                                 isEditing: isEditing,
                                 onPowerToggle: { powerId in
                                     character.toggleV5Power(powerId, for: disciplineName, at: level)
@@ -153,9 +149,9 @@ struct V5DisciplineDetailView: View {
                     // Add custom power section if editing
                     if isEditing {
                         Section("Custom Powers") {
-                            if progress.currentLevel > 0 {
+                            if discipline.currentLevel > 0 {
                                 Picker("Level for Custom Power", selection: $selectedLevelForCustomPower) {
-                                    ForEach(1...progress.currentLevel, id: \.self) { level in
+                                    ForEach(1...discipline.currentLevel, id: \.self) { level in
                                         Text("Level \(level)").tag(level)
                                     }
                                 }
@@ -196,8 +192,8 @@ struct V5DisciplineDetailView: View {
             }
             .onAppear {
                 // Set default level for custom power creation
-                if let progress = progress, progress.currentLevel > 0 {
-                    selectedLevelForCustomPower = progress.currentLevel
+                if let discipline = discipline, discipline.currentLevel > 0 {
+                    selectedLevelForCustomPower = discipline.currentLevel
                 }
             }
         }
@@ -210,7 +206,7 @@ struct V5AddDisciplineView: View {
     @Environment(\.dismiss) var dismiss
     
     private var availableDisciplines: [V5Discipline] {
-        let existingNames = Set(character.v5Disciplines.keys)
+        let existingNames = Set(character.v5Disciplines.map(\.name))
         return character.getAllAvailableV5Disciplines().filter { !existingNames.contains($0.name) }
     }
     
@@ -313,22 +309,22 @@ struct V5DisciplinesTab: View {
                     Text("No V5 disciplines learned")
                         .foregroundColor(.secondary)
                 } else {
-                    ForEach(character.v5Disciplines.sorted(by: { $0.key < $1.key }), id: \.key) { disciplineName, progress in
+                    ForEach(character.v5Disciplines.sorted(by: { $0.name < $1.name })) { discipline in
                         VStack(alignment: .leading, spacing: 4) {
                             HStack {
-                                Text(disciplineName)
+                                Text(discipline.name)
                                     .font(.subheadline)
                                     .fontWeight(.medium)
                                 Spacer()
                                 
                                 if isEditing {
                                     Picker("", selection: Binding(
-                                        get: { progress.currentLevel },
+                                        get: { discipline.currentLevel },
                                         set: { newLevel in
                                             if newLevel == 0 {
-                                                character.removeV5Discipline(disciplineName)
+                                                character.removeV5Discipline(discipline.name)
                                             } else {
-                                                character.setV5DisciplineLevel(disciplineName, to: newLevel)
+                                                character.setV5DisciplineLevel(discipline.name, to: newLevel)
                                             }
                                         }
                                     )) {
@@ -338,13 +334,13 @@ struct V5DisciplinesTab: View {
                                     }
                                     .pickerStyle(MenuPickerStyle())
                                 } else {
-                                    Text("Level \(progress.currentLevel)")
+                                    Text("Level \(discipline.currentLevel)")
                                         .foregroundColor(.secondary)
                                         .font(.caption)
                                 }
                                 
                                 Button(action: {
-                                    selectedDiscipline = disciplineName
+                                    selectedDiscipline = discipline.name
                                     showingDisciplineDetail = true
                                 }) {
                                     Image(systemName: "info.circle")
@@ -353,7 +349,7 @@ struct V5DisciplinesTab: View {
                             }
                             
                             // Show selected powers as a list
-                            let allSelectedPowers = getAllSelectedPowers(for: disciplineName, progress: progress)
+                            let allSelectedPowers = getAllSelectedPowers(for: discipline)
                             if !allSelectedPowers.isEmpty {
                                 ForEach(allSelectedPowers, id: \.id) { power in
                                     PowerRowView(power: power)
@@ -390,7 +386,7 @@ struct V5DisciplinesTab: View {
             }
         }
         .sheet(isPresented: $showingAddDiscipline) {
-            EnhancedV5AddDisciplineView(character: $character)
+            V5AddDisciplineView(character: $character)
         }
         .sheet(isPresented: $showingDisciplineDetail) {
             if let disciplineName = selectedDiscipline {
@@ -404,14 +400,10 @@ struct V5DisciplinesTab: View {
     }
     
     // Helper function to get all selected powers for a discipline
-    private func getAllSelectedPowers(for disciplineName: String, progress: V5DisciplineProgress) -> [V5DisciplinePower] {
-        guard let discipline = character.getV5Discipline(named: disciplineName) else {
-            return []
-        }
-        
+    private func getAllSelectedPowers(for discipline: V5Discipline) -> [V5DisciplinePower] {
         var allPowers: [V5DisciplinePower] = []
-        for level in 1...progress.currentLevel {
-            let selectedIds = progress.getSelectedPowers(for: level)
+        for level in 1...discipline.currentLevel {
+            let selectedIds = discipline.getSelectedPowers(for: level)
             let levelPowers = discipline.getPowers(for: level)
             let selectedPowers = levelPowers.filter { selectedIds.contains($0.id) }
             allPowers.append(contentsOf: selectedPowers)

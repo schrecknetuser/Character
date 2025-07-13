@@ -20,20 +20,20 @@ struct V5DisciplinesStage: View {
                             .foregroundColor(.secondary)
                     }
                 } else {
-                    ForEach(character.v5Disciplines.sorted(by: { $0.key < $1.key }), id: \.key) { disciplineName, progress in
+                    ForEach(character.v5Disciplines.sorted(by: { $0.name < $1.name })) { discipline in
                         VStack(alignment: .leading, spacing: 6) {
                             HStack {
-                                Text(disciplineName)
+                                Text(discipline.name)
                                     .font(.headline)
                                 Spacer()
                                 
                                 Picker("Level", selection: Binding(
-                                    get: { progress.currentLevel },
+                                    get: { discipline.currentLevel },
                                     set: { newLevel in
                                         if newLevel == 0 {
-                                            character.removeV5Discipline(disciplineName)
+                                            character.removeV5Discipline(discipline.name)
                                         } else {
-                                            character.setV5DisciplineLevel(disciplineName, to: newLevel)
+                                            character.setV5DisciplineLevel(discipline.name, to: newLevel)
                                         }
                                     }
                                 )) {
@@ -44,7 +44,7 @@ struct V5DisciplinesStage: View {
                                 .pickerStyle(MenuPickerStyle())
                                 
                                 Button("Powers") {
-                                    selectedDiscipline = disciplineName
+                                    selectedDiscipline = discipline.name
                                     showingDisciplineDetail = true
                                 }
                                 .buttonStyle(.bordered)
@@ -52,12 +52,11 @@ struct V5DisciplinesStage: View {
                             }
                             
                             // Show progress summary
-                            if progress.currentLevel > 0 {
+                            if discipline.currentLevel > 0 {
                                 HStack {
-                                    ForEach(1...progress.currentLevel, id: \.self) { level in
-                                        let selectedCount = progress.getSelectedPowers(for: level).count
-                                        let discipline = character.getV5Discipline(named: disciplineName)
-                                        let totalCount = discipline?.getPowers(for: level).count ?? 0
+                                    ForEach(1...discipline.currentLevel, id: \.self) { level in
+                                        let selectedCount = discipline.getSelectedPowers(for: level).count
+                                        let totalCount = discipline.getPowers(for: level).count
                                         
                                         VStack(spacing: 2) {
                                             Text("L\(level)")
@@ -111,7 +110,7 @@ struct V5CreationAddDisciplineView: View {
     @Environment(\.dismiss) var dismiss
     
     private var availableDisciplines: [V5Discipline] {
-        let existingNames = Set(character.v5Disciplines.keys)
+        let existingNames = Set(character.v5Disciplines.map(\.name))
         return character.getAllAvailableV5Disciplines().filter { !existingNames.contains($0.name) }
     }
     
@@ -196,21 +195,17 @@ struct V5CreationDisciplineDetailView: View {
     @Environment(\.dismiss) var dismiss
     
     private var discipline: V5Discipline? {
-        character.getV5Discipline(named: disciplineName)
-    }
-    
-    private var progress: V5DisciplineProgress? {
-        character.getV5DisciplineProgress(for: disciplineName)
+        character.v5Disciplines.first { $0.name == disciplineName }
     }
     
     var body: some View {
         NavigationView {
             Form {
-                if let discipline = discipline, let progress = progress {
+                if let discipline = discipline {
                     // Level selector
                     Section("Discipline Level") {
                         Picker("Level", selection: Binding(
-                            get: { progress.currentLevel },
+                            get: { discipline.currentLevel },
                             set: { newLevel in
                                 character.setV5DisciplineLevel(disciplineName, to: newLevel)
                             }
@@ -223,10 +218,10 @@ struct V5CreationDisciplineDetailView: View {
                     }
                     
                     // Powers for each level
-                    ForEach(1...progress.currentLevel, id: \.self) { level in
+                    ForEach(1...discipline.currentLevel, id: \.self) { level in
                         Section("Level \(level) Powers") {
                             let powers = discipline.getPowers(for: level)
-                            let selectedIds = progress.getSelectedPowers(for: level)
+                            let selectedIds = discipline.getSelectedPowers(for: level)
                             
                             if powers.isEmpty {
                                 Text("No powers available at this level")
@@ -304,7 +299,7 @@ struct EnhancedV5CreationAddDisciplineView: View {
     @State private var showingCustomCreation = false
     
     private var availableDisciplines: [V5Discipline] {
-        let existingNames = Set(character.v5Disciplines.keys)
+        let existingNames = Set(character.v5Disciplines.map(\.name))
         return character.getAllAvailableV5Disciplines().filter { !existingNames.contains($0.name) }
     }
     

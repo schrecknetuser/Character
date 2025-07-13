@@ -34,34 +34,34 @@ struct V5DisciplineTests {
         #expect(level1Powers.contains { $0.name == "Bond Famulus" })
     }
     
-    @Test func testV5DisciplineProgress() async throws {
-        var progress = V5DisciplineProgress(disciplineName: "Animalism", currentLevel: 2)
+    @Test func testV5DisciplineProgressIntegration() async throws {
+        var discipline = V5Discipline(name: "Animalism", currentLevel: 2)
         let powerId1 = UUID()
         let powerId2 = UUID()
         
-        #expect(progress.disciplineName == "Animalism")
-        #expect(progress.currentLevel == 2)
-        #expect(progress.getSelectedPowers(for: 1).isEmpty)
+        #expect(discipline.name == "Animalism")
+        #expect(discipline.currentLevel == 2)
+        #expect(discipline.getSelectedPowers(for: 1).isEmpty)
         
         // Test power selection
-        progress.togglePower(powerId1, at: 1)
-        #expect(progress.isPowerSelected(powerId1, at: 1))
-        #expect(!progress.isPowerSelected(powerId2, at: 1))
-        #expect(progress.getSelectedPowers(for: 1).count == 1)
+        discipline.togglePower(powerId1, at: 1)
+        #expect(discipline.isPowerSelected(powerId1, at: 1))
+        #expect(!discipline.isPowerSelected(powerId2, at: 1))
+        #expect(discipline.getSelectedPowers(for: 1).count == 1)
         
         // Test power deselection
-        progress.togglePower(powerId1, at: 1)
-        #expect(!progress.isPowerSelected(powerId1, at: 1))
-        #expect(progress.getSelectedPowers(for: 1).isEmpty)
+        discipline.togglePower(powerId1, at: 1)
+        #expect(!discipline.isPowerSelected(powerId1, at: 1))
+        #expect(discipline.getSelectedPowers(for: 1).isEmpty)
         
         // Test multiple powers at different levels
-        progress.togglePower(powerId1, at: 1)
-        progress.togglePower(powerId2, at: 2)
-        #expect(progress.getSelectedPowers(for: 1).count == 1)
-        #expect(progress.getSelectedPowers(for: 2).count == 1)
+        discipline.togglePower(powerId1, at: 1)
+        discipline.togglePower(powerId2, at: 2)
+        #expect(discipline.getSelectedPowers(for: 1).count == 1)
+        #expect(discipline.getSelectedPowers(for: 2).count == 1)
         
         // Test accessible levels
-        let accessibleLevels = progress.getAccessibleLevels()
+        let accessibleLevels = discipline.getAccessibleLevels()
         #expect(accessibleLevels == [1, 2])
     }
     
@@ -95,7 +95,6 @@ struct V5DisciplineTests {
         
         // Test initial state
         #expect(character.v5Disciplines.isEmpty)
-        #expect(character.customV5Disciplines.isEmpty)
         #expect(!character.isUsingV5Disciplines)
         
         // Test adding a discipline
@@ -103,10 +102,10 @@ struct V5DisciplineTests {
         #expect(character.v5Disciplines.count == 1)
         #expect(character.isUsingV5Disciplines)
         
-        let progress = character.getV5DisciplineProgress(for: "Animalism")
-        #expect(progress != nil)
-        #expect(progress?.currentLevel == 2)
-        #expect(progress?.disciplineName == "Animalism")
+        let discipline = character.getV5DisciplineProgress(for: "Animalism")
+        #expect(discipline != nil)
+        #expect(discipline?.currentLevel == 2)
+        #expect(discipline?.name == "Animalism")
         
         // Test power selection
         if let animalism = V5Constants.getV5Discipline(named: "Animalism") {
@@ -143,11 +142,11 @@ struct V5DisciplineTests {
         #expect(character.v5Disciplines.count == 2)
         #expect(character.isUsingV5Disciplines)
         
-        let animalismProgress = character.getV5DisciplineProgress(for: "Animalism")
-        #expect(animalismProgress?.currentLevel == 3)
+        let animalismDiscipline = character.getV5DisciplineProgress(for: "Animalism")
+        #expect(animalismDiscipline?.currentLevel == 3)
         
-        let auspexProgress = character.getV5DisciplineProgress(for: "Animalism")
-        #expect(auspexProgress?.currentLevel == 3)
+        let auspexDiscipline = character.getV5DisciplineProgress(for: "Auspex")
+        #expect(auspexDiscipline?.currentLevel == 2)
     }
     
     @Test func testVampireCharacterCustomDisciplines() async throws {
@@ -166,7 +165,7 @@ struct V5DisciplineTests {
         
         // Add to character
         character.addCustomV5Discipline(customDiscipline)
-        #expect(character.customV5Disciplines.count == 1)
+        #expect(character.v5Disciplines.contains { $0.name == "Custom Discipline" && $0.isCustom })
         
         // Test that it appears in available disciplines
         let available = character.getAllAvailableV5Disciplines()
@@ -174,9 +173,9 @@ struct V5DisciplineTests {
         
         // Test that it can be learned
         character.setV5DisciplineLevel("Custom Discipline", to: 1)
-        let progress = character.getV5DisciplineProgress(for: "Custom Discipline")
-        #expect(progress != nil)
-        #expect(progress?.currentLevel == 1)
+        let discipline = character.getV5DisciplineProgress(for: "Custom Discipline")
+        #expect(discipline != nil)
+        #expect(discipline?.currentLevel == 1)
     }
     
     @Test func testV5DisciplineChangeLogging() async throws {
@@ -211,22 +210,22 @@ struct V5DisciplineTests {
         #expect(changeSummary.contains("auspex level 0→1"))
     }
     
-    @Test func testV5DisciplineProgressSerialization() async throws {
-        // Test that V5 discipline progress can be encoded and decoded
-        var progress = V5DisciplineProgress(disciplineName: "Animalism", currentLevel: 3)
+    @Test func testV5DisciplineSerialization() async throws {
+        // Test that V5 discipline can be encoded and decoded
+        var discipline = V5Discipline(name: "Animalism", currentLevel: 3)
         let powerId1 = UUID()
         let powerId2 = UUID()
         
-        progress.togglePower(powerId1, at: 1)
-        progress.togglePower(powerId2, at: 2)
+        discipline.togglePower(powerId1, at: 1)
+        discipline.togglePower(powerId2, at: 2)
         
         let encoder = JSONEncoder()
-        let data = try encoder.encode(progress)
+        let data = try encoder.encode(discipline)
         
         let decoder = JSONDecoder()
-        let decoded = try decoder.decode(V5DisciplineProgress.self, from: data)
+        let decoded = try decoder.decode(V5Discipline.self, from: data)
         
-        #expect(decoded.disciplineName == "Animalism")
+        #expect(decoded.name == "Animalism")
         #expect(decoded.currentLevel == 3)
         #expect(decoded.isPowerSelected(powerId1, at: 1))
         #expect(decoded.isPowerSelected(powerId2, at: 2))
