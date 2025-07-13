@@ -3,7 +3,6 @@ import SwiftUI
 struct SphereRowView: View {
     let sphereName: String
     @Binding var sphereLevel: Int
-    var onChange: (() -> Void)? = nil
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -17,9 +16,7 @@ struct SphereRowView: View {
                 HStack(spacing: 8) {
                     Button(action: {
                         if sphereLevel > 0 {
-                            print("Decreasing \(sphereName) from \(sphereLevel) to \(sphereLevel - 1)")
                             sphereLevel -= 1
-                            onChange?()
                         }
                     }) {
                         Image(systemName: "minus.circle")
@@ -33,9 +30,7 @@ struct SphereRowView: View {
                     
                     Button(action: {
                         if sphereLevel < 5 {
-                            print("Increasing \(sphereName) from \(sphereLevel) to \(sphereLevel + 1)")
                             sphereLevel += 1
-                            onChange?()
                         }
                     }) {
                         Image(systemName: "plus.circle")

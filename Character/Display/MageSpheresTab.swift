@@ -13,56 +13,16 @@ struct MageSpheresTab: View {
                     if isEditing {
                         // Use the same UI as creation mode when editing
                         ForEach(V5Constants.mageSpheres, id: \.self) { sphere in
-                            VStack(alignment: .leading, spacing: 8) {
-                                HStack {
-                                    Text(sphere)
-                                        .font(.headline)
-                                        .frame(minWidth: 120, alignment: .leading)
-                                    
-                                    Spacer()
-                                    
-                                    HStack(spacing: 8) {
-                                        Button(action: {
-                                            let currentLevel = character.spheres[sphere] ?? 0
-                                            if currentLevel > 0 {
-                                                character.spheres[sphere] = currentLevel - 1
-                                                refresh()
-                                            }
-                                        }) {
-                                            Image(systemName: "minus.circle")
-                                                .foregroundColor((character.spheres[sphere] ?? 0) > 0 ? .red : .gray)
-                                        }
-                                        .disabled((character.spheres[sphere] ?? 0) <= 0)
-                                        
-                                        Text("\(character.spheres[sphere] ?? 0)")
-                                            .font(.headline)
-                                            .frame(minWidth: 30)
-                                        
-                                        Button(action: {
-                                            let currentLevel = character.spheres[sphere] ?? 0
-                                            if currentLevel < 5 {
-                                                character.spheres[sphere] = currentLevel + 1
-                                                refresh()
-                                            }
-                                        }) {
-                                            Image(systemName: "plus.circle")
-                                                .foregroundColor((character.spheres[sphere] ?? 0) < 5 ? .green : .gray)
-                                        }
-                                        .disabled((character.spheres[sphere] ?? 0) >= 5)
+                            SphereRowView(
+                                sphereName: sphere,
+                                sphereLevel: Binding(
+                                    get: { character.spheres[sphere] ?? 0 },
+                                    set: { newValue in
+                                        character.spheres[sphere] = newValue
+                                        refresh()
                                     }
-                                }
-                                
-                                // Dots visualization
-                                HStack(spacing: 4) {
-                                    ForEach(0..<5) { index in
-                                        Circle()
-                                            .fill(index < (character.spheres[sphere] ?? 0) ? Color.primary : Color.clear)
-                                            .stroke(Color.primary, lineWidth: 1)
-                                            .frame(width: 12, height: 12)
-                                    }
-                                }
-                            }
-                            .padding(.vertical, 4)
+                                )
+                            )
                         }
                     } else {
                         // Read-only view when not editing
