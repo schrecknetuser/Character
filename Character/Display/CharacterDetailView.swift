@@ -6,6 +6,7 @@ struct CharacterDetailView: View {
 
     @State private var isEditing = false
     @State private var draftCharacter: BaseCharacter?
+    @State private var selectedTab = 0
 
     var activeCharacterBinding: Binding<any BaseCharacter> {
         Binding(
@@ -19,14 +20,67 @@ struct CharacterDetailView: View {
             }
         )
     }
+    
+    // Helper function to get available tabs for the current character type
+    private var availableTabs: [String] {
+        var tabs = ["Character"]
+        
+        switch character.characterType {
+        case .vampire:
+            tabs.append("Status")
+        case .ghoul:
+            tabs.append("Status")
+        case .mage:
+            tabs.append("Status")
+        }
+        
+        tabs.append("Attributes & Skills")
+        
+        switch character.characterType {
+        case .vampire:
+            tabs.append("Disciplines")
+        case .ghoul:
+            tabs.append("Disciplines")
+        case .mage:
+            tabs.append("Spheres")
+        }
+        
+        tabs.append("Merits & Flaws")
+        tabs.append("Data")
+        
+        return tabs
+    }
+    
+    // Helper function to handle swipe gestures
+    private func handleSwipe(direction: SwipeDirection) {
+        let maxTabIndex = availableTabs.count - 1
+        
+        switch direction {
+        case .left:
+            // Swipe left moves to next tab (right)
+            if selectedTab < maxTabIndex {
+                selectedTab += 1
+            }
+        case .right:
+            // Swipe right moves to previous tab (left)
+            if selectedTab > 0 {
+                selectedTab -= 1
+            }
+        }
+    }
+    
+    private enum SwipeDirection {
+        case left, right
+    }
 
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             CharacterInfoTab(character: activeCharacterBinding, isEditing: $isEditing)
                 .tabItem {
                     Image(systemName: "person.fill")
                     Text("Character")
                 }
+                .tag(0)
 
             if character.characterType == .vampire {
                 if let vampire = (isEditing ? draftCharacter : character) as? VampireCharacter {
@@ -39,6 +93,7 @@ struct CharacterDetailView: View {
                             Image(systemName: "heart.fill")
                             Text("Status")
                         }
+                        .tag(1)
                 }
             } else if character.characterType == .ghoul {
                 if let ghoul = (isEditing ? draftCharacter : character) as? GhoulCharacter {
@@ -51,6 +106,7 @@ struct CharacterDetailView: View {
                             Image(systemName: "heart.fill")
                             Text("Status")
                         }
+                        .tag(1)
                 }
             } else if character.characterType == .mage {
                 if let mage = (isEditing ? draftCharacter : character) as? MageCharacter {
@@ -63,6 +119,7 @@ struct CharacterDetailView: View {
                             Image(systemName: "star.circle.fill")
                             Text("Status")
                         }
+                        .tag(1)
                 }
             }
 
@@ -71,6 +128,7 @@ struct CharacterDetailView: View {
                     Image(systemName: "brain.head.profile")
                     Text("Attributes & Skills")
                 }
+                .tag(2)
 
             if character.characterType == .vampire {
                 if let vampire = (isEditing ? draftCharacter : character) as? VampireCharacter {
@@ -83,6 +141,7 @@ struct CharacterDetailView: View {
                             Image(systemName: "flame.fill")
                             Text("Disciplines")
                         }
+                        .tag(3)
                 }
             } else if character.characterType == .ghoul {
                 if let ghoul = (isEditing ? draftCharacter : character) as? GhoulCharacter {
@@ -95,6 +154,7 @@ struct CharacterDetailView: View {
                             Image(systemName: "flame.fill")
                             Text("Disciplines")
                         }
+                        .tag(3)
                 }
             } else if character.characterType == .mage {
                 if let mage = (isEditing ? draftCharacter : character) as? MageCharacter {
@@ -107,6 +167,7 @@ struct CharacterDetailView: View {
                             Image(systemName: "sparkles")
                             Text("Spheres")
                         }
+                        .tag(3)
                 }
             }
 
@@ -115,13 +176,33 @@ struct CharacterDetailView: View {
                     Image(systemName: "star.fill")
                     Text("Merits & Flaws")
                 }
+                .tag(4)
 
             DataTab(character: activeCharacterBinding, isEditing: $isEditing)
                 .tabItem {
                     Image(systemName: "doc.text.fill")
                     Text("Data")
                 }
+                .tag(5)
         }
+        .gesture(
+            DragGesture()
+                .onEnded { value in
+                    let horizontalAmount = value.translation.width
+                    let verticalAmount = value.translation.height
+                    
+                    // Only process horizontal swipes (more horizontal than vertical movement)
+                    if abs(horizontalAmount) > abs(verticalAmount) {
+                        if horizontalAmount > 50 {
+                            // Swipe right (previous tab)
+                            handleSwipe(direction: .right)
+                        } else if horizontalAmount < -50 {
+                            // Swipe left (next tab)
+                            handleSwipe(direction: .left)
+                        }
+                    }
+                }
+        )
         .navigationTitle(character.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
