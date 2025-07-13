@@ -593,6 +593,38 @@ struct CharacterTests {
         #expect(changeSummary.contains("touchstones added: New Mage Touchstone"))
     }
     
+    @Test func testMageSpheresDefaultsAndChanges() async throws {
+        // Test that mage spheres default to 0 and can be changed properly
+        let character = MageCharacter()
+        
+        // Test that all spheres default to 0
+        for sphere in V5Constants.mageSpheres {
+            #expect(character.spheres[sphere] == 0)
+        }
+        
+        // Test that spheres can be set and retrieved
+        character.spheres["Forces"] = 3
+        character.spheres["Life"] = 2
+        character.spheres["Mind"] = 1
+        
+        #expect(character.spheres["Forces"] == 3)
+        #expect(character.spheres["Life"] == 2)
+        #expect(character.spheres["Mind"] == 1)
+        #expect(character.spheres["Matter"] == 0) // Should still be 0
+        
+        // Test that change tracking works for spheres
+        let originalCharacter = character.clone() as! MageCharacter
+        character.spheres["Forces"] = 4
+        character.spheres["Matter"] = 2
+        character.spheres["Life"] = 0 // Set back to 0
+        
+        let changeSummary = originalCharacter.generateChangeSummary(for: character)
+        #expect(changeSummary.contains("forces 3→4"))
+        #expect(changeSummary.contains("matter 0→2"))
+        #expect(changeSummary.contains("life 2→0"))
+        #expect(!changeSummary.contains("mind")) // Mind should not appear since it didn't change
+    }
+    
     @Test func testGhoulCharacterInfoChangeLogging() async throws {
         // Test that changes to ghoul character info are properly logged
         let originalCharacter = GhoulCharacter()
