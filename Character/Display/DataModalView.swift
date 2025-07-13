@@ -17,8 +17,10 @@ struct DataModalView: View {
                             
                             Spacer()
                             
-                            Text("\(character.currentSession)")
+                            TextField("Session", value: $character.currentSession, format: .number)
                                 .font(.system(size: dynamicFontSize))
+                                .multilineTextAlignment(.trailing)
+                                .keyboardType(.numberPad)
                         }
                     }
                     
