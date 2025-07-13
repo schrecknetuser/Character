@@ -192,19 +192,7 @@ struct CharacterDetailView: View {
         }
         .navigationTitle(character.name)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button {
-                    if character.isArchived {
-                        store.unarchiveCharacter(character)
-                    } else {
-                        store.archiveCharacter(character)
-                    }
-                } label: {
-                    Image(systemName: character.isArchived ? "archivebox.fill" : "archivebox")
-                }
-            }
-            
+        .toolbar {            
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(isEditing ? "Save" : "Edit") {
                     if isEditing {

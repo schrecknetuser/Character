@@ -16,116 +16,118 @@ struct CharacterGroupSection: View {
     @State private var showingDeleteConfirmation = false
 
     var body: some View {
-        if group.chronicleName.isEmpty {
-            Section {
-                ForEach(group.characters.indices, id: \.self) { index in
-                    let characterId = group.characters[index].id
-                    if let characterIndex = store.characters.firstIndex(where: { $0.id == characterId }) {
-                        let character = store.characters[characterIndex].character
-                        let characterBinding = $store.characters[characterIndex].character
-                        let displayInfo = getCharacterDisplayInfo(character)
-
-                        NavigationLink(destination: CharacterDetailView(character: characterBinding, store: store)) {
-                            CharacterRow(character: character, displayInfo: displayInfo)
-                        }
-                        .swipeActions(edge: .trailing) {
-                            Button {
-                                characterToDelete = character
-                                showingDeleteConfirmation = true
-                            } label: {
-                                Label("Delete", systemImage: "trash")
-                            }
-                            .tint(.red)
+        Group {
+            if group.chronicleName.isEmpty {
+                Section {
+                    ForEach(group.characters.indices, id: \.self) { index in
+                        let characterId = group.characters[index].id
+                        if let characterIndex = store.characters.firstIndex(where: { $0.id == characterId }) {
+                            let character = store.characters[characterIndex].character
+                            let characterBinding = $store.characters[characterIndex].character
+                            let displayInfo = getCharacterDisplayInfo(character)
                             
-                            if !character.isArchived {
+                            NavigationLink(destination: CharacterDetailView(character: characterBinding, store: store)) {
+                                CharacterRow(character: character, displayInfo: displayInfo)
+                            }
+                            .swipeActions(edge: .trailing) {
                                 Button {
-                                    store.archiveCharacter(character)
+                                    characterToDelete = character
+                                    showingDeleteConfirmation = true
                                 } label: {
-                                    Label("Archive", systemImage: "archivebox")
+                                    Label("Delete", systemImage: "trash")
                                 }
-                                .tint(.orange)
-                            } else {
-                                Button {
-                                    store.unarchiveCharacter(character)
-                                } label: {
-                                    Label("Unarchive", systemImage: "archivebox.fill")
+                                .tint(.red)
+                                
+                                if !character.isArchived {
+                                    Button {
+                                        store.archiveCharacter(character)
+                                    } label: {
+                                        Label("Archive", systemImage: "archivebox")
+                                    }
+                                    .tint(.orange)
+                                } else {
+                                    Button {
+                                        store.unarchiveCharacter(character)
+                                    } label: {
+                                        Label("Unarchive", systemImage: "archivebox.fill")
+                                    }
+                                    .tint(.green)
                                 }
-                                .tint(.green)
                             }
                         }
                     }
-                }
-                .onDelete { offsets in
-                    let charactersToDelete = offsets.map { group.characters[$0].id }
-                    let indicesToDelete = IndexSet(store.characters.enumerated().compactMap { index, character in
-                        charactersToDelete.contains(character.id) ? index : nil
-                    })
-                    store.deleteCharacter(at: indicesToDelete)
-                }
-            } header: {
-                Text("No Chronicle")
-                    .font(.headline)
-                    .foregroundColor(.primary)
-            }
-        } else {
-            DisclosureGroup(isExpanded: $isExpanded) {
-                ForEach(group.characters.indices, id: \.self) { index in
-                    let characterId = group.characters[index].id
-                    if let characterIndex = store.characters.firstIndex(where: { $0.id == characterId }) {
-                        let character = store.characters[characterIndex].character
-                        let characterBinding = $store.characters[characterIndex].character
-                        let displayInfo = getCharacterDisplayInfo(character)
-
-                        NavigationLink(destination: CharacterDetailView(character: characterBinding, store: store)) {
-                            CharacterRow(character: character, displayInfo: displayInfo)
-                        }
-                        .swipeActions(edge: .trailing) {
-                            Button {
-                                characterToDelete = character
-                                showingDeleteConfirmation = true
-                            } label: {
-                                Label("Delete", systemImage: "trash")
-                            }
-                            .tint(.red)
-                            
-                            if !character.isArchived {
-                                Button {
-                                    store.archiveCharacter(character)
-                                } label: {
-                                    Label("Archive", systemImage: "archivebox")
-                                }
-                                .tint(.orange)
-                            } else {
-                                Button {
-                                    store.unarchiveCharacter(character)
-                                } label: {
-                                    Label("Unarchive", systemImage: "archivebox.fill")
-                                }
-                                .tint(.green)
-                            }
-                        }
+                    .onDelete { offsets in
+                        let charactersToDelete = offsets.map { group.characters[$0].id }
+                        let indicesToDelete = IndexSet(store.characters.enumerated().compactMap { index, character in
+                            charactersToDelete.contains(character.id) ? index : nil
+                        })
+                        store.deleteCharacter(at: indicesToDelete)
                     }
-                }
-                .onDelete { offsets in
-                    let charactersToDelete = offsets.map { group.characters[$0].id }
-                    let indicesToDelete = IndexSet(store.characters.enumerated().compactMap { index, character in
-                        charactersToDelete.contains(character.id) ? index : nil
-                    })
-                    store.deleteCharacter(at: indicesToDelete)
-                }
-            } label: {
-                HStack {
-                    Text(group.chronicleName)
+                } header: {
+                    Text("No Chronicle")
                         .font(.headline)
                         .foregroundColor(.primary)
-                    Spacer()
-                    Text("\(group.characters.count)")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 2)
-                        .background(Color.secondary.opacity(0.2))
-                        .clipShape(Capsule())
+                }
+            } else {
+                DisclosureGroup(isExpanded: $isExpanded) {
+                    ForEach(group.characters.indices, id: \.self) { index in
+                        let characterId = group.characters[index].id
+                        if let characterIndex = store.characters.firstIndex(where: { $0.id == characterId }) {
+                            let character = store.characters[characterIndex].character
+                            let characterBinding = $store.characters[characterIndex].character
+                            let displayInfo = getCharacterDisplayInfo(character)
+                            
+                            NavigationLink(destination: CharacterDetailView(character: characterBinding, store: store)) {
+                                CharacterRow(character: character, displayInfo: displayInfo)
+                            }
+                            .swipeActions(edge: .trailing) {
+                                Button {
+                                    characterToDelete = character
+                                    showingDeleteConfirmation = true
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                                .tint(.red)
+                                
+                                if !character.isArchived {
+                                    Button {
+                                        store.archiveCharacter(character)
+                                    } label: {
+                                        Label("Archive", systemImage: "archivebox")
+                                    }
+                                    .tint(.orange)
+                                } else {
+                                    Button {
+                                        store.unarchiveCharacter(character)
+                                    } label: {
+                                        Label("Unarchive", systemImage: "archivebox.fill")
+                                    }
+                                    .tint(.green)
+                                }
+                            }
+                        }
+                    }
+                    .onDelete { offsets in
+                        let charactersToDelete = offsets.map { group.characters[$0].id }
+                        let indicesToDelete = IndexSet(store.characters.enumerated().compactMap { index, character in
+                            charactersToDelete.contains(character.id) ? index : nil
+                        })
+                        store.deleteCharacter(at: indicesToDelete)
+                    }
+                } label: {
+                    HStack {
+                        Text(group.chronicleName)
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                        Spacer()
+                        Text("\(group.characters.count)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 2)
+                            .background(Color.secondary.opacity(0.2))
+                            .clipShape(Capsule())
+                    }
                 }
             }
         }
