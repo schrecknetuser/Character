@@ -17,6 +17,7 @@ struct SphereRowView: View {
                 HStack(spacing: 8) {
                     Button(action: {
                         if sphereLevel > 0 {
+                            print("Decreasing \(sphereName) from \(sphereLevel) to \(sphereLevel - 1)")
                             sphereLevel -= 1
                             onChange?()
                         }
@@ -32,6 +33,7 @@ struct SphereRowView: View {
                     
                     Button(action: {
                         if sphereLevel < 5 {
+                            print("Increasing \(sphereName) from \(sphereLevel) to \(sphereLevel + 1)")
                             sphereLevel += 1
                             onChange?()
                         }

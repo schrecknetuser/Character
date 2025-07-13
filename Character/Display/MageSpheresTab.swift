@@ -16,12 +16,21 @@ struct MageSpheresTab: View {
                             SphereRowView(
                                 sphereName: sphere,
                                 sphereLevel: Binding(
-                                    get: { character.spheres[sphere] ?? 0 },
+                                    get: { 
+                                        let value = character.spheres[sphere] ?? 0
+                                        print("Getting \(sphere) value: \(value)")
+                                        return value
+                                    },
                                     set: { newValue in 
+                                        print("Setting \(sphere) to \(newValue)")
                                         character.spheres[sphere] = newValue
+                                        print("Character spheres now: \(character.spheres)")
                                     }
                                 ),
-                                onChange: { refresh() }
+                                onChange: { 
+                                    print("onChange called for \(sphere), calling refresh()")
+                                    refresh() 
+                                }
                             )
                         }
                     } else {
