@@ -17,8 +17,11 @@ struct MageSpheresTab: View {
                                 sphereName: sphere,
                                 sphereLevel: Binding(
                                     get: { character.spheres[sphere] ?? 0 },
-                                    set: { character.spheres[sphere] = $0 }
-                                )
+                                    set: { newValue in 
+                                        character.spheres[sphere] = newValue
+                                    }
+                                ),
+                                onChange: { refresh() }
                             )
                         }
                     } else {
@@ -65,6 +68,7 @@ struct MageSpheresTab: View {
                     }
                 }
             }
+            .id(refreshID)
             .onAppear {
                 calculateOptimalFontSize(for: geometry.size)
             }
@@ -85,5 +89,9 @@ struct MageSpheresTab: View {
         let calculatedSize = baseSize * scaleFactor
         
         dynamicFontSize = max(minSize, min(maxSize, calculatedSize))
+    }
+    
+    private func refresh() {
+        refreshID = UUID()
     }
 }
