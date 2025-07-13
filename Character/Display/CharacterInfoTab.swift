@@ -81,6 +81,102 @@ struct CharacterInfoTab: View {
                             }
                         }
                     }
+                    
+                    // Date of Birth
+                    HStack {
+                        Text("Date of Birth:")
+                            .fontWeight(.medium)
+                            .font(.system(size: dynamicFontSize))
+                        Spacer()
+                        if isEditing {
+                            DatePicker("", selection: Binding(
+                                get: { character.dateOfBirth ?? Date() },
+                                set: { character.dateOfBirth = $0 }
+                            ), displayedComponents: .date)
+                            .labelsHidden()
+                        } else {
+                            if let dateOfBirth = character.dateOfBirth {
+                                Text(dateOfBirth, style: .date)
+                                    .font(.system(size: dynamicFontSize))
+                            } else {
+                                Text("Not set")
+                                    .foregroundColor(.secondary)
+                                    .font(.system(size: dynamicFontSize))
+                            }
+                        }
+                    }
+                    
+                    // Character-specific dates
+                    if let vampire = character as? VampireCharacter {
+                        HStack {
+                            Text("Date of Embrace:")
+                                .fontWeight(.medium)
+                                .font(.system(size: dynamicFontSize))
+                            Spacer()
+                            if isEditing {
+                                DatePicker("", selection: Binding(
+                                    get: { vampire.dateOfEmbrace ?? Date() },
+                                    set: { vampire.dateOfEmbrace = $0 }
+                                ), displayedComponents: .date)
+                                .labelsHidden()
+                            } else {
+                                if let dateOfEmbrace = vampire.dateOfEmbrace {
+                                    Text(dateOfEmbrace, style: .date)
+                                        .font(.system(size: dynamicFontSize))
+                                } else {
+                                    Text("Not set")
+                                        .foregroundColor(.secondary)
+                                        .font(.system(size: dynamicFontSize))
+                                }
+                            }
+                        }
+                    } else if let ghoul = character as? GhoulCharacter {
+                        HStack {
+                            Text("Date of Ghouling:")
+                                .fontWeight(.medium)
+                                .font(.system(size: dynamicFontSize))
+                            Spacer()
+                            if isEditing {
+                                DatePicker("", selection: Binding(
+                                    get: { ghoul.dateOfGhouling ?? Date() },
+                                    set: { ghoul.dateOfGhouling = $0 }
+                                ), displayedComponents: .date)
+                                .labelsHidden()
+                            } else {
+                                if let dateOfGhouling = ghoul.dateOfGhouling {
+                                    Text(dateOfGhouling, style: .date)
+                                        .font(.system(size: dynamicFontSize))
+                                } else {
+                                    Text("Not set")
+                                        .foregroundColor(.secondary)
+                                        .font(.system(size: dynamicFontSize))
+                                }
+                            }
+                        }
+                    } else if let mage = character as? MageCharacter {
+                        HStack {
+                            Text("Date of Awakening:")
+                                .fontWeight(.medium)
+                                .font(.system(size: dynamicFontSize))
+                            Spacer()
+                            if isEditing {
+                                DatePicker("", selection: Binding(
+                                    get: { mage.dateOfAwakening ?? Date() },
+                                    set: { mage.dateOfAwakening = $0 }
+                                ), displayedComponents: .date)
+                                .labelsHidden()
+                            } else {
+                                if let dateOfAwakening = mage.dateOfAwakening {
+                                    Text(dateOfAwakening, style: .date)
+                                        .font(.system(size: dynamicFontSize))
+                                } else {
+                                    Text("Not set")
+                                        .foregroundColor(.secondary)
+                                        .font(.system(size: dynamicFontSize))
+                                }
+                            }
+                        }
+                    }
                 }
                 
                 Section(header: Text("Character Background")) {
