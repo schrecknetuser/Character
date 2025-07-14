@@ -39,6 +39,7 @@ struct CharacterDetailView: View {
         }
         
         tabs.append("Merits & Flaws")
+        tabs.append("Background")
         
         return tabs
     }
@@ -130,6 +131,13 @@ struct CharacterDetailView: View {
                             Text("Merits & Flaws")
                         }
                         .tag(3)
+                    
+                    CharacterBackgroundTab(character: activeCharacterBinding, isEditing: $isEditing)
+                        .tabItem {
+                            Image(systemName: "doc.text.fill")
+                            Text("Background")
+                        }
+                        .tag(4)
                 }
                 .gesture(
                     DragGesture()
