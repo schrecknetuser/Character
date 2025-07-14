@@ -500,6 +500,10 @@ struct CharacterInfoTab: View {
                     }
                 }
             }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                // Add bottom padding to prevent floating buttons from covering content
+                Color.clear.frame(height: UIConstants.contentBottomPadding())
+            }
             .onAppear {
                 calculateOptimalFontSize(for: geometry.size)
             }
