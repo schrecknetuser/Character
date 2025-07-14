@@ -4,6 +4,7 @@ import SwiftUI
 struct EditableAdvantagesListView: View {
     @Binding var selectedAdvantages: [Background]
     let characterType: CharacterType
+    let onRefresh: () -> Void
     @State private var showingAddAdvantage = false
     
     var body: some View {
@@ -12,7 +13,7 @@ struct EditableAdvantagesListView: View {
         }
         .foregroundColor(.accentColor)
         .sheet(isPresented: $showingAddAdvantage) {
-            AddAdvantageView(selectedAdvantages: $selectedAdvantages, characterType: characterType)
+            AddAdvantageView(selectedAdvantages: $selectedAdvantages, characterType: characterType, onRefresh: onRefresh)
         }
     }
 }
@@ -21,6 +22,7 @@ struct EditableAdvantagesListView: View {
 struct EditableFlawsListView: View {
     @Binding var selectedFlaws: [Background]
     let characterType: CharacterType
+    let onRefresh: () -> Void
     @State private var showingAddFlaw = false
     
     var body: some View {
@@ -29,7 +31,7 @@ struct EditableFlawsListView: View {
         }
         .foregroundColor(.accentColor)
         .sheet(isPresented: $showingAddFlaw) {
-            AddFlawView(selectedFlaws: $selectedFlaws, characterType: characterType)
+            AddFlawView(selectedFlaws: $selectedFlaws, characterType: characterType, onRefresh: onRefresh)
         }
     }
 }
@@ -76,7 +78,7 @@ struct AdvantagesListView: View {
             .foregroundColor(.accentColor)
         }
         .sheet(isPresented: $showingAddAdvantage) {
-            AddAdvantageView(selectedAdvantages: $selectedAdvantages, characterType: characterType)
+            AddAdvantageView(selectedAdvantages: $selectedAdvantages, characterType: characterType, onRefresh: {})
         }
     }
 }
@@ -85,6 +87,7 @@ struct AdvantagesListView: View {
 struct AddAdvantageView: View {
     @Binding var selectedAdvantages: [Background]
     let characterType: CharacterType
+    let onRefresh: () -> Void
     @Environment(\.dismiss) var dismiss
     @State private var selectedPredefined: Background?
     @State private var customName = ""
@@ -108,6 +111,8 @@ struct AddAdvantageView: View {
                             Button("Add") {
                                 let newAdvantage = Background(name: advantage.name, cost: advantage.cost, isCustom: advantage.isCustom, suitableCharacterTypes: advantage.suitableCharacterTypes)
                                 selectedAdvantages.append(newAdvantage)
+                                // Trigger refresh in parent view
+                                onRefresh()
                                 // Small delay to ensure state update is processed
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                     dismiss()
@@ -124,6 +129,8 @@ struct AddAdvantageView: View {
                     Button("Add Custom") {
                         let customAdvantage = Background(name: customName, cost: customCost, isCustom: true, suitableCharacterTypes: [characterType])
                         selectedAdvantages.append(customAdvantage)
+                        // Trigger refresh in parent view
+                        onRefresh()
                         // Small delay to ensure state update is processed
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                             dismiss()
@@ -186,7 +193,7 @@ struct FlawsListView: View {
             .foregroundColor(.accentColor)
         }
         .sheet(isPresented: $showingAddFlaw) {
-            AddFlawView(selectedFlaws: $selectedFlaws, characterType: characterType)
+            AddFlawView(selectedFlaws: $selectedFlaws, characterType: characterType, onRefresh: {})
         }
     }
 }
@@ -195,6 +202,7 @@ struct FlawsListView: View {
 struct AddFlawView: View {
     @Binding var selectedFlaws: [Background]
     let characterType: CharacterType
+    let onRefresh: () -> Void
     @Environment(\.dismiss) var dismiss
     @State private var customName = ""
     @State private var customCost = 1
@@ -216,6 +224,8 @@ struct AddFlawView: View {
                             Button("Add") {
                                 let newFlaw = Background(name: flaw.name, cost: flaw.cost, isCustom: flaw.isCustom, suitableCharacterTypes: flaw.suitableCharacterTypes)
                                 selectedFlaws.append(newFlaw)
+                                // Trigger refresh in parent view
+                                onRefresh()
                                 // Small delay to ensure state update is processed
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                     dismiss()
@@ -232,6 +242,8 @@ struct AddFlawView: View {
                     Button("Add Custom") {
                         let customFlaw = Background(name: customName, cost: -customCost, isCustom: true, suitableCharacterTypes: [characterType]) // Negative cost for flaws
                         selectedFlaws.append(customFlaw)
+                        // Trigger refresh in parent view
+                        onRefresh()
                         // Small delay to ensure state update is processed
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                             dismiss()
@@ -313,7 +325,9 @@ struct AdvantagesFlawsTab: View {
                     }
                     
                     if isEditing {
-                        EditableAdvantagesListView(selectedAdvantages: $character.advantages, characterType: character.characterType)
+                        EditableAdvantagesListView(selectedAdvantages: $character.advantages, characterType: character.characterType, onRefresh: {
+                            refreshID = UUID()
+                        })
                     }
                 }
                 
@@ -368,10 +382,13 @@ struct AdvantagesFlawsTab: View {
                     }
                     
                     if isEditing {
-                        EditableFlawsListView(selectedFlaws: $character.flaws, characterType: character.characterType)
+                        EditableFlawsListView(selectedFlaws: $character.flaws, characterType: character.characterType, onRefresh: {
+                            refreshID = UUID()
+                        })
                     }
                 }
             }
+            .id(refreshID)
             .onAppear {
                 calculateOptimalFontSizes(for: geometry.size)
             }
