@@ -199,10 +199,6 @@ struct CustomPowerCreationView<T: DisciplineCapable>: View {
     @State private var powerDescription: String = ""
     @State private var selectedLevel: Int = 1
     
-    private var discipline: V5Discipline? {
-        character.v5Disciplines.first { $0.name == disciplineName }
-    }
-    
     var body: some View {
         NavigationView {
             Form {
