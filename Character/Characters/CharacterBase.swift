@@ -20,9 +20,77 @@ enum CharacterType: String, Codable, CaseIterable {
     }
 }
 
-// MARK: - Character with Disciplines Protocol
-protocol CharacterWithDisciplines: BaseCharacter {
-    var disciplines: [String: Int] { get set }
+protocol DisciplineCapable: BaseCharacter {
+    var v5Disciplines: [V5Discipline] { get set }
+    
+    // Add a custom discipline
+    func addCustomV5Discipline(_ discipline: V5Discipline)
+    
+    // Toggle a power selection for a discipline at a specific level
+    func toggleV5Power(_ powerId: UUID, for disciplineName: String, at level: Int)
+    
+    // Get all available disciplines (standard + custom)
+    func getAllAvailableV5Disciplines() -> [V5Discipline]
+    
+    func processDisciplineChanges(original: [V5Discipline], updated: [V5Discipline], changes: inout [String])
+}
+
+extension DisciplineCapable {    
+    
+    // Add a custom discipline
+    func addCustomV5Discipline(_ discipline: V5Discipline) {
+        var customDiscipline = discipline
+        customDiscipline.isCustom = true
+        if !v5Disciplines.contains(where: { $0.name == discipline.name }) {
+            v5Disciplines.append(customDiscipline)
+        }
+    }
+    
+    // Toggle a power selection for a discipline at a specific level
+    func toggleV5Power(_ powerId: UUID, for disciplineName: String, at level: Int) {
+        if let index = v5Disciplines.firstIndex(where: { $0.name == disciplineName }) {
+            v5Disciplines[index].togglePower(powerId, at: level)
+        }
+    }
+    
+    // Get all available disciplines (standard + custom)
+    func getAllAvailableV5Disciplines() -> [V5Discipline] {
+        let standardDisciplines = V5Constants.v5Disciplines
+        let customDisciplines = v5Disciplines.filter { $0.isCustom }
+        let existingNames = Set(v5Disciplines.map(\.name))
+        
+        // Return standard disciplines that aren't already added plus all custom ones
+        let availableStandard = standardDisciplines.filter { !existingNames.contains($0.name) }
+        return availableStandard + customDisciplines
+    }
+    
+    func processDisciplineChanges(original: [V5Discipline], updated: [V5Discipline], changes: inout [String]) {
+        // Check V5 discipline changes
+        let allV5DisciplineNames = Set(original.map(\.name)).union(Set(updated.map(\.name)))
+        for disciplineName in allV5DisciplineNames {
+            let originalDiscipline = original.first { $0.name == disciplineName }
+            let updatedDiscipline = updated.first { $0.name == disciplineName }
+            
+            // Check power selection changes
+            if let orig = originalDiscipline, let upd = updatedDiscipline {
+
+                let originalPowers = orig.getAllSelectedPowerNames()
+                let updatedPowers = upd.getAllSelectedPowerNames()
+                    
+                if originalPowers != updatedPowers {
+                    let addedCount = updatedPowers.subtracting(originalPowers).count
+                    let removedCount = originalPowers.subtracting(updatedPowers).count
+                    
+                    if addedCount > 0 {
+                        changes.append("added \(updatedPowers.subtracting(originalPowers).joined(separator: ", ")) to \(disciplineName.lowercased())")
+                    }
+                    if removedCount > 0 {
+                        changes.append("removed \(originalPowers.subtracting(updatedPowers).joined(separator: ", ")) from \(disciplineName.lowercased())")
+                    }
+                }
+            }
+        }
+    }
 }
 
 // MARK: - Character with Humanity Protocol

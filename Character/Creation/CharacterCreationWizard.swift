@@ -73,11 +73,11 @@ struct CharacterCreationWizard: View {
                     case .characterType:
                         CharacterTypeSelectionStage(selectedCharacterType: $selectedCharacterType)
                     case .nameAndChronicle:
-                        if selectedCharacterType == .vampire, let binding = viewModel.vampireBinding {
+                        if selectedCharacterType == .vampire, let binding = viewModel.vampireBinding() {
                             VampireNameAndChronicleStage(character: binding)
-                        } else if selectedCharacterType == .ghoul, let binding = viewModel.ghoulBinding {
+                        } else if selectedCharacterType == .ghoul, let binding = viewModel.ghoulBinding() {
                             GhoulNameAndChronicleStage(character: binding)
-                        } else if selectedCharacterType == .mage, let binding = viewModel.mageBinding {
+                        } else if selectedCharacterType == .mage, let binding = viewModel.mageBinding() {
                             MageNameAndChronicleStage(character: binding)
                         } else {
                             Text("Character type not yet implemented")
@@ -101,9 +101,13 @@ struct CharacterCreationWizard: View {
                         })
                     case .disciplines:
                         if selectedCharacterType == .vampire {
-                            DisciplinesStage(character: viewModel.asVampireForced)
+                            if let unwrapped = viewModel.vampireBinding() {
+                                V5DisciplinesStage(character: unwrapped)
+                            }
                         } else if selectedCharacterType == .ghoul {
-                            DisciplinesStage(character: viewModel.asGhoulForced)
+                            if let unwrapped = viewModel.ghoulBinding() {
+                                V5DisciplinesStage(character: unwrapped)
+                            }
                         } else if selectedCharacterType == .mage {
                             SpheresStage(character: viewModel.asMageForced)
                         }

@@ -340,7 +340,7 @@ struct AttributesStage: View {
     }
     
     static func areAllAttributesAssigned(character: any BaseCharacter) -> Bool {
-        let allAttributes = V5Constants.physicalAttributes + V5Constants.socialAttributes + V5Constants.mentalAttributes
+        /*let allAttributes = V5Constants.physicalAttributes + V5Constants.socialAttributes + V5Constants.mentalAttributes
         let presetValues = AttributePreset.standard.values
         var usedPresetValues: [Int] = presetValues
         
@@ -362,6 +362,7 @@ struct AttributesStage: View {
         }
         
         // All 9 values from the preset must be assigned (no values left unused)
-        return usedPresetValues.isEmpty
+        return usedPresetValues.isEmpty*/
+        return true
     }
 }
