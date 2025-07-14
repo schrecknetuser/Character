@@ -43,10 +43,10 @@ struct AreteControlTests {
         
         // The model should allow values outside 0-5, but UI should prevent it
         character.arete = 6
-        #expect(character.arete == 6) // Model allows it, SphereStyleAreteView should prevent it
+        #expect(character.arete == 6) // Model allows it, SphereRowView should prevent it
         
         character.arete = -1
-        #expect(character.arete == -1) // Model allows it, SphereStyleAreteView should prevent it
+        #expect(character.arete == -1) // Model allows it, SphereRowView should prevent it
         
         // Reset to valid value
         character.arete = 3
