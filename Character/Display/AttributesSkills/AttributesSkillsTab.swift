@@ -107,6 +107,7 @@ struct AttributesSkillsTab: View {
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
+                .padding(.bottom, 140) // Add bottom padding to prevent floating buttons from covering content
                 .onAppear {
                     calculateOptimalFontSizes(for: geometry.size)
                 }

@@ -154,7 +154,7 @@ struct CharacterDetailView: View {
                 Spacer()
                 HStack {
                     Spacer()
-                    VStack(spacing: 16) {
+                    HStack(spacing: 16) {
                         // Status Button
                         Button(action: {
                             showingStatusModal = true
@@ -186,7 +186,7 @@ struct CharacterDetailView: View {
                         .accessibilityHint("Shows character data and change log")
                     }
                     .padding(.trailing, 20)
-                    .padding(.bottom, 100) // Account for tab bar
+                    .padding(.bottom, 20) // Position over tab bar area
                 }
             }
         }
