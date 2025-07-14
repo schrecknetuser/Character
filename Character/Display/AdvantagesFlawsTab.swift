@@ -92,6 +92,7 @@ struct AddAdvantageView: View {
     @State private var selectedPredefined: Background?
     @State private var customName = ""
     @State private var customCost = 1
+    @State private var customDescription = ""
     @State private var isCustom = false
     
     var filteredAdvantages: [Background] {
@@ -103,31 +104,42 @@ struct AddAdvantageView: View {
             Form {
                 Section("Predefined Merits") {
                     ForEach(filteredAdvantages) { advantage in
-                        HStack {
-                            Text(advantage.name)
-                            Spacer()
-                            Text("\(advantage.cost) pts")
-                                .foregroundColor(.secondary)
-                            Button("Add") {
-                                let newAdvantage = Background(name: advantage.name, cost: advantage.cost, isCustom: advantage.isCustom, suitableCharacterTypes: advantage.suitableCharacterTypes)
-                                selectedAdvantages.append(newAdvantage)
-                                // Trigger refresh in parent view
-                                onRefresh()
-                                // Small delay to ensure state update is processed
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    dismiss()
+                        VStack(alignment: .leading, spacing: 2) {
+                            HStack {
+                                Text(advantage.name)
+                                Spacer()
+                                Text("\(advantage.cost) pts")
+                                    .foregroundColor(.secondary)
+                                Button("Add") {
+                                    let newAdvantage = Background(name: advantage.name, cost: advantage.cost, description: advantage.description, isCustom: advantage.isCustom, suitableCharacterTypes: advantage.suitableCharacterTypes)
+                                    selectedAdvantages.append(newAdvantage)
+                                    // Trigger refresh in parent view
+                                    onRefresh()
+                                    // Small delay to ensure state update is processed
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                        dismiss()
+                                    }
                                 }
+                                .disabled(selectedAdvantages.contains { $0.name == advantage.name })
                             }
-                            .disabled(selectedAdvantages.contains { $0.name == advantage.name })
+                            if !advantage.description.isEmpty {
+                                Text(advantage.description)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(2)
+                                    .padding(.leading, 4)
+                            }
                         }
                     }
                 }
                 
                 Section("Custom Merit") {
                     TextField("Name", text: $customName)
+                    TextField("Description (optional)", text: $customDescription)
+                        .font(.caption)
                     Stepper("Cost: \(customCost)", value: $customCost, in: 1...10)
                     Button("Add Custom") {
-                        let customAdvantage = Background(name: customName, cost: customCost, isCustom: true, suitableCharacterTypes: [characterType])
+                        let customAdvantage = Background(name: customName, cost: customCost, description: customDescription, isCustom: true, suitableCharacterTypes: [characterType])
                         selectedAdvantages.append(customAdvantage)
                         // Trigger refresh in parent view
                         onRefresh()
@@ -206,6 +218,7 @@ struct AddFlawView: View {
     @Environment(\.dismiss) var dismiss
     @State private var customName = ""
     @State private var customCost = 1
+    @State private var customDescription = ""
     
     var filteredFlaws: [Background] {
         V5Constants.getFlawsForCharacterType(characterType)
@@ -216,31 +229,42 @@ struct AddFlawView: View {
             Form {
                 Section("Predefined Flaws") {
                     ForEach(filteredFlaws) { flaw in
-                        HStack {
-                            Text(flaw.name)
-                            Spacer()
-                            Text("\(abs(flaw.cost)) pts")
-                                .foregroundColor(.secondary)
-                            Button("Add") {
-                                let newFlaw = Background(name: flaw.name, cost: flaw.cost, isCustom: flaw.isCustom, suitableCharacterTypes: flaw.suitableCharacterTypes)
-                                selectedFlaws.append(newFlaw)
-                                // Trigger refresh in parent view
-                                onRefresh()
-                                // Small delay to ensure state update is processed
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    dismiss()
+                        VStack(alignment: .leading, spacing: 2) {
+                            HStack {
+                                Text(flaw.name)
+                                Spacer()
+                                Text("\(abs(flaw.cost)) pts")
+                                    .foregroundColor(.secondary)
+                                Button("Add") {
+                                    let newFlaw = Background(name: flaw.name, cost: flaw.cost, description: flaw.description, isCustom: flaw.isCustom, suitableCharacterTypes: flaw.suitableCharacterTypes)
+                                    selectedFlaws.append(newFlaw)
+                                    // Trigger refresh in parent view
+                                    onRefresh()
+                                    // Small delay to ensure state update is processed
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                        dismiss()
+                                    }
                                 }
+                                .disabled(selectedFlaws.contains { $0.name == flaw.name })
                             }
-                            .disabled(selectedFlaws.contains { $0.name == flaw.name })
+                            if !flaw.description.isEmpty {
+                                Text(flaw.description)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(2)
+                                    .padding(.leading, 4)
+                            }
                         }
                     }
                 }
                 
                 Section("Custom Flaw") {
                     TextField("Name", text: $customName)
+                    TextField("Description (optional)", text: $customDescription)
+                        .font(.caption)
                     Stepper("Value: \(customCost)", value: $customCost, in: 1...10)
                     Button("Add Custom") {
-                        let customFlaw = Background(name: customName, cost: -customCost, isCustom: true, suitableCharacterTypes: [characterType]) // Negative cost for flaws
+                        let customFlaw = Background(name: customName, cost: -customCost, description: customDescription, isCustom: true, suitableCharacterTypes: [characterType]) // Negative cost for flaws
                         selectedFlaws.append(customFlaw)
                         // Trigger refresh in parent view
                         onRefresh()
@@ -283,31 +307,41 @@ struct AdvantagesFlawsTab: View {
                             .minimumScaleFactor(0.6)
                     } else {
                         ForEach(character.advantages) { advantage in
-                            HStack {
-                                Text(advantage.name)
-                                    .font(.system(size: dynamicFontSize))
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.5)
-                                Spacer()
-                                if advantage.isCustom {
-                                    Text("(Custom)")
+                            VStack(alignment: .leading, spacing: 2) {
+                                HStack {
+                                    Text(advantage.name)
+                                        .font(.system(size: dynamicFontSize))
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.5)
+                                    Spacer()
+                                    if advantage.isCustom {
+                                        Text("(Custom)")
+                                            .font(.system(size: captionFontSize))
+                                            .foregroundColor(.orange)
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.6)
+                                    }
+                                    Text("\(advantage.cost) pts")
                                         .font(.system(size: captionFontSize))
-                                        .foregroundColor(.orange)
+                                        .foregroundColor(.secondary)
                                         .lineLimit(1)
                                         .minimumScaleFactor(0.6)
-                                }
-                                Text("\(advantage.cost) pts")
-                                    .font(.system(size: captionFontSize))
-                                    .foregroundColor(.secondary)
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.6)
-                                if isEditing {
-                                    Button("Remove") {
-                                        character.advantages.removeAll { $0.id == advantage.id }
-                                        refreshID = UUID()
+                                    if isEditing {
+                                        Button("Remove") {
+                                            character.advantages.removeAll { $0.id == advantage.id }
+                                            refreshID = UUID()
+                                        }
+                                        .font(.caption)
+                                        .foregroundColor(.red)
                                     }
-                                    .font(.caption)
-                                    .foregroundColor(.red)
+                                }
+                                if !advantage.description.isEmpty {
+                                    Text(advantage.description)
+                                        .font(.system(size: captionFontSize - 1))
+                                        .foregroundColor(.secondary)
+                                        .lineLimit(2)
+                                        .minimumScaleFactor(0.8)
+                                        .padding(.leading, 4)
                                 }
                             }
                         }
@@ -340,31 +374,41 @@ struct AdvantagesFlawsTab: View {
                             .minimumScaleFactor(0.6)
                     } else {
                         ForEach(character.flaws) { flaw in
-                            HStack {
-                                Text(flaw.name)
-                                    .font(.system(size: dynamicFontSize))
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.5)
-                                Spacer()
-                                if flaw.isCustom {
-                                    Text("(Custom)")
+                            VStack(alignment: .leading, spacing: 2) {
+                                HStack {
+                                    Text(flaw.name)
+                                        .font(.system(size: dynamicFontSize))
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.5)
+                                    Spacer()
+                                    if flaw.isCustom {
+                                        Text("(Custom)")
+                                            .font(.system(size: captionFontSize))
+                                            .foregroundColor(.orange)
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.6)
+                                    }
+                                    Text("\(abs(flaw.cost)) pts")
                                         .font(.system(size: captionFontSize))
-                                        .foregroundColor(.orange)
+                                        .foregroundColor(.secondary)
                                         .lineLimit(1)
                                         .minimumScaleFactor(0.6)
-                                }
-                                Text("\(abs(flaw.cost)) pts")
-                                    .font(.system(size: captionFontSize))
-                                    .foregroundColor(.secondary)
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.6)
-                                if isEditing {
-                                    Button("Remove") {
-                                        character.flaws.removeAll { $0.id == flaw.id }
-                                        refreshID = UUID()
+                                    if isEditing {
+                                        Button("Remove") {
+                                            character.flaws.removeAll { $0.id == flaw.id }
+                                            refreshID = UUID()
+                                        }
+                                        .font(.caption)
+                                        .foregroundColor(.red)
                                     }
-                                    .font(.caption)
-                                    .foregroundColor(.red)
+                                }
+                                if !flaw.description.isEmpty {
+                                    Text(flaw.description)
+                                        .font(.system(size: captionFontSize - 1))
+                                        .foregroundColor(.secondary)
+                                        .lineLimit(2)
+                                        .minimumScaleFactor(0.8)
+                                        .padding(.leading, 4)
                                 }
                             }
                         }

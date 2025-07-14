@@ -365,47 +365,47 @@ struct V5Constants {
     // Predefined V5 Advantages with costs
     static let predefinedAdvantages = [
         // Universal backgrounds suitable for all character types
-        Background(name: "Allies", cost: 3, suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        Background(name: "Contacts", cost: 1, suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        Background(name: "Fame", cost: 1, suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        Background(name: "Influence", cost: 2, suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        Background(name: "Resources", cost: 3, suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        Background(name: "Retainers", cost: 2, suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        Background(name: "Status", cost: 2, suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        Background(name: "Iron Will", cost: 5, suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        Background(name: "Time Sense", cost: 1, suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        Background(name: "Eidetic Memory", cost: 2, suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        Background(name: "Linguistics", cost: 1, suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        Background(name: "Allies", cost: 3, description: "Friends and supporters who provide assistance", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        Background(name: "Contacts", cost: 1, description: "Network of information sources", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        Background(name: "Fame", cost: 1, description: "Public recognition and celebrity status", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        Background(name: "Influence", cost: 2, description: "Political or social power within institutions", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        Background(name: "Resources", cost: 3, description: "Financial wealth and material assets", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        Background(name: "Retainers", cost: 2, description: "Loyal servants and subordinates", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        Background(name: "Status", cost: 2, description: "Formal rank or position in society", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        Background(name: "Iron Will", cost: 5, description: "Exceptional mental fortitude and resistance", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        Background(name: "Time Sense", cost: 1, description: "Innate ability to track time precisely", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        Background(name: "Eidetic Memory", cost: 2, description: "Perfect recall of past events and information", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        Background(name: "Linguistics", cost: 1, description: "Natural talent for learning languages", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
         
         // Vampire-specific backgrounds
-        Background(name: "Herd", cost: 3, suitableCharacterTypes: [.vampire]),
-        Background(name: "Haven", cost: 2, suitableCharacterTypes: [.vampire]),
-        Background(name: "Feeding Grounds", cost: 1, suitableCharacterTypes: [.vampire]),
-        Background(name: "Domain", cost: 2, suitableCharacterTypes: [.vampire]),
-        Background(name: "Thin-Blooded Alchemy", cost: 5, suitableCharacterTypes: [.vampire])
+        Background(name: "Herd", cost: 3, description: "Reliable group of mortal blood sources", suitableCharacterTypes: [.vampire]),
+        Background(name: "Haven", cost: 2, description: "Secure and well-equipped dwelling", suitableCharacterTypes: [.vampire]),
+        Background(name: "Feeding Grounds", cost: 1, description: "Territory rich in potential prey", suitableCharacterTypes: [.vampire]),
+        Background(name: "Domain", cost: 2, description: "Area under your control and influence", suitableCharacterTypes: [.vampire]),
+        Background(name: "Thin-Blooded Alchemy", cost: 5, description: "Knowledge of thin-blood formulae and distillation", suitableCharacterTypes: [.vampire])
     ]
     
     // Predefined V5 Flaws with costs (negative values as they give points back)
     static let predefinedFlaws = [
         // Universal flaws suitable for all character types
-        Background(name: "Enemy", cost: -1, suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        Background(name: "Dark Secret", cost: -1, suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        Background(name: "Hunted", cost: -3, suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        Background(name: "Anachronism", cost: -1, suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        Background(name: "Archaic", cost: -1, suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        Background(name: "Disgraced", cost: -2, suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        Background(name: "Shunned", cost: -1, suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        Background(name: "Suspect", cost: -2, suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        Background(name: "Enemy", cost: -1, description: "Someone who actively works against you", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        Background(name: "Dark Secret", cost: -1, description: "Hidden information that could ruin you if revealed", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        Background(name: "Hunted", cost: -3, description: "Actively pursued by dangerous individuals or groups", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        Background(name: "Anachronism", cost: -1, description: "Outdated mannerisms that mark you as old-fashioned", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        Background(name: "Archaic", cost: -1, description: "Difficulty adapting to modern technology and customs", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        Background(name: "Disgraced", cost: -2, description: "Fallen from favor and social standing", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        Background(name: "Shunned", cost: -1, description: "Rejected by certain social groups or communities", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        Background(name: "Suspect", cost: -2, description: "Under constant suspicion for past actions", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
         
         // Vampire-specific flaws
-        Background(name: "Folkloric Block", cost: -2, suitableCharacterTypes: [.vampire]),
-        Background(name: "Clan Curse", cost: -2, suitableCharacterTypes: [.vampire]),
-        Background(name: "Feeding Restriction", cost: -1, suitableCharacterTypes: [.vampire]),
-        Background(name: "Obvious Predator", cost: -2, suitableCharacterTypes: [.vampire]),
-        Background(name: "Prey Exclusion", cost: -1, suitableCharacterTypes: [.vampire]),
-        Background(name: "Stigmata", cost: -2, suitableCharacterTypes: [.vampire]),
-        Background(name: "Thin-Blooded", cost: -4, suitableCharacterTypes: [.vampire]),
-        Background(name: "Caitiff", cost: -2, suitableCharacterTypes: [.vampire])
+        Background(name: "Folkloric Block", cost: -2, description: "Bound by traditional vampire limitations", suitableCharacterTypes: [.vampire]),
+        Background(name: "Clan Curse", cost: -2, description: "Suffers from an intensified clan weakness", suitableCharacterTypes: [.vampire]),
+        Background(name: "Feeding Restriction", cost: -1, description: "Limited to specific types of blood or prey", suitableCharacterTypes: [.vampire]),
+        Background(name: "Obvious Predator", cost: -2, description: "Difficulty hiding your predatory nature", suitableCharacterTypes: [.vampire]),
+        Background(name: "Prey Exclusion", cost: -1, description: "Cannot feed on certain types of mortals", suitableCharacterTypes: [.vampire]),
+        Background(name: "Stigmata", cost: -2, description: "Bleeds constantly, leaving obvious traces", suitableCharacterTypes: [.vampire]),
+        Background(name: "Thin-Blooded", cost: -4, description: "Weak vampiric blood with reduced powers", suitableCharacterTypes: [.vampire]),
+        Background(name: "Caitiff", cost: -2, description: "Clanless vampire with no inherited abilities", suitableCharacterTypes: [.vampire])
     ]
     
     // Helper methods to filter backgrounds by character type
