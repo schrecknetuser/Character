@@ -9,6 +9,7 @@ struct V5DisciplinesStage<T: DisciplineCapable>: View {
     @State private var showingAddDiscipline = false
     @State private var selectedDiscipline: V5Discipline?
     @State private var showingDisciplineDetail = false
+    @State private var refreshID: UUID = UUID()
     
     var body: some View {
         Form {
@@ -31,7 +32,8 @@ struct V5DisciplinesStage<T: DisciplineCapable>: View {
                             discipline: discipline,
                             isEditing: true,
                             selectedDiscipline: $selectedDiscipline,
-                            showingDisciplineDetail: $showingDisciplineDetail
+                            showingDisciplineDetail: $showingDisciplineDetail,
+                            refreshID: $refreshID
                         )
                     }
                 }

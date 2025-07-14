@@ -318,6 +318,7 @@ struct V5DisciplineRowView<T: DisciplineCapable>: View {
     let isEditing: Bool
     @Binding var selectedDiscipline: V5Discipline?
     @Binding var showingDisciplineDetail: Bool
+    @Binding var refreshID: UUID
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -335,6 +336,7 @@ struct V5DisciplineRowView<T: DisciplineCapable>: View {
                 if isEditing {
                     Button(action: {
                         character.v5Disciplines.removeAll { $0.id == discipline.id }
+                        refreshID = UUID()
                     }) {
                         Image(systemName: "trash")
                             .foregroundColor(.red)
@@ -381,6 +383,7 @@ struct V5DisciplinesTab<T: DisciplineCapable>: View {
     @State private var showingAddDiscipline = false
     @State private var selectedDiscipline: V5Discipline?
     @State private var showingDisciplineDetail = false
+    @State var refreshID: UUID = UUID()
     
     var body: some View {
         Form {
@@ -399,7 +402,8 @@ struct V5DisciplinesTab<T: DisciplineCapable>: View {
                             discipline: discipline,
                             isEditing: isEditing,
                             selectedDiscipline: $selectedDiscipline,
-                            showingDisciplineDetail: $showingDisciplineDetail
+                            showingDisciplineDetail: $showingDisciplineDetail,
+                            refreshID: $refreshID
                         )
                     }
                     .onDelete(perform: isEditing ? deleteDisciplines : nil)
