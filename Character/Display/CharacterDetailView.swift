@@ -155,7 +155,7 @@ struct CharacterDetailView: View {
                 Spacer()
                 HStack {
                     Spacer()
-                    HStack(spacing: 16) {
+                    HStack(spacing: UIConstants.floatingButtonSpacing) {
                         // Status Button
                         Button(action: {
                             showingStatusModal = true
@@ -186,8 +186,8 @@ struct CharacterDetailView: View {
                         .accessibilityLabel("Data")
                         .accessibilityHint("Shows character data and change log")
                     }
-                    .padding(.trailing, 20)
-                    .padding(.bottom, geometry.safeAreaInsets.bottom + 49 + 20) // Position above tab bar: safe area + tab bar height + spacing
+                    .padding(.trailing, UIConstants.screenEdgeSpacing)
+                    .padding(.bottom, UIConstants.floatingButtonBottomPadding(safeAreaBottom: geometry.safeAreaInsets.bottom))
                 }
             }
         }

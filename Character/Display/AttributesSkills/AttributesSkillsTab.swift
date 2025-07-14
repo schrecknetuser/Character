@@ -107,8 +107,7 @@ struct AttributesSkillsTab: View {
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
-                .padding(.bottom, 145) // Add bottom padding to prevent floating buttons from covering content
-                                                // Button height (56) + spacing above button (20) + tab bar height (49) + spacing (20) = 145
+                .padding(.bottom, UIConstants.contentBottomPadding()) // Add bottom padding to prevent floating buttons from covering content
                 .onAppear {
                     calculateOptimalFontSizes(for: geometry.size)
                 }
