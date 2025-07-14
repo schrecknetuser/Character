@@ -50,20 +50,14 @@ struct MageSpheresTab: View {
                     }
                 }
                 
-                if isEditing {
-                    Section(header: Text("Arete Configuration")) {
-                        HStack {
-                            Text("Arete")
-                                .font(.system(size: dynamicFontSize))
-                            Spacer()
-                            Picker("", selection: $character.arete) {
-                                ForEach(0...5, id: \.self) { value in
-                                    Text("Level \(value)").tag(value)
-                                }
-                            }
-                            .pickerStyle(MenuPickerStyle())
-                        }
-                    }
+                Section(header: Text("Arete")) {
+                    AreteRowView(
+                        initialLevel: character.arete,
+                        onChange: { newValue in
+                            character.arete = newValue
+                        },
+                        isEditing: isEditing
+                    )
                 }
             }
             .onAppear {
