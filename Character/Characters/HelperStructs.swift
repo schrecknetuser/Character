@@ -5,12 +5,14 @@ struct Background: Identifiable, Codable, Hashable {
     var id = UUID()
     var name: String
     var cost: Int
+    var description: String = ""
     var isCustom: Bool = false
     var suitableCharacterTypes: Set<CharacterType> = Set(CharacterType.allCases)
     
-    init(name: String, cost: Int, isCustom: Bool = false, suitableCharacterTypes: Set<CharacterType> = Set(CharacterType.allCases)) {
+    init(name: String, cost: Int, description: String = "", isCustom: Bool = false, suitableCharacterTypes: Set<CharacterType> = Set(CharacterType.allCases)) {
         self.name = name
         self.cost = cost
+        self.description = description
         self.isCustom = isCustom
         self.suitableCharacterTypes = suitableCharacterTypes
     }
