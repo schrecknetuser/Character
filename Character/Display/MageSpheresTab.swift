@@ -51,7 +51,7 @@ struct MageSpheresTab: View {
                 }
                 
                 Section(header: Text("Arete")) {
-                    AreteRowView(
+                    SphereStyleAreteView(
                         initialLevel: character.arete,
                         onChange: { newValue in
                             character.arete = newValue

@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct AreteRowView: View {
+struct SphereStyleAreteView: View {
     let initialLevel: Int
     let onChange: (Int) -> Void
     let isEditing: Bool
