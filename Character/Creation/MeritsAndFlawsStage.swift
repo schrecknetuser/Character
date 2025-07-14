@@ -95,7 +95,7 @@ struct CreationMeritsListView: View {
         }
         .foregroundColor(.accentColor)
         .sheet(isPresented: $showingAddMerit) {
-            AddAdvantageView(selectedAdvantages: $selectedMerits, characterType: characterType)
+            AddAdvantageView(selectedAdvantages: $selectedMerits, characterType: characterType, onRefresh: {})
         }
     }
 }
@@ -111,7 +111,7 @@ struct CreationFlawsListView: View {
         }
         .foregroundColor(.accentColor)
         .sheet(isPresented: $showingAddFlaw) {
-            AddFlawView(selectedFlaws: $selectedFlaws, characterType: characterType)
+            AddFlawView(selectedFlaws: $selectedFlaws, characterType: characterType, onRefresh: {})
         }
     }
 }
