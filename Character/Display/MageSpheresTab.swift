@@ -63,7 +63,8 @@ struct MageSpheresTab: View {
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 // Add bottom padding to prevent floating buttons from covering content
-                Color.clear.frame(height: 140)
+                // Button height (56) + spacing above button (20) + tab bar height (49) + spacing (20) = 145
+                Color.clear.frame(height: 145)
             }
             .onAppear {
                 calculateOptimalFontSize(for: geometry.size)

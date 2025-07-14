@@ -66,8 +66,9 @@ struct CharacterDetailView: View {
     }
 
     var body: some View {
-        ZStack {
-            TabView(selection: $selectedTab) {
+        GeometryReader { geometry in
+            ZStack {
+                TabView(selection: $selectedTab) {
                 CharacterInfoTab(character: activeCharacterBinding, isEditing: $isEditing)
                     .tabItem {
                         Image(systemName: "person.fill")
@@ -186,7 +187,7 @@ struct CharacterDetailView: View {
                         .accessibilityHint("Shows character data and change log")
                     }
                     .padding(.trailing, 20)
-                    .padding(.bottom, 20) // Position over tab bar area
+                    .padding(.bottom, geometry.safeAreaInsets.bottom + 49 + 20) // Position above tab bar: safe area + tab bar height + spacing
                 }
             }
         }
