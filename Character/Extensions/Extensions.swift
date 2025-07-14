@@ -42,24 +42,19 @@ struct UIConstants {
     
     /// Spacing between buttons and tab bar
     static var buttonTabBarSpacing: CGFloat {
-        return standardMargin
+        return 5
     }
     
     // MARK: - Dynamic Calculations
     
-    /// Calculate tab bar height including safe area
-    static func tabBarHeight(safeAreaBottom: CGFloat = 0) -> CGFloat {
-        return iOSTabBarContentHeight + safeAreaBottom
-    }
-    
     /// Calculate bottom padding for content to prevent button overlap
-    static func contentBottomPadding(safeAreaBottom: CGFloat = 0) -> CGFloat {
-        return floatingButtonSize + buttonTabBarSpacing + tabBarHeight(safeAreaBottom: safeAreaBottom) + screenEdgeSpacing
+    static func contentBottomPadding() -> CGFloat {
+        return floatingButtonSize + buttonTabBarSpacing
     }
     
     /// Calculate bottom padding for floating buttons positioning
-    static func floatingButtonBottomPadding(safeAreaBottom: CGFloat) -> CGFloat {
-        return tabBarHeight(safeAreaBottom: safeAreaBottom) + buttonTabBarSpacing
+    static func floatingButtonBottomPadding() -> CGFloat {
+        return iOSTabBarContentHeight + buttonTabBarSpacing
     }
 }
 

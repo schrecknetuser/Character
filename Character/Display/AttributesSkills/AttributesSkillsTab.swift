@@ -107,7 +107,7 @@ struct AttributesSkillsTab: View {
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
-                .padding(.bottom, UIConstants.contentBottomPadding(safeAreaBottom: geometry.safeAreaInsets.bottom)) // Add bottom padding to prevent floating buttons from covering content
+                .padding(.bottom, UIConstants.contentBottomPadding()) // Add bottom padding to prevent floating buttons from covering content
                 .onAppear {
                     calculateOptimalFontSizes(for: geometry.size)
                 }
