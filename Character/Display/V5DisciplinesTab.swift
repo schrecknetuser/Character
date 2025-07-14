@@ -270,6 +270,7 @@ struct TabDisciplineRow: View {
 struct V5AddDisciplineView<T: DisciplineCapable>: View {
     @Binding var character: T
     @Environment(\.dismiss) var dismiss
+    @State private var showingCustomDisciplineCreation = false
 
     private var availableDisciplines: [V5Discipline] {
         let existingNames = Set(character.v5Disciplines.map(\.name))
@@ -290,7 +291,7 @@ struct V5AddDisciplineView<T: DisciplineCapable>: View {
 
                 Section {
                     Button("Create Custom Discipline") {
-                        // TODO: Implement custom discipline creation
+                        showingCustomDisciplineCreation = true
                     }
                     .foregroundColor(.accentColor)
                 }
@@ -302,6 +303,9 @@ struct V5AddDisciplineView<T: DisciplineCapable>: View {
                         dismiss()
                     }
                 }
+            }
+            .sheet(isPresented: $showingCustomDisciplineCreation) {
+                CustomDisciplineCreationView(character: character)
             }
         }
     }
@@ -327,6 +331,16 @@ struct V5DisciplineRowView<T: DisciplineCapable>: View {
                 Text("Level \(discipline.currentLevel())")
                     .foregroundColor(.secondary)
                     .font(.caption)
+                
+                if isEditing {
+                    Button(action: {
+                        character.v5Disciplines.removeAll { $0.id == discipline.id }
+                    }) {
+                        Image(systemName: "trash")
+                            .foregroundColor(.red)
+                    }
+                    .buttonStyle(.borderless)
+                }
                 
                 Button(action: {
                     selectedDiscipline = discipline
@@ -388,6 +402,7 @@ struct V5DisciplinesTab<T: DisciplineCapable>: View {
                             showingDisciplineDetail: $showingDisciplineDetail
                         )
                     }
+                    .onDelete(perform: isEditing ? deleteDisciplines : nil)
                 }
                 
                 if isEditing {
@@ -424,6 +439,14 @@ struct V5DisciplinesTab<T: DisciplineCapable>: View {
         }
         
         return allPowers.sorted { $0.level < $1.level }
+    }
+    
+    private func deleteDisciplines(at offsets: IndexSet) {
+        let sortedDisciplines = character.v5Disciplines.sorted(by: { $0.name < $1.name })
+        for index in offsets {
+            let disciplineToDelete = sortedDisciplines[index]
+            character.v5Disciplines.removeAll { $0.id == disciplineToDelete.id }
+        }
     }
 }
 
