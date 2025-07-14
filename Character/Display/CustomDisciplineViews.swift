@@ -12,6 +12,8 @@ struct CustomDisciplineCreationView<T: DisciplineCapable>: View {
     @State private var showingAddPowerAlert = false
     @State private var newPowerName: String = ""
     @State private var newPowerDescription: String = ""
+    @State private var showDeleteConfirmation = false
+    @State private var powerToDelete: V5DisciplinePower?
     
     var body: some View {
         NavigationView {
@@ -45,7 +47,8 @@ struct CustomDisciplineCreationView<T: DisciplineCapable>: View {
                                         .fontWeight(.medium)
                                     Spacer()
                                     Button("Remove") {
-                                        removePower(power)
+                                        showDeleteConfirmation = true
+                                        powerToDelete = power
                                     }
                                     .foregroundColor(.red)
                                     .font(.caption)
@@ -132,6 +135,21 @@ struct CustomDisciplineCreationView<T: DisciplineCapable>: View {
             } message: {
                 Text("Create a new power for level \(currentLevel)")
             }
+            .alert("Delete Power", isPresented: $showDeleteConfirmation) {
+                Button("Delete", role: .destructive) {
+                    if let power = powerToDelete {
+                        removePower(power)
+                    }
+                    powerToDelete = nil
+                }
+                Button("Cancel", role: .cancel) {
+                    powerToDelete = nil
+                }
+            } message: {
+                if let power = powerToDelete {
+                    Text("Are you sure you want to delete '\(power.name)'? This action cannot be undone.")
+                }
+            }
         }
     }
     
@@ -179,6 +197,11 @@ struct CustomPowerCreationView<T: DisciplineCapable>: View {
     
     @State private var powerName: String = ""
     @State private var powerDescription: String = ""
+    @State private var selectedLevel: Int = 1
+    
+    private var discipline: V5Discipline? {
+        character.v5Disciplines.first { $0.name == disciplineName }
+    }
     
     var body: some View {
         NavigationView {
@@ -197,12 +220,12 @@ struct CustomPowerCreationView<T: DisciplineCapable>: View {
                             .foregroundColor(.secondary)
                     }
                     
-                    HStack {
-                        Text("Level")
-                        Spacer()
-                        Text("1")
-                            .foregroundColor(.secondary)
+                    Picker("Level", selection: $selectedLevel) {
+                        ForEach(1...V5Discipline.theoreticalMaxLevel, id: \.self) { level in
+                            Text("Level \(level)").tag(level)
+                        }
                     }
+                    .pickerStyle(MenuPickerStyle())
                     
                     HStack {
                         Text("Type")
@@ -259,18 +282,18 @@ struct CustomPowerCreationView<T: DisciplineCapable>: View {
         let power = V5DisciplinePower(
             name: powerName,
             description: powerDescription.isEmpty ? "Custom power for \(disciplineName)" : powerDescription,
-            level: 1,
+            level: selectedLevel,
             isCustom: true
         )
         
         // Find the discipline in the character's list and add the power
         if let disciplineIndex = character.v5Disciplines.firstIndex(where: { $0.name == disciplineName }) {
-            character.v5Disciplines[disciplineIndex].addPower(power, level: 1)
+            character.v5Disciplines[disciplineIndex].addPower(power, level: selectedLevel)
         } else {
             // Create a new discipline instance from standard template if it exists
             if let standardDiscipline = V5Constants.getV5Discipline(named: disciplineName) {
                 var newDiscipline = standardDiscipline
-                newDiscipline.addPower(power, level: 1)
+                newDiscipline.addPower(power, level: selectedLevel)
                 character.v5Disciplines.append(newDiscipline)
             }
         }

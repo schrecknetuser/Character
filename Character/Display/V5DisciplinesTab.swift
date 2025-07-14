@@ -96,7 +96,6 @@ struct V5DisciplineDetailView<T: DisciplineCapable>: View {
     @Environment(\.dismiss) var dismiss
     @State var refreshID: UUID = UUID()
     @State private var showingCustomPowerCreation = false
-    @State private var selectedLevelForCustomPower = 1
 
     private var discipline: V5Discipline? {
         character.v5Disciplines.first { $0.name == disciplineName }
@@ -119,7 +118,6 @@ struct V5DisciplineDetailView<T: DisciplineCapable>: View {
                     if isEditing {
                         CustomPowerSectionView(
                             discipline: discipline,
-                            selectedLevel: $selectedLevelForCustomPower,
                             showingCustomPowerCreation: $showingCustomPowerCreation
                         )
                     }
@@ -188,24 +186,14 @@ struct PowerLevelSectionView<T: DisciplineCapable>: View {
 
 struct CustomPowerSectionView: View {
     let discipline: V5Discipline
-    @Binding var selectedLevel: Int
     @Binding var showingCustomPowerCreation: Bool
 
     var body: some View {
         Section("Custom Powers") {
-
-            Picker("Level for Custom Power", selection: $selectedLevel) {
-                ForEach(1...V5Discipline.theoreticalMaxLevel, id: \.self) { level in
-                    Text("Level \(level)").tag(level)
-                }
-            }
-            .pickerStyle(MenuPickerStyle())
-
-            Button("Add Custom Power to Level \(selectedLevel)") {
+            Button("Add Custom Power") {
                 showingCustomPowerCreation = true
             }
             .foregroundColor(.accentColor)
-
         }
     }
 }
