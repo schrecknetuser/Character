@@ -2,19 +2,17 @@ import SwiftUI
 
 
 // MARK: - Ghoul
-class GhoulCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHumanity {
-    @Published var humanity: Int
-    @Published var disciplines: [String: Int]
-    @Published var v5Disciplines: [V5Discipline] = []
+class GhoulCharacter:CharacterBase, DisciplineCapable, CharacterWithHumanity {
+    @Published var humanity: Int    
     @Published var humanityStates: [HumanityState]
     @Published var dateOfGhouling: Date? = nil
+    @Published var v5Disciplines: [V5Discipline] = []
 
     enum CodingKeys: String, CodingKey {
         case humanity, disciplines, v5Disciplines, humanityStates, dateOfGhouling
     }
 
     override init(characterType: CharacterType = .ghoul) {
-        self.disciplines = [:]
         self.v5Disciplines = []
         
         let defaultHumanity: Int = 7
@@ -35,7 +33,6 @@ class GhoulCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHuma
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.humanity = try container.decode(Int.self, forKey: .humanity)
-        self.disciplines = try container.decode([String: Int].self, forKey: .disciplines)
         self.v5Disciplines = try container.decodeIfPresent([V5Discipline].self, forKey: .v5Disciplines) ?? []
         self.humanityStates = try container.decode([HumanityState].self, forKey: .humanityStates)
         self.dateOfGhouling = try container.decodeIfPresent(Date.self, forKey: .dateOfGhouling)
@@ -46,7 +43,6 @@ class GhoulCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHuma
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(humanity, forKey: .humanity)
-        try container.encode(disciplines, forKey: .disciplines)
         try container.encode(v5Disciplines, forKey: .v5Disciplines)
         try container.encode(humanityStates, forKey: .humanityStates)
         try container.encodeIfPresent(dateOfGhouling, forKey: .dateOfGhouling)
@@ -107,49 +103,8 @@ class GhoulCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHuma
             changes.append("spent experience \(self.spentExperience)→\(other.spentExperience)")
         }
         
-        // Check discipline changes
-        let allDisciplines = Set(self.disciplines.keys).union(Set(other.disciplines.keys))
-        for discipline in allDisciplines {
-            let originalVal = self.disciplines[discipline] ?? 0
-            let updatedVal = other.disciplines[discipline] ?? 0
-            if originalVal != updatedVal {
-                changes.append("\(discipline.lowercased()) \(originalVal)→\(updatedVal)")
-            }
-        }
-        
         // Check V5 discipline changes
-        let allV5DisciplineNames = Set(self.v5Disciplines.map(\.name)).union(Set(other.v5Disciplines.map(\.name)))
-        for disciplineName in allV5DisciplineNames {
-            let originalDiscipline = self.v5Disciplines.first { $0.name == disciplineName }
-            let updatedDiscipline = other.v5Disciplines.first { $0.name == disciplineName }
-            
-            // Check level changes
-            let originalLevel = originalDiscipline?.currentLevel ?? 0
-            let updatedLevel = updatedDiscipline?.currentLevel ?? 0
-            if originalLevel != updatedLevel {
-                changes.append("\(disciplineName.lowercased()) level \(originalLevel)→\(updatedLevel)")
-            }
-            
-            // Check power selection changes
-            if let orig = originalDiscipline, let upd = updatedDiscipline {
-                for level in 1...max(orig.currentLevel, upd.currentLevel) {
-                    let originalPowers = orig.getSelectedPowers(for: level)
-                    let updatedPowers = upd.getSelectedPowers(for: level)
-                    
-                    if originalPowers != updatedPowers {
-                        let addedCount = updatedPowers.subtracting(originalPowers).count
-                        let removedCount = originalPowers.subtracting(updatedPowers).count
-                        
-                        if addedCount > 0 {
-                            changes.append("\(disciplineName.lowercased()) level \(level): +\(addedCount) powers")
-                        }
-                        if removedCount > 0 {
-                            changes.append("\(disciplineName.lowercased()) level \(level): -\(removedCount) powers")
-                        }
-                    }
-                }
-            }
-        }
+        processDisciplineChanges(original: self.v5Disciplines, updated: other.v5Disciplines, changes: &changes)
         
         //Check specialisations
         processSpecializationChanges(original: self.specializations, updated: other.specializations, changes: &changes)
@@ -172,7 +127,6 @@ class GhoulCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHuma
         // Copy Ghoul-specific properties
         copy.humanity = self.humanity
         copy.humanityStates = self.humanityStates
-        copy.disciplines = self.disciplines
         copy.v5Disciplines = self.v5Disciplines
         copy.dateOfGhouling = self.dateOfGhouling
 
@@ -180,17 +134,6 @@ class GhoulCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHuma
     }
     
     // MARK: - V5 Discipline Helper Methods
-    
-    // Get all available disciplines (standard + custom)
-    func getAllAvailableV5Disciplines() -> [V5Discipline] {
-        let standardDisciplines = V5Constants.v5Disciplines
-        let customDisciplines = v5Disciplines.filter { $0.isCustom }
-        let existingNames = Set(v5Disciplines.map(\.name))
-        
-        // Return standard disciplines that aren't already added plus all custom ones
-        let availableStandard = standardDisciplines.filter { !existingNames.contains($0.name) }
-        return availableStandard + customDisciplines
-    }
     
     // Get a specific discipline by name
     func getV5Discipline(named name: String) -> V5Discipline? {
@@ -207,30 +150,9 @@ class GhoulCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHuma
         return v5Disciplines.first { $0.name == disciplineName }
     }
     
-    // Add or update a V5 discipline level
-    func setV5DisciplineLevel(_ disciplineName: String, to level: Int) {
-        if let index = v5Disciplines.firstIndex(where: { $0.name == disciplineName }) {
-            v5Disciplines[index].currentLevel = level
-        } else {
-            // Create new discipline from template
-            if let template = V5Constants.v5Disciplines.first(where: { $0.name == disciplineName }) {
-                var newDiscipline = template
-                newDiscipline.currentLevel = level
-                v5Disciplines.append(newDiscipline)
-            }
-        }
-    }
-    
     // Remove a V5 discipline
     func removeV5Discipline(_ disciplineName: String) {
         v5Disciplines.removeAll { $0.name == disciplineName }
-    }
-    
-    // Toggle a power selection for a discipline at a specific level
-    func toggleV5Power(_ powerId: UUID, for disciplineName: String, at level: Int) {
-        if let index = v5Disciplines.firstIndex(where: { $0.name == disciplineName }) {
-            v5Disciplines[index].togglePower(powerId, at: level)
-        }
     }
     
     // Get selected powers for a discipline at a specific level
@@ -249,26 +171,5 @@ class GhoulCharacter: CharacterBase, CharacterWithDisciplines, CharacterWithHuma
     var isUsingV5Disciplines: Bool {
         return !v5Disciplines.isEmpty
     }
-    
-    // Migrate legacy disciplines to V5 format
-    func migrateLegacyDisciplinesToV5() {
-        for (disciplineName, level) in disciplines {
-            if !v5Disciplines.contains(where: { $0.name == disciplineName }) {
-                if let template = V5Constants.v5Disciplines.first(where: { $0.name == disciplineName }) {
-                    var newDiscipline = template
-                    newDiscipline.currentLevel = level
-                    v5Disciplines.append(newDiscipline)
-                }
-            }
-        }
-    }
-    
-    // Add a custom discipline
-    func addCustomV5Discipline(_ discipline: V5Discipline) {
-        var customDiscipline = discipline
-        customDiscipline.isCustom = true
-        if !v5Disciplines.contains(where: { $0.name == discipline.name }) {
-            v5Disciplines.append(customDiscipline)
-        }
-    }
+        
 }

@@ -2,12 +2,12 @@ import SwiftUI
 
 // V5 Discipline Powers View for a specific level
 struct V5DisciplinePowersView: View {
-    let disciplineName: String
     let level: Int
     let powers: [V5DisciplinePower]
     let selectedPowerIds: Set<UUID>
     let isEditing: Bool
     let onPowerToggle: (UUID) -> Void
+    @Binding var refreshID: UUID
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -21,7 +21,10 @@ struct V5DisciplinePowersView: View {
                         power: power,
                         isSelected: selectedPowerIds.contains(power.id),
                         isEditing: isEditing,
-                        onToggle: { onPowerToggle(power.id) }
+                        onToggle: {
+                            onPowerToggle(power.id)
+                        },
+                        refreshID: $refreshID
                     )
                 }
             }
@@ -36,6 +39,7 @@ struct V5PowerRowView: View {
     let isEditing: Bool
     let onToggle: () -> Void
     @State private var showingDescription = false
+    @Binding var refreshID: UUID
     
     var body: some View {
         HStack(alignment: .top) {
@@ -85,94 +89,43 @@ struct V5PowerRowView: View {
     }
 }
 
-// V5 Discipline Detail View
 struct V5DisciplineDetailView<T: DisciplineCapable>: View {
     @Binding var character: T
-    let disciplineName: String
-    @Binding var isEditing: Bool
+    var disciplineName: String
+    var isEditing: Bool
     @Environment(\.dismiss) var dismiss
     @State var refreshID: UUID = UUID()
     @State private var showingCustomPowerCreation = false
     @State private var selectedLevelForCustomPower = 1
-    
+
     private var discipline: V5Discipline? {
         character.v5Disciplines.first { $0.name == disciplineName }
     }
-    
+
     var body: some View {
         NavigationView {
             Form {
                 if let discipline = discipline {
-                    // Level selector
-                    if isEditing {
-                        Section("Discipline Level") {
-                            Picker("Level", selection: Binding(
-                                get: { discipline.currentLevel },
-                                set: { newLevel in
-                                    character.setV5DisciplineLevel(disciplineName, to: newLevel)
-                                }
-                            )) {
-                                ForEach(0...5, id: \.self) { level in
-                                    Text("Level \(level)").tag(level)
-                                }
-                            }
-                            .pickerStyle(SegmentedPickerStyle())
-                        }
-                    } else {
-                        Section {
-                            HStack {
-                                Text("Discipline Level")
-                                Spacer()
-                                Text("\(discipline.currentLevel)")
-                                    .foregroundColor(.secondary)
-                            }
-                        }
+                    ForEach(discipline.getLevels(), id: \.self) { level in
+                        PowerLevelSectionView(
+                            character: $character,
+                            level: level,
+                            discipline: discipline,
+                            isEditing: isEditing,
+                            refreshID: $refreshID
+                        )
                     }
-                    
-                    // Powers for each level
-                    ForEach(1...discipline.currentLevel, id: \.self) { level in
-                        Section("Level \(level) Powers") {
-                            V5DisciplinePowersView(
-                                disciplineName: disciplineName,
-                                level: level,
-                                powers: discipline.getPowers(for: level),
-                                selectedPowerIds: discipline.getSelectedPowers(for: level),
-                                isEditing: isEditing,
-                                onPowerToggle: { powerId in
-                                    character.toggleV5Power(powerId, for: disciplineName, at: level)
-                                    refreshID = UUID()
-                                }
-                            )
-                        }
-                    }
-                    
-                    // Add custom power section if editing
+
                     if isEditing {
-                        Section("Custom Powers") {
-                            if discipline.currentLevel > 0 {
-                                Picker("Level for Custom Power", selection: $selectedLevelForCustomPower) {
-                                    ForEach(1...discipline.currentLevel, id: \.self) { level in
-                                        Text("Level \(level)").tag(level)
-                                    }
-                                }
-                                .pickerStyle(MenuPickerStyle())
-                                
-                                Button("Add Custom Power to Level \(selectedLevelForCustomPower)") {
-                                    showingCustomPowerCreation = true
-                                }
-                                .foregroundColor(.accentColor)
-                            } else {
-                                Text("Increase discipline level to add custom powers")
-                                    .foregroundColor(.secondary)
-                                    .font(.caption)
-                            }
-                        }
+                        CustomPowerSectionView(
+                            discipline: discipline,
+                            selectedLevel: $selectedLevelForCustomPower,
+                            showingCustomPowerCreation: $showingCustomPowerCreation
+                        )
                     }
                 } else {
-                    Section {
-                        Text("Discipline not found")
-                            .foregroundColor(.secondary)
-                    }
+                    Text("Discipline not found")
+                        .foregroundColor(.secondary)
                 }
             }
             .navigationTitle(disciplineName)
@@ -186,69 +139,155 @@ struct V5DisciplineDetailView<T: DisciplineCapable>: View {
             .sheet(isPresented: $showingCustomPowerCreation) {
                 CustomPowerCreationView(
                     disciplineName: disciplineName,
-                    level: selectedLevelForCustomPower,
                     character: character
                 )
-            }
-            .onAppear {
-                // Set default level for custom power creation
-                if let discipline = discipline, discipline.currentLevel > 0 {
-                    selectedLevelForCustomPower = discipline.currentLevel
-                }
             }
         }
     }
 }
 
+
+struct DisciplineHeaderSectionView: View {
+    let discipline: V5Discipline
+
+    var body: some View {
+        Section {
+            HStack {
+                Text("Discipline Level")
+                Spacer()
+                Text("\(discipline.currentLevel())")
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+}
+
+struct PowerLevelSectionView<T: DisciplineCapable>: View {
+    @Binding var character: T
+    let level: Int
+    let discipline: V5Discipline
+    let isEditing: Bool
+    @Binding var refreshID: UUID
+
+    var body: some View {
+        Section("Level \(level) Powers") {
+            V5DisciplinePowersView(
+                level: level,
+                powers: discipline.getPowers(for: level),
+                selectedPowerIds: discipline.getSelectedPowers(for: level),
+                isEditing: isEditing,
+                onPowerToggle: { powerId in
+                    character.toggleV5Power(powerId, for: discipline.name, at: level)
+                    refreshID = UUID()
+                },
+                refreshID: $refreshID,
+            )
+        }
+    }
+}
+
+struct CustomPowerSectionView: View {
+    let discipline: V5Discipline
+    @Binding var selectedLevel: Int
+    @Binding var showingCustomPowerCreation: Bool
+
+    var body: some View {
+        Section("Custom Powers") {
+
+            Picker("Level for Custom Power", selection: $selectedLevel) {
+                ForEach(1...V5Discipline.theoreticalMaxLevel, id: \.self) { level in
+                    Text("Level \(level)").tag(level)
+                }
+            }
+            .pickerStyle(MenuPickerStyle())
+
+            Button("Add Custom Power to Level \(selectedLevel)") {
+                showingCustomPowerCreation = true
+            }
+            .foregroundColor(.accentColor)
+
+        }
+    }
+}
+
+struct AvailableDisciplinesSection: View {
+    let disciplines: [V5Discipline]
+    let onAdd: (V5Discipline) -> Void
+
+    var body: some View {
+        Section("Available V5 Disciplines") {
+            ForEach(disciplines) { discipline in
+                TabDisciplineRow(discipline: discipline, onAdd: onAdd)
+            }
+        }
+    }
+}
+
+struct TabDisciplineRow: View {
+    let discipline: V5Discipline
+    let onAdd: (V5Discipline) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(discipline.name)
+                    .font(.headline)
+                Spacer()
+
+                if discipline.isCustom {
+                    Text("Custom")
+                        .font(.caption2)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.orange.opacity(0.2))
+                        .foregroundColor(.orange)
+                        .cornerRadius(4)
+                }
+
+                Button("Add") {
+                    onAdd(discipline)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.small)
+            }
+
+            let level1Powers = discipline.getPowers(for: 1)
+            if !level1Powers.isEmpty {
+                Text("Level 1 Powers: \(level1Powers.map { $0.name }.joined(separator: ", "))")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+
+
+
+
 // V5 Add Discipline View
 struct V5AddDisciplineView<T: DisciplineCapable>: View {
     @Binding var character: T
     @Environment(\.dismiss) var dismiss
-    
+
     private var availableDisciplines: [V5Discipline] {
         let existingNames = Set(character.v5Disciplines.map(\.name))
-        return character.getAllAvailableV5Disciplines().filter { !existingNames.contains($0.name) }
+        return character.getAllAvailableV5Disciplines()
+            .filter { !existingNames.contains($0.name) }
     }
-    
+
     var body: some View {
         NavigationView {
             Form {
-                Section("Available V5 Disciplines") {
-                    ForEach(availableDisciplines) { discipline in
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack {
-                                Text(discipline.name)
-                                    .font(.headline)
-                                Spacer()
-                                if discipline.isCustom {
-                                    Text("Custom")
-                                        .font(.caption2)
-                                        .padding(.horizontal, 6)
-                                        .padding(.vertical, 2)
-                                        .background(Color.orange.opacity(0.2))
-                                        .foregroundColor(.orange)
-                                        .cornerRadius(4)
-                                }
-                                Button("Add") {
-                                    character.setV5DisciplineLevel(discipline.name, to: 1)
-                                    dismiss()
-                                }
-                                .buttonStyle(.borderedProminent)
-                                .controlSize(.small)
-                            }
-                            
-                            // Show level 1 powers preview
-                            let level1Powers = discipline.getPowers(for: 1)
-                            if !level1Powers.isEmpty {
-                                Text("Level 1 Powers: \(level1Powers.map { $0.name }.joined(separator: ", "))")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                        .padding(.vertical, 4)
+                AvailableDisciplinesSection(
+                    disciplines: availableDisciplines,
+                    onAdd: { discipline in
+                        character.v5Disciplines.append(discipline)
+                        dismiss()
                     }
-                }
-                
+                )
+
                 Section {
                     Button("Create Custom Discipline") {
                         // TODO: Implement custom discipline creation
@@ -268,40 +307,69 @@ struct V5AddDisciplineView<T: DisciplineCapable>: View {
     }
 }
 
+
+struct V5DisciplineRowView<T: DisciplineCapable>: View {
+    @Binding var character: T
+    let discipline: V5Discipline
+    let isEditing: Bool
+    @Binding var selectedDiscipline: V5Discipline?
+    @Binding var showingDisciplineDetail: Bool
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(discipline.name)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                Spacer()
+                
+                
+                Text("Level \(discipline.currentLevel())")
+                    .foregroundColor(.secondary)
+                    .font(.caption)
+                
+                Button(action: {
+                    selectedDiscipline = discipline
+                    showingDisciplineDetail = true
+                }) {
+                    Image(systemName: "info.circle")
+                        .foregroundColor(.accentColor)
+                }
+            }
+            
+            let allSelectedPowers = getAllSelectedPowers(for: discipline)
+            if !allSelectedPowers.isEmpty {
+                ForEach(allSelectedPowers, id: \.id) { power in
+                    PowerRowView(power: power)
+                        .padding(.leading, 8)
+                }
+            }
+        }
+        .padding(.vertical, 2)
+    }
+    
+    private func getAllSelectedPowers(for discipline: V5Discipline) -> [V5DisciplinePower] {
+        var allPowers: [V5DisciplinePower] = []
+        for level in discipline.getLevels() {
+            let selectedIds = discipline.getSelectedPowers(for: level)
+            let levelPowers = discipline.getPowers(for: level)
+            let selectedPowers = levelPowers.filter { selectedIds.contains($0.id) }
+            allPowers.append(contentsOf: selectedPowers)
+        }
+        return allPowers.sorted { $0.level < $1.level }
+    }
+}
+
 // V5 Disciplines Tab
 struct V5DisciplinesTab<T: DisciplineCapable>: View {
     @Binding var character: T
     @Binding var isEditing: Bool
     @State private var showingAddDiscipline = false
-    @State private var selectedDiscipline: String?
+    @State private var selectedDiscipline: V5Discipline?
     @State private var showingDisciplineDetail = false
-    @State private var showingMigrationAlert = false
     
     var body: some View {
         Form {
-            // Migration section for legacy disciplines
-            if !character.disciplines.isEmpty && character.v5Disciplines.isEmpty {
-                Section {
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Image(systemName: "arrow.up.circle.fill")
-                                .foregroundColor(.blue)
-                            Text("Upgrade to V5 Disciplines")
-                                .font(.headline)
-                        }
-                        
-                        Text("You have legacy disciplines. Upgrade to V5 format to access individual powers and enhanced features.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        
-                        Button("Upgrade Now") {
-                            character.migrateLegacyDisciplinesToV5()
-                        }
-                        .buttonStyle(.borderedProminent)
-                    }
-                    .padding(.vertical, 4)
-                }
-            }
             
             // V5 Disciplines section
             Section(header: Text("V5 Disciplines")) {
@@ -309,55 +377,16 @@ struct V5DisciplinesTab<T: DisciplineCapable>: View {
                     Text("No V5 disciplines learned")
                         .foregroundColor(.secondary)
                 } else {
-                    ForEach(character.v5Disciplines.sorted(by: { $0.name < $1.name })) { discipline in
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack {
-                                Text(discipline.name)
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                                Spacer()
-                                
-                                if isEditing {
-                                    Picker("", selection: Binding(
-                                        get: { discipline.currentLevel },
-                                        set: { newLevel in
-                                            if newLevel == 0 {
-                                                character.removeV5Discipline(discipline.name)
-                                            } else {
-                                                character.setV5DisciplineLevel(discipline.name, to: newLevel)
-                                            }
-                                        }
-                                    )) {
-                                        ForEach(0...5, id: \.self) { level in
-                                            Text("Level \(level)").tag(level)
-                                        }
-                                    }
-                                    .pickerStyle(MenuPickerStyle())
-                                } else {
-                                    Text("Level \(discipline.currentLevel)")
-                                        .foregroundColor(.secondary)
-                                        .font(.caption)
-                                }
-                                
-                                Button(action: {
-                                    selectedDiscipline = discipline.name
-                                    showingDisciplineDetail = true
-                                }) {
-                                    Image(systemName: "info.circle")
-                                        .foregroundColor(.accentColor)
-                                }
-                            }
-                            
-                            // Show selected powers as a list
-                            let allSelectedPowers = getAllSelectedPowers(for: discipline)
-                            if !allSelectedPowers.isEmpty {
-                                ForEach(allSelectedPowers, id: \.id) { power in
-                                    PowerRowView(power: power)
-                                        .padding(.leading, 8)
-                                }
-                            }
-                        }
-                        .padding(.vertical, 2)
+                    let sortedDisciplines: [V5Discipline] = character.v5Disciplines.sorted(by: { $0.name < $1.name })
+                    
+                    ForEach(sortedDisciplines) { discipline in
+                        V5DisciplineRowView(
+                            character: $character,
+                            discipline: discipline,
+                            isEditing: isEditing,
+                            selectedDiscipline: $selectedDiscipline,
+                            showingDisciplineDetail: $showingDisciplineDetail
+                        )
                     }
                 }
                 
@@ -368,32 +397,17 @@ struct V5DisciplinesTab<T: DisciplineCapable>: View {
                     .foregroundColor(.accentColor)
                 }
             }
-            
-            // Legacy disciplines section (if any remain)
-            if !character.disciplines.isEmpty {
-                Section(header: Text("Legacy Disciplines")) {
-                    ForEach(character.disciplines.sorted(by: { $0.key < $1.key }), id: \.key) { discipline, level in
-                        HStack {
-                            Text(discipline)
-                                .foregroundColor(.secondary)
-                            Spacer()
-                            Text("Level \(level)")
-                                .foregroundColor(.secondary)
-                                .font(.caption)
-                        }
-                    }
-                }
-            }
+                        
         }
         .sheet(isPresented: $showingAddDiscipline) {
             V5AddDisciplineView(character: $character)
         }
         .sheet(isPresented: $showingDisciplineDetail) {
-            if let disciplineName = selectedDiscipline {
+            if let selected = selectedDiscipline {
                 V5DisciplineDetailView(
                     character: $character,
-                    disciplineName: disciplineName,
-                    isEditing: $isEditing
+                    disciplineName: selected.name,
+                    isEditing: isEditing
                 )
             }
         }
@@ -402,7 +416,7 @@ struct V5DisciplinesTab<T: DisciplineCapable>: View {
     // Helper function to get all selected powers for a discipline
     private func getAllSelectedPowers(for discipline: V5Discipline) -> [V5DisciplinePower] {
         var allPowers: [V5DisciplinePower] = []
-        for level in 1...discipline.currentLevel {
+        for level in 1...discipline.currentLevel() {
             let selectedIds = discipline.getSelectedPowers(for: level)
             let levelPowers = discipline.getPowers(for: level)
             let selectedPowers = levelPowers.filter { selectedIds.contains($0.id) }

@@ -112,14 +112,24 @@ struct V5Discipline: Identifiable, Codable, Hashable {
     var name: String
     var powers: [Int: [V5DisciplinePower]] // Level -> Powers
     var isCustom: Bool = false
-    var currentLevel: Int = 0
-    var selectedPowers: [Int: Set<UUID>] = [:] // Level -> Selected Power IDs
+    var selectedPowers: [Int: [V5DisciplinePower]] = [:] // Level -> Selected Power IDs
+    var allowAllLevels: Bool = false
     
-    init(name: String, powers: [Int: [V5DisciplinePower]] = [:], isCustom: Bool = false, currentLevel: Int = 0) {
+    static var theoreticalMaxLevel = 10
+    
+    init(name: String, powers: [Int: [V5DisciplinePower]] = [:], isCustom: Bool = false, allowAllLevels: Bool = false) {
         self.name = name
         self.powers = powers
         self.isCustom = isCustom
-        self.currentLevel = currentLevel
+        self.allowAllLevels = allowAllLevels
+    }
+    
+    func getLevels() -> [Int] {
+        return Array(powers.keys).sorted()
+    }
+    
+    func isLevelAvailable(_ level: Int) -> Bool {
+        return allowAllLevels || level <= currentLevel() + 1
     }
     
     // Get all powers for a specific level
@@ -128,39 +138,42 @@ struct V5Discipline: Identifiable, Codable, Hashable {
     }
     
     // Add a power to a specific level
-    mutating func addPower(_ power: V5DisciplinePower, to level: Int) {
+    mutating func addPower(_ power: V5DisciplinePower, level: Int) {
         if powers[level] == nil {
             powers[level] = []
         }
         powers[level]?.append(power)
     }
+
     
-    // Check if a power is selected at a specific level
-    func isPowerSelected(_ powerId: UUID, at level: Int) -> Bool {
-        return selectedPowers[level]?.contains(powerId) ?? false
+    func currentLevel() -> Int {
+        return selectedPowers.values.flatMap { $0.map(\.id) }.count
     }
     
     // Toggle selection of a power at a specific level
     mutating func togglePower(_ powerId: UUID, at level: Int) {
         if selectedPowers[level] == nil {
-            selectedPowers[level] = Set<UUID>()
+            selectedPowers[level] = []
         }
         
-        if selectedPowers[level]!.contains(powerId) {
-            selectedPowers[level]!.remove(powerId)
+        if selectedPowers[level]!.contains(where: { $0.id == powerId }) {
+            selectedPowers[level]!.removeAll(where: { $0.id == powerId} )
         } else {
-            selectedPowers[level]!.insert(powerId)
+            var power = powers[level]!.first(where: { $0.id == powerId })!
+            selectedPowers[level]!.append(power)
         }
     }
     
     // Get selected power IDs for a specific level
     func getSelectedPowers(for level: Int) -> Set<UUID> {
-        return selectedPowers[level] ?? Set<UUID>()
+        if selectedPowers[level] == nil {
+            return Set<UUID>()
+        }
+        return Set(selectedPowers[level]!.map { $0.id })
     }
     
-    // Get all accessible levels (1 through current level)
-    func getAccessibleLevels() -> [Int] {
-        return Array(1...max(1, currentLevel))
+    func getAllSelectedPowerNames() -> Set<String> {
+        return Set(selectedPowers.values.flatMap { $0.map(\.name) })
     }
 }
 

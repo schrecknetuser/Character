@@ -174,7 +174,6 @@ struct CustomDisciplineCreationView<T: DisciplineCapable>: View {
 // Custom Power Creation View (for existing disciplines)
 struct CustomPowerCreationView<T: DisciplineCapable>: View {
     let disciplineName: String
-    let level: Int
     @ObservedObject var character: T
     @Environment(\.dismiss) var dismiss
     
@@ -201,7 +200,7 @@ struct CustomPowerCreationView<T: DisciplineCapable>: View {
                     HStack {
                         Text("Level")
                         Spacer()
-                        Text("\(level)")
+                        Text("1")
                             .foregroundColor(.secondary)
                     }
                     
@@ -260,18 +259,18 @@ struct CustomPowerCreationView<T: DisciplineCapable>: View {
         let power = V5DisciplinePower(
             name: powerName,
             description: powerDescription.isEmpty ? "Custom power for \(disciplineName)" : powerDescription,
-            level: level,
+            level: 1,
             isCustom: true
         )
         
         // Find the discipline in the character's list and add the power
         if let disciplineIndex = character.v5Disciplines.firstIndex(where: { $0.name == disciplineName }) {
-            character.v5Disciplines[disciplineIndex].addPower(power, to: level)
+            character.v5Disciplines[disciplineIndex].addPower(power, level: 1)
         } else {
             // Create a new discipline instance from standard template if it exists
             if let standardDiscipline = V5Constants.getV5Discipline(named: disciplineName) {
                 var newDiscipline = standardDiscipline
-                newDiscipline.addPower(power, to: level)
+                newDiscipline.addPower(power, level: 1)
                 character.v5Disciplines.append(newDiscipline)
             }
         }
@@ -281,7 +280,7 @@ struct CustomPowerCreationView<T: DisciplineCapable>: View {
 }
 
 // Enhanced V5 Add Discipline View with Custom Creation
-struct EnhancedV5AddDisciplineView: View {
+/*struct EnhancedV5AddDisciplineView: View {
     @Binding var character: VampireCharacter
     @Environment(\.dismiss) var dismiss
     @State private var showingCustomCreation = false
@@ -334,7 +333,7 @@ struct EnhancedV5AddDisciplineView: View {
             }
         }
     }
-}
+}*/
 
 // Helper view for discipline rows
 struct DisciplineRow: View {

@@ -58,32 +58,38 @@ class CharacterCreationViewModel: ObservableObject {
 
     // MARK: - SwiftUI Bindings
 
-    var vampireBinding: Binding<VampireCharacter>? {
-        guard let vampire = character as? VampireCharacter else { return nil }
+    func vampireBinding() -> Binding<VampireCharacter>? {
+        guard let _ = character as? VampireCharacter else { return nil }
         return Binding(
-            get: { vampire },
-            set: { [weak self] newValue in
-                self?.character = newValue
+            get: {
+                self.character as! VampireCharacter
+            },
+            set: {
+                self.character = $0
             }
         )
     }
-
-    var ghoulBinding: Binding<GhoulCharacter>? {
-        guard let ghoul = character as? GhoulCharacter else { return nil }
+    
+    func ghoulBinding() -> Binding<GhoulCharacter>? {
+        guard let _ = character as? GhoulCharacter else { return nil }
         return Binding(
-            get: { ghoul },
-            set: { [weak self] newValue in
-                self?.character = newValue
+            get: {
+                self.character as! GhoulCharacter
+            },
+            set: {
+                self.character = $0
             }
         )
     }
-
-    var mageBinding: Binding<MageCharacter>? {
-        guard let mage = character as? MageCharacter else { return nil }
+    
+    func mageBinding() -> Binding<MageCharacter>? {
+        guard let _ = character as? MageCharacter else { return nil }
         return Binding(
-            get: { mage },
-            set: { [weak self] newValue in
-                self?.character = newValue
+            get: {
+                self.character as! MageCharacter
+            },
+            set: {
+                self.character = $0
             }
         )
     }
