@@ -292,7 +292,8 @@ struct CharacterListView: View {
     
     private func groupCharacters(_ characters: [AnyCharacter]) -> [(chronicleName: String, characters: [AnyCharacter])] {
         let charactersByChronicle = Dictionary(grouping: characters) { character in
-            character.character.chronicleName.isEmpty ? "" : character.character.chronicleName
+            let normalizedName = character.character.chronicleName.trimmingCharacters(in: .whitespacesAndNewlines)
+            return normalizedName.isEmpty ? "" : normalizedName
         }
 
         let emptyChronicleCharacters = charactersByChronicle[""] ?? []
@@ -309,7 +310,9 @@ struct CharacterListView: View {
         let sortedChronicleNames = namedChronicles.keys.sorted()
         for chronicleName in sortedChronicleNames {
             let characters = namedChronicles[chronicleName]!.sorted { $0.character.name < $1.character.name }
-            result.append((chronicleName: chronicleName, characters: characters))
+            // Use the first character's original chronicle name for display to preserve formatting
+            let displayName = characters.first?.character.chronicleName.trimmingCharacters(in: .whitespacesAndNewlines) ?? chronicleName
+            result.append((chronicleName: displayName, characters: characters))
         }
 
         return result
