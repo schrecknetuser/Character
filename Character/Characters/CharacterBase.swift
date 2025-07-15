@@ -383,11 +383,11 @@ class CharacterBase: BaseCharacter {
     }
 
     var healthBoxCount: Int {
-        (physicalAttributes["Stamina"] ?? 1) + 3
+        self.health
     }
 
     var willpowerBoxCount: Int {
-        (mentalAttributes["Resolve"] ?? 1) + (socialAttributes["Composure"] ?? 1)
+        self.willpower
     }
 
     func getSpecializations(for skillName: String) -> [Specialization] {
