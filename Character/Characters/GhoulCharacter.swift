@@ -167,6 +167,8 @@ class GhoulCharacter:CharacterBase, DisciplineCapable, CharacterWithHumanity {
     // Remove a V5 discipline
     func removeV5Discipline(_ disciplineName: String) {
         v5Disciplines.removeAll { $0.name == disciplineName }
+        // Recalculate derived values since discipline deletion may affect health/willpower
+        recalculateDerivedValues()
     }
     
     // Get selected powers for a discipline at a specific level

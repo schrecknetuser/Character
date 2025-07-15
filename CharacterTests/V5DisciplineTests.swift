@@ -277,4 +277,90 @@ struct V5DisciplineTests {
         #expect(decoded.isPowerSelected(powerId2, at: 2))
         #expect(!decoded.isPowerSelected(powerId1, at: 2))
     }
+    
+    @Test func testDisciplinePowerHealthBonus() async throws {
+        var character = VampireCharacter()
+        
+        // Set initial stamina to 2, so base health should be 5
+        character.physicalAttributes["Stamina"] = 2
+        character.recalculateDerivedValues()
+        #expect(character.health == 5)
+        #expect(character.healthStates.count == 5)
+        
+        // Add Fortitude discipline
+        if let fortitude = V5Constants.getV5Discipline(named: "Fortitude") {
+            character.v5Disciplines.append(fortitude)
+            
+            // Find Resilience power (which should have addToHealth = true)
+            let resiliencePower = fortitude.getPowers(for: 1).first { $0.name == "Resilience" }
+            #expect(resiliencePower != nil)
+            #expect(resiliencePower!.addToHealth == true)
+            
+            // Toggle the power - this should trigger recalculation
+            character.toggleV5Power(resiliencePower!.id, for: "Fortitude", at: 1)
+            
+            // Health should now be base (5) + discipline level (1) = 6
+            #expect(character.health == 6)
+            #expect(character.healthStates.count == 6)
+            
+            // Remove Resilience power - should lose the health bonus
+            character.toggleV5Power(resiliencePower!.id, for: "Fortitude", at: 1)
+            
+            // Should be back to base health since no powers with addToHealth are selected
+            #expect(character.health == 5)
+            #expect(character.healthStates.count == 5)
+        }
+    }
+    
+    @Test func testDisciplinePowerHealthBonusWithWounds() async throws {
+        var character = VampireCharacter()
+        
+        // Set initial stamina to 2, so base health should be 5
+        character.physicalAttributes["Stamina"] = 2
+        character.recalculateDerivedValues()
+        #expect(character.health == 5)
+        
+        // Add some wounds
+        character.healthStates[3] = .superficial
+        character.healthStates[4] = .aggravated
+        
+        // Add Fortitude and select Resilience power
+        if let fortitude = V5Constants.getV5Discipline(named: "Fortitude") {
+            character.v5Disciplines.append(fortitude)
+            let resiliencePower = fortitude.getPowers(for: 1).first { $0.name == "Resilience" }!
+            character.toggleV5Power(resiliencePower.id, for: "Fortitude", at: 1)
+            
+            // Health should increase but wounds should remain
+            #expect(character.health == 6)
+            #expect(character.healthStates.count == 6)
+            #expect(character.healthStates[3] == .superficial)
+            #expect(character.healthStates[4] == .aggravated)
+            #expect(character.healthStates[5] == .ok)
+            
+            // Now remove the power - this should remove the health box and any overflow wounds
+            character.toggleV5Power(resiliencePower.id, for: "Fortitude", at: 1)
+            
+            // Health should be back to 5, and we should have lost 1 health box
+            #expect(character.health == 5)
+            #expect(character.healthStates.count == 5)
+            #expect(character.healthStates[3] == .superficial)
+            #expect(character.healthStates[4] == .aggravated)
+        }
+    }
+    
+    @Test func testResiliencePowerHasHealthFlag() async throws {
+        // Test that the Resilience power in Fortitude discipline has addToHealth = true
+        if let fortitude = V5Constants.getV5Discipline(named: "Fortitude") {
+            let resiliencePower = fortitude.getPowers(for: 1).first { $0.name == "Resilience" }
+            #expect(resiliencePower != nil)
+            #expect(resiliencePower!.addToHealth == true)
+            #expect(resiliencePower!.addToWillpower == false)
+            
+            // Test that other powers don't have the flag
+            let unswayableMind = fortitude.getPowers(for: 1).first { $0.name == "Unswayable Mind" }
+            #expect(unswayableMind != nil)
+            #expect(unswayableMind!.addToHealth == false)
+            #expect(unswayableMind!.addToWillpower == false)
+        }
+    }
 }

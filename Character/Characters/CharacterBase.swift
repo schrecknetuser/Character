@@ -50,6 +50,10 @@ extension DisciplineCapable {
     func toggleV5Power(_ powerId: UUID, for disciplineName: String, at level: Int) {
         if let index = v5Disciplines.firstIndex(where: { $0.name == disciplineName }) {
             v5Disciplines[index].togglePower(powerId, at: level)
+            // Recalculate derived values since powers may affect health/willpower
+            if let baseCharacter = self as? BaseCharacter {
+                baseCharacter.recalculateDerivedValues()
+            }
         }
     }
     
@@ -62,6 +66,38 @@ extension DisciplineCapable {
         // Return standard disciplines that aren't already added plus all custom ones
         let availableStandard = standardDisciplines.filter { !existingNames.contains($0.name) }
         return availableStandard + customDisciplines
+    }
+    
+    // Calculate discipline bonus to health from selected powers
+    func getDisciplineHealthBonus() -> Int {
+        var bonus = 0
+        for discipline in v5Disciplines {
+            for level in discipline.getLevels() {
+                let selectedPowers = discipline.selectedPowers[level] ?? []
+                for power in selectedPowers {
+                    if power.addToHealth {
+                        bonus += discipline.currentLevel()
+                    }
+                }
+            }
+        }
+        return bonus
+    }
+    
+    // Calculate discipline bonus to willpower from selected powers  
+    func getDisciplineWillpowerBonus() -> Int {
+        var bonus = 0
+        for discipline in v5Disciplines {
+            for level in discipline.getLevels() {
+                let selectedPowers = discipline.selectedPowers[level] ?? []
+                for power in selectedPowers {
+                    if power.addToWillpower {
+                        bonus += discipline.currentLevel()
+                    }
+                }
+            }
+        }
+        return bonus
     }
     
     func processDisciplineChanges(original: [V5Discipline], updated: [V5Discipline], changes: inout [String]) {
@@ -347,11 +383,11 @@ class CharacterBase: BaseCharacter {
     }
 
     var healthBoxCount: Int {
-        (physicalAttributes["Stamina"] ?? 1) + 3
+        self.health
     }
 
     var willpowerBoxCount: Int {
-        (mentalAttributes["Resolve"] ?? 1) + (socialAttributes["Composure"] ?? 1)
+        self.willpower
     }
 
     func getSpecializations(for skillName: String) -> [Specialization] {
@@ -379,15 +415,35 @@ class CharacterBase: BaseCharacter {
         let resolve = mentalAttributes["Resolve"] ?? 1
         let composure = socialAttributes["Composure"] ?? 1
 
-        let newHealth = stamina + 3
-        let newWillpower = resolve + composure
+        // Calculate base values
+        var newHealth = stamina + 3
+        var newWillpower = resolve + composure
+        
+        // Add discipline bonuses if this character has disciplines
+        if let disciplineCharacter = self as? DisciplineCapable {
+            newHealth += disciplineCharacter.getDisciplineHealthBonus()
+            newWillpower += disciplineCharacter.getDisciplineWillpowerBonus()
+        }
 
         if newHealth != health {
             health = newHealth
             if healthStates.count < newHealth {
                 healthStates.append(contentsOf: Array(repeating: .ok, count: newHealth - healthStates.count))
             } else {
-                healthStates = Array(healthStates.prefix(newHealth))
+                // Remove excess wounds when health decreases, starting from the end
+                let excessWounds = healthStates.count - newHealth
+                if excessWounds > 0 {
+                    // Count wounds from the end and remove them
+                    var woundsToRemove = 0
+                    for i in stride(from: healthStates.count - 1, through: newHealth, by: -1) {
+                        if healthStates[i] != .ok {
+                            woundsToRemove += 1
+                        }
+                    }
+                    
+                    // Truncate the array but preserve existing wounds in remaining slots
+                    healthStates = Array(healthStates.prefix(newHealth))
+                }
             }
         }
 
