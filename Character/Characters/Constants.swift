@@ -495,9 +495,18 @@ struct V5Constants {
                     V5DisciplinePower(name: "Ward Against Ghouls", description: "Protect against Ghouls.\nRitual roll: Intelligence + Blood Sorcery\nUses standard Ward rules.", level: 1)
                 ],
                 2: [
-                    V5DisciplinePower(name: "Ward vs. Spirits", description: "Protect an area from spiritual intrusion.\nDice pool: Intelligence + Blood Sorcery\nWard lasts for one month and repels ghosts.", level: 2),
-                    V5DisciplinePower(name: "Incorporeal Passage", description: "Become incorporeal to pass through solid matter.\nDice pool: Wits + Blood Sorcery\nEffect lasts for one turn per success.", level: 2),
-                    V5DisciplinePower(name: "Deflection of Wooden Doom", description: "Redirect wooden weapons away from your heart.\nDice pool: Dexterity + Blood Sorcery\nAutomatic protection against staking attempts.", level: 2)
+                    V5DisciplinePower(name: "As Fog on Water", description: "Walk on water silently.\nRitual roll: Intelligence + Blood Sorcery\nMay be ended early or kept active for one night.", level: 2),
+                    V5DisciplinePower(name: "Calling the Aura's Remnants", description: "Speak with residual aura of the dead.\nRitual roll: Intelligence + Blood Sorcery\nAura only has memories up to moment of death.", level: 2),
+                    V5DisciplinePower(name: "Calix Secretus", description: "Store vitae for later.\nRitual roll: Intelligence + Blood Sorcery\nTwo stored Rouse Checks slake one Hunger.", level: 2),
+                    V5DisciplinePower(name: "Communicate with Kindred Sire", description: "Telepathically link Sire and Childe.\nRitual roll: Intelligence + Blood Sorcery\nMajor disturbances break the link.", level: 2),
+                    V5DisciplinePower(name: "Craftmaster", description: "Gain temporary dots and specialties in a Craft skill.\nRitual roll: Intelligence + Blood Sorcery\nOn total failure, suffer Aggravated damage.", level: 2),
+                    V5DisciplinePower(name: "Depths of Nightmare", description: "Induce unhealable Willpower damage with nightmares.\nRitual roll: Intelligence + Blood Sorcery\nFailure causes pleasant dreams that point to caster.", level: 2),
+                    V5DisciplinePower(name: "Elemental Grasp", description: "Command a chosen element to cause damage.\nRitual roll: Intelligence + Blood Sorcery\nGain +1 die if element is already active (e.g. water in a flood).", level: 2),
+                    V5DisciplinePower(name: "Enhance Dyscrasia", description: "Allow multiple Kindred to feed on a Dyscrasia.\nRitual roll: Intelligence + Blood Sorcery\nOften used with Enrich the Blood first.", level: 2),
+                    V5DisciplinePower(name: "Eyes of Babel", description: "Gain ability to read/speak target's known languages.\nRitual roll: Intelligence + Blood Sorcery\nRequires consumption of eyes and tongue. May cause Stains.", level: 2),
+                    V5DisciplinePower(name: "Illuminate Trail of Prey", description: "Track a specific individual.\nRitual roll: Intelligence + Blood Sorcery\nCaster must know the target's face.", level: 2),
+                    V5DisciplinePower(name: "Le Sang de l'Amour", description: "Create a link between two who desire each other.\nRitual roll: Intelligence + Blood Sorcery\nRoll failure disorients and reduces Composure.", level: 2),
+                    V5DisciplinePower(name: "Soporific Touch", description: "Weaken victim against mundane and supernatural manipulation.\nRitual roll: Intelligence + Blood Sorcery\nActivated after contact; opposed by Stamina + Resolve.", level: 2)
                 ],
                 3: [
                     V5DisciplinePower(name: "Ward vs. Kindred", description: "Create barriers that repel vampires.\nDice pool: Intelligence + Blood Sorcery\nWard lasts for one month and causes pain to Kindred.", level: 3),
