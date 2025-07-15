@@ -71,6 +71,18 @@ extension DisciplineCapable {
             let originalDiscipline = original.first { $0.name == disciplineName }
             let updatedDiscipline = updated.first { $0.name == disciplineName }
             
+            if originalDiscipline != nil && updatedDiscipline == nil {
+                changes.append("lost \(originalDiscipline!.name)")
+            }
+            
+            if updatedDiscipline != nil && originalDiscipline == nil {
+                var summary = "learned \(updatedDiscipline!.name)"
+                if updatedDiscipline!.getAllSelectedPowerNames().count > 0 {
+                    summary += "(\(updatedDiscipline!.getAllSelectedPowerNames().joined(separator: ", ")))"
+                }
+                changes.append(summary)
+            }
+            
             // Check power selection changes
             if let orig = originalDiscipline, let upd = updatedDiscipline {
 
@@ -82,10 +94,10 @@ extension DisciplineCapable {
                     let removedCount = originalPowers.subtracting(updatedPowers).count
                     
                     if addedCount > 0 {
-                        changes.append("added \(updatedPowers.subtracting(originalPowers).joined(separator: ", ")) to \(disciplineName.lowercased())")
+                        changes.append("added \(updatedPowers.subtracting(originalPowers).joined(separator: ", ")) to \(disciplineName)")
                     }
                     if removedCount > 0 {
-                        changes.append("removed \(originalPowers.subtracting(updatedPowers).joined(separator: ", ")) from \(disciplineName.lowercased())")
+                        changes.append("removed \(originalPowers.subtracting(updatedPowers).joined(separator: ", ")) from \(disciplineName)")
                     }
                 }
             }
