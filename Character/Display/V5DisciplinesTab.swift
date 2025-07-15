@@ -332,16 +332,6 @@ struct V5DisciplineRowView<T: DisciplineCapable>: View {
                     }
                     .buttonStyle(.borderless)
                 }
-                
-                Button(action: {
-                    selectedDiscipline = discipline
-                    showingDisciplineDetail = true
-                }) {
-                    Text("Details")
-                        .font(.caption)
-                        .foregroundColor(.accentColor)
-                }
-                .buttonStyle(.borderless)
             }
             .contentShape(Rectangle())
             .onTapGesture {
