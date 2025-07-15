@@ -260,10 +260,16 @@ struct V5Constants {
                     V5DisciplinePower(name: "True Love's Face", description: "Appear as someone the victim has strong emotional ties with.", level: 3)
                 ],
                 4: [
-                    // Powers would be here based on the comment, but it was cut off
+                    V5DisciplinePower(name: "Irresistible Voice", description: "Compel obedience through spoken commands, even without eye contact.\nDice pool: Manipulation + Presence\nOpposing pool: Intelligence + Resolve\nEffect works through any form of voice transmission including recordings.", level: 4),
+                    V5DisciplinePower(name: "Majesty", description: "Inspire awe, devotion, and fear in all around you.\nAdd Presence rating to all social rolls.\nEffect lasts for the scene. Viewers hesitate to take hostile action.", level: 4),
+                    V5DisciplinePower(name: "Spark of Rage", description: "Incite violence and uncontrolled anger in a crowd.\nDice pool: Manipulation + Presence\nOpposing pool: Composure + Intelligence\nEffect spreads through crowd based on margin of success.", level: 4),
+                    V5DisciplinePower(name: "Summoning", description: "Call a person to come to you from anywhere.\nDice pool: Manipulation + Presence\nOpposing pool: Composure + Intelligence\nTarget feels compelled to travel to your location.", level: 4)
                 ],
                 5: [
-                    // Powers would be here based on the comment, but it was cut off
+                    V5DisciplinePower(name: "Oração", description: "Command absolute obedience from multiple targets.\nDice pool: Charisma + Presence\nOpposing pool: Wits + Composure\nTargets follow commands even if they conflict with their nature.", level: 5),
+                    V5DisciplinePower(name: "Paragon of (Virtue)", description: "Become the perfect embodiment of a chosen emotion or ideal.\nEffect lasts for one scene.\nAll present are affected by the chosen emotion intensely.", level: 5),
+                    V5DisciplinePower(name: "Pulse of the City", description: "Sense the general mood and emotional state of an entire city district.\nDice pool: Resolve + Presence\nProvides information about major events, unrest, or supernatural activity.", level: 5),
+                    V5DisciplinePower(name: "Siren's Call", description: "Irresistibly draw all within a large area to your location.\nDice pool: Charisma + Presence\nOpposing pool: Wits + Composure\nEffect works on everyone within several city blocks.", level: 5)
                 ]
             ]
         ),
@@ -423,10 +429,75 @@ struct V5Constants {
                     V5DisciplinePower(name: "Shadow Servant", description: "Use a shadow to spy or scare.", level: 3)
                 ],
                 4: [
-                    // Would add Level 4 powers here if they were provided in the comments
+                    V5DisciplinePower(name: "Grave's Decay", description: "Accelerate decomposition of organic matter.\nDice pool: Stamina + Oblivion\nOpposing pool: Stamina + Fortitude\nCauses rapid aging and decay of target's body.", level: 4),
+                    V5DisciplinePower(name: "Necrotic Soil", description: "Turn earth into death-aspected ground that harms the living.\nDice pool: Intelligence + Oblivion\nArea becomes hostile to living creatures, causing damage over time.", level: 4),
+                    V5DisciplinePower(name: "Shadow Body", description: "Transform into a being of living shadow.\nGain immunity to physical attacks but vulnerable to light.\nEffect lasts for one scene.", level: 4),
+                    V5DisciplinePower(name: "Stygian Shroud", description: "Summon a supernatural darkness that follows you.\nDice pool: Wits + Oblivion\nDarkness blocks normal vision and enhances fear in living beings.", level: 4)
                 ],
                 5: [
-                    // Would add Level 5 powers here if they were provided in the comments  
+                    V5DisciplinePower(name: "Shadowstep", description: "Travel instantly through shadows across great distances.\nDice pool: Dexterity + Oblivion\nCan appear in any shadow within several miles.", level: 5),
+                    V5DisciplinePower(name: "Night's Calling", description: "Summon powerful wraiths to serve your will.\nDice pool: Charisma + Oblivion\nOpposing pool: Resolve + Composure (for wraiths)\nSummoned wraiths remain for the scene.", level: 5),
+                    V5DisciplinePower(name: "Tenebrous Form", description: "Become one with darkness itself.\nGain immunity to most attacks except light-based.\nCan pass through solid objects. Effect lasts one scene.", level: 5),
+                    V5DisciplinePower(name: "Withering", description: "Drain life force from all living things in a large area.\nDice pool: Resolve + Oblivion\nOpposing pool: Stamina + Resolve\nCauses Aggravated damage and ages targets.", level: 5)
+                ]
+            ]
+        ),
+        
+        // Oblivion Ceremonies
+        V5Discipline(
+            name: "Oblivion Ceremonies",
+            powers: [
+                1: [
+                    V5DisciplinePower(name: "Compel Spirit", description: "Force a ghost to manifest and interact.\nDice pool: Manipulation + Oblivion\nOpposing pool: Resolve + Composure\nCeremony requires 10 minutes and a personal item.", level: 1),
+                    V5DisciplinePower(name: "Eyes of the Dead", description: "See through the eyes of a corpse's final moments.\nDice pool: Intelligence + Oblivion\nRequires touching the corpse. Shows last few minutes of life.", level: 1)
+                ],
+                2: [
+                    V5DisciplinePower(name: "Summon Soul", description: "Call forth the ghost of a specific deceased person.\nDice pool: Charisma + Oblivion\nOpposing pool: Resolve + Composure\nRequires knowing the ghost's true name and a personal item.", level: 2),
+                    V5DisciplinePower(name: "Ritual of Death", description: "Create a zone where death energy accumulates.\nDice pool: Intelligence + Oblivion\nZone enhances all Oblivion powers used within it.", level: 2)
+                ],
+                3: [
+                    V5DisciplinePower(name: "Soul Burn", description: "Inflict spiritual damage that persists beyond death.\nDice pool: Resolve + Oblivion\nOpposing pool: Composure + Resolve\nDamage affects both living and unliving targets.", level: 3),
+                    V5DisciplinePower(name: "Ward vs. Spirits", description: "Create barriers that repel ghosts and wraiths.\nDice pool: Intelligence + Oblivion\nWard lasts for one month and covers a building.", level: 3)
+                ],
+                4: [
+                    V5DisciplinePower(name: "Bind Wraith", description: "Permanently enslave a powerful ghost.\nDice pool: Manipulation + Oblivion\nOpposing pool: Resolve + Composure\nRequires elaborate ceremony lasting several hours.", level: 4),
+                    V5DisciplinePower(name: "Create Shadowland", description: "Establish a permanent zone where the dead can manifest.\nDice pool: Intelligence + Oblivion\nArea becomes easier for spirits to interact with the living.", level: 4)
+                ],
+                5: [
+                    V5DisciplinePower(name: "Mass Summoning", description: "Call forth an army of the dead.\nDice pool: Charisma + Oblivion\nSummons multiple wraiths and zombies to serve.", level: 5),
+                    V5DisciplinePower(name: "Sever the Gauntlet", description: "Permanently tear open barriers between life and death.\nDice pool: Resolve + Oblivion\nCreates a permanent portal to the underworld.", level: 5)
+                ]
+            ]
+        ),
+        
+        // Blood Sorcery Rituals
+        V5Discipline(
+            name: "Blood Sorcery Rituals",
+            powers: [
+                1: [
+                    V5DisciplinePower(name: "Communicate with Kindred Sire", description: "Telepathically contact your sire across any distance.\nDice pool: Resolve + Blood Sorcery\nAllows brief mental communication for one scene.", level: 1),
+                    V5DisciplinePower(name: "Preserve Blood", description: "Prevent blood from spoiling or coagulating.\nDice pool: Intelligence + Blood Sorcery\nBlood remains fresh for months.", level: 1),
+                    V5DisciplinePower(name: "Wake with Evening's Freshness", description: "Awaken fully alert regardless of damage or torpor.\nDice pool: Stamina + Blood Sorcery\nIgnore all penalties from damage when awakening.", level: 1)
+                ],
+                2: [
+                    V5DisciplinePower(name: "Ward vs. Spirits", description: "Protect an area from spiritual intrusion.\nDice pool: Intelligence + Blood Sorcery\nWard lasts for one month and repels ghosts.", level: 2),
+                    V5DisciplinePower(name: "Incorporeal Passage", description: "Become incorporeal to pass through solid matter.\nDice pool: Wits + Blood Sorcery\nEffect lasts for one turn per success.", level: 2),
+                    V5DisciplinePower(name: "Deflection of Wooden Doom", description: "Redirect wooden weapons away from your heart.\nDice pool: Dexterity + Blood Sorcery\nAutomatic protection against staking attempts.", level: 2)
+                ],
+                3: [
+                    V5DisciplinePower(name: "Ward vs. Kindred", description: "Create barriers that repel vampires.\nDice pool: Intelligence + Blood Sorcery\nWard lasts for one month and causes pain to Kindred.", level: 3),
+                    V5DisciplinePower(name: "Pavis of Foul Presence", description: "Protect against supernatural mental intrusion.\nDice pool: Wits + Blood Sorcery\nProvides defense against Dominate, Presence, and similar powers.", level: 3),
+                    V5DisciplinePower(name: "Enchant Talisman", description: "Imbue an object with protective powers.\nDice pool: Intelligence + Blood Sorcery\nTalisman provides ongoing benefits to the bearer.", level: 3)
+                ],
+                4: [
+                    V5DisciplinePower(name: "Ward vs. Lupines", description: "Create powerful barriers against werewolves.\nDice pool: Intelligence + Blood Sorcery\nWard causes severe damage to shapeshifters.", level: 4),
+                    V5DisciplinePower(name: "Heart of Stone", description: "Turn your heart to stone for protection.\nDice pool: Stamina + Blood Sorcery\nBecome immune to staking and heart-based attacks.", level: 4),
+                    V5DisciplinePower(name: "Ritual of Introduction", description: "Gain detailed information about any Kindred.\nDice pool: Intelligence + Blood Sorcery\nReveal lineage, generation, and clan of target.", level: 4)
+                ],
+                5: [
+                    V5DisciplinePower(name: "Stone of the True Form", description: "Force shapechangers into true form permanently.\nDice pool: Resolve + Blood Sorcery\nOpposing pool: Stamina + Composure\nPrevents all supernatural transformation.", level: 5),
+                    V5DisciplinePower(name: "Escape to True Sanctuary", description: "Instantly teleport to a prepared haven.\nDice pool: Wits + Blood Sorcery\nMust be cast on the sanctuary in advance.", level: 5),
+                    V5DisciplinePower(name: "Blood Contract", description: "Create magically binding agreements.\nDice pool: Intelligence + Blood Sorcery\nBreaking the contract causes supernatural punishment.", level: 5)
                 ]
             ]
         )
