@@ -125,6 +125,18 @@ class VampireCharacter: CharacterBase, DisciplineCapable, CharacterWithHumanity 
             changes.append("spent experience \(self.spentExperience)→\(other.spentExperience)")
         }
         
+        // Check date changes
+        if self.dateOfBirth != other.dateOfBirth {
+            let originalDate = self.dateOfBirth != nil ? formatDate(self.dateOfBirth!) : "not set"
+            let newDate = other.dateOfBirth != nil ? formatDate(other.dateOfBirth!) : "not set"
+            changes.append("date of birth \(originalDate)→\(newDate)")
+        }
+        if self.dateOfEmbrace != other.dateOfEmbrace {
+            let originalDate = self.dateOfEmbrace != nil ? formatDate(self.dateOfEmbrace!) : "not set"
+            let newDate = other.dateOfEmbrace != nil ? formatDate(other.dateOfEmbrace!) : "not set"
+            changes.append("date of embrace \(originalDate)→\(newDate)")
+        }
+        
         // Check V5 discipline changes
         processDisciplineChanges(original: self.v5Disciplines, updated: other.v5Disciplines, changes: &changes)
         
@@ -198,6 +210,14 @@ class VampireCharacter: CharacterBase, DisciplineCapable, CharacterWithHumanity 
     // Check if using V5 discipline system (has any V5 disciplines)
     var isUsingV5Disciplines: Bool {
         return !v5Disciplines.isEmpty
+    }
+    
+    // Helper function to format dates consistently
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        return formatter.string(from: date)
     }
 
 }

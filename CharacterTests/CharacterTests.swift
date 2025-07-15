@@ -707,5 +707,59 @@ struct CharacterTests {
         #expect(decoded.touchstones[0] == testTouchstones[0])
         #expect(decoded.touchstones[1] == testTouchstones[1])
     }
+    
+    @Test func testDateChangeLogging() async throws {
+        // Test that changes to date fields are properly logged
+        let originalDate = Date(timeIntervalSince1970: 0) // Jan 1, 1970
+        let newDate = Date(timeIntervalSince1970: 86400 * 365) // Jan 1, 1971
+        let embraceDate = Date(timeIntervalSince1970: 86400) // Jan 2, 1970
+        let newEmbraceDate = Date(timeIntervalSince1970: 86400 * 366) // Jan 2, 1971
+        
+        // Test Vampire Character date changes
+        let vampire = VampireCharacter()
+        vampire.name = "Test Vampire"
+        vampire.dateOfBirth = originalDate
+        vampire.dateOfEmbrace = embraceDate
+        
+        let updatedVampire = vampire.clone() as! VampireCharacter
+        updatedVampire.dateOfBirth = newDate
+        updatedVampire.dateOfEmbrace = newEmbraceDate
+        
+        let vampireChanges = vampire.generateChangeSummary(for: updatedVampire)
+        
+        // Check that date changes are logged (this test will initially fail and demonstrate the bug)
+        #expect(vampireChanges.contains("date of birth"))
+        #expect(vampireChanges.contains("date of embrace"))
+        
+        // Test Ghoul Character date changes
+        let ghoul = GhoulCharacter()
+        ghoul.name = "Test Ghoul"
+        ghoul.dateOfBirth = originalDate
+        ghoul.dateOfGhouling = embraceDate
+        
+        let updatedGhoul = ghoul.clone() as! GhoulCharacter
+        updatedGhoul.dateOfBirth = newDate
+        updatedGhoul.dateOfGhouling = newEmbraceDate
+        
+        let ghoulChanges = ghoul.generateChangeSummary(for: updatedGhoul)
+        
+        #expect(ghoulChanges.contains("date of birth"))
+        #expect(ghoulChanges.contains("date of ghouling"))
+        
+        // Test Mage Character date changes
+        let mage = MageCharacter()
+        mage.name = "Test Mage"
+        mage.dateOfBirth = originalDate
+        mage.dateOfAwakening = embraceDate
+        
+        let updatedMage = mage.clone() as! MageCharacter
+        updatedMage.dateOfBirth = newDate
+        updatedMage.dateOfAwakening = newEmbraceDate
+        
+        let mageChanges = mage.generateChangeSummary(for: updatedMage)
+        
+        #expect(mageChanges.contains("date of birth"))
+        #expect(mageChanges.contains("date of awakening"))
+    }
 
 }
