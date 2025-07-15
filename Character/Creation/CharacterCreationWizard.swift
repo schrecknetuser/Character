@@ -22,19 +22,21 @@ enum CreationStage: Int, CaseIterable {
     case characterType = 0
     case nameAndChronicle = 1
     case clan = 2
-    case attributes = 3
-    case skills = 4
-    case specializations = 5
-    case disciplines = 6
-    case meritsAndFlaws = 7
-    case convictionsAndTouchstones = 8
-    case ambitionAndDesire = 9
+    case predatorPath = 3
+    case attributes = 4
+    case skills = 5
+    case specializations = 6
+    case disciplines = 7
+    case meritsAndFlaws = 8
+    case convictionsAndTouchstones = 9
+    case ambitionAndDesire = 10
     
     func title(for characterType: CharacterType) -> String {
         switch self {
         case .characterType: return "Character Type"
         case .nameAndChronicle: return "Name & Chronicle"
         case .clan: return "Clan"
+        case .predatorPath: return "Predator Path"
         case .attributes: return "Attributes"
         case .skills: return "Skills"
         case .specializations: return "Specializations"
@@ -91,6 +93,15 @@ struct CharacterCreationWizard: View {
                             // Skip clan selection for non-vampires
                             EmptyView()
                         }
+                    case .predatorPath:
+                        if selectedCharacterType == .vampire {
+                            PredatorPathSelectionStage(character: viewModel.asVampireForced, onChange: {
+                                triggerRefresh.toggle()
+                            })
+                        } else {
+                            // Skip predator path selection for non-vampires
+                            EmptyView()
+                        }
                     case .attributes:
                         AttributesStage(character: viewModel.baseBinding)
                     case .skills:
@@ -126,8 +137,13 @@ struct CharacterCreationWizard: View {
                     Button("Back") {
                         if currentStage.rawValue > 0 {
                             let previousStage = CreationStage(rawValue: currentStage.rawValue - 1) ?? .characterType
-                            if selectedCharacterType != .vampire && previousStage == .clan {
-                                currentStage = .nameAndChronicle
+                            if selectedCharacterType != .vampire && (previousStage == .clan || previousStage == .predatorPath) {
+                                // Skip vampire-only stages for non-vampires
+                                if previousStage == .predatorPath {
+                                    currentStage = .clan
+                                } else if previousStage == .clan {
+                                    currentStage = .nameAndChronicle
+                                }
                             } else {
                                 currentStage = previousStage
                             }
@@ -156,8 +172,13 @@ struct CharacterCreationWizard: View {
                             
                             if currentStage.rawValue < CreationStage.allCases.count - 1 {
                                 let nextStage = CreationStage(rawValue: currentStage.rawValue + 1) ?? .ambitionAndDesire
-                                if selectedCharacterType != .vampire && nextStage == .clan {
-                                    currentStage = .attributes
+                                if selectedCharacterType != .vampire && (nextStage == .clan || nextStage == .predatorPath) {
+                                    // Skip vampire-only stages for non-vampires
+                                    if nextStage == .clan {
+                                        currentStage = .attributes
+                                    } else if nextStage == .predatorPath {
+                                        currentStage = .attributes
+                                    }
                                 } else {
                                     currentStage = nextStage
                                 }
@@ -192,6 +213,8 @@ struct CharacterCreationWizard: View {
                        !viewModel.character.chronicleName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             case .clan:
                 return selectedCharacterType != .vampire || (viewModel.asVampire?.clan.isEmpty == false)
+            case .predatorPath:
+                return selectedCharacterType != .vampire || (viewModel.asVampire?.predatorPath.isEmpty == false)
             case .attributes:
                 return AttributesStage.areAllAttributesAssigned(character: viewModel.character)
             case .skills:

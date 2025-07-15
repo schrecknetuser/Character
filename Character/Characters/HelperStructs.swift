@@ -232,4 +232,55 @@ struct V5Discipline: Identifiable, Codable, Hashable {
     }
 }
 
+// MARK: - Predator Path System
+
+// Data structure for predator path bonuses/drawbacks
+struct PredatorPathBonus: Identifiable, Codable, Hashable {
+    var id = UUID()
+    var type: BonusType
+    var skillName: String?
+    var disciplineName: String?
+    var specializationName: String?
+    var meritName: String?
+    var flawName: String?
+    var description: String
+    
+    enum BonusType: String, Codable, CaseIterable {
+        case skillSpecialization = "skillSpecialization"
+        case disciplineDot = "disciplineDot"
+        case merit = "merit"
+        case flaw = "flaw"
+        case feeding = "feeding"
+        case other = "other"
+    }
+    
+    init(type: BonusType, description: String, skillName: String? = nil, disciplineName: String? = nil, specializationName: String? = nil, meritName: String? = nil, flawName: String? = nil) {
+        self.type = type
+        self.description = description
+        self.skillName = skillName
+        self.disciplineName = disciplineName
+        self.specializationName = specializationName
+        self.meritName = meritName
+        self.flawName = flawName
+    }
+}
+
+// Data structure for predator paths
+struct PredatorPath: Identifiable, Codable, Hashable {
+    var id = UUID()
+    var name: String
+    var description: String
+    var bonuses: [PredatorPathBonus]
+    var drawbacks: [PredatorPathBonus]
+    var feedingDescription: String
+    
+    init(name: String, description: String, bonuses: [PredatorPathBonus] = [], drawbacks: [PredatorPathBonus] = [], feedingDescription: String = "") {
+        self.name = name
+        self.description = description
+        self.bonuses = bonuses
+        self.drawbacks = drawbacks
+        self.feedingDescription = feedingDescription
+    }
+}
+
 
