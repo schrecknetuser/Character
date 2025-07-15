@@ -64,6 +64,7 @@ struct DataModalView: View {
                                 }
                                 .padding(.vertical, 2)
                             }
+                            .id(refreshID) // Force refresh when refreshID changes
                         }
                     }
                 }
@@ -87,8 +88,17 @@ struct DataModalView: View {
                             
                             // Update character in store if available
                             store?.updateCharacter(character)
+                            
+                            // Force UI refresh to show the new log entry immediately
+                            refreshID = UUID()
+                            
+                            // Add a small delay to let user see the change was logged
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                isPresented = false
+                            }
+                        } else {
+                            isPresented = false
                         }
-                        isPresented = false
                     }
                 }
             }
