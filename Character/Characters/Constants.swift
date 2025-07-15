@@ -568,9 +568,19 @@ struct V5Constants {
                     V5DisciplinePower(name: "Warding Circle against Lupines", description: "Protect against werewolves.\nRitual roll: Intelligence + Blood Sorcery\nCost: Three Rouse Checks. Uses standard Ward rules.", level: 4)
                 ],
                 5: [
-                    V5DisciplinePower(name: "Stone of the True Form", description: "Force shapechangers into true form permanently.\nDice pool: Resolve + Blood Sorcery\nOpposing pool: Stamina + Composure\nPrevents all supernatural transformation.", level: 5),
-                    V5DisciplinePower(name: "Escape to True Sanctuary", description: "Instantly teleport to a prepared haven.\nDice pool: Wits + Blood Sorcery\nMust be cast on the sanctuary in advance.", level: 5),
-                    V5DisciplinePower(name: "Blood Contract", description: "Create magically binding agreements.\nDice pool: Intelligence + Blood Sorcery\nBreaking the contract causes supernatural punishment.", level: 5)
+                    V5DisciplinePower(name: "Antebrachia Ignium", description: "Set the user's arms on fire.\nRitual roll: Intelligence + Blood Sorcery\nOnly the arms are resistant to fire.", level: 5),
+                    V5DisciplinePower(name: "Atrocity's Release", description: "Reverse the effects of Diablerie.\nRitual roll: Intelligence + Blood Sorcery\nCan be resisted with Resolve + Blood Sorcery.", level: 5),
+                    V5DisciplinePower(name: "Dominion", description: "Block Animalism, Auspex, Dominate, and Presence within a building.\nRitual roll: Intelligence + Blood Sorcery\nArea of effect depends on number of Rouse Checks.", level: 5),
+                    V5DisciplinePower(name: "Eden's Bounty", description: "Drain blood from nearby creatures.\nRitual roll: Intelligence + Blood Sorcery\nMortals suffer −1 to Physical rolls and 1 Aggravated damage for remainder of chapter.", level: 5),
+                    V5DisciplinePower(name: "Elemental Attack", description: "Attack using an element; can be chained into a natural disaster.\nRitual roll: Intelligence + Blood Sorcery\nGains extra die if element is already active. May chain with other rituals.", level: 5),
+                    V5DisciplinePower(name: "Escape to True Sanctuary", description: "Create a one-way portal.\nRitual roll: Intelligence + Blood Sorcery\nRequires twelve Rouse Checks in total. Only one set of circles can be active.", level: 5),
+                    V5DisciplinePower(name: "Fisher King", description: "Become one with the land to gain its secrets.\nRitual roll: Intelligence + Blood Sorcery\nAsk questions with Wits + Streetwise or Survival; can be chained with Land's Sustenance and Compel the Inanimate.", level: 5),
+                    V5DisciplinePower(name: "Heart of Stone", description: "Transform the heart to stone to avoid staking.\nRitual roll: Intelligence + Blood Sorcery\nCannot use Presence; bonuses to resist social influence.", level: 5),
+                    V5DisciplinePower(name: "Reawakened Vigor", description: "Recover Blood Potency faster after torpor.\nRitual roll: Intelligence + Blood Sorcery\nInflicts Aggravated damage on others (not the caster).", level: 5),
+                    V5DisciplinePower(name: "Shaft of Belated Dissolution", description: "Create a stake that targets the heart.\nRitual roll: Intelligence + Blood Sorcery\nIf not a heart hit, a splinter moves toward it; causes Final Death on success.", level: 5),
+                    V5DisciplinePower(name: "Simulacrum Gate", description: "Create a teleport gate for multiple vampires.\nRitual roll: Intelligence + Blood Sorcery\nRare; possible Stains on use.", level: 5),
+                    V5DisciplinePower(name: "Transferring the Soul", description: "Take over a body post-diablerie.\nRitual roll: Intelligence + Blood Sorcery and Intelligence + Oblivion\nRequires assistance from another Kindred with Oblivion ●●●●● or dual mastery.", level: 5),
+                    V5DisciplinePower(name: "Warding Circle against Cainites", description: "Wards against vampires.\nRitual roll: Intelligence + Blood Sorcery\nCost: Three Rouse Checks. Uses standard ward rules.", level: 5)
                 ]
             ]
         )
