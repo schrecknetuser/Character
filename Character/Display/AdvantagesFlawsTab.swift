@@ -64,12 +64,14 @@ struct ItemRowView<T: Identifiable>: View {
                         }
                         .font(.caption)
                         .foregroundColor(.blue)
+                        .buttonStyle(BorderlessButtonStyle())
                     }
                     Button("Remove") {
                         onDelete()
                     }
                     .font(.caption)
                     .foregroundColor(.red)
+                    .buttonStyle(BorderlessButtonStyle())
                 }
             }
             if !description.isEmpty {
@@ -521,11 +523,13 @@ struct AdvantagesFlawsTab: View {
                                 description: advantage.description,
                                 dynamicFontSize: dynamicFontSize,
                                 captionFontSize: captionFontSize,
-                                isEditing: isEditing
-                            ) {
-                                itemToDelete = (advantage.id, advantage.name, "merit")
-                                showingMeritDeleteConfirmation = true
-                            }
+                                isEditing: isEditing,
+                                onEdit: nil,
+                                onDelete: {
+                                    itemToDelete = (advantage.id, advantage.name, "merit")
+                                    showingMeritDeleteConfirmation = true
+                                }
+                            )
                         }
                         HStack {
                             Text("Total Merit Cost:")
@@ -605,11 +609,13 @@ struct AdvantagesFlawsTab: View {
                                 description: flaw.description,
                                 dynamicFontSize: dynamicFontSize,
                                 captionFontSize: captionFontSize,
-                                isEditing: isEditing
-                            ) {
-                                itemToDelete = (flaw.id, flaw.name, "flaw")
-                                showingFlawDeleteConfirmation = true
-                            }
+                                isEditing: isEditing,
+                                onEdit: nil,
+                                onDelete: {
+                                    itemToDelete = (flaw.id, flaw.name, "flaw")
+                                    showingFlawDeleteConfirmation = true
+                                }
+                            )
                         }
                         HStack {
                             Text("Total Flaw Value:")
