@@ -37,7 +37,10 @@ struct MeritsAndFlawsStage: View {
 
                 }
                 
-                CreationBackgroundMeritsListView(selectedBackgrounds: $character.backgroundMerits)
+                CreationBackgroundMeritsListView(
+                    selectedBackgrounds: $character.backgroundMerits,
+                    characterType: character.characterType
+                )
             }
             
             Section(header: Text("Merits")) {
@@ -104,7 +107,10 @@ struct MeritsAndFlawsStage: View {
 
                 }
                 
-                CreationBackgroundFlawsListView(selectedBackgrounds: $character.backgroundFlaws)
+                CreationBackgroundFlawsListView(
+                    selectedBackgrounds: $character.backgroundFlaws,
+                    characterType: character.characterType
+                )
             }
             
             Section(header: Text("Flaws")) {
@@ -154,6 +160,7 @@ struct MeritsAndFlawsStage: View {
 
 struct CreationBackgroundMeritsListView: View {
     @Binding var selectedBackgrounds: [CharacterBackground]
+    let characterType: CharacterType
     @State private var showingAddBackground = false
     
     var body: some View {
@@ -165,6 +172,7 @@ struct CreationBackgroundMeritsListView: View {
             AddCharacterBackgroundView(
                 selectedBackgrounds: $selectedBackgrounds,
                 backgroundType: .merit,
+                characterType: characterType,
                 onRefresh: {}
             )
         }
@@ -173,6 +181,7 @@ struct CreationBackgroundMeritsListView: View {
 
 struct CreationBackgroundFlawsListView: View {
     @Binding var selectedBackgrounds: [CharacterBackground]
+    let characterType: CharacterType
     @State private var showingAddBackground = false
     
     var body: some View {
@@ -184,6 +193,7 @@ struct CreationBackgroundFlawsListView: View {
             AddCharacterBackgroundView(
                 selectedBackgrounds: $selectedBackgrounds,
                 backgroundType: .flaw,
+                characterType: characterType,
                 onRefresh: {}
             )
         }

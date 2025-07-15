@@ -409,13 +409,34 @@ struct V5Constants {
     ]
     
     // Character Background definitions (separate from merits/flaws)
-    static let characterBackgroundMerits = [
-        "Haven", "Resources", "Allies", "Retainers", "Contacts", "Domain", "Languages"
+    struct CharacterBackgroundDefinition {
+        let name: String
+        let suitableCharacterTypes: Set<CharacterType>
+        
+        init(name: String, suitableCharacterTypes: Set<CharacterType> = Set(CharacterType.allCases)) {
+            self.name = name
+            self.suitableCharacterTypes = suitableCharacterTypes
+        }
+    }
+    
+    static let characterBackgroundMeritDefinitions = [
+        CharacterBackgroundDefinition(name: "Haven", suitableCharacterTypes: [.vampire]),
+        CharacterBackgroundDefinition(name: "Resources", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        CharacterBackgroundDefinition(name: "Allies", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        CharacterBackgroundDefinition(name: "Retainers", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        CharacterBackgroundDefinition(name: "Contacts", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        CharacterBackgroundDefinition(name: "Domain", suitableCharacterTypes: [.vampire]),
+        CharacterBackgroundDefinition(name: "Languages", suitableCharacterTypes: [.vampire, .ghoul, .mage])
     ]
     
-    static let characterBackgroundFlaws = [
-        "Adversary", "Enemy"
+    static let characterBackgroundFlawDefinitions = [
+        CharacterBackgroundDefinition(name: "Adversary", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        CharacterBackgroundDefinition(name: "Enemy", suitableCharacterTypes: [.vampire, .ghoul, .mage])
     ]
+    
+    // Legacy string arrays for backward compatibility
+    static let characterBackgroundMerits = characterBackgroundMeritDefinitions.map { $0.name }
+    static let characterBackgroundFlaws = characterBackgroundFlawDefinitions.map { $0.name }
     
     // Helper methods to filter backgrounds by character type
     static func getAdvantagesForCharacterType(_ characterType: CharacterType) -> [BackgroundBase] {
@@ -424,5 +445,13 @@ struct V5Constants {
     
     static func getFlawsForCharacterType(_ characterType: CharacterType) -> [BackgroundBase] {
         return predefinedFlaws.filter { $0.suitableCharacterTypes.contains(characterType) }
+    }
+    
+    static func getCharacterBackgroundMeritsForCharacterType(_ characterType: CharacterType) -> [CharacterBackgroundDefinition] {
+        return characterBackgroundMeritDefinitions.filter { $0.suitableCharacterTypes.contains(characterType) }
+    }
+    
+    static func getCharacterBackgroundFlawsForCharacterType(_ characterType: CharacterType) -> [CharacterBackgroundDefinition] {
+        return characterBackgroundFlawDefinitions.filter { $0.suitableCharacterTypes.contains(characterType) }
     }
 }

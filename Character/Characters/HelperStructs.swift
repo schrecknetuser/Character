@@ -25,12 +25,14 @@ struct CharacterBackground: Identifiable, Codable, Hashable {
     var cost: Int
     var comment: String = ""
     var type: BackgroundType
+    var suitableCharacterTypes: Set<CharacterType> = Set(CharacterType.allCases)
     
-    init(name: String, cost: Int, comment: String = "", type: BackgroundType) {
+    init(name: String, cost: Int, comment: String = "", type: BackgroundType, suitableCharacterTypes: Set<CharacterType> = Set(CharacterType.allCases)) {
         self.name = name
         self.cost = cost
         self.comment = comment
         self.type = type
+        self.suitableCharacterTypes = suitableCharacterTypes
     }
 }
 

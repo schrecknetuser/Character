@@ -123,6 +123,7 @@ struct EditableFlawsListView: View {
 // Editable Character Background Merits List View
 struct EditableCharacterBackgroundMeritsListView: View {
     @Binding var backgroundMerits: [CharacterBackground]
+    let characterType: CharacterType
     let onRefresh: () -> Void
     @State private var showingAddBackground = false
     
@@ -135,6 +136,7 @@ struct EditableCharacterBackgroundMeritsListView: View {
             AddCharacterBackgroundView(
                 selectedBackgrounds: $backgroundMerits,
                 backgroundType: .merit,
+                characterType: characterType,
                 onRefresh: onRefresh
             )
         }
@@ -144,6 +146,7 @@ struct EditableCharacterBackgroundMeritsListView: View {
 // Editable Character Background Flaws List View
 struct EditableCharacterBackgroundFlawsListView: View {
     @Binding var backgroundFlaws: [CharacterBackground]
+    let characterType: CharacterType
     let onRefresh: () -> Void
     @State private var showingAddBackground = false
     
@@ -156,6 +159,7 @@ struct EditableCharacterBackgroundFlawsListView: View {
             AddCharacterBackgroundView(
                 selectedBackgrounds: $backgroundFlaws,
                 backgroundType: .flaw,
+                characterType: characterType,
                 onRefresh: onRefresh
             )
         }
@@ -490,9 +494,13 @@ struct AdvantagesFlawsTab: View {
                     }
                     
                     if isEditing {
-                        EditableCharacterBackgroundMeritsListView(backgroundMerits: $character.backgroundMerits, onRefresh: {
-                            refreshID = UUID()
-                        })
+                        EditableCharacterBackgroundMeritsListView(
+                            backgroundMerits: $character.backgroundMerits,
+                            characterType: character.characterType,
+                            onRefresh: {
+                                refreshID = UUID()
+                            }
+                        )
                     }
                 }
                 
@@ -570,9 +578,13 @@ struct AdvantagesFlawsTab: View {
                     }
                     
                     if isEditing {
-                        EditableCharacterBackgroundFlawsListView(backgroundFlaws: $character.backgroundFlaws, onRefresh: {
-                            refreshID = UUID()
-                        })
+                        EditableCharacterBackgroundFlawsListView(
+                            backgroundFlaws: $character.backgroundFlaws,
+                            characterType: character.characterType,
+                            onRefresh: {
+                                refreshID = UUID()
+                            }
+                        )
                     }
                 }
                 
@@ -721,6 +733,7 @@ struct CharacterBackgroundRowView: View {
 struct AddCharacterBackgroundView: View {
     @Binding var selectedBackgrounds: [CharacterBackground]
     let backgroundType: BackgroundType
+    let characterType: CharacterType
     let onRefresh: () -> Void
     @Environment(\.dismiss) var dismiss
     @State private var selectedName = ""
@@ -729,12 +742,12 @@ struct AddCharacterBackgroundView: View {
     @State private var customName = ""
     @State private var isCustom = false
     
-    var availableBackgrounds: [String] {
+    var availableBackgrounds: [V5Constants.CharacterBackgroundDefinition] {
         switch backgroundType {
         case .merit:
-            return V5Constants.characterBackgroundMerits
+            return V5Constants.getCharacterBackgroundMeritsForCharacterType(characterType)
         case .flaw:
-            return V5Constants.characterBackgroundFlaws
+            return V5Constants.getCharacterBackgroundFlawsForCharacterType(characterType)
         }
     }
     
@@ -753,8 +766,8 @@ struct AddCharacterBackgroundView: View {
                     } else {
                         Picker("Background Type", selection: $selectedName) {
                             Text("Select Background").tag("")
-                            ForEach(availableBackgrounds, id: \.self) { background in
-                                Text(background).tag(background)
+                            ForEach(availableBackgrounds, id: \.name) { background in
+                                Text(background.name).tag(background.name)
                             }
                         }
                         .pickerStyle(MenuPickerStyle())
@@ -769,11 +782,23 @@ struct AddCharacterBackgroundView: View {
                 Section {
                     Button("Add Background") {
                         let backgroundName = isCustom ? customName : selectedName
+                        
+                        // Determine suitable character types
+                        let suitableTypes: Set<CharacterType>
+                        if isCustom {
+                            // Custom backgrounds are suitable for all character types
+                            suitableTypes = Set(CharacterType.allCases)
+                        } else {
+                            // Use the suitable character types from the definition
+                            suitableTypes = availableBackgrounds.first { $0.name == backgroundName }?.suitableCharacterTypes ?? Set(CharacterType.allCases)
+                        }
+                        
                         let newBackground = CharacterBackground(
                             name: backgroundName,
                             cost: backgroundType == .flaw ? -cost : cost, // Negative for flaws
                             comment: comment,
-                            type: backgroundType
+                            type: backgroundType,
+                            suitableCharacterTypes: suitableTypes
                         )
                         selectedBackgrounds.append(newBackground)
                         onRefresh()
