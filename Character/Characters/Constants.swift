@@ -267,10 +267,8 @@ struct V5Constants {
                     V5DisciplinePower(name: "Wingman", description: "Extend Presence to another character.\nAs per power used.\nCannot double bonus with the same Presence power.", level: 4)
                 ],
                 5: [
-                    V5DisciplinePower(name: "Oração", description: "Command absolute obedience from multiple targets.\nDice pool: Charisma + Presence\nOpposing pool: Wits + Composure\nTargets follow commands even if they conflict with their nature.", level: 5),
-                    V5DisciplinePower(name: "Paragon of (Virtue)", description: "Become the perfect embodiment of a chosen emotion or ideal.\nEffect lasts for one scene.\nAll present are affected by the chosen emotion intensely.", level: 5),
-                    V5DisciplinePower(name: "Pulse of the City", description: "Sense the general mood and emotional state of an entire city district.\nDice pool: Resolve + Presence\nProvides information about major events, unrest, or supernatural activity.", level: 5),
-                    V5DisciplinePower(name: "Siren's Call", description: "Irresistibly draw all within a large area to your location.\nDice pool: Charisma + Presence\nOpposing pool: Wits + Composure\nEffect works on everyone within several city blocks.", level: 5)
+                    V5DisciplinePower(name: "Majesty", description: "All who see the user are stunned, acting only for self-preservation.\nDice pool: Charisma + Presence\nOpposing pool: Composure + Resolve\nEffect lasts for one scene. Winning the contest gives one turn plus one per margin of free action.", level: 5),
+                    V5DisciplinePower(name: "Star Magnetism", description: "Allows Presence powers to be used through live-feed tech.\nRequires one extra Rouse Check.\nIf using Entrancement, must say the target's name clearly.", level: 5)
                 ]
             ]
         ),
