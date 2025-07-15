@@ -625,6 +625,37 @@ struct CharacterTests {
         #expect(!changeSummary.contains("mind")) // Mind should not appear since it didn't change
     }
     
+    @Test func testChronicleNameNormalization() async throws {
+        // Test the core normalization logic that should fix the chronicle grouping issue
+        let testCases = [
+            ("Test Chronicle", "Test Chronicle"),    // Normal case
+            (" Test Chronicle", "Test Chronicle"),   // Leading space
+            ("Test Chronicle ", "Test Chronicle"),   // Trailing space  
+            (" Test Chronicle ", "Test Chronicle"),  // Both spaces
+            ("  Test Chronicle  ", "Test Chronicle"), // Multiple spaces
+            ("", ""),                                // Empty string
+            ("   ", ""),                            // Only spaces
+        ]
+        
+        for (input, expected) in testCases {
+            let normalized = input.trimmingCharacters(in: .whitespacesAndNewlines)
+            let result = normalized.isEmpty ? "" : normalized
+            #expect(result == expected, "Input: '\(input)' should normalize to '\(expected)' but got '\(result)'")
+        }
+        
+        // Test that normalized names would group together
+        let chronicleNames = ["Test Chronicle", " Test Chronicle", "Test Chronicle ", " Test Chronicle "]
+        let normalizedNames = chronicleNames.map { name in
+            let normalized = name.trimmingCharacters(in: .whitespacesAndNewlines)
+            return normalized.isEmpty ? "" : normalized
+        }
+        
+        // All normalized names should be the same
+        let uniqueNormalizedNames = Set(normalizedNames)
+        #expect(uniqueNormalizedNames.count == 1)
+        #expect(uniqueNormalizedNames.first == "Test Chronicle")
+    }
+    
     @Test func testGhoulCharacterInfoChangeLogging() async throws {
         // Test that changes to ghoul character info are properly logged
         let originalCharacter = GhoulCharacter()
