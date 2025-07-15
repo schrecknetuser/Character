@@ -136,17 +136,20 @@ struct CharacterCreationWizard: View {
                 HStack {
                     Button("Back") {
                         if currentStage.rawValue > 0 {
-                            let previousStage = CreationStage(rawValue: currentStage.rawValue - 1) ?? .characterType
-                            if selectedCharacterType != .vampire && (previousStage == .clan || previousStage == .predatorPath) {
-                                // Skip vampire-only stages for non-vampires
-                                if previousStage == .predatorPath {
-                                    currentStage = .clan
-                                } else if previousStage == .clan {
-                                    currentStage = .nameAndChronicle
+                            var targetStage = CreationStage(rawValue: currentStage.rawValue - 1) ?? .characterType
+                            
+                            // Skip vampire-only stages for non-vampires
+                            if selectedCharacterType != .vampire {
+                                while targetStage == .clan || targetStage == .predatorPath {
+                                    if targetStage.rawValue > 0 {
+                                        targetStage = CreationStage(rawValue: targetStage.rawValue - 1) ?? .characterType
+                                    } else {
+                                        break
+                                    }
                                 }
-                            } else {
-                                currentStage = previousStage
                             }
+                            
+                            currentStage = targetStage
                         }
                     }
                     .disabled(currentStage == .characterType)
@@ -171,17 +174,20 @@ struct CharacterCreationWizard: View {
                             }
                             
                             if currentStage.rawValue < CreationStage.allCases.count - 1 {
-                                let nextStage = CreationStage(rawValue: currentStage.rawValue + 1) ?? .ambitionAndDesire
-                                if selectedCharacterType != .vampire && (nextStage == .clan || nextStage == .predatorPath) {
-                                    // Skip vampire-only stages for non-vampires
-                                    if nextStage == .clan {
-                                        currentStage = .attributes
-                                    } else if nextStage == .predatorPath {
-                                        currentStage = .attributes
+                                var targetStage = CreationStage(rawValue: currentStage.rawValue + 1) ?? .ambitionAndDesire
+                                
+                                // Skip vampire-only stages for non-vampires
+                                if selectedCharacterType != .vampire {
+                                    while targetStage == .clan || targetStage == .predatorPath {
+                                        if targetStage.rawValue < CreationStage.allCases.count - 1 {
+                                            targetStage = CreationStage(rawValue: targetStage.rawValue + 1) ?? .ambitionAndDesire
+                                        } else {
+                                            break
+                                        }
                                     }
-                                } else {
-                                    currentStage = nextStage
                                 }
+                                
+                                currentStage = targetStage
                             }
                         }
                         .disabled({
