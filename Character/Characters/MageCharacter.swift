@@ -135,6 +135,18 @@ class MageCharacter: CharacterBase {
             changes.append("spent experience \(self.spentExperience)→\(other.spentExperience)")
         }
         
+        // Check date changes
+        if self.dateOfBirth != other.dateOfBirth {
+            let originalDate = self.dateOfBirth != nil ? formatDate(self.dateOfBirth!) : "not set"
+            let newDate = other.dateOfBirth != nil ? formatDate(other.dateOfBirth!) : "not set"
+            changes.append("date of birth \(originalDate)→\(newDate)")
+        }
+        if self.dateOfAwakening != other.dateOfAwakening {
+            let originalDate = self.dateOfAwakening != nil ? formatDate(self.dateOfAwakening!) : "not set"
+            let newDate = other.dateOfAwakening != nil ? formatDate(other.dateOfAwakening!) : "not set"
+            changes.append("date of awakening \(originalDate)→\(newDate)")
+        }
+        
         // Check sphere changes
         let allSpheres = Set(self.spheres.keys).union(Set(other.spheres.keys))
         for sphere in allSpheres {
@@ -198,5 +210,13 @@ class MageCharacter: CharacterBase {
                 changes.append("instruments added: \(addedNames)")
             }
         }
+    }
+    
+    // Helper function to format dates consistently
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        return formatter.string(from: date)
     }
 }
