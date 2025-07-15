@@ -165,6 +165,7 @@ struct V5DisciplinePower: Identifiable, Codable, Hashable {
 struct V5Discipline: Identifiable, Codable, Hashable {
     var id = UUID()
     var name: String
+    var description: String = ""
     var powers: [Int: [V5DisciplinePower]] // Level -> Powers
     var isCustom: Bool = false
     var selectedPowers: [Int: [V5DisciplinePower]] = [:] // Level -> Selected Power IDs
@@ -172,8 +173,9 @@ struct V5Discipline: Identifiable, Codable, Hashable {
     
     static var theoreticalMaxLevel = 10
     
-    init(name: String, powers: [Int: [V5DisciplinePower]] = [:], isCustom: Bool = false, allowAllLevels: Bool = false) {
+    init(name: String, description: String = "", powers: [Int: [V5DisciplinePower]] = [:], isCustom: Bool = false, allowAllLevels: Bool = false) {
         self.name = name
+        self.description = description
         self.powers = powers
         self.isCustom = isCustom
         self.allowAllLevels = allowAllLevels
@@ -229,6 +231,22 @@ struct V5Discipline: Identifiable, Codable, Hashable {
     
     func getAllSelectedPowerNames() -> Set<String> {
         return Set(selectedPowers.values.flatMap { $0.map(\.name) })
+    }
+    
+    // Custom coding to maintain backwards compatibility
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        description = try container.decodeIfPresent(String.self, forKey: .description) ?? ""
+        powers = try container.decode([Int: [V5DisciplinePower]].self, forKey: .powers)
+        isCustom = try container.decodeIfPresent(Bool.self, forKey: .isCustom) ?? false
+        selectedPowers = try container.decodeIfPresent([Int: [V5DisciplinePower]].self, forKey: .selectedPowers) ?? [:]
+        allowAllLevels = try container.decodeIfPresent(Bool.self, forKey: .allowAllLevels) ?? false
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case id, name, description, powers, isCustom, selectedPowers, allowAllLevels
     }
 }
 
