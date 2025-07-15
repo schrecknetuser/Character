@@ -1,5 +1,89 @@
 import SwiftUI
 
+// Generic item row component to reduce duplication
+struct ItemRowView<T: Identifiable>: View {
+    let item: T
+    let name: String
+    let cost: Int
+    let isCustom: Bool
+    let description: String
+    let dynamicFontSize: CGFloat
+    let captionFontSize: CGFloat
+    let isEditing: Bool
+    let onEdit: (() -> Void)?
+    let onDelete: () -> Void
+    
+    init(
+        item: T,
+        name: String,
+        cost: Int,
+        isCustom: Bool = false,
+        description: String = "",
+        dynamicFontSize: CGFloat,
+        captionFontSize: CGFloat,
+        isEditing: Bool,
+        onEdit: (() -> Void)? = nil,
+        onDelete: @escaping () -> Void
+    ) {
+        self.item = item
+        self.name = name
+        self.cost = cost
+        self.isCustom = isCustom
+        self.description = description
+        self.dynamicFontSize = dynamicFontSize
+        self.captionFontSize = captionFontSize
+        self.isEditing = isEditing
+        self.onEdit = onEdit
+        self.onDelete = onDelete
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            HStack {
+                Text(name)
+                    .font(.system(size: dynamicFontSize))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                Spacer()
+                if isCustom {
+                    Text("(Custom)")
+                        .font(.system(size: captionFontSize))
+                        .foregroundColor(.orange)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
+                }
+                Text("\(abs(cost)) pts")
+                    .font(.system(size: captionFontSize))
+                    .foregroundColor(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+                if isEditing {
+                    if let onEdit = onEdit {
+                        Button("Edit") {
+                            onEdit()
+                        }
+                        .font(.caption)
+                        .foregroundColor(.blue)
+                    }
+                    Button("Remove") {
+                        onDelete()
+                    }
+                    .font(.caption)
+                    .foregroundColor(.red)
+                }
+            }
+            if !description.isEmpty {
+                Text(description)
+                    .font(.system(size: captionFontSize - 1))
+                    .foregroundColor(.secondary)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
+                    .padding(.leading, 4)
+            }
+        }
+    }
+}
+
 // Editable Merits List View
 struct EditableAdvantagesListView: View {
     @Binding var selectedAdvantages: [BackgroundBase]
@@ -421,42 +505,18 @@ struct AdvantagesFlawsTab: View {
                             .minimumScaleFactor(0.6)
                     } else {
                         ForEach(character.advantages) { advantage in
-                            VStack(alignment: .leading, spacing: 2) {
-                                HStack {
-                                    Text(advantage.name)
-                                        .font(.system(size: dynamicFontSize))
-                                        .lineLimit(1)
-                                        .minimumScaleFactor(0.5)
-                                    Spacer()
-                                    if advantage.isCustom {
-                                        Text("(Custom)")
-                                            .font(.system(size: captionFontSize))
-                                            .foregroundColor(.orange)
-                                            .lineLimit(1)
-                                            .minimumScaleFactor(0.6)
-                                    }
-                                    Text("\(advantage.cost) pts")
-                                        .font(.system(size: captionFontSize))
-                                        .foregroundColor(.secondary)
-                                        .lineLimit(1)
-                                        .minimumScaleFactor(0.6)
-                                    if isEditing {
-                                        Button("Remove") {
-                                            itemToDelete = (advantage.id, advantage.name, "merit")
-                                            showingMeritDeleteConfirmation = true
-                                        }
-                                        .font(.caption)
-                                        .foregroundColor(.red)
-                                    }
-                                }
-                                if !advantage.description.isEmpty {
-                                    Text(advantage.description)
-                                        .font(.system(size: captionFontSize - 1))
-                                        .foregroundColor(.secondary)
-                                        .lineLimit(2)
-                                        .minimumScaleFactor(0.8)
-                                        .padding(.leading, 4)
-                                }
+                            ItemRowView(
+                                item: advantage,
+                                name: advantage.name,
+                                cost: advantage.cost,
+                                isCustom: advantage.isCustom,
+                                description: advantage.description,
+                                dynamicFontSize: dynamicFontSize,
+                                captionFontSize: captionFontSize,
+                                isEditing: isEditing
+                            ) {
+                                itemToDelete = (advantage.id, advantage.name, "merit")
+                                showingMeritDeleteConfirmation = true
                             }
                         }
                         HStack {
@@ -525,42 +585,18 @@ struct AdvantagesFlawsTab: View {
                             .minimumScaleFactor(0.6)
                     } else {
                         ForEach(character.flaws) { flaw in
-                            VStack(alignment: .leading, spacing: 2) {
-                                HStack {
-                                    Text(flaw.name)
-                                        .font(.system(size: dynamicFontSize))
-                                        .lineLimit(1)
-                                        .minimumScaleFactor(0.5)
-                                    Spacer()
-                                    if flaw.isCustom {
-                                        Text("(Custom)")
-                                            .font(.system(size: captionFontSize))
-                                            .foregroundColor(.orange)
-                                            .lineLimit(1)
-                                            .minimumScaleFactor(0.6)
-                                    }
-                                    Text("\(abs(flaw.cost)) pts")
-                                        .font(.system(size: captionFontSize))
-                                        .foregroundColor(.secondary)
-                                        .lineLimit(1)
-                                        .minimumScaleFactor(0.6)
-                                    if isEditing {
-                                        Button("Remove") {
-                                            itemToDelete = (flaw.id, flaw.name, "flaw")
-                                            showingFlawDeleteConfirmation = true
-                                        }
-                                        .font(.caption)
-                                        .foregroundColor(.red)
-                                    }
-                                }
-                                if !flaw.description.isEmpty {
-                                    Text(flaw.description)
-                                        .font(.system(size: captionFontSize - 1))
-                                        .foregroundColor(.secondary)
-                                        .lineLimit(2)
-                                        .minimumScaleFactor(0.8)
-                                        .padding(.leading, 4)
-                                }
+                            ItemRowView(
+                                item: flaw,
+                                name: flaw.name,
+                                cost: flaw.cost,
+                                isCustom: flaw.isCustom,
+                                description: flaw.description,
+                                dynamicFontSize: dynamicFontSize,
+                                captionFontSize: captionFontSize,
+                                isEditing: isEditing
+                            ) {
+                                itemToDelete = (flaw.id, flaw.name, "flaw")
+                                showingFlawDeleteConfirmation = true
                             }
                         }
                         HStack {
@@ -657,40 +693,19 @@ struct CharacterBackgroundRowView: View {
     @State private var showingEditView = false
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            HStack {
-                Text(background.name)
-                    .font(.system(size: dynamicFontSize))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                Spacer()
-                Text("\(abs(background.cost)) pts")
-                    .font(.system(size: captionFontSize))
-                    .foregroundColor(.secondary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.6)
-                if isEditing {
-                    Button("Edit") {
-                        showingEditView = true
-                    }
-                    .font(.caption)
-                    .foregroundColor(.blue)
-                    Button("Remove") {
-                        onDelete()
-                    }
-                    .font(.caption)
-                    .foregroundColor(.red)
-                }
-            }
-            if !background.comment.isEmpty {
-                Text(background.comment)
-                    .font(.system(size: captionFontSize - 1))
-                    .foregroundColor(.secondary)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.8)
-                    .padding(.leading, 4)
-            }
-        }
+        ItemRowView(
+            item: background,
+            name: background.name,
+            cost: background.cost,
+            description: background.comment,
+            dynamicFontSize: dynamicFontSize,
+            captionFontSize: captionFontSize,
+            isEditing: isEditing,
+            onEdit: {
+                showingEditView = true
+            },
+            onDelete: onDelete
+        )
         .sheet(isPresented: $showingEditView) {
             EditCharacterBackgroundView(
                 background: background,
