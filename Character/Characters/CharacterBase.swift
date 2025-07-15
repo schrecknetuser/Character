@@ -423,19 +423,21 @@ class CharacterBase: BaseCharacter {
     
     func processCharacterBackgroundChanges(original: [CharacterBackground], updated: [CharacterBackground], name: String, changes: inout [String])
     {
-        let originalSet = Set(original)
-        let updatedSet = Set(updated)
+        let originalSet = Set(original.map(\.id))
+        let updatedSet = Set(updated.map(\.id))
 
         let removed = originalSet.subtracting(updatedSet)
         let added = updatedSet.subtracting(originalSet)
 
         if !removed.isEmpty || !added.isEmpty {
             if !removed.isEmpty {
-                let removedNames = removed.map { "\($0.name) (\($0.cost) pts)" }.joined(separator: ", ")
+                let removedBackgrounds = original.filter { removed.contains($0.id) }
+                let removedNames = removedBackgrounds.map { "\($0.name) (\($0.cost) pts)" }.joined(separator: ", ")
                 changes.append("\(name) removed: \(removedNames)")
             }
             if !added.isEmpty {
-                let addedNames = added.map { "\($0.name) (\($0.cost) pts)" }.joined(separator: ", ")
+                let addedBackgrounds = updated.filter { added.contains($0.id) }
+                let addedNames = addedBackgrounds.map { "\($0.name) (\($0.cost) pts)" }.joined(separator: ", ")
                 changes.append("\(name) added: \(addedNames)")
             }
         }
