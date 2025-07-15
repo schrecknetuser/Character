@@ -257,13 +257,14 @@ struct V5Constants {
                     V5DisciplinePower(name: "Dread Gaze", description: "Instill fear to make a target flee.\nDice pool: Charisma + Presence\nOpposing pool: Composure + Resolve\nEffect lasts one turn. A critical win causes a vampire to make a difficulty 3 terror Frenzy test.", level: 3),
                     V5DisciplinePower(name: "Entrancement", description: "Influence someone to keep user happy; add Presence rating to all social rolls against them.\nDice pool: Charisma + Presence\nOpposing pool: Composure + Wits\nEffect lasts one hour plus one per margin. Harmful or opposing requests require a second roll or cause failure.", level: 3),
                     V5DisciplinePower(name: "Thrown Voice", description: "Throw voice to any point in sight.\nEffect lasts for one scene.\nRoll required only if used with other presence-enhancing powers.", level: 3),
-                    V5DisciplinePower(name: "True Love's Face", description: "Appear as someone the victim has strong emotional ties with.", level: 3)
+                    V5DisciplinePower(name: "True Love's Face", description: "Appear as someone the victim has strong emotional ties with.\nDice pool: Manipulation + Presence\nOpposing pool: Composure + Wits\nEffect lasts for one scene. May cause stains if target is the victim's touchstone.", level: 3)
                 ],
                 4: [
-                    V5DisciplinePower(name: "Irresistible Voice", description: "Compel obedience through spoken commands, even without eye contact.\nDice pool: Manipulation + Presence\nOpposing pool: Intelligence + Resolve\nEffect works through any form of voice transmission including recordings.", level: 4),
-                    V5DisciplinePower(name: "Majesty", description: "Inspire awe, devotion, and fear in all around you.\nAdd Presence rating to all social rolls.\nEffect lasts for the scene. Viewers hesitate to take hostile action.", level: 4),
-                    V5DisciplinePower(name: "Spark of Rage", description: "Incite violence and uncontrolled anger in a crowd.\nDice pool: Manipulation + Presence\nOpposing pool: Composure + Intelligence\nEffect spreads through crowd based on margin of success.", level: 4),
-                    V5DisciplinePower(name: "Summoning", description: "Call a person to come to you from anywhere.\nDice pool: Manipulation + Presence\nOpposing pool: Composure + Intelligence\nTarget feels compelled to travel to your location.", level: 4)
+                    V5DisciplinePower(name: "Irresistible Voice", description: "User's voice alone allows use of Dominate.\nPassive effect.\nDoes not work through technology.", level: 4),
+                    V5DisciplinePower(name: "Magnum Opus", description: "Infuse Presence into art or creative works.\nDice pool: Charisma/Manipulation + Craft\nAudiences resist with Composure + Resolve.", level: 4),
+                    V5DisciplinePower(name: "Suffuse the Edifice", description: "Extend Presence onto a building.\nAs per power transmitted\nIf user is present, they become the focus.", level: 4),
+                    V5DisciplinePower(name: "Summon", description: "Call someone affected by Presence or who tasted user's vitae.\nDice pool: Manipulation + Presence\nOpposing pool: Composure + Intelligence\nEffect lasts for one night. Victim won't harm themselves to reach user.", level: 4),
+                    V5DisciplinePower(name: "Wingman", description: "Extend Presence to another character.\nAs per power used.\nCannot double bonus with the same Presence power.", level: 4)
                 ],
                 5: [
                     V5DisciplinePower(name: "Oração", description: "Command absolute obedience from multiple targets.\nDice pool: Charisma + Presence\nOpposing pool: Wits + Composure\nTargets follow commands even if they conflict with their nature.", level: 5),
