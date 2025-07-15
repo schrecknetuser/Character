@@ -307,38 +307,36 @@ struct V5DisciplineRowView<T: DisciplineCapable>: View {
     @Binding var selectedDiscipline: V5Discipline?
     @Binding var showingDisciplineDetail: Bool
     @Binding var refreshID: UUID
+    @State private var showDeleteConfirmation = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
-                Text(discipline.name)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(discipline.name)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    Text("Level \(discipline.currentLevel())")
+                        .foregroundColor(.secondary)
+                        .font(.caption)
+                }
+                
                 Spacer()
-                
-                
-                Text("Level \(discipline.currentLevel())")
-                    .foregroundColor(.secondary)
-                    .font(.caption)
                 
                 if isEditing {
                     Button(action: {
-                        character.v5Disciplines.removeAll { $0.id == discipline.id }
-                        refreshID = UUID()
+                        showDeleteConfirmation = true
                     }) {
                         Image(systemName: "trash")
                             .foregroundColor(.red)
                     }
                     .buttonStyle(.borderless)
                 }
-                
-                Button(action: {
-                    selectedDiscipline = discipline
-                    showingDisciplineDetail = true
-                }) {
-                    Image(systemName: "info.circle")
-                        .foregroundColor(.accentColor)
-                }
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                selectedDiscipline = discipline
+                showingDisciplineDetail = true
             }
             
             let allSelectedPowers = getAllSelectedPowers(for: discipline)
@@ -350,6 +348,15 @@ struct V5DisciplineRowView<T: DisciplineCapable>: View {
             }
         }
         .padding(.vertical, 2)
+        .alert("Delete Discipline", isPresented: $showDeleteConfirmation) {
+            Button("Delete", role: .destructive) {
+                character.v5Disciplines.removeAll { $0.id == discipline.id }
+                refreshID = UUID()
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("Are you sure you want to delete \(discipline.name)? This action cannot be undone.")
+        }
     }
     
     private func getAllSelectedPowers(for discipline: V5Discipline) -> [V5DisciplinePower] {
