@@ -1,64 +1,64 @@
 import SwiftUI
 
-// Shared predator path selection component to avoid duplication
-struct PredatorPathSelectionView: View {
+// Shared predator type selection component to avoid duplication
+struct PredatorTypeSelectionView: View {
     @ObservedObject var vampire: VampireCharacter
-    @Binding var selectedPath: PredatorPath?
+    @Binding var selectedType: PredatorType?
     var showNoneOption: Bool = true
     var showCustomOption: Bool = true
     var onChange: (() -> Void)? = nil
-    var onCustomPathRequested: (() -> Void)? = nil
+    var onCustomTypeRequested: (() -> Void)? = nil
     
-    @State private var showingCustomPathForm: Bool = false
-    @State private var customPathName: String = ""
-    @State private var customPathDescription: String = ""
-    @State private var customPathFeedingDescription: String = ""
+    @State private var showingCustomTypeForm: Bool = false
+    @State private var customTypeName: String = ""
+    @State private var customTypeDescription: String = ""
+    @State private var customTypeFeedingDescription: String = ""
     
-    private var availablePaths: [PredatorPath] {
-        var paths = V5Constants.predatorPaths
+    private var availableTypes: [PredatorType] {
+        var types = V5Constants.predatorTypes
         
-        // Add "None" option as a special path if enabled
+        // Add "None" option as a special type if enabled
         if showNoneOption {
-            let nonePath = PredatorPath(
+            let noneType = PredatorType(
                 name: "None",
-                description: "No specific predator path chosen",
+                description: "No specific predator type chosen",
                 bonuses: [],
                 drawbacks: [],
                 feedingDescription: "Feeds as needed without a specialized hunting method"
             )
-            paths.insert(nonePath, at: 0)
+            types.insert(noneType, at: 0)
         }
         
-        // Add custom paths from the vampire character
-        paths.append(contentsOf: vampire.customPredatorPaths)
+        // Add custom types from the vampire character
+        types.append(contentsOf: vampire.customPredatorTypes)
         
-        return paths
+        return types
     }
     
     var body: some View {
         Group {
-            Section(header: Text("Select Predator Path")) {
-                ForEach(availablePaths) { path in
+            Section(header: Text("Select Predator Type")) {
+                ForEach(availableTypes) { type in
                     Button(action: {
-                        selectedPath = path
-                        if path.name != "None" {
-                            vampire.predatorPath = path.name
+                        selectedType = type
+                        if type.name != "None" {
+                            vampire.predatorType = type.name
                         } else {
-                            vampire.predatorPath = ""
+                            vampire.predatorType = ""
                         }
                         onChange?()
                     }) {
                         VStack(alignment: .leading, spacing: 4) {
                             HStack {
-                                Image(systemName: selectedPath?.name == path.name ? "circle.fill" : "circle")
-                                    .foregroundColor(selectedPath?.name == path.name ? .accentColor : .secondary)
-                                Text(path.name)
+                                Image(systemName: selectedType?.name == type.name ? "circle.fill" : "circle")
+                                    .foregroundColor(selectedType?.name == type.name ? .accentColor : .secondary)
+                                Text(type.name)
                                     .font(.headline)
                                     .foregroundColor(.primary)
                                 Spacer()
                             }
                             
-                            Text(path.description)
+                            Text(type.description)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                                 .multilineTextAlignment(.leading)
@@ -68,21 +68,21 @@ struct PredatorPathSelectionView: View {
                     .buttonStyle(PlainButtonStyle())
                 }
                 
-                // Custom path option
+                // Custom type option
                 if showCustomOption {
                     Button(action: {
-                        if let onCustomPathRequested = onCustomPathRequested {
+                        if let onCustomTypeRequested = onCustomTypeRequested {
                             // Use callback if provided (for modal context)
-                            onCustomPathRequested()
+                            onCustomTypeRequested()
                         } else {
                             // Fall back to internal sheet management (for creation context)
-                            showingCustomPathForm = true
+                            showingCustomTypeForm = true
                         }
                     }) {
                         HStack {
                             Image(systemName: "plus.circle")
                                 .foregroundColor(.accentColor)
-                            Text("Create Custom Path")
+                            Text("Create Custom Type")
                                 .font(.headline)
                                 .foregroundColor(.accentColor)
                             Spacer()
@@ -93,16 +93,16 @@ struct PredatorPathSelectionView: View {
                 }
             }
             
-            if let selectedPath = selectedPath, selectedPath.name != "None" {
-                Section(header: Text("Path Details")) {
-                    Text(selectedPath.feedingDescription)
+            if let selectedType = selectedType, selectedType.name != "None" {
+                Section(header: Text("Type Details")) {
+                    Text(selectedType.feedingDescription)
                         .font(.body)
                         .foregroundColor(.primary)
                 }
                 
-                if !selectedPath.bonuses.isEmpty {
+                if !selectedType.bonuses.isEmpty {
                     Section(header: Text("Bonuses")) {
-                        ForEach(selectedPath.bonuses) { bonus in
+                        ForEach(selectedType.bonuses) { bonus in
                             Text("• \(bonus.description)")
                                 .font(.body)
                                 .foregroundColor(.green)
@@ -110,9 +110,9 @@ struct PredatorPathSelectionView: View {
                     }
                 }
                 
-                if !selectedPath.drawbacks.isEmpty {
+                if !selectedType.drawbacks.isEmpty {
                     Section(header: Text("Drawbacks")) {
-                        ForEach(selectedPath.drawbacks) { drawback in
+                        ForEach(selectedType.drawbacks) { drawback in
                             Text("• \(drawback.description)")
                                 .font(.body)
                                 .foregroundColor(.red)
@@ -122,45 +122,45 @@ struct PredatorPathSelectionView: View {
             }
         }
         .onAppear {
-            // Set initial selection based on current vampire predator path
-            if vampire.predatorPath.isEmpty {
-                selectedPath = availablePaths.first { $0.name == "None" }
+            // Set initial selection based on current vampire predator type
+            if vampire.predatorType.isEmpty {
+                selectedType = availableTypes.first { $0.name == "None" }
             } else {
-                selectedPath = availablePaths.first { $0.name == vampire.predatorPath }
+                selectedType = availableTypes.first { $0.name == vampire.predatorType }
             }
         }
-        .sheet(isPresented: $showingCustomPathForm) {
-            CustomPredatorPathForm(
-                pathName: $customPathName,
-                pathDescription: $customPathDescription,
-                feedingDescription: $customPathFeedingDescription,
-                onSave: { path in
-                    // Add to vampire's custom paths
-                    vampire.customPredatorPaths.append(path)
-                    selectedPath = path
-                    vampire.predatorPath = path.name
+        .sheet(isPresented: $showingCustomTypeForm) {
+            CustomPredatorTypeForm(
+                typeName: $customTypeName,
+                typeDescription: $customTypeDescription,
+                feedingDescription: $customTypeFeedingDescription,
+                onSave: { type in
+                    // Add to vampire's custom types
+                    vampire.customPredatorTypes.append(type)
+                    selectedType = type
+                    vampire.predatorType = type.name
                     // Clear form fields
-                    customPathName = ""
-                    customPathDescription = ""
-                    customPathFeedingDescription = ""
+                    customTypeName = ""
+                    customTypeDescription = ""
+                    customTypeFeedingDescription = ""
                     onChange?()
                 },
                 onCancel: {
                     // Clear form fields on cancel
-                    customPathName = ""
-                    customPathDescription = ""
-                    customPathFeedingDescription = ""
+                    customTypeName = ""
+                    customTypeDescription = ""
+                    customTypeFeedingDescription = ""
                 }
             )
         }
     }
 }
 
-struct CustomPredatorPathForm: View {
-    @Binding var pathName: String
-    @Binding var pathDescription: String
+struct CustomPredatorTypeForm: View {
+    @Binding var typeName: String
+    @Binding var typeDescription: String
     @Binding var feedingDescription: String
-    var onSave: (PredatorPath) -> Void
+    var onSave: (PredatorType) -> Void
     var onCancel: (() -> Void)? = nil
     
     @Environment(\.dismiss) private var dismiss
@@ -168,17 +168,17 @@ struct CustomPredatorPathForm: View {
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("Path Information")) {
+                Section(header: Text("Type Information")) {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Name:")
                             .fontWeight(.medium)
-                        TextField("Enter path name", text: $pathName)
+                        TextField("Enter type name", text: $typeName)
                     }
                     
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Description:")
                             .fontWeight(.medium)
-                        TextField("Enter path description", text: $pathDescription, axis: .vertical)
+                        TextField("Enter type description", text: $typeDescription, axis: .vertical)
                             .lineLimit(3...6)
                     }
                     
@@ -190,11 +190,11 @@ struct CustomPredatorPathForm: View {
                     }
                 }
                 
-                Section(footer: Text("Custom predator paths allow you to create unique hunting styles for your vampire character.")) {
+                Section(footer: Text("Custom predator types allow you to create unique hunting styles for your vampire character.")) {
                     EmptyView()
                 }
             }
-            .navigationTitle("Custom Path")
+            .navigationTitle("Custom Type")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -205,17 +205,17 @@ struct CustomPredatorPathForm: View {
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Save") {
-                        let customPath = PredatorPath(
-                            name: pathName.trim(),
-                            description: pathDescription.trim(),
+                        let customType = PredatorType(
+                            name: typeName.trim(),
+                            description: typeDescription.trim(),
                             bonuses: [],
                             drawbacks: [],
                             feedingDescription: feedingDescription.trim()
                         )
-                        onSave(customPath)
+                        onSave(customType)
                         dismiss()
                     }
-                    .disabled(pathName.trim().isEmpty || pathDescription.trim().isEmpty)
+                    .disabled(typeName.trim().isEmpty || typeDescription.trim().isEmpty)
                 }
             }
         }

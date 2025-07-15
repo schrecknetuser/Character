@@ -1,22 +1,22 @@
 import Testing
 @testable import Character
 
-struct PredatorPathTests {
+struct PredatorTypeTests {
     
-    @Test func testPredatorPathInitialization() async throws {
-        // Test that predator paths are properly defined
-        let predatorPaths = V5Constants.predatorPaths
+    @Test func testPredatorTypeInitialization() async throws {
+        // Test that predator types are properly defined
+        let predatorTypes = V5Constants.predatorTypes
         
-        #expect(predatorPaths.count > 0)
-        #expect(predatorPaths.contains { $0.name == "Alleycat" })
-        #expect(predatorPaths.contains { $0.name == "Bagger" })
-        #expect(predatorPaths.contains { $0.name == "Cleaver" })
-        #expect(predatorPaths.contains { $0.name == "Siren" })
+        #expect(predatorTypes.count > 0)
+        #expect(predatorTypes.contains { $0.name == "Alleycat" })
+        #expect(predatorTypes.contains { $0.name == "Bagger" })
+        #expect(predatorTypes.contains { $0.name == "Cleaver" })
+        #expect(predatorTypes.contains { $0.name == "Siren" })
     }
     
-    @Test func testPredatorPathDetails() async throws {
-        // Test specific predator path details
-        let alleycat = V5Constants.getPredatorPath(named: "Alleycat")
+    @Test func testPredatorTypeDetails() async throws {
+        // Test specific predator type details
+        let alleycat = V5Constants.getPredatorType(named: "Alleycat")
         
         #expect(alleycat != nil)
         #expect(alleycat?.name == "Alleycat")
@@ -26,19 +26,19 @@ struct PredatorPathTests {
         #expect(alleycat?.feedingDescription.isEmpty == false)
     }
     
-    @Test func testVampireCharacterPredatorPath() async throws {
-        // Test that vampire characters can have predator paths
+    @Test func testVampireCharacterPredatorType() async throws {
+        // Test that vampire characters can have predator types
         let vampire = VampireCharacter()
         
-        #expect(vampire.predatorPath == "")
+        #expect(vampire.predatorType == "")
         
-        vampire.predatorPath = "Alleycat"
-        #expect(vampire.predatorPath == "Alleycat")
+        vampire.predatorType = "Alleycat"
+        #expect(vampire.predatorType == "Alleycat")
     }
     
-    @Test func testPredatorPathBonusTypes() async throws {
-        // Test that predator path bonuses have proper types
-        let farmer = V5Constants.getPredatorPath(named: "Farmer")
+    @Test func testPredatorTypeBonusTypes() async throws {
+        // Test that predator type bonuses have proper types
+        let farmer = V5Constants.getPredatorType(named: "Farmer")
         
         #expect(farmer != nil)
         
@@ -51,20 +51,20 @@ struct PredatorPathTests {
         #expect(skillBonus?.skillName == "Animal Ken")
     }
     
-    @Test func testAllPredatorPathNames() async throws {
-        // Test that we can get all predator path names
-        let pathNames = V5Constants.getAllPredatorPathNames()
+    @Test func testAllPredatorTypeNames() async throws {
+        // Test that we can get all predator type names
+        let typeNames = V5Constants.getAllPredatorTypeNames()
         
-        #expect(pathNames.count > 0)
-        #expect(pathNames.contains("Alleycat"))
-        #expect(pathNames.contains("Bagger"))
-        #expect(pathNames.contains("Blood Leech"))
-        #expect(pathNames.contains("Cleaver"))
-        #expect(pathNames.contains("Consensualist"))
-        #expect(pathNames.contains("Farmer"))
-        #expect(pathNames.contains("Osiris"))
-        #expect(pathNames.contains("Sandman"))
-        #expect(pathNames.contains("Scene Queen"))
-        #expect(pathNames.contains("Siren"))
+        #expect(typeNames.count > 0)
+        #expect(typeNames.contains("Alleycat"))
+        #expect(typeNames.contains("Bagger"))
+        #expect(typeNames.contains("Blood Leech"))
+        #expect(typeNames.contains("Cleaver"))
+        #expect(typeNames.contains("Consensualist"))
+        #expect(typeNames.contains("Farmer"))
+        #expect(typeNames.contains("Osiris"))
+        #expect(typeNames.contains("Sandman"))
+        #expect(typeNames.contains("Scene Queen"))
+        #expect(typeNames.contains("Siren"))
     }
 }

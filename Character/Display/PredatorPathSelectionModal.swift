@@ -1,29 +1,29 @@
 import SwiftUI
 
-struct PredatorPathSelectionModal: View {
+struct PredatorTypeSelectionModal: View {
     @ObservedObject var vampire: VampireCharacter
     @Binding var isPresented: Bool
     
-    @State private var selectedPath: PredatorPath?
-    @State private var showingCustomPathForm: Bool = false
-    @State private var customPathName: String = ""
-    @State private var customPathDescription: String = ""
-    @State private var customPathFeedingDescription: String = ""
+    @State private var selectedType: PredatorType?
+    @State private var showingCustomTypeForm: Bool = false
+    @State private var customTypeName: String = ""
+    @State private var customTypeDescription: String = ""
+    @State private var customTypeFeedingDescription: String = ""
     
     var body: some View {
         NavigationView {
             Form {
-                PredatorPathSelectionView(
+                PredatorTypeSelectionView(
                     vampire: vampire,
-                    selectedPath: $selectedPath,
+                    selectedType: $selectedType,
                     showNoneOption: true,
                     showCustomOption: true,
-                    onCustomPathRequested: {
-                        showingCustomPathForm = true
+                    onCustomTypeRequested: {
+                        showingCustomTypeForm = true
                     }
                 )
             }
-            .navigationTitle("Predator Path")
+            .navigationTitle("Predator Type")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -38,26 +38,26 @@ struct PredatorPathSelectionModal: View {
                 }
             }
         }
-        .sheet(isPresented: $showingCustomPathForm) {
-            CustomPredatorPathForm(
-                pathName: $customPathName,
-                pathDescription: $customPathDescription,
-                feedingDescription: $customPathFeedingDescription,
-                onSave: { path in
-                    // Add to vampire's custom paths
-                    vampire.customPredatorPaths.append(path)
-                    selectedPath = path
-                    vampire.predatorPath = path.name
+        .sheet(isPresented: $showingCustomTypeForm) {
+            CustomPredatorTypeForm(
+                typeName: $customTypeName,
+                typeDescription: $customTypeDescription,
+                feedingDescription: $customTypeFeedingDescription,
+                onSave: { type in
+                    // Add to vampire's custom types
+                    vampire.customPredatorTypes.append(type)
+                    selectedType = type
+                    vampire.predatorType = type.name
                     // Clear form fields
-                    customPathName = ""
-                    customPathDescription = ""
-                    customPathFeedingDescription = ""
+                    customTypeName = ""
+                    customTypeDescription = ""
+                    customTypeFeedingDescription = ""
                 },
                 onCancel: {
                     // Clear form fields on cancel
-                    customPathName = ""
-                    customPathDescription = ""
-                    customPathFeedingDescription = ""
+                    customTypeName = ""
+                    customTypeDescription = ""
+                    customTypeFeedingDescription = ""
                 }
             )
         }

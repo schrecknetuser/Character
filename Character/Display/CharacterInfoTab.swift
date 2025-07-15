@@ -8,7 +8,7 @@ struct CharacterInfoTab: View {
     @State private var newInstrumentDescription: String = ""
     @State private var newInstrumentUsage: String = ""
     @State private var refreshID: UUID = UUID()
-    @State private var showPredatorPathSelection: Bool = false
+    @State private var showPredatorTypeSelection: Bool = false
     
     var body: some View {
         GeometryReader { geometry in
@@ -132,21 +132,21 @@ struct CharacterInfoTab: View {
                         
                         // Predator Path
                         HStack {
-                            Text("Predator Path:")
+                            Text("Predator Type:")
                                 .fontWeight(.medium)
                                 .font(.system(size: dynamicFontSize))
                             Spacer()
                             if isEditing {
                                 Button(action: {
-                                    showPredatorPathSelection = true
+                                    showPredatorTypeSelection = true
                                 }) {
-                                    Text(vampire.predatorPath.isEmpty ? "Select Path" : vampire.predatorPath)
+                                    Text(vampire.predatorType.isEmpty ? "Select Type" : vampire.predatorType)
                                         .font(.system(size: dynamicFontSize))
-                                        .foregroundColor(vampire.predatorPath.isEmpty ? .secondary : .primary)
+                                        .foregroundColor(vampire.predatorType.isEmpty ? .secondary : .primary)
                                 }
                             } else {
-                                if !vampire.predatorPath.isEmpty {
-                                    Text(vampire.predatorPath)
+                                if !vampire.predatorType.isEmpty {
+                                    Text(vampire.predatorType)
                                         .font(.system(size: dynamicFontSize))
                                 } else {
                                     Text("Not set")
@@ -369,9 +369,9 @@ struct CharacterInfoTab: View {
             .onChange(of: geometry.size) { _, newSize in
                 calculateOptimalFontSize(for: newSize)
             }
-            .sheet(isPresented: $showPredatorPathSelection) {
+            .sheet(isPresented: $showPredatorTypeSelection) {
                 if let vampire = character as? VampireCharacter {
-                    PredatorPathSelectionModal(vampire: vampire, isPresented: $showPredatorPathSelection)
+                    PredatorTypeSelectionModal(vampire: vampire, isPresented: $showPredatorTypeSelection)
                 }
             }
         }
