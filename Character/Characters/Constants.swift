@@ -519,9 +519,19 @@ struct V5Constants {
                     V5DisciplinePower(name: "Web of Hunger", description: "Resist the Beckoning.\nRitual roll: Intelligence + Blood Sorcery\nCounts as Level 2 if cast with dagger; otherwise Level 4.", level: 2)
                 ],
                 3: [
-                    V5DisciplinePower(name: "Ward vs. Kindred", description: "Create barriers that repel vampires.\nDice pool: Intelligence + Blood Sorcery\nWard lasts for one month and causes pain to Kindred.", level: 3),
-                    V5DisciplinePower(name: "Pavis of Foul Presence", description: "Protect against supernatural mental intrusion.\nDice pool: Wits + Blood Sorcery\nProvides defense against Dominate, Presence, and similar powers.", level: 3),
-                    V5DisciplinePower(name: "Enchant Talisman", description: "Imbue an object with protective powers.\nDice pool: Intelligence + Blood Sorcery\nTalisman provides ongoing benefits to the bearer.", level: 3)
+                    V5DisciplinePower(name: "Bladed Hands", description: "Sharpens hands into deadly weapons.\nRitual roll: Intelligence + Blood Sorcery\nHands count as light piercing weapons with +2 modifier.", level: 3),
+                    V5DisciplinePower(name: "Bloodless Feast", description: "Purify blood into clear substance.\nRitual roll: Intelligence + Blood Sorcery\nUsers become more vulnerable to diablerie.", level: 3),
+                    V5DisciplinePower(name: "Blood Sigil", description: "Tattoo that stores messages.\nRitual roll: Intelligence + Blood Sorcery\nRead via Resolve + Occult or Auspex (Sense the Unseen).", level: 3),
+                    V5DisciplinePower(name: "Communal Vigor", description: "Share Blood Potency with packmates.\nRitual roll: Intelligence + Blood Sorcery\nGain bonus dice to Dominate and Presence rolls vs pack.", level: 3),
+                    V5DisciplinePower(name: "Dagon's Call", description: "Rupture blood vessels of a distant target.\nRitual roll: Resolve + Blood Sorcery\nCan be used up to two more times with extra Rouse Checks.", level: 3),
+                    V5DisciplinePower(name: "Deflection of Wooden Doom", description: "Protect against being staked.\nRitual roll: Intelligence + Blood Sorcery\nRoll only triggered upon being staked.", level: 3),
+                    V5DisciplinePower(name: "Elemental Shelter", description: "Merge with an elemental medium (e.g. earth, fire).\nRitual roll: Intelligence + Blood Sorcery\nKoldun's body is detectable via Wits + Awareness or Auspex.", level: 3),
+                    V5DisciplinePower(name: "Essence of Air", description: "Allows flight.\nRitual roll: Intelligence + Blood Sorcery\nHighly discouraged due to Masquerade concerns.", level: 3),
+                    V5DisciplinePower(name: "Eyes of the Past", description: "See what occurred in the current location in the past.\nRitual roll: Intelligence + Blood Sorcery\nLimited to events from past five years.", level: 3),
+                    V5DisciplinePower(name: "Fire in the Blood", description: "Inflict fire-like pain internally.\nRitual roll: Intelligence + Blood Sorcery\nTarget can only be affected once per night.", level: 3),
+                    V5DisciplinePower(name: "Firewalker", description: "Temporarily resist fire.\nRitual roll: Intelligence + Blood Sorcery\nRitual can affect others; all parts must come from caster.", level: 3),
+                    V5DisciplinePower(name: "Galvanic Ruination", description: "Short-circuits nearby electronics.\nRitual roll: Intelligence + Blood Sorcery\nMay extend range by increasing difficulty.", level: 3),
+                    V5DisciplinePower(name: "Gentle Mind", description: "Protect another from frenzy.\nRitual roll: Intelligence + Blood Sorcery\nRequires shared blood; cannot cast on self.", level: 3)
                 ],
                 4: [
                     V5DisciplinePower(name: "Ward vs. Lupines", description: "Create powerful barriers against werewolves.\nDice pool: Intelligence + Blood Sorcery\nWard causes severe damage to shapeshifters.", level: 4),
