@@ -22,7 +22,7 @@ enum CreationStage: Int, CaseIterable {
     case characterType = 0
     case nameAndChronicle = 1
     case clan = 2
-    case predatorPath = 3
+    case predatorType = 3
     case attributes = 4
     case skills = 5
     case specializations = 6
@@ -36,7 +36,7 @@ enum CreationStage: Int, CaseIterable {
         case .characterType: return "Character Type"
         case .nameAndChronicle: return "Name & Chronicle"
         case .clan: return "Clan"
-        case .predatorPath: return "Predator Path"
+        case .predatorType: return "Predator Type"
         case .attributes: return "Attributes"
         case .skills: return "Skills"
         case .specializations: return "Specializations"
@@ -93,9 +93,9 @@ struct CharacterCreationWizard: View {
                             // Skip clan selection for non-vampires
                             EmptyView()
                         }
-                    case .predatorPath:
+                    case .predatorType:
                         if selectedCharacterType == .vampire {
-                            PredatorPathSelectionStage(character: viewModel.asVampireForced, onChange: {
+                            PredatorTypeSelectionStage(character: viewModel.asVampireForced, onChange: {
                                 triggerRefresh.toggle()
                             })
                         } else {
@@ -140,7 +140,7 @@ struct CharacterCreationWizard: View {
                             
                             // Skip vampire-only stages for non-vampires
                             if selectedCharacterType != .vampire {
-                                while targetStage == .clan || targetStage == .predatorPath {
+                                while targetStage == .clan || targetStage == .predatorType {
                                     if targetStage.rawValue > 0 {
                                         targetStage = CreationStage(rawValue: targetStage.rawValue - 1) ?? .characterType
                                     } else {
@@ -178,7 +178,7 @@ struct CharacterCreationWizard: View {
                                 
                                 // Skip vampire-only stages for non-vampires
                                 if selectedCharacterType != .vampire {
-                                    while targetStage == .clan || targetStage == .predatorPath {
+                                    while targetStage == .clan || targetStage == .predatorType {
                                         if targetStage.rawValue < CreationStage.allCases.count - 1 {
                                             targetStage = CreationStage(rawValue: targetStage.rawValue + 1) ?? .ambitionAndDesire
                                         } else {
@@ -219,7 +219,7 @@ struct CharacterCreationWizard: View {
                        !viewModel.character.chronicleName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             case .clan:
                 return selectedCharacterType != .vampire || (viewModel.asVampire?.clan.isEmpty == false)
-            case .predatorPath:
+            case .predatorType:
                 return true // Allow any predator path choice including "None"
             case .attributes:
                 return AttributesStage.areAllAttributesAssigned(character: viewModel.character)

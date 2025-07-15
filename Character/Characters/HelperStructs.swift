@@ -232,10 +232,10 @@ struct V5Discipline: Identifiable, Codable, Hashable {
     }
 }
 
-// MARK: - Predator Path System
+// MARK: - Predator Type System
 
-// Data structure for predator path bonuses/drawbacks
-struct PredatorPathBonus: Identifiable, Codable, Hashable {
+// Data structure for predator type bonuses/drawbacks
+struct PredatorTypeBonus: Identifiable, Codable, Hashable {
     var id = UUID()
     var type: BonusType
     var skillName: String?
@@ -265,16 +265,16 @@ struct PredatorPathBonus: Identifiable, Codable, Hashable {
     }
 }
 
-// Data structure for predator paths
-struct PredatorPath: Identifiable, Codable, Hashable {
+// Data structure for predator types
+struct PredatorType: Identifiable, Codable, Hashable {
     var id = UUID()
     var name: String
     var description: String
-    var bonuses: [PredatorPathBonus]
-    var drawbacks: [PredatorPathBonus]
+    var bonuses: [PredatorTypeBonus]
+    var drawbacks: [PredatorTypeBonus]
     var feedingDescription: String
     
-    init(name: String, description: String, bonuses: [PredatorPathBonus] = [], drawbacks: [PredatorPathBonus] = [], feedingDescription: String = "") {
+    init(name: String, description: String, bonuses: [PredatorTypeBonus] = [], drawbacks: [PredatorTypeBonus] = [], feedingDescription: String = "") {
         self.name = name
         self.description = description
         self.bonuses = bonuses

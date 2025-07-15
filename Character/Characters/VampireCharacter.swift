@@ -10,11 +10,11 @@ class VampireCharacter: CharacterBase, DisciplineCapable, CharacterWithHumanity 
     @Published var humanityStates: [HumanityState]
     @Published var dateOfEmbrace: Date? = nil
     @Published var v5Disciplines: [V5Discipline] = []
-    @Published var predatorPath: String = ""
-    @Published var customPredatorPaths: [PredatorPath] = []
+    @Published var predatorType: String = ""
+    @Published var customPredatorTypes: [PredatorType] = []
 
     enum CodingKeys: String, CodingKey {
-        case clan, generation, bloodPotency, humanity, hunger, disciplines, v5Disciplines, humanityStates, dateOfEmbrace, predatorPath, customPredatorPaths
+        case clan, generation, bloodPotency, humanity, hunger, disciplines, v5Disciplines, humanityStates, dateOfEmbrace, predatorType, customPredatorTypes
     }
 
     override init(characterType: CharacterType = .vampire) {
@@ -47,8 +47,8 @@ class VampireCharacter: CharacterBase, DisciplineCapable, CharacterWithHumanity 
         self.v5Disciplines = try container.decodeIfPresent([V5Discipline].self, forKey: .v5Disciplines) ?? []
         self.humanityStates = try container.decode([HumanityState].self, forKey: .humanityStates)
         self.dateOfEmbrace = try container.decodeIfPresent(Date.self, forKey: .dateOfEmbrace)
-        self.predatorPath = try container.decodeIfPresent(String.self, forKey: .predatorPath) ?? ""
-        self.customPredatorPaths = try container.decodeIfPresent([PredatorPath].self, forKey: .customPredatorPaths) ?? []
+        self.predatorType = try container.decodeIfPresent(String.self, forKey: .predatorType) ?? ""
+        self.customPredatorTypes = try container.decodeIfPresent([PredatorType].self, forKey: .customPredatorTypes) ?? []
         try super.init(from: decoder)
     }
 
@@ -63,8 +63,8 @@ class VampireCharacter: CharacterBase, DisciplineCapable, CharacterWithHumanity 
         try container.encode(v5Disciplines, forKey: .v5Disciplines)
         try container.encode(humanityStates, forKey: .humanityStates)
         try container.encodeIfPresent(dateOfEmbrace, forKey: .dateOfEmbrace)
-        try container.encode(predatorPath, forKey: .predatorPath)
-        try container.encode(customPredatorPaths, forKey: .customPredatorPaths)
+        try container.encode(predatorType, forKey: .predatorType)
+        try container.encode(customPredatorTypes, forKey: .customPredatorTypes)
     }
     
     override func generateChangeSummary(for updated: any BaseCharacter) -> String {
@@ -91,8 +91,8 @@ class VampireCharacter: CharacterBase, DisciplineCapable, CharacterWithHumanity 
         if self.clan != other.clan {
             changes.append("clan \(self.clan)→\(other.clan)")
         }
-        if self.predatorPath != other.predatorPath {
-            changes.append("predator path \(self.predatorPath)→\(other.predatorPath)")
+        if self.predatorType != other.predatorType {
+            changes.append("predator type \(self.predatorType)→\(other.predatorType)")
         }
         if self.generation != other.generation {
             changes.append("generation \(self.generation)→\(other.generation)")
@@ -178,8 +178,8 @@ class VampireCharacter: CharacterBase, DisciplineCapable, CharacterWithHumanity 
         copy.hunger = self.hunger
         copy.v5Disciplines = self.v5Disciplines
         copy.dateOfEmbrace = self.dateOfEmbrace
-        copy.predatorPath = self.predatorPath
-        copy.customPredatorPaths = self.customPredatorPaths
+        copy.predatorType = self.predatorType
+        copy.customPredatorTypes = self.customPredatorTypes
 
         return copy
     }
