@@ -239,9 +239,8 @@ struct TabDisciplineRow: View {
                 .controlSize(.small)
             }
 
-            let level1Powers = discipline.getPowers(for: 1)
-            if !level1Powers.isEmpty {
-                Text("Level 1 Powers: \(level1Powers.map { $0.name }.joined(separator: ", "))")
+            if !discipline.description.isEmpty {
+                Text(discipline.description)
                     .font(.caption)
                     .foregroundColor(.secondary)
             }

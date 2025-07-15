@@ -79,6 +79,7 @@ struct V5Constants {
         // Animalism
         V5Discipline(
             name: "Animalism",
+            description: "Utilized by those who desire a close and supernatural bond with the animal world as well as a vampire's own Beast.",
             powers: [
                 1: [
                     V5DisciplinePower(name: "Bond Famulus", description: "Create an enhanced animal companion.\nDice pool: Charisma + Animal Ken", level: 1),
@@ -113,6 +114,7 @@ struct V5Constants {
         // Auspex
         V5Discipline(
             name: "Auspex",
+            description: "Enables users to hone their senses both physical and psychic in order to bolster their awareness, perceptions, or even see visions of the future.",
             powers: [
                 1: [
                     V5DisciplinePower(name: "Heightened Senses", description: "Enhance vampiric senses and add Auspex rating to all perception rolls.\nDice pool: Wits + Resolve", level: 1),
@@ -145,6 +147,7 @@ struct V5Constants {
         // Celerity
         V5Discipline(
             name: "Celerity",
+            description: "Powers up the movement of the user, enabling them to have unnatural quickness in their movement and supernatural reflexes.",
             powers: [
                 1: [
                     V5DisciplinePower(name: "Cat's Grace", description: "Automatically pass balance tests.", level: 1),
@@ -176,6 +179,7 @@ struct V5Constants {
         // Dominate
         V5Discipline(
             name: "Dominate",
+            description: "Allows the user to use mind control through eye contact and spoken word as well as manipulate memories of their victims.",
             powers: [
                 1: [
                     V5DisciplinePower(name: "Cloud Memory", description: "Make someone forget the current moment.\nDice pool: Charisma + Dominate\nOpposing pool: Wits + Resolve", level: 1),
@@ -208,6 +212,7 @@ struct V5Constants {
         // Fortitude
         V5Discipline(
             name: "Fortitude",
+            description: "Strengthens the user's physical and mental resistance.",
             powers: [
                 1: [
                     V5DisciplinePower(name: "Fluent Endurance", description: "Reroll the Blood Surge rouse check on a Stamina or Fortitude test.", level: 1),
@@ -242,6 +247,7 @@ struct V5Constants {
         // Presence
         V5Discipline(
             name: "Presence",
+            description: "Enables the user to use subtle manipulation, control, and swaying of emotions to guide others towards a goal.",
             powers: [
                 1: [
                     V5DisciplinePower(name: "Awe", description: "Add Presence rating to any Skill roll involving Persuasion, Performance, or Charisma related rolls.\nEffect lasts for one scene or until ended by the user.\nOnce the power wears off, the victim reverts to their original opinions.", level: 1),
@@ -276,6 +282,7 @@ struct V5Constants {
         // Blood Sorcery
         V5Discipline(
             name: "Blood Sorcery",
+            description: "A type of blood magic that allows the practitioners to manipulate the blood, mortal or vampiric.",
             powers: [
                 1: [
                     V5DisciplinePower(name: "Corrosive Vitae", description: "Turn vitae corrosive.", level: 1),
@@ -309,6 +316,7 @@ struct V5Constants {
         // Obfuscate
         V5Discipline(
             name: "Obfuscate",
+            description: "The art of not being seen even in crowds either through being wholly unseen or by blending in.",
             powers: [
                 1: [
                     V5DisciplinePower(name: "Cloak of Shadows", description: "Stand still to blend into surroundings.", level: 1),
@@ -345,6 +353,7 @@ struct V5Constants {
         // Potence
         V5Discipline(
             name: "Potence",
+            description: "Strengthens the user's physical prowess.",
             powers: [
                 1: [
                     V5DisciplinePower(name: "Fluent Strength", description: "Reroll Blood Surge rouse checks on Strength or Potence rolls.", level: 1),
@@ -376,6 +385,7 @@ struct V5Constants {
         // Protean
         V5Discipline(
             name: "Protean",
+            description: "Grants the ability to change one's shape, grow claws, meld into the earth, or become fog.",
             powers: [
                 1: [
                     V5DisciplinePower(name: "Eyes of the Beast", description: "See in total darkness.\n+2 bonus dice to intimidation against mortals while active.\nEffect lasts as long as desired.", level: 1),
@@ -407,6 +417,7 @@ struct V5Constants {
         // Oblivion
         V5Discipline(
             name: "Oblivion",
+            description: "Has two branches: one allows the user to manipulate shadows at will and the other enables necromancy or usage of spirits, though both tap into the Abyss.",
             powers: [
                 1: [
                     V5DisciplinePower(name: "Ashes to Ashes", description: "Destroy a corpse by dissolving it.\nDice pool: Stamina + Oblivion\nOpposing pool: Stamina + Medicine/Fortitude\nIf the body is not animated it will dissolve throughout three turns with no test needed.", level: 1),
@@ -445,6 +456,7 @@ struct V5Constants {
         // Oblivion Ceremonies
         V5Discipline(
             name: "Oblivion Ceremonies",
+            description: "dark rites that harness the powers of death and the underworld to summon spirits, command decay, or breach the Shroud.",
             powers: [
                 1: [
                     V5DisciplinePower(name: "Compel Spirit", description: "Force a ghost to manifest and interact.\nDice pool: Manipulation + Oblivion\nOpposing pool: Resolve + Composure\nCeremony requires 10 minutes and a personal item.", level: 1),
@@ -472,6 +484,7 @@ struct V5Constants {
         // Blood Sorcery Rituals
         V5Discipline(
             name: "Blood Sorcery Rituals",
+            description: "Structured magical rites that channel vitae and occult knowledge to produce versatile supernatural effects.",
             powers: [
                 1: [
                     V5DisciplinePower(name: "Astromancy", description: "Learn information such as Skills, Desires and Convictions about someone.\nRitual roll: Intelligence + Blood Sorcery\nAdd 1 die if caster knows either Birth or Embrace date (not both).", level: 1),
