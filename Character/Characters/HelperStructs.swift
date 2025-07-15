@@ -132,12 +132,16 @@ struct V5DisciplinePower: Identifiable, Codable, Hashable {
     var description: String
     var level: Int
     var isCustom: Bool = false
+    var addToHealth: Bool = false
+    var addToWillpower: Bool = false
     
-    init(name: String, description: String, level: Int, isCustom: Bool = false) {
+    init(name: String, description: String, level: Int, isCustom: Bool = false, addToHealth: Bool = false, addToWillpower: Bool = false) {
         self.name = name
         self.description = description
         self.level = level
         self.isCustom = isCustom
+        self.addToHealth = addToHealth
+        self.addToWillpower = addToWillpower
     }
 }
 

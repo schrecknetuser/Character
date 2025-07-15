@@ -189,7 +189,7 @@ struct V5Constants {
             name: "Fortitude",
             powers: [
                 1: [
-                    V5DisciplinePower(name: "Resilience", description: "Reduce damage from physical attacks", level: 1),
+                    V5DisciplinePower(name: "Resilience", description: "Reduce damage from physical attacks", level: 1, addToHealth: true),
                     V5DisciplinePower(name: "Unswayable Mind", description: "Resist mental intrusion and emotional manipulation", level: 1)
                 ],
                 2: [
