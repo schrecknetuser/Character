@@ -463,9 +463,9 @@ struct V5Constants {
             name: "Alleycat",
             description: "Those who find violence to be the quickest way to get what they want might gravitate towards this hunting style. Alleycats are a vampire who feeds by brute force and outright attack and feeds from whomever they can when they can. Intimidation is a route easily taken to make their victims cower or even Dominating the victims to not report the attack or mask it as something else entirely.",
             bonuses: [
-                PredatorTypeBonus(type: .skillSpecialization, description: "Intimidation (Stickups)", skillName: "Intimidation", specializationName: "Stickups"),
-                PredatorTypeBonus(type: .disciplineDot, description: "Celerity 1", disciplineName: "Celerity"),
-                PredatorTypeBonus(type: .merit, description: "Criminal Contacts (3 pts)", meritName: "Criminal Contacts")
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Intimidation (Stickups) or Brawl (Grappling)", skillName: "Intimidation", specializationName: "Stickups"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of either Celerity or Potence", disciplineName: "Celerity"),
+                PredatorTypeBonus(type: .merit, description: "Three dots of Criminal Contacts", meritName: "Criminal Contacts")
             ],
             drawbacks: [
                 PredatorTypeBonus(type: .flaw, description: "Lose one dot of Humanity", flawName: "Humanity Loss")
@@ -477,12 +477,12 @@ struct V5Constants {
             name: "Bagger",
             description: "Sometimes the best blood doesn't come from a live body. Baggers are kindred who take an approach most are unable to with their ability to consume preserved, defractionated or rancid blood through (•••) Iron Gullet, allowing them to feed from unusual sources such as blood bags or corpses. Perhaps they work in a hospital or blood bank or they might even have enough knowledge about the black market to obtain their blood. Ventrue are unable to pick this Predator type.",
             bonuses: [
-                PredatorTypeBonus(type: .skillSpecialization, description: "Larceny (Lock Picking)", skillName: "Larceny", specializationName: "Lock Picking"),
-                PredatorTypeBonus(type: .disciplineDot, description: "Obfuscate 1", disciplineName: "Obfuscate"),
-                PredatorTypeBonus(type: .merit, description: "Iron Gullet (3 pts)", meritName: "Iron Gullet")
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Larceny (Lock Picking) or Streetwise (Black Market)", skillName: "Larceny", specializationName: "Lock Picking"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Blood Sorcery (Tremere and Banu Haqim only), Oblivion (Hecata only), or Obfuscate", disciplineName: "Obfuscate"),
+                PredatorTypeBonus(type: .merit, description: "Iron Gullet Merit (3 pts)", meritName: "Iron Gullet")
             ],
             drawbacks: [
-                PredatorTypeBonus(type: .flaw, description: "Enemy (2 pts) - someone who believes this vampire owes them something", flawName: "Enemy")
+                PredatorTypeBonus(type: .flaw, description: "Enemy Flaw (2 pts) - someone who believes this vampire owes them something", flawName: "Enemy")
             ],
             feedingDescription: "Intelligence + Streetwise can be used to find, gain access and purchase the goods."
         ),
@@ -491,14 +491,14 @@ struct V5Constants {
             name: "Blood Leech",
             description: "Some Kindred might see feeding from mortals as inherently wrong or disgusting regardless of others' rationale. Blood Leech is a feeding style that is not looked upon kindly by many vampires making it risky unless the Kindred has a position of power and can keep their little secret secure. Regardless, with their rejection of mortal blood, they instead feed upon the vitae of other vampires through hunting those weaker than them, coercion, or taking Blood as payment.",
             bonuses: [
-                PredatorTypeBonus(type: .skillSpecialization, description: "Brawl (Kindred)", skillName: "Brawl", specializationName: "Kindred"),
-                PredatorTypeBonus(type: .disciplineDot, description: "Celerity 1", disciplineName: "Celerity"),
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Brawl (Kindred) or Stealth (Against Kindred)", skillName: "Brawl", specializationName: "Kindred"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Celerity or Protean", disciplineName: "Celerity"),
                 PredatorTypeBonus(type: .other, description: "Increase blood potency by one")
             ],
             drawbacks: [
                 PredatorTypeBonus(type: .flaw, description: "Lose one dot of Humanity", flawName: "Humanity Loss"),
-                PredatorTypeBonus(type: .flaw, description: "Dark Secret: Diablerist (2 pts)", flawName: "Dark Secret"),
-                PredatorTypeBonus(type: .flaw, description: "Prey Exclusion: Mortals (2 pts)", flawName: "Prey Exclusion")
+                PredatorTypeBonus(type: .flaw, description: "Dark Secret Flaw: Diablerist (2 pts), or Shunned Flaw (2 pts)", flawName: "Dark Secret"),
+                PredatorTypeBonus(type: .flaw, description: "Feeding Flaw: Prey Exclusion (Mortals) (2 pts)", flawName: "Prey Exclusion")
             ],
             feedingDescription: "This Predator Type is suggested to not be abstracted down to a dice pool."
         ),
@@ -507,12 +507,12 @@ struct V5Constants {
             name: "Cleaver",
             description: "The sweetest blood might be from those closest to them, the Cleaver takes advantage of that idea while taking blood from either their own close family and friends or even those close to someone else. Covertly stealing the blood from their victims while still maintaining ties to them. Cleavers will go to extreme lengths to keep their condition a secret from their victims but some may instead take a less than pleasant route. The Camarilla forbids the practice of taking a human family in this fashion, as it's a breach waiting to happen.",
             bonuses: [
-                PredatorTypeBonus(type: .skillSpecialization, description: "Persuasion (Gaslighting)", skillName: "Persuasion", specializationName: "Gaslighting"),
-                PredatorTypeBonus(type: .disciplineDot, description: "Dominate 1", disciplineName: "Dominate"),
-                PredatorTypeBonus(type: .merit, description: "Herd (2 pts)", meritName: "Herd")
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Persuasion (Gaslighting) or Subterfuge (Coverups)", skillName: "Persuasion", specializationName: "Gaslighting"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Dominate or Animalism", disciplineName: "Dominate"),
+                PredatorTypeBonus(type: .merit, description: "Herd Advantage (2 pts)", meritName: "Herd")
             ],
             drawbacks: [
-                PredatorTypeBonus(type: .flaw, description: "Dark Secret: Cleaver (1 pt)", flawName: "Dark Secret")
+                PredatorTypeBonus(type: .flaw, description: "Dark Secret Flaw: Cleaver (1 pt)", flawName: "Dark Secret")
             ],
             feedingDescription: "Manipulation + Subterfuge is used to condition the victims, socializing with them and feeding from them without the cover being blown."
         ),
@@ -521,13 +521,13 @@ struct V5Constants {
             name: "Consensualist",
             description: "Consent is a dangerous thing to gather when they're a blood-sucking monster, but Consensualists make do. They never feed against the victim's free will, instead pretending to be a representative of a charity blood drive, someone with a blood kink within the kink community, or blatantly admitting to their victims what they are and getting their permission to feed. To the Camarilla, the last method is considered a masquerade breach but perhaps to a philosophical Anarch, it might be an acceptable risk to take.",
             bonuses: [
-                PredatorTypeBonus(type: .skillSpecialization, description: "Medicine (Phlebotomy)", skillName: "Medicine", specializationName: "Phlebotomy"),
-                PredatorTypeBonus(type: .disciplineDot, description: "Auspex 1", disciplineName: "Auspex"),
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Medicine (Phlebotomy) or Persuasion (Vessels)", skillName: "Medicine", specializationName: "Phlebotomy"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Auspex or Fortitude", disciplineName: "Auspex"),
                 PredatorTypeBonus(type: .merit, description: "Gain one dot of Humanity", meritName: "Humanity")
             ],
             drawbacks: [
-                PredatorTypeBonus(type: .flaw, description: "Dark Secret: Masquerade Breacher (1 pt)", flawName: "Dark Secret"),
-                PredatorTypeBonus(type: .flaw, description: "Prey Exclusion: Non-consenting (1 pt)", flawName: "Prey Exclusion")
+                PredatorTypeBonus(type: .flaw, description: "Dark Secret Flaw: Masquerade Breacher (1 pt)", flawName: "Dark Secret"),
+                PredatorTypeBonus(type: .flaw, description: "Feeding Flaw: Prey Exclusion (Non-consenting) (1 pt)", flawName: "Prey Exclusion")
             ],
             feedingDescription: "Manipulation + Persuasion allows the kindred to take blood by consent, under the guide of medical work or mutual kink."
         ),
@@ -536,12 +536,12 @@ struct V5Constants {
             name: "Farmer",
             description: "Perhaps this vampire was once someone who worked as an activist or an aid worker, regardless of their reasoning the Farmer only feed from animals as their primary source of blood. The beast may gnaw at them with its throes of hunger, but they've successfully managed to avoid killing mortals except on the occasional bad night. Ventrue may not pick this Predator type and it cannot be taken on characters with Blood Potency 3 or higher.",
             bonuses: [
-                PredatorTypeBonus(type: .skillSpecialization, description: "Animal Ken (specific animal)", skillName: "Animal Ken", specializationName: "Specific Animal"),
-                PredatorTypeBonus(type: .disciplineDot, description: "Animalism 1", disciplineName: "Animalism"),
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Animal Ken (specific animal) or Survival (Hunting)", skillName: "Animal Ken", specializationName: "Specific Animal"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Animalism or Protean", disciplineName: "Animalism"),
                 PredatorTypeBonus(type: .merit, description: "Gain one dot of Humanity", meritName: "Humanity")
             ],
             drawbacks: [
-                PredatorTypeBonus(type: .flaw, description: "Farmer (2 pts)", flawName: "Farmer")
+                PredatorTypeBonus(type: .flaw, description: "Feeding Flaw: Farmer (2 pts)", flawName: "Farmer")
             ],
             feedingDescription: "Composure + Animal Ken is the roll to find and catch the chosen animal."
         ),
@@ -550,12 +550,12 @@ struct V5Constants {
             name: "Osiris",
             description: "More than not, Osiris are celebrities within mortal society. Musicians, writers, priests, and even cult leaders may find an easy time finding their blood by utilizing those already around them. They tend to feed from their fans or worshippers which means they have easy access to blood, but followers tend to attract their own problems with the local authority or worse.",
             bonuses: [
-                PredatorTypeBonus(type: .skillSpecialization, description: "Occult (specific tradition)", skillName: "Occult", specializationName: "Specific Tradition"),
-                PredatorTypeBonus(type: .disciplineDot, description: "Presence 1", disciplineName: "Presence"),
-                PredatorTypeBonus(type: .merit, description: "Fame and Herd (3 pts total)", meritName: "Fame and Herd")
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Occult (specific tradition) or Performance (specific entertainment field)", skillName: "Occult", specializationName: "Specific Tradition"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Blood Sorcery (Tremere or Banu Haqim only) or Presence", disciplineName: "Presence"),
+                PredatorTypeBonus(type: .merit, description: "Spend three dots between Fame and Herd Backgrounds", meritName: "Fame and Herd")
             ],
             drawbacks: [
-                PredatorTypeBonus(type: .flaw, description: "Enemies and Mythic (2 pts total)", flawName: "Enemies and Mythic")
+                PredatorTypeBonus(type: .flaw, description: "Spend two dots between Enemies and Mythic Flaws", flawName: "Enemies and Mythic")
             ],
             feedingDescription: "Manipulation + Subterfuge or Intimidation + Fame are both used to feed from the adoring fans."
         ),
@@ -564,8 +564,8 @@ struct V5Constants {
             name: "Sandman",
             description: "If they never wake during the feed it never happened, right? Sandman prefers to hunt on sleeping mortals than anyone else by using stealth or Disciplines to feed from their victims they are rarely caught in the act, though when they are, problems are sure to occur. Maybe they were anti-social in life or perhaps they find the route of seduction or violence too much for them and find comfort in the silence of this feeding style.",
             bonuses: [
-                PredatorTypeBonus(type: .skillSpecialization, description: "Medicine (Anesthetics)", skillName: "Medicine", specializationName: "Anesthetics"),
-                PredatorTypeBonus(type: .disciplineDot, description: "Auspex 1", disciplineName: "Auspex"),
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Medicine (Anesthetics) or Stealth (Break-in)", skillName: "Medicine", specializationName: "Anesthetics"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Auspex or Obfuscate", disciplineName: "Auspex"),
                 PredatorTypeBonus(type: .merit, description: "Resources (1 pt)", meritName: "Resources")
             ],
             drawbacks: [],
@@ -576,13 +576,13 @@ struct V5Constants {
             name: "Scene Queen",
             description: "Similar to Osiris these Kindred find comfort in a particular subculture rather than a wider audience. Hunting in or around a subculture they likely belonged to in their previous life, their victims adore them for their status, and those who have an inkling of what they are disbelieved. The scene itself could be anything, from street culture to high fashion, and the unifying trait is the use of those around them.",
             bonuses: [
-                PredatorTypeBonus(type: .skillSpecialization, description: "Etiquette (specific scene)", skillName: "Etiquette", specializationName: "Specific Scene"),
-                PredatorTypeBonus(type: .disciplineDot, description: "Dominate 1", disciplineName: "Dominate"),
-                PredatorTypeBonus(type: .merit, description: "Fame (1 pt)", meritName: "Fame"),
-                PredatorTypeBonus(type: .merit, description: "Contact (1 pt)", meritName: "Contact")
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Etiquette (specific scene), Leadership (specific scene), or Streetwise (specific scene)", skillName: "Etiquette", specializationName: "Specific Scene"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Dominate or Potence", disciplineName: "Dominate"),
+                PredatorTypeBonus(type: .merit, description: "Fame Advantage (1 pt)", meritName: "Fame"),
+                PredatorTypeBonus(type: .merit, description: "Contact Advantage (1 pt)", meritName: "Contact")
             ],
             drawbacks: [
-                PredatorTypeBonus(type: .flaw, description: "Disliked outside their subculture (1 pt)", flawName: "Influence")
+                PredatorTypeBonus(type: .flaw, description: "Either Influence Flaw: Disliked (outside their subculture) (1 pt) or Feeding Flaw: Prey Exclusion (a different subculture than theirs) (1 pt)", flawName: "Influence")
             ],
             feedingDescription: "Manipulation + Persuasion aids in feeding from those within the Kindred's subgroup, through conditioning and isolation to gain blood or gaslighting or forced silence."
         ),
@@ -591,12 +591,12 @@ struct V5Constants {
             name: "Siren",
             description: "Everyone knows that sex sells and the Siren uses this to their advantage. Almost exclusively feeding while feigning sex or sexual interest, they utilize Disciplines and seduction to lure away a possible meal. Moving through clubs and one-night stands are skills they've mastered and regardless of how sexy they feel, deep in their darkest moments, they realize at best they are problematic and at worst a serial sexual assaulter.",
             bonuses: [
-                PredatorTypeBonus(type: .skillSpecialization, description: "Persuasion (Seduction)", skillName: "Persuasion", specializationName: "Seduction"),
-                PredatorTypeBonus(type: .disciplineDot, description: "Fortitude 1", disciplineName: "Fortitude"),
-                PredatorTypeBonus(type: .merit, description: "Beautiful (2 pts)", meritName: "Beautiful")
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Persuasion (Seduction) or Subterfuge (Seduction)", skillName: "Persuasion", specializationName: "Seduction"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Fortitude or Presence", disciplineName: "Fortitude"),
+                PredatorTypeBonus(type: .merit, description: "Looks Merit: Beautiful (2 pts)", meritName: "Beautiful")
             ],
             drawbacks: [
-                PredatorTypeBonus(type: .flaw, description: "Enemy: spurned lover or jealous partner (1 pt)", flawName: "Enemy")
+                PredatorTypeBonus(type: .flaw, description: "Enemy Flaw: spurned lover or jealous partner (1 pt)", flawName: "Enemy")
             ],
             feedingDescription: "Charisma + Subterfuge is how sirens feed under the guise of sexual acts."
         ),
@@ -605,12 +605,12 @@ struct V5Constants {
             name: "Extortionist",
             description: "On the surface, Extortionists acquire their blood in exchange for services such as protection, security, or surveillance. Though, for as many times as the service might be genuine, there are many more times when the service has been offered from fabricated information to make the deal feel that much sweeter.",
             bonuses: [
-                PredatorTypeBonus(type: .skillSpecialization, description: "Intimidation (Coercion)", skillName: "Intimidation", specializationName: "Coercion"),
-                PredatorTypeBonus(type: .disciplineDot, description: "Dominate 1", disciplineName: "Dominate"),
-                PredatorTypeBonus(type: .merit, description: "Contacts and Resources (3 pts total)", meritName: "Contacts and Resources")
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Intimidation (Coercion) or Larceny (Security)", skillName: "Intimidation", specializationName: "Coercion"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Dominate or Potence", disciplineName: "Dominate"),
+                PredatorTypeBonus(type: .merit, description: "Spend three dots between Contacts and Resources Backgrounds", meritName: "Contacts and Resources")
             ],
             drawbacks: [
-                PredatorTypeBonus(type: .flaw, description: "Enemy: police or escaped victim (2 pts)", flawName: "Enemy")
+                PredatorTypeBonus(type: .flaw, description: "Enemy Flaw: police or escaped victim (2 pts)", flawName: "Enemy")
             ],
             feedingDescription: "Strength/Manipulation + Intimidation to feed through coercion."
         ),
@@ -619,13 +619,13 @@ struct V5Constants {
             name: "Graverobber",
             description: "Similar to Baggers these kindred understand there's no good in wasting good blood, even if others cannot consume it. Often they find themselves digging up corpses or working or mortuaries to obtain their bodies, yet regardless of what the name suggests, they prefer feeding from mourners at a gravesite or a hospital. This Predator Type often requires a haven or other connections to a church, hospital, or morgue as a way to obtain the bodies.",
             bonuses: [
-                PredatorTypeBonus(type: .skillSpecialization, description: "Occult (Grave Rituals)", skillName: "Occult", specializationName: "Grave Rituals"),
-                PredatorTypeBonus(type: .disciplineDot, description: "Fortitude 1", disciplineName: "Fortitude"),
-                PredatorTypeBonus(type: .merit, description: "Iron Gullet (3 pts)", meritName: "Iron Gullet"),
-                PredatorTypeBonus(type: .merit, description: "Haven (1 pt)", meritName: "Haven")
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Occult (Grave Rituals) or Medicine (Cadavers)", skillName: "Occult", specializationName: "Grave Rituals"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Fortitude or Oblivion", disciplineName: "Fortitude"),
+                PredatorTypeBonus(type: .merit, description: "Feeding Merit: Iron Gullet (3 pts)", meritName: "Iron Gullet"),
+                PredatorTypeBonus(type: .merit, description: "Haven Advantage (1 pt)", meritName: "Haven")
             ],
             drawbacks: [
-                PredatorTypeBonus(type: .flaw, description: "Obvious Predator (2 pts)", flawName: "Obvious Predator")
+                PredatorTypeBonus(type: .flaw, description: "Herd Flaw: Obvious Predator (2 pts)", flawName: "Obvious Predator")
             ],
             feedingDescription: "Resolve + Medicine for sifting through the dead for a body with blood. Manipulation + Insight for moving among miserable mortals."
         ),
@@ -634,12 +634,12 @@ struct V5Constants {
             name: "Roadside Killer",
             description: "These Kindred never stay in one spot for too long and are always on the move, hunting those who won't be missed if they disappear alongside the road. Roadside Killers know the risk is just as worth as the reward. Perhaps this Kindred was once a truck driver themselves or maybe they met their fate alongside the road as well.",
             bonuses: [
-                PredatorTypeBonus(type: .skillSpecialization, description: "Survival (the road)", skillName: "Survival", specializationName: "The Road"),
-                PredatorTypeBonus(type: .disciplineDot, description: "Fortitude 1", disciplineName: "Fortitude"),
-                PredatorTypeBonus(type: .merit, description: "Migrating Herd (2 pts)", meritName: "Migrating Herd")
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Survival (the road) or Investigation (vampire cant)", skillName: "Survival", specializationName: "The Road"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Fortitude or Protean", disciplineName: "Fortitude"),
+                PredatorTypeBonus(type: .merit, description: "Two additional dots of migrating Herd", meritName: "Migrating Herd")
             ],
             drawbacks: [
-                PredatorTypeBonus(type: .flaw, description: "Prey Exclusion: locals", flawName: "Prey Exclusion")
+                PredatorTypeBonus(type: .flaw, description: "Feeding Flaw: Prey Exclusion (locals)", flawName: "Prey Exclusion")
             ],
             feedingDescription: "Dexterity/Charisma + Drive to feed by picking up down and outs with no other options."
         ),
@@ -648,13 +648,13 @@ struct V5Constants {
             name: "Grim Reaper",
             description: "Hunting inside hospice care facilities, assisted living homes, and other places where those who are near death reside. Grim Reapers are constantly on the move in an effort to locate new victims near the end of their lives to feed from. Hunting in this style may also earn a taste for specific diseases making them easier to identify.",
             bonuses: [
-                PredatorTypeBonus(type: .skillSpecialization, description: "Awareness (Death)", skillName: "Awareness", specializationName: "Death"),
-                PredatorTypeBonus(type: .disciplineDot, description: "Auspex 1", disciplineName: "Auspex"),
-                PredatorTypeBonus(type: .merit, description: "Allies or Influence (medical community) (1 pt)", meritName: "Allies"),
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Awareness (Death) or Larceny (Forgery)", skillName: "Awareness", specializationName: "Death"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Auspex or Oblivion", disciplineName: "Auspex"),
+                PredatorTypeBonus(type: .merit, description: "One dot of Allies or Influence associated with the medical community", meritName: "Allies"),
                 PredatorTypeBonus(type: .merit, description: "Gain one dot of Humanity", meritName: "Humanity")
             ],
             drawbacks: [
-                PredatorTypeBonus(type: .flaw, description: "Prey Exclusion: Healthy Mortals (1 pt)", flawName: "Prey Exclusion")
+                PredatorTypeBonus(type: .flaw, description: "Feeding Flaw: Prey Exclusion (Healthy Mortals) (1 pt)", flawName: "Prey Exclusion")
             ],
             feedingDescription: "Intelligence + Awareness/Medicine in order to find victims."
         ),
@@ -663,8 +663,8 @@ struct V5Constants {
             name: "Montero",
             description: "Montero carry on a tradition held by aristocratic Spaniards where they hunted deer and used teams to drive them into the huntsman. Retainers drive the victims towards the vampire for them to feed. This is not always done in the traditional style but in the forms of long cons, flash mobs, or gang pursuits.",
             bonuses: [
-                PredatorTypeBonus(type: .skillSpecialization, description: "Leadership (Hunting Pack)", skillName: "Leadership", specializationName: "Hunting Pack"),
-                PredatorTypeBonus(type: .disciplineDot, description: "Dominate 1", disciplineName: "Dominate"),
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Leadership (Hunting Pack) or Stealth (Stakeout)", skillName: "Leadership", specializationName: "Hunting Pack"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Dominate or Obfuscate", disciplineName: "Dominate"),
                 PredatorTypeBonus(type: .merit, description: "Retainers (2 pts)", meritName: "Retainers")
             ],
             drawbacks: [
@@ -677,10 +677,10 @@ struct V5Constants {
             name: "Pursuer",
             description: "For those who prefer to stalk their victim, learning their habits and routines, determining if they will cause an outcry if they disappear or not. The Pursuer strikes when the time is right and when hunger is at a perfect balance.",
             bonuses: [
-                PredatorTypeBonus(type: .skillSpecialization, description: "Investigation (Profiling)", skillName: "Investigation", specializationName: "Profiling"),
-                PredatorTypeBonus(type: .disciplineDot, description: "Animalism 1", disciplineName: "Animalism"),
-                PredatorTypeBonus(type: .merit, description: "Bloodhound (1 pt)", meritName: "Bloodhound"),
-                PredatorTypeBonus(type: .merit, description: "Contacts (1 pt)", meritName: "Contacts")
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Investigation (Profiling) or Stealth (Shadowing)", skillName: "Investigation", specializationName: "Profiling"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Animalism or Auspex", disciplineName: "Animalism"),
+                PredatorTypeBonus(type: .merit, description: "Bloodhound Merit (1 pt)", meritName: "Bloodhound"),
+                PredatorTypeBonus(type: .merit, description: "One dot of Contacts from the morally flexible inhabitants", meritName: "Contacts")
             ],
             drawbacks: [
                 PredatorTypeBonus(type: .flaw, description: "Lose one dot of Humanity", flawName: "Humanity Loss")
@@ -692,13 +692,13 @@ struct V5Constants {
             name: "Trapdoor",
             description: "Much like the spider, this vampire builds a nest and lures their prey inside. Be it an amusement park, an abandoned house, or an underground club, the victim comes to them. There the trapdoor might only play with their mind and terrorize them, imprison them to drain them slowly, or take a deep drink and then send them home.",
             bonuses: [
-                PredatorTypeBonus(type: .skillSpecialization, description: "Persuasion (Marketing)", skillName: "Persuasion", specializationName: "Marketing"),
-                PredatorTypeBonus(type: .disciplineDot, description: "Protean 1", disciplineName: "Protean"),
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Persuasion (Marketing) or Stealth (Ambushes or Traps)", skillName: "Persuasion", specializationName: "Marketing"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Protean or Obfuscate", disciplineName: "Protean"),
                 PredatorTypeBonus(type: .merit, description: "Haven (1 pt)", meritName: "Haven"),
-                PredatorTypeBonus(type: .merit, description: "Retainers or Herd (1 pt)", meritName: "Retainers or Herd")
+                PredatorTypeBonus(type: .merit, description: "One dot of either Retainers or Herd, or a second Haven dot", meritName: "Retainers or Herd")
             ],
             drawbacks: [
-                PredatorTypeBonus(type: .flaw, description: "Haven Flaw: Creepy or Haunted (1 pt)", flawName: "Haven Flaw")
+                PredatorTypeBonus(type: .flaw, description: "One Haven Flaw, either Creepy (1 pt) or Haunted (1 pt)", flawName: "Haven Flaw")
             ],
             feedingDescription: "Charisma + Stealth for the victims that enter expecting a fun-filled night. Dexterity + Stealth to feed upon trespassers. Wits + Awareness + Haven dots is used to navigate the maze of the den itself."
         ),
@@ -707,9 +707,9 @@ struct V5Constants {
             name: "Tithe Collector",
             description: "They hold enough power that other Kindred around them pay tribute in the form of specially selected vessels, who are delivered regularly, or upon request. The vessels must be kept in reasonable condition and returned, but otherwise the Masquerade is everyone else's problem.",
             bonuses: [
-                PredatorTypeBonus(type: .skillSpecialization, description: "Intimidation (Kindred)", skillName: "Intimidation", specializationName: "Kindred"),
-                PredatorTypeBonus(type: .disciplineDot, description: "Dominate 1", disciplineName: "Dominate"),
-                PredatorTypeBonus(type: .merit, description: "Domain or Status (3 pts)", meritName: "Domain or Status")
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Intimidation (Kindred) or Leadership (Kindred)", skillName: "Intimidation", specializationName: "Kindred"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Dominate or Presence", disciplineName: "Dominate"),
+                PredatorTypeBonus(type: .merit, description: "Three dots of Domain or Status", meritName: "Domain or Status")
             ],
             drawbacks: [
                 PredatorTypeBonus(type: .flaw, description: "Adversary (2 pts)", flawName: "Adversary")
