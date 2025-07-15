@@ -38,35 +38,23 @@ struct PredatorTypeSelectionView: View {
     var body: some View {
         Group {
             Section(header: Text("Select Predator Type")) {
-                ForEach(availableTypes) { type in
-                    Button(action: {
-                        selectedType = type
-                        if type.name != "None" {
-                            vampire.predatorType = type.name
+                Picker("Predator Type", selection: Binding(
+                    get: { selectedType?.name ?? "" },
+                    set: { typeName in
+                        selectedType = availableTypes.first { $0.name == typeName }
+                        if typeName != "None" && !typeName.isEmpty {
+                            vampire.predatorType = typeName
                         } else {
                             vampire.predatorType = ""
                         }
                         onChange?()
-                    }) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack {
-                                Image(systemName: selectedType?.name == type.name ? "circle.fill" : "circle")
-                                    .foregroundColor(selectedType?.name == type.name ? .accentColor : .secondary)
-                                Text(type.name)
-                                    .font(.headline)
-                                    .foregroundColor(.primary)
-                                Spacer()
-                            }
-                            
-                            Text(type.description)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .multilineTextAlignment(.leading)
-                        }
-                        .padding(.vertical, 2)
                     }
-                    .buttonStyle(PlainButtonStyle())
+                )) {
+                    ForEach(availableTypes) { type in
+                        Text(type.name).tag(type.name)
+                    }
                 }
+                .pickerStyle(.menu)
                 
                 // Custom type option
                 if showCustomOption {
@@ -94,10 +82,16 @@ struct PredatorTypeSelectionView: View {
             }
             
             if let selectedType = selectedType, selectedType.name != "None" {
-                Section(header: Text("Type Details")) {
-                    Text(selectedType.feedingDescription)
+                Section(header: Text("Description")) {
+                    Text(selectedType.description)
                         .font(.body)
                         .foregroundColor(.primary)
+                }
+                
+                Section(header: Text("Feeding Method")) {
+                    Text(selectedType.feedingDescription)
+                        .font(.body)
+                        .foregroundColor(.secondary)
                 }
                 
                 if !selectedType.bonuses.isEmpty {
