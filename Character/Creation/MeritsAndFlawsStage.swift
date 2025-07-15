@@ -6,6 +6,46 @@ struct MeritsAndFlawsStage: View {
     
     var body: some View {
         Form {
+            Section(header: Text("Backgrounds (Merits)")) {
+                if character.backgroundMerits.isEmpty {
+                    Text("No background merits selected")
+                        .foregroundColor(.secondary)
+                } else {
+                    ForEach(character.backgroundMerits) { background in
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(background.name)
+                                if !background.comment.isEmpty {
+                                    Text(background.comment)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            Spacer()
+                            Text("\(background.cost) pts")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Button("Remove") {
+                                character.backgroundMerits.removeAll { $0.id == background.id }
+                                refresh()
+                            }
+                            .font(.caption)
+                            .foregroundColor(.red)
+                        }
+                    }
+                    
+                    HStack {
+                        Text("Total Cost:")
+                            .fontWeight(.semibold)
+                        Spacer()
+                        Text("\(character.backgroundMerits.reduce(0) { $0 + $1.cost }) pts")
+                            .fontWeight(.semibold)
+                    }
+                }
+                
+                CreationBackgroundMeritsListView(selectedBackgrounds: $character.backgroundMerits)
+            }
+            
             Section(header: Text("Merits")) {
                 if character.advantages.isEmpty {
                     Text("No merits selected")
@@ -37,6 +77,46 @@ struct MeritsAndFlawsStage: View {
                 }
                 
                 CreationMeritsListView(selectedMerits: $character.advantages, characterType: character.characterType)
+            }
+            
+            Section(header: Text("Backgrounds (Flaws)")) {
+                if character.backgroundFlaws.isEmpty {
+                    Text("No background flaws selected")
+                        .foregroundColor(.secondary)
+                } else {
+                    ForEach(character.backgroundFlaws) { background in
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(background.name)
+                                if !background.comment.isEmpty {
+                                    Text(background.comment)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            Spacer()
+                            Text("\(abs(background.cost)) pts")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Button("Remove") {
+                                character.backgroundFlaws.removeAll { $0.id == background.id }
+                                refresh()
+                            }
+                            .font(.caption)
+                            .foregroundColor(.red)
+                        }
+                    }
+                    
+                    HStack {
+                        Text("Total Value:")
+                            .fontWeight(.semibold)
+                        Spacer()
+                        Text("\(abs(character.backgroundFlaws.reduce(0) { $0 + $1.cost })) pts")
+                            .fontWeight(.semibold)
+                    }
+                }
+                
+                CreationBackgroundFlawsListView(selectedBackgrounds: $character.backgroundFlaws)
             }
             
             Section(header: Text("Flaws")) {
@@ -72,7 +152,7 @@ struct MeritsAndFlawsStage: View {
                 CreationFlawsListView(selectedFlaws: $character.flaws, characterType: character.characterType)
             }
             
-            Section(footer: Text("Merits and flaws are optional for character creation.")) {
+            Section(footer: Text("Backgrounds and merits/flaws are optional for character creation.")) {
                 EmptyView()
             }
         }
@@ -81,6 +161,44 @@ struct MeritsAndFlawsStage: View {
     
     private func refresh() {
         refreshID = UUID()
+    }
+}
+
+struct CreationBackgroundMeritsListView: View {
+    @Binding var selectedBackgrounds: [CharacterBackground]
+    @State private var showingAddBackground = false
+    
+    var body: some View {
+        Button("Add Background Merit") {
+            showingAddBackground = true
+        }
+        .foregroundColor(.accentColor)
+        .sheet(isPresented: $showingAddBackground) {
+            AddCharacterBackgroundView(
+                selectedBackgrounds: $selectedBackgrounds,
+                backgroundType: .merit,
+                onRefresh: {}
+            )
+        }
+    }
+}
+
+struct CreationBackgroundFlawsListView: View {
+    @Binding var selectedBackgrounds: [CharacterBackground]
+    @State private var showingAddBackground = false
+    
+    var body: some View {
+        Button("Add Background Flaw") {
+            showingAddBackground = true
+        }
+        .foregroundColor(.accentColor)
+        .sheet(isPresented: $showingAddBackground) {
+            AddCharacterBackgroundView(
+                selectedBackgrounds: $selectedBackgrounds,
+                backgroundType: .flaw,
+                onRefresh: {}
+            )
+        }
     }
 }
 

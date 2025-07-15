@@ -639,8 +639,10 @@ struct CharacterBackgroundRowView: View {
         }
         .sheet(isPresented: $showingEditView) {
             EditCharacterBackgroundView(
-                background: .constant(background),
-                onSave: { onEdit(background) }
+                background: background,
+                onSave: { editedBackground in
+                    onEdit(editedBackground)
+                }
             )
         }
     }
@@ -714,17 +716,17 @@ struct AddCharacterBackgroundView: View {
 
 // Helper view for editing character backgrounds
 struct EditCharacterBackgroundView: View {
-    @Binding var background: CharacterBackground
-    let onSave: () -> Void
+    let background: CharacterBackground
+    let onSave: (CharacterBackground) -> Void
     @Environment(\.dismiss) var dismiss
     @State private var cost: Int
     @State private var comment: String
     
-    init(background: Binding<CharacterBackground>, onSave: @escaping () -> Void) {
-        self._background = background
+    init(background: CharacterBackground, onSave: @escaping (CharacterBackground) -> Void) {
+        self.background = background
         self.onSave = onSave
-        self._cost = State(initialValue: abs(background.wrappedValue.cost))
-        self._comment = State(initialValue: background.wrappedValue.comment)
+        self._cost = State(initialValue: abs(background.cost))
+        self._comment = State(initialValue: background.comment)
     }
     
     var body: some View {
@@ -753,9 +755,10 @@ struct EditCharacterBackgroundView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        background.cost = background.type == .flaw ? -cost : cost
-                        background.comment = comment
-                        onSave()
+                        var editedBackground = background
+                        editedBackground.cost = background.type == .flaw ? -cost : cost
+                        editedBackground.comment = comment
+                        onSave(editedBackground)
                         dismiss()
                     }
                 }
