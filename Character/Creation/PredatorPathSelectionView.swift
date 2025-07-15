@@ -7,6 +7,7 @@ struct PredatorPathSelectionView: View {
     var showNoneOption: Bool = true
     var showCustomOption: Bool = true
     var onChange: (() -> Void)? = nil
+    var onCustomPathRequested: (() -> Void)? = nil
     
     @State private var showingCustomPathForm: Bool = false
     @State private var customPathName: String = ""
@@ -70,7 +71,13 @@ struct PredatorPathSelectionView: View {
                 // Custom path option
                 if showCustomOption {
                     Button(action: {
-                        showingCustomPathForm = true
+                        if let onCustomPathRequested = onCustomPathRequested {
+                            // Use callback if provided (for modal context)
+                            onCustomPathRequested()
+                        } else {
+                            // Fall back to internal sheet management (for creation context)
+                            showingCustomPathForm = true
+                        }
                     }) {
                         HStack {
                             Image(systemName: "plus.circle")
@@ -124,7 +131,6 @@ struct PredatorPathSelectionView: View {
         }
         .sheet(isPresented: $showingCustomPathForm) {
             CustomPredatorPathForm(
-                isPresented: $showingCustomPathForm,
                 pathName: $customPathName,
                 pathDescription: $customPathDescription,
                 feedingDescription: $customPathFeedingDescription,
@@ -138,6 +144,12 @@ struct PredatorPathSelectionView: View {
                     customPathDescription = ""
                     customPathFeedingDescription = ""
                     onChange?()
+                },
+                onCancel: {
+                    // Clear form fields on cancel
+                    customPathName = ""
+                    customPathDescription = ""
+                    customPathFeedingDescription = ""
                 }
             )
         }
@@ -145,11 +157,11 @@ struct PredatorPathSelectionView: View {
 }
 
 struct CustomPredatorPathForm: View {
-    @Binding var isPresented: Bool
     @Binding var pathName: String
     @Binding var pathDescription: String
     @Binding var feedingDescription: String
     var onSave: (PredatorPath) -> Void
+    var onCancel: (() -> Void)? = nil
     
     @Environment(\.dismiss) private var dismiss
     
@@ -187,6 +199,7 @@ struct CustomPredatorPathForm: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
+                        onCancel?()
                         dismiss()
                     }
                 }
