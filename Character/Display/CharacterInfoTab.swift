@@ -9,6 +9,7 @@ struct CharacterInfoTab: View {
     @State private var newInstrumentUsage: String = ""
     @State private var refreshID: UUID = UUID()
     @State private var showPredatorTypeSelection: Bool = false
+    @State private var showPredatorTypeInfo: Bool = false
     
     var body: some View {
         GeometryReader { geometry in
@@ -146,8 +147,14 @@ struct CharacterInfoTab: View {
                                 }
                             } else {
                                 if !vampire.predatorType.isEmpty {
-                                    Text(vampire.predatorType)
-                                        .font(.system(size: dynamicFontSize))
+                                    Button(action: {
+                                        showPredatorTypeInfo = true
+                                    }) {
+                                        Text(vampire.predatorType)
+                                            .font(.system(size: dynamicFontSize))
+                                            .foregroundColor(.blue)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
                                 } else {
                                     Text("Not set")
                                         .foregroundColor(.secondary)
@@ -372,6 +379,11 @@ struct CharacterInfoTab: View {
             .sheet(isPresented: $showPredatorTypeSelection) {
                 if let vampire = character as? VampireCharacter {
                     PredatorTypeSelectionModal(vampire: vampire, isPresented: $showPredatorTypeSelection)
+                }
+            }
+            .sheet(isPresented: $showPredatorTypeInfo) {
+                if let vampire = character as? VampireCharacter {
+                    PredatorTypeDisplayModal(vampire: vampire, isPresented: $showPredatorTypeInfo)
                 }
             }
         }
