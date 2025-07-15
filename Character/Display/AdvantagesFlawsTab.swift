@@ -2,7 +2,7 @@ import SwiftUI
 
 // Editable Merits List View
 struct EditableAdvantagesListView: View {
-    @Binding var selectedAdvantages: [Background]
+    @Binding var selectedAdvantages: [BackgroundBase]
     let characterType: CharacterType
     let onRefresh: () -> Void
     @State private var showingAddAdvantage = false
@@ -20,7 +20,7 @@ struct EditableAdvantagesListView: View {
 
 // Editable Flaws List View
 struct EditableFlawsListView: View {
-    @Binding var selectedFlaws: [Background]
+    @Binding var selectedFlaws: [BackgroundBase]
     let characterType: CharacterType
     let onRefresh: () -> Void
     @State private var showingAddFlaw = false
@@ -36,9 +36,51 @@ struct EditableFlawsListView: View {
     }
 }
 
+// Editable Character Background Merits List View
+struct EditableCharacterBackgroundMeritsListView: View {
+    @Binding var backgroundMerits: [CharacterBackground]
+    let onRefresh: () -> Void
+    @State private var showingAddBackground = false
+    
+    var body: some View {
+        Button("Add Background") {
+            showingAddBackground = true
+        }
+        .foregroundColor(.accentColor)
+        .sheet(isPresented: $showingAddBackground) {
+            AddCharacterBackgroundView(
+                selectedBackgrounds: $backgroundMerits,
+                backgroundType: .merit,
+                onRefresh: onRefresh
+            )
+        }
+    }
+}
+
+// Editable Character Background Flaws List View
+struct EditableCharacterBackgroundFlawsListView: View {
+    @Binding var backgroundFlaws: [CharacterBackground]
+    let onRefresh: () -> Void
+    @State private var showingAddBackground = false
+    
+    var body: some View {
+        Button("Add Background") {
+            showingAddBackground = true
+        }
+        .foregroundColor(.accentColor)
+        .sheet(isPresented: $showingAddBackground) {
+            AddCharacterBackgroundView(
+                selectedBackgrounds: $backgroundFlaws,
+                backgroundType: .flaw,
+                onRefresh: onRefresh
+            )
+        }
+    }
+}
+
 // Helper view for managing advantages list
 struct AdvantagesListView: View {
-    @Binding var selectedAdvantages: [Background]
+    @Binding var selectedAdvantages: [BackgroundBase]
     let characterType: CharacterType
     @State private var showingAddAdvantage = false
     
@@ -85,17 +127,17 @@ struct AdvantagesListView: View {
 
 // Helper view for adding advantages
 struct AddAdvantageView: View {
-    @Binding var selectedAdvantages: [Background]
+    @Binding var selectedAdvantages: [BackgroundBase]
     let characterType: CharacterType
     let onRefresh: () -> Void
     @Environment(\.dismiss) var dismiss
-    @State private var selectedPredefined: Background?
+    @State private var selectedPredefined: BackgroundBase?
     @State private var customName = ""
     @State private var customCost = 1
     @State private var customDescription = ""
     @State private var isCustom = false
     
-    var filteredAdvantages: [Background] {
+    var filteredAdvantages: [BackgroundBase] {
         V5Constants.getAdvantagesForCharacterType(characterType)
     }
     
@@ -111,7 +153,7 @@ struct AddAdvantageView: View {
                                 Text("\(advantage.cost) pts")
                                     .foregroundColor(.secondary)
                                 Button("Add") {
-                                    let newAdvantage = Background(name: advantage.name, cost: advantage.cost, description: advantage.description, isCustom: advantage.isCustom, suitableCharacterTypes: advantage.suitableCharacterTypes)
+                                    let newAdvantage = BackgroundBase(name: advantage.name, cost: advantage.cost, description: advantage.description, isCustom: advantage.isCustom, suitableCharacterTypes: advantage.suitableCharacterTypes)
                                     selectedAdvantages.append(newAdvantage)
                                     // Trigger refresh in parent view
                                     onRefresh()
@@ -120,7 +162,6 @@ struct AddAdvantageView: View {
                                         dismiss()
                                     }
                                 }
-                                .disabled(selectedAdvantages.contains { $0.name == advantage.name })
                             }
                             if !advantage.description.isEmpty {
                                 Text(advantage.description)
@@ -139,7 +180,7 @@ struct AddAdvantageView: View {
                         .font(.caption)
                     Stepper("Cost: \(customCost)", value: $customCost, in: 1...10)
                     Button("Add Custom") {
-                        let customAdvantage = Background(name: customName, cost: customCost, description: customDescription, isCustom: true, suitableCharacterTypes: [characterType])
+                        let customAdvantage = BackgroundBase(name: customName, cost: customCost, description: customDescription, isCustom: true, suitableCharacterTypes: [characterType])
                         selectedAdvantages.append(customAdvantage)
                         // Trigger refresh in parent view
                         onRefresh()
@@ -165,7 +206,7 @@ struct AddAdvantageView: View {
 
 // Helper view for managing flaws list
 struct FlawsListView: View {
-    @Binding var selectedFlaws: [Background]
+    @Binding var selectedFlaws: [BackgroundBase]
     let characterType: CharacterType
     @State private var showingAddFlaw = false
     
@@ -212,7 +253,7 @@ struct FlawsListView: View {
 
 // Helper view for adding flaws
 struct AddFlawView: View {
-    @Binding var selectedFlaws: [Background]
+    @Binding var selectedFlaws: [BackgroundBase]
     let characterType: CharacterType
     let onRefresh: () -> Void
     @Environment(\.dismiss) var dismiss
@@ -220,7 +261,7 @@ struct AddFlawView: View {
     @State private var customCost = 1
     @State private var customDescription = ""
     
-    var filteredFlaws: [Background] {
+    var filteredFlaws: [BackgroundBase] {
         V5Constants.getFlawsForCharacterType(characterType)
     }
     
@@ -236,7 +277,7 @@ struct AddFlawView: View {
                                 Text("\(abs(flaw.cost)) pts")
                                     .foregroundColor(.secondary)
                                 Button("Add") {
-                                    let newFlaw = Background(name: flaw.name, cost: flaw.cost, description: flaw.description, isCustom: flaw.isCustom, suitableCharacterTypes: flaw.suitableCharacterTypes)
+                                    let newFlaw = BackgroundBase(name: flaw.name, cost: flaw.cost, description: flaw.description, isCustom: flaw.isCustom, suitableCharacterTypes: flaw.suitableCharacterTypes)
                                     selectedFlaws.append(newFlaw)
                                     // Trigger refresh in parent view
                                     onRefresh()
@@ -245,7 +286,6 @@ struct AddFlawView: View {
                                         dismiss()
                                     }
                                 }
-                                .disabled(selectedFlaws.contains { $0.name == flaw.name })
                             }
                             if !flaw.description.isEmpty {
                                 Text(flaw.description)
@@ -264,7 +304,7 @@ struct AddFlawView: View {
                         .font(.caption)
                     Stepper("Value: \(customCost)", value: $customCost, in: 1...10)
                     Button("Add Custom") {
-                        let customFlaw = Background(name: customName, cost: -customCost, description: customDescription, isCustom: true, suitableCharacterTypes: [characterType]) // Negative cost for flaws
+                        let customFlaw = BackgroundBase(name: customName, cost: -customCost, description: customDescription, isCustom: true, suitableCharacterTypes: [characterType]) // Negative cost for flaws
                         selectedFlaws.append(customFlaw)
                         // Trigger refresh in parent view
                         onRefresh()
@@ -298,6 +338,53 @@ struct AdvantagesFlawsTab: View {
     var body: some View {
         GeometryReader { geometry in
             Form {
+                // Backgrounds (merits) section - comes before merits
+                Section(header: Text("Backgrounds (Merits)")) {
+                    if character.backgroundMerits.isEmpty {
+                        Text("No background merits recorded")
+                            .foregroundColor(.secondary)
+                            .font(.system(size: dynamicFontSize))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
+                    } else {
+                        ForEach(character.backgroundMerits) { background in
+                            CharacterBackgroundRowView(
+                                background: background,
+                                dynamicFontSize: dynamicFontSize,
+                                captionFontSize: captionFontSize,
+                                isEditing: isEditing,
+                                onEdit: { editedBackground in
+                                    if let index = character.backgroundMerits.firstIndex(where: { $0.id == background.id }) {
+                                        character.backgroundMerits[index] = editedBackground
+                                        refreshID = UUID()
+                                    }
+                                },
+                                onDelete: {
+                                    character.backgroundMerits.removeAll { $0.id == background.id }
+                                    refreshID = UUID()
+                                }
+                            )
+                        }
+                        HStack {
+                            Text("Total Cost:")
+                                .font(.system(size: dynamicFontSize, weight: .semibold))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.6)
+                            Spacer()
+                            Text("\(character.backgroundMerits.reduce(0) { $0 + $1.cost }) pts")
+                                .font(.system(size: dynamicFontSize, weight: .semibold))
+                                .foregroundColor(.primary)
+                                .lineLimit(1)
+                        }
+                    }
+                    
+                    if isEditing {
+                        EditableCharacterBackgroundMeritsListView(backgroundMerits: $character.backgroundMerits, onRefresh: {
+                            refreshID = UUID()
+                        })
+                    }
+                }
+                
                 Section(header: Text("Merits")) {
                     if character.advantages.isEmpty {
                         Text("No merits recorded")
@@ -351,7 +438,7 @@ struct AdvantagesFlawsTab: View {
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.6)
                             Spacer()
-                            Text("\(character.totalAdvantageCost) pts")
+                            Text("\(character.advantages.reduce(0) { $0 + $1.cost }) pts")
                                 .font(.system(size: dynamicFontSize, weight: .semibold))
                                 .foregroundColor(.primary)
                                 .lineLimit(1)
@@ -360,6 +447,53 @@ struct AdvantagesFlawsTab: View {
                     
                     if isEditing {
                         EditableAdvantagesListView(selectedAdvantages: $character.advantages, characterType: character.characterType, onRefresh: {
+                            refreshID = UUID()
+                        })
+                    }
+                }
+                
+                // Backgrounds (flaws) section - comes before flaws
+                Section(header: Text("Backgrounds (Flaws)")) {
+                    if character.backgroundFlaws.isEmpty {
+                        Text("No background flaws recorded")
+                            .foregroundColor(.secondary)
+                            .font(.system(size: dynamicFontSize))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
+                    } else {
+                        ForEach(character.backgroundFlaws) { background in
+                            CharacterBackgroundRowView(
+                                background: background,
+                                dynamicFontSize: dynamicFontSize,
+                                captionFontSize: captionFontSize,
+                                isEditing: isEditing,
+                                onEdit: { editedBackground in
+                                    if let index = character.backgroundFlaws.firstIndex(where: { $0.id == background.id }) {
+                                        character.backgroundFlaws[index] = editedBackground
+                                        refreshID = UUID()
+                                    }
+                                },
+                                onDelete: {
+                                    character.backgroundFlaws.removeAll { $0.id == background.id }
+                                    refreshID = UUID()
+                                }
+                            )
+                        }
+                        HStack {
+                            Text("Total Value:")
+                                .font(.system(size: dynamicFontSize, weight: .semibold))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.6)
+                            Spacer()
+                            Text("\(abs(character.backgroundFlaws.reduce(0) { $0 + $1.cost })) pts")
+                                .font(.system(size: dynamicFontSize, weight: .semibold))
+                                .foregroundColor(.primary)
+                                .lineLimit(1)
+                        }
+                    }
+                    
+                    if isEditing {
+                        EditableCharacterBackgroundFlawsListView(backgroundFlaws: $character.backgroundFlaws, onRefresh: {
                             refreshID = UUID()
                         })
                     }
@@ -418,7 +552,7 @@ struct AdvantagesFlawsTab: View {
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.6)
                             Spacer()
-                            Text("\(abs(character.totalFlawValue)) pts")
+                            Text("\(abs(character.flaws.reduce(0) { $0 + $1.cost })) pts")
                                 .font(.system(size: dynamicFontSize, weight: .semibold))
                                 .foregroundColor(.primary)
                                 .lineLimit(1)
@@ -455,5 +589,177 @@ struct AdvantagesFlawsTab: View {
         
         dynamicFontSize = max(11, min(18, baseDynamicSize * scaleFactor))
         captionFontSize = max(9, min(14, baseCaptionSize * scaleFactor))
+    }
+}
+
+// Helper view for displaying character background rows
+struct CharacterBackgroundRowView: View {
+    let background: CharacterBackground
+    let dynamicFontSize: CGFloat
+    let captionFontSize: CGFloat
+    let isEditing: Bool
+    let onEdit: (CharacterBackground) -> Void
+    let onDelete: () -> Void
+    @State private var showingEditView = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            HStack {
+                Text(background.name)
+                    .font(.system(size: dynamicFontSize))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                Spacer()
+                Text("\(abs(background.cost)) pts")
+                    .font(.system(size: captionFontSize))
+                    .foregroundColor(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+                if isEditing {
+                    Button("Edit") {
+                        showingEditView = true
+                    }
+                    .font(.caption)
+                    .foregroundColor(.blue)
+                    Button("Remove") {
+                        onDelete()
+                    }
+                    .font(.caption)
+                    .foregroundColor(.red)
+                }
+            }
+            if !background.comment.isEmpty {
+                Text(background.comment)
+                    .font(.system(size: captionFontSize - 1))
+                    .foregroundColor(.secondary)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
+                    .padding(.leading, 4)
+            }
+        }
+        .sheet(isPresented: $showingEditView) {
+            EditCharacterBackgroundView(
+                background: .constant(background),
+                onSave: { onEdit(background) }
+            )
+        }
+    }
+}
+
+// Helper view for adding character backgrounds
+struct AddCharacterBackgroundView: View {
+    @Binding var selectedBackgrounds: [CharacterBackground]
+    let backgroundType: BackgroundType
+    let onRefresh: () -> Void
+    @Environment(\.dismiss) var dismiss
+    @State private var selectedName = ""
+    @State private var cost = 1
+    @State private var comment = ""
+    
+    var availableBackgrounds: [String] {
+        switch backgroundType {
+        case .merit:
+            return V5Constants.characterBackgroundMerits
+        case .flaw:
+            return V5Constants.characterBackgroundFlaws
+        }
+    }
+    
+    var body: some View {
+        NavigationView {
+            Form {
+                Section("Background Details") {
+                    Picker("Background Type", selection: $selectedName) {
+                        Text("Select Background").tag("")
+                        ForEach(availableBackgrounds, id: \.self) { background in
+                            Text(background).tag(background)
+                        }
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                    
+                    Stepper("Cost: \(cost)", value: $cost, in: 1...10)
+                    
+                    TextField("Comment (optional)", text: $comment, axis: .vertical)
+                        .lineLimit(2...4)
+                }
+                
+                Section {
+                    Button("Add Background") {
+                        let newBackground = CharacterBackground(
+                            name: selectedName,
+                            cost: backgroundType == .flaw ? -cost : cost, // Negative for flaws
+                            comment: comment,
+                            type: backgroundType
+                        )
+                        selectedBackgrounds.append(newBackground)
+                        onRefresh()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            dismiss()
+                        }
+                    }
+                    .disabled(selectedName.isEmpty)
+                }
+            }
+            .navigationTitle("Add \(backgroundType.displayName) Background")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Helper view for editing character backgrounds
+struct EditCharacterBackgroundView: View {
+    @Binding var background: CharacterBackground
+    let onSave: () -> Void
+    @Environment(\.dismiss) var dismiss
+    @State private var cost: Int
+    @State private var comment: String
+    
+    init(background: Binding<CharacterBackground>, onSave: @escaping () -> Void) {
+        self._background = background
+        self.onSave = onSave
+        self._cost = State(initialValue: abs(background.wrappedValue.cost))
+        self._comment = State(initialValue: background.wrappedValue.comment)
+    }
+    
+    var body: some View {
+        NavigationView {
+            Form {
+                Section("Background Details") {
+                    HStack {
+                        Text("Type:")
+                        Spacer()
+                        Text(background.name)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    Stepper("Cost: \(cost)", value: $cost, in: 1...10)
+                    
+                    TextField("Comment (optional)", text: $comment, axis: .vertical)
+                        .lineLimit(2...4)
+                }
+            }
+            .navigationTitle("Edit Background")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
+                        background.cost = background.type == .flaw ? -cost : cost
+                        background.comment = comment
+                        onSave()
+                        dismiss()
+                    }
+                }
+            }
+        }
     }
 }

@@ -1,7 +1,7 @@
 import SwiftUI
 
-// Data structures for character traits with costs
-struct Background: Identifiable, Codable, Hashable {
+// Data structures for character traits with costs (renamed to avoid confusion with character backgrounds)
+struct BackgroundBase: Identifiable, Codable, Hashable {
     var id = UUID()
     var name: String
     var cost: Int
@@ -15,6 +15,37 @@ struct Background: Identifiable, Codable, Hashable {
         self.description = description
         self.isCustom = isCustom
         self.suitableCharacterTypes = suitableCharacterTypes
+    }
+}
+
+// New structure for character backgrounds (separate from merits/flaws)
+struct CharacterBackground: Identifiable, Codable, Hashable {
+    var id = UUID()
+    var name: String
+    var cost: Int
+    var comment: String = ""
+    var type: BackgroundType
+    
+    init(name: String, cost: Int, comment: String = "", type: BackgroundType) {
+        self.name = name
+        self.cost = cost
+        self.comment = comment
+        self.type = type
+    }
+}
+
+// Background type enumeration for merit vs flaw backgrounds
+enum BackgroundType: String, Codable, CaseIterable {
+    case merit = "merit"
+    case flaw = "flaw"
+    
+    var displayName: String {
+        switch self {
+        case .merit:
+            return "Merit"
+        case .flaw:
+            return "Flaw"
+        }
     }
 }
 
