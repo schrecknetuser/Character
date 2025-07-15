@@ -506,7 +506,17 @@ struct V5Constants {
                     V5DisciplinePower(name: "Eyes of Babel", description: "Gain ability to read/speak target's known languages.\nRitual roll: Intelligence + Blood Sorcery\nRequires consumption of eyes and tongue. May cause Stains.", level: 2),
                     V5DisciplinePower(name: "Illuminate Trail of Prey", description: "Track a specific individual.\nRitual roll: Intelligence + Blood Sorcery\nCaster must know the target's face.", level: 2),
                     V5DisciplinePower(name: "Le Sang de l'Amour", description: "Create a link between two who desire each other.\nRitual roll: Intelligence + Blood Sorcery\nRoll failure disorients and reduces Composure.", level: 2),
-                    V5DisciplinePower(name: "Soporific Touch", description: "Weaken victim against mundane and supernatural manipulation.\nRitual roll: Intelligence + Blood Sorcery\nActivated after contact; opposed by Stamina + Resolve.", level: 2)
+                    V5DisciplinePower(name: "Soporific Touch", description: "Weaken victim against mundane and supernatural manipulation.\nRitual roll: Intelligence + Blood Sorcery\nActivated after contact; opposed by Stamina + Resolve.", level: 2),
+                    V5DisciplinePower(name: "Silentia Mortis", description: "Replicates Silence of Death (Obfuscate ●).\nRitual roll: Intelligence + Blood Sorcery\nIf cast on another, they must make a Rouse Check.", level: 2),
+                    V5DisciplinePower(name: "Shroud of Silence", description: "Prevent sounds from escaping a room.\nRitual roll: Intelligence + Blood Sorcery\nRequires vitae from Kindred with Obfuscate.", level: 2),
+                    V5DisciplinePower(name: "Stolen Memory", description: "Access sire's memories.\nRitual roll: Intelligence + Blood Sorcery\nDifficulty increases by 2 for each generation past sire.", level: 2),
+                    V5DisciplinePower(name: "Tiamat Glistens", description: "Attune to a place of power (e.g., Furcus).\nRitual roll: Intelligence + Blood Sorcery\nOnly one caster can be attuned at a time.", level: 2),
+                    V5DisciplinePower(name: "Truth of Blood", description: "Discern truth from lies.\nRitual roll: Resolve + Blood Sorcery\nOpposed by Composure + Occult.", level: 2),
+                    V5DisciplinePower(name: "Unseen Underground", description: "Become invisible underground.\nRitual roll: Intelligence + Blood Sorcery\nEnds if caster rises above ground or acts hostile.", level: 2),
+                    V5DisciplinePower(name: "Viscera Garden", description: "Grow blood-fed plants that can consume corpses.\nRitual roll: Intelligence + Blood Sorcery\nRequire monthly Rouse Checks. Mortals are more susceptible to Disciplines after ingestion.", level: 2),
+                    V5DisciplinePower(name: "Ward against Spirits", description: "Protect against spirits.\nRitual roll: Intelligence + Blood Sorcery\nUses standard Ward rules.", level: 2),
+                    V5DisciplinePower(name: "Warding Circle against Ghouls", description: "Protect against Ghouls.\nRitual roll: Intelligence + Blood Sorcery\nCost: Three Rouse Checks. Uses standard Ward rules.", level: 2),
+                    V5DisciplinePower(name: "Web of Hunger", description: "Resist the Beckoning.\nRitual roll: Intelligence + Blood Sorcery\nCounts as Level 2 if cast with dagger; otherwise Level 4.", level: 2)
                 ],
                 3: [
                     V5DisciplinePower(name: "Ward vs. Kindred", description: "Create barriers that repel vampires.\nDice pool: Intelligence + Blood Sorcery\nWard lasts for one month and causes pain to Kindred.", level: 3),
