@@ -34,13 +34,7 @@ struct MeritsAndFlawsStage: View {
                         }
                     }
                     
-                    HStack {
-                        Text("Total Cost:")
-                            .fontWeight(.semibold)
-                        Spacer()
-                        Text("\(character.backgroundMerits.reduce(0) { $0 + $1.cost }) pts")
-                            .fontWeight(.semibold)
-                    }
+
                 }
                 
                 CreationBackgroundMeritsListView(selectedBackgrounds: $character.backgroundMerits)
@@ -68,10 +62,10 @@ struct MeritsAndFlawsStage: View {
                     }
                     
                     HStack {
-                        Text("Total Cost:")
+                        Text("Total Merit Cost:")
                             .fontWeight(.semibold)
                         Spacer()
-                        Text("\(character.advantages.reduce(0) { $0 + $1.cost }) pts")
+                        Text("\(character.totalAdvantageCost) pts")
                             .fontWeight(.semibold)
                     }
                 }
@@ -107,13 +101,7 @@ struct MeritsAndFlawsStage: View {
                         }
                     }
                     
-                    HStack {
-                        Text("Total Value:")
-                            .fontWeight(.semibold)
-                        Spacer()
-                        Text("\(abs(character.backgroundFlaws.reduce(0) { $0 + $1.cost })) pts")
-                            .fontWeight(.semibold)
-                    }
+
                 }
                 
                 CreationBackgroundFlawsListView(selectedBackgrounds: $character.backgroundFlaws)
@@ -141,10 +129,10 @@ struct MeritsAndFlawsStage: View {
                     }
                     
                     HStack {
-                        Text("Total Value:")
+                        Text("Total Flaw Value:")
                             .fontWeight(.semibold)
                         Spacer()
-                        Text("\(abs(character.flaws.reduce(0) { $0 + $1.cost })) pts")
+                        Text("\(character.totalFlawValue) pts")
                             .fontWeight(.semibold)
                     }
                 }

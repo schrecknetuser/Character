@@ -365,17 +365,7 @@ struct AdvantagesFlawsTab: View {
                                 }
                             )
                         }
-                        HStack {
-                            Text("Total Cost:")
-                                .font(.system(size: dynamicFontSize, weight: .semibold))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.6)
-                            Spacer()
-                            Text("\(character.backgroundMerits.reduce(0) { $0 + $1.cost }) pts")
-                                .font(.system(size: dynamicFontSize, weight: .semibold))
-                                .foregroundColor(.primary)
-                                .lineLimit(1)
-                        }
+
                     }
                     
                     if isEditing {
@@ -433,12 +423,12 @@ struct AdvantagesFlawsTab: View {
                             }
                         }
                         HStack {
-                            Text("Total Cost:")
+                            Text("Total Merit Cost:")
                                 .font(.system(size: dynamicFontSize, weight: .semibold))
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.6)
                             Spacer()
-                            Text("\(character.advantages.reduce(0) { $0 + $1.cost }) pts")
+                            Text("\(character.totalAdvantageCost) pts")
                                 .font(.system(size: dynamicFontSize, weight: .semibold))
                                 .foregroundColor(.primary)
                                 .lineLimit(1)
@@ -479,17 +469,7 @@ struct AdvantagesFlawsTab: View {
                                 }
                             )
                         }
-                        HStack {
-                            Text("Total Value:")
-                                .font(.system(size: dynamicFontSize, weight: .semibold))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.6)
-                            Spacer()
-                            Text("\(abs(character.backgroundFlaws.reduce(0) { $0 + $1.cost })) pts")
-                                .font(.system(size: dynamicFontSize, weight: .semibold))
-                                .foregroundColor(.primary)
-                                .lineLimit(1)
-                        }
+
                     }
                     
                     if isEditing {
@@ -547,12 +527,12 @@ struct AdvantagesFlawsTab: View {
                             }
                         }
                         HStack {
-                            Text("Total Value:")
+                            Text("Total Flaw Value:")
                                 .font(.system(size: dynamicFontSize, weight: .semibold))
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.6)
                             Spacer()
-                            Text("\(abs(character.flaws.reduce(0) { $0 + $1.cost })) pts")
+                            Text("\(character.totalFlawValue) pts")
                                 .font(.system(size: dynamicFontSize, weight: .semibold))
                                 .foregroundColor(.primary)
                                 .lineLimit(1)
@@ -657,6 +637,8 @@ struct AddCharacterBackgroundView: View {
     @State private var selectedName = ""
     @State private var cost = 1
     @State private var comment = ""
+    @State private var customName = ""
+    @State private var isCustom = false
     
     var availableBackgrounds: [String] {
         switch backgroundType {
@@ -670,14 +652,24 @@ struct AddCharacterBackgroundView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section("Background Details") {
-                    Picker("Background Type", selection: $selectedName) {
-                        Text("Select Background").tag("")
-                        ForEach(availableBackgrounds, id: \.self) { background in
-                            Text(background).tag(background)
-                        }
+                Section("Background Selection") {
+                    Picker("Background Type", selection: $isCustom) {
+                        Text("Predefined Background").tag(false)
+                        Text("Custom Background").tag(true)
                     }
-                    .pickerStyle(MenuPickerStyle())
+                    .pickerStyle(SegmentedPickerStyle())
+                    
+                    if isCustom {
+                        TextField("Custom Background Name", text: $customName)
+                    } else {
+                        Picker("Background Type", selection: $selectedName) {
+                            Text("Select Background").tag("")
+                            ForEach(availableBackgrounds, id: \.self) { background in
+                                Text(background).tag(background)
+                            }
+                        }
+                        .pickerStyle(MenuPickerStyle())
+                    }
                     
                     Stepper("Cost: \(cost)", value: $cost, in: 1...10)
                     
@@ -687,8 +679,9 @@ struct AddCharacterBackgroundView: View {
                 
                 Section {
                     Button("Add Background") {
+                        let backgroundName = isCustom ? customName : selectedName
                         let newBackground = CharacterBackground(
-                            name: selectedName,
+                            name: backgroundName,
                             cost: backgroundType == .flaw ? -cost : cost, // Negative for flaws
                             comment: comment,
                             type: backgroundType
@@ -699,7 +692,7 @@ struct AddCharacterBackgroundView: View {
                             dismiss()
                         }
                     }
-                    .disabled(selectedName.isEmpty)
+                    .disabled(isCustom ? customName.isEmpty : selectedName.isEmpty)
                 }
             }
             .navigationTitle("Add \(backgroundType.displayName) Background")

@@ -420,6 +420,45 @@ class CharacterBase: BaseCharacter {
             }
         }
     }
+    
+    func processCharacterBackgroundChanges(original: [CharacterBackground], updated: [CharacterBackground], name: String, changes: inout [String])
+    {
+        let originalSet = Set(original)
+        let updatedSet = Set(updated)
+
+        let removed = originalSet.subtracting(updatedSet)
+        let added = updatedSet.subtracting(originalSet)
+
+        if !removed.isEmpty || !added.isEmpty {
+            if !removed.isEmpty {
+                let removedNames = removed.map { "\($0.name) (\($0.cost) pts)" }.joined(separator: ", ")
+                changes.append("\(name) removed: \(removedNames)")
+            }
+            if !added.isEmpty {
+                let addedNames = added.map { "\($0.name) (\($0.cost) pts)" }.joined(separator: ", ")
+                changes.append("\(name) added: \(addedNames)")
+            }
+        }
+        
+        // Check for changes in existing backgrounds (same ID but different content)
+        let commonIds = Set(original.map(\.id)).intersection(Set(updated.map(\.id)))
+        for id in commonIds {
+            if let originalBg = original.first(where: { $0.id == id }),
+               let updatedBg = updated.first(where: { $0.id == id }),
+               originalBg != updatedBg {
+                var changeDetails: [String] = []
+                if originalBg.cost != updatedBg.cost {
+                    changeDetails.append("cost \(originalBg.cost) → \(updatedBg.cost)")
+                }
+                if originalBg.comment != updatedBg.comment {
+                    changeDetails.append("comment updated")
+                }
+                if !changeDetails.isEmpty {
+                    changes.append("\(name) \(originalBg.name) modified: \(changeDetails.joined(separator: ", "))")
+                }
+            }
+        }
+    }
         
     func processSpecializationChanges(original: [Specialization], updated: [Specialization], changes: inout [String])
     {
