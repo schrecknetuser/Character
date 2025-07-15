@@ -642,12 +642,14 @@ class CharacterStore: ObservableObject {
     func archiveCharacter(_ character: any BaseCharacter) {
         var updatedCharacter = character
         updatedCharacter.isArchived = true
+        updatedCharacter.changeLog.append(ChangeLogEntry(summary: "Character moved to archive."))
         updateCharacter(updatedCharacter)
     }
     
     func unarchiveCharacter(_ character: any BaseCharacter) {
         var updatedCharacter = character
         updatedCharacter.isArchived = false
+        updatedCharacter.changeLog.append(ChangeLogEntry(summary: "Character returned from archive"))
         updateCharacter(updatedCharacter)
     }
 }
