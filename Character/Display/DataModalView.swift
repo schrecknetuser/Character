@@ -6,7 +6,6 @@ struct DataModalView: View {
     var store: CharacterStore?
     @State private var dynamicFontSize: CGFloat = 16
     @State var refreshID: UUID = UUID()
-    @State private var initialSessionCount: Int = 1
     
     var body: some View {
         NavigationView {
@@ -17,7 +16,16 @@ struct DataModalView: View {
                             if character.currentSession > 1 {
                                 Button(action: {
                                     if character.currentSession > 1 {
+                                        let oldSession = character.currentSession
                                         character.currentSession -= 1
+                                        
+                                        // Log the session change immediately
+                                        let logEntry = ChangeLogEntry(summary: "Session changed from \(oldSession) to \(character.currentSession)")
+                                        character.changeLog.append(logEntry)
+                                        
+                                        // Update character in store if available
+                                        store?.updateCharacter(character)
+                                        
                                         refreshID = UUID()
                                     }
                                 }) {
@@ -34,7 +42,16 @@ struct DataModalView: View {
                             Spacer()
                             
                             Button(action: {
+                                let oldSession = character.currentSession
                                 character.currentSession += 1
+                                
+                                // Log the session change immediately
+                                let logEntry = ChangeLogEntry(summary: "Session changed from \(oldSession) to \(character.currentSession)")
+                                character.changeLog.append(logEntry)
+                                
+                                // Update character in store if available
+                                store?.updateCharacter(character)
+                                
                                 refreshID = UUID()
                             }) {
                                 Image(systemName: "plus.circle")
@@ -70,7 +87,6 @@ struct DataModalView: View {
                 }
                 .onAppear {
                     calculateOptimalFontSize(for: geometry.size)
-                    initialSessionCount = character.currentSession
                 }
                 .onChange(of: geometry.size) { _, newSize in
                     calculateOptimalFontSize(for: newSize)
@@ -81,24 +97,7 @@ struct DataModalView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
-                        // Check if session count has changed and log it
-                        if character.currentSession != initialSessionCount {
-                            let logEntry = ChangeLogEntry(summary: "Session changed from \(initialSessionCount) to \(character.currentSession)")
-                            character.changeLog.append(logEntry)
-                            
-                            // Update character in store if available
-                            store?.updateCharacter(character)
-                            
-                            // Force UI refresh to show the new log entry immediately
-                            refreshID = UUID()
-                            
-                            // Add a small delay to let user see the change was logged
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                isPresented = false
-                            }
-                        } else {
-                            isPresented = false
-                        }
+                        isPresented = false
                     }
                 }
             }
