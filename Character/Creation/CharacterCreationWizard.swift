@@ -141,6 +141,8 @@ struct CharacterCreationWizard: View {
                         Button("Create Character") {
                             // Recalculate derived values before saving
                             viewModel.character.recalculateDerivedValues()
+                            // Log the character creation
+                            viewModel.character.changeLog.append(ChangeLogEntry(summary: "Character created."))
                             store.addCharacter(viewModel.character)
                             dismiss()
                         }

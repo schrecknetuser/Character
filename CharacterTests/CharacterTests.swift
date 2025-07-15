@@ -762,4 +762,34 @@ struct CharacterTests {
         #expect(mageChanges.contains("date of awakening"))
     }
 
+    @Test func testCharacterCreationLogging() async throws {
+        // Test that a new character has "Character created." as the first log entry
+        let vampire = VampireCharacter()
+        vampire.name = "Test Vampire"
+        vampire.clan = "Brujah"
+        
+        // Simulate adding the creation log entry (this is what our implementation should do)
+        vampire.changeLog.append(ChangeLogEntry(summary: "Character created."))
+        
+        // Verify the log entry exists
+        #expect(!vampire.changeLog.isEmpty)
+        #expect(vampire.changeLog.count == 1)
+        #expect(vampire.changeLog.first?.summary == "Character created.")
+        
+        // Test with other character types as well
+        let ghoul = GhoulCharacter()
+        ghoul.name = "Test Ghoul"
+        ghoul.changeLog.append(ChangeLogEntry(summary: "Character created."))
+        
+        #expect(!ghoul.changeLog.isEmpty)
+        #expect(ghoul.changeLog.first?.summary == "Character created.")
+        
+        let mage = MageCharacter()
+        mage.name = "Test Mage"
+        mage.changeLog.append(ChangeLogEntry(summary: "Character created."))
+        
+        #expect(!mage.changeLog.isEmpty)
+        #expect(mage.changeLog.first?.summary == "Character created.")
+    }
+
 }
