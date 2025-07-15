@@ -461,134 +461,134 @@ struct V5Constants {
     static let predatorPaths: [PredatorPath] = [
         PredatorPath(
             name: "Alleycat",
-            description: "You stalk the streets and back alleys, hunting among the homeless, drug addicts, and other urban predators.",
+            description: "The Alleycat feeds from mortals dwelling on the fringes of society—the homeless, runaways, drug addicts, and criminals. A creature of the urban wilderness, this predator type dwells on the streets among the forgotten.",
             bonuses: [
-                PredatorPathBonus(type: .skillSpecialization, description: "Athletics specialization in Parkour", skillName: "Athletics", specializationName: "Parkour"),
-                PredatorPathBonus(type: .skillSpecialization, description: "Larceny specialization in Security Systems", skillName: "Larceny", specializationName: "Security Systems")
+                PredatorPathBonus(type: .skillSpecialization, description: "Athletics (Parkour)", skillName: "Athletics", specializationName: "Parkour"),
+                PredatorPathBonus(type: .skillSpecialization, description: "Larceny (Security Systems)", skillName: "Larceny", specializationName: "Security Systems")
             ],
             drawbacks: [
-                PredatorPathBonus(type: .flaw, description: "Obvious Predator (2 pts)", flawName: "Obvious Predator")
+                PredatorPathBonus(type: .flaw, description: "Obvious Predator (2 pt Flaw)", flawName: "Obvious Predator")
             ],
-            feedingDescription: "Hunt in urban areas, feeding on the vulnerable and desperate."
+            feedingDescription: "You hunt among the forgotten and desperate of urban society—the homeless, addicts, runaways, and criminals who dwell in the spaces between civilization."
         ),
         
         PredatorPath(
             name: "Bagger",
-            description: "You feed on stored blood from hospitals, blood banks, or morgues rather than living victims.",
+            description: "The Bagger feeds from stored blood obtained from hospitals, blood banks, or morgues. This predator avoids hunting mortals directly, instead acquiring blood through medical sources.",
             bonuses: [
-                PredatorPathBonus(type: .merit, description: "Resources (1 pt)", meritName: "Resources"),
-                PredatorPathBonus(type: .skillSpecialization, description: "Larceny specialization in Security Systems", skillName: "Larceny", specializationName: "Security Systems")
+                PredatorPathBonus(type: .merit, description: "Resources 1", meritName: "Resources"),
+                PredatorPathBonus(type: .skillSpecialization, description: "Larceny (Security Systems)", skillName: "Larceny", specializationName: "Security Systems")
             ],
             drawbacks: [
-                PredatorPathBonus(type: .feeding, description: "Must hunt for stored blood; bag blood is less nourishing")
+                PredatorPathBonus(type: .flaw, description: "Enemy (medical authorities or security)", flawName: "Enemy"),
+                PredatorPathBonus(type: .feeding, description: "Bag blood is less nourishing than fresh blood")
             ],
-            feedingDescription: "Acquire blood from medical sources, morgues, or blood banks."
+            feedingDescription: "You acquire blood from medical facilities, blood banks, or morgues rather than feeding directly from living mortals."
         ),
         
         PredatorPath(
             name: "Blood Leech",
-            description: "You feed on other vampires, stealing their vitae through violence or trickery.",
+            description: "The Blood Leech preys upon other vampires, taking their vitae through violence, subterfuge, or parasitism. This dangerous predator type risks the wrath of Kindred society.",
             bonuses: [
-                PredatorPathBonus(type: .skillSpecialization, description: "Brawl specialization in Grappling", skillName: "Brawl", specializationName: "Grappling"),
-                PredatorPathBonus(type: .skillSpecialization, description: "Stealth specialization in Ambush", skillName: "Stealth", specializationName: "Ambush")
+                PredatorPathBonus(type: .skillSpecialization, description: "Brawl (Grappling)", skillName: "Brawl", specializationName: "Grappling"),
+                PredatorPathBonus(type: .skillSpecialization, description: "Stealth (Ambush)", skillName: "Stealth", specializationName: "Ambush")
             ],
             drawbacks: [
-                PredatorPathBonus(type: .flaw, description: "Enemy: Targeted vampire or their allies", flawName: "Enemy"),
-                PredatorPathBonus(type: .feeding, description: "Diablerie risks and Kindred politics complications")
+                PredatorPathBonus(type: .flaw, description: "Enemy (1 pt - targeted vampire or allies)", flawName: "Enemy"),
+                PredatorPathBonus(type: .feeding, description: "Must hunt other vampires; risks diablerie temptation")
             ],
-            feedingDescription: "Prey upon other vampires, taking their blood by force or stealth."
+            feedingDescription: "You prey upon other vampires, taking their blood through violence, trickery, or parasitic feeding relationships."
         ),
         
         PredatorPath(
             name: "Cleaver",
-            description: "You maintain your mortal life as a façade, carefully feeding from family, friends, or colleagues.",
+            description: "The Cleaver maintains their mortal life as much as possible, feeding from those close to them—family, friends, colleagues, or lovers—while keeping their true nature secret.",
             bonuses: [
-                PredatorPathBonus(type: .merit, description: "Herd (2 pts)", meritName: "Herd"),
-                PredatorPathBonus(type: .skillSpecialization, description: "Subterfuge specialization in Innocent Face", skillName: "Subterfuge", specializationName: "Innocent Face")
+                PredatorPathBonus(type: .merit, description: "Herd 2", meritName: "Herd"),
+                PredatorPathBonus(type: .skillSpecialization, description: "Subterfuge (Innocent Face)", skillName: "Subterfuge", specializationName: "Innocent Face")
             ],
             drawbacks: [
-                PredatorPathBonus(type: .flaw, description: "Dark Secret: Vampiric nature", flawName: "Dark Secret")
+                PredatorPathBonus(type: .flaw, description: "Dark Secret (1 pt Flaw)", flawName: "Dark Secret")
             ],
-            feedingDescription: "Feed carefully from your mortal contacts while maintaining the Masquerade."
+            feedingDescription: "You feed from those close to you in your mortal life, carefully maintaining relationships while hiding your vampiric nature."
         ),
         
         PredatorPath(
             name: "Consensualist",
-            description: "You only feed from willing participants, often through BDSM communities or blood-sharing cults.",
+            description: "The Consensualist feeds only from willing participants who are aware of their vampiric nature. This may involve BDSM communities, blood fetishists, or devoted followers.",
             bonuses: [
-                PredatorPathBonus(type: .skillSpecialization, description: "Medicine specialization in Phlebotomy", skillName: "Medicine", specializationName: "Phlebotomy"),
-                PredatorPathBonus(type: .skillSpecialization, description: "Persuasion specialization in Seduction", skillName: "Persuasion", specializationName: "Seduction")
+                PredatorPathBonus(type: .skillSpecialization, description: "Medicine (Phlebotomy)", skillName: "Medicine", specializationName: "Phlebotomy"),
+                PredatorPathBonus(type: .skillSpecialization, description: "Persuasion (Seduction)", skillName: "Persuasion", specializationName: "Seduction")
             ],
             drawbacks: [
-                PredatorPathBonus(type: .feeding, description: "Requires willing participants; complications if consent is violated")
+                PredatorPathBonus(type: .flaw, description: "Prey Exclusion (1 pt Flaw) - unwilling victims", flawName: "Prey Exclusion")
             ],
-            feedingDescription: "Feed only from willing mortals who consent to being blood sources."
+            feedingDescription: "You feed only from willing mortals who consent to your vampiric feeding, often through subcultures that eroticize blood exchange."
         ),
         
         PredatorPath(
             name: "Farmer",
-            description: "You feed exclusively on animals, avoiding human blood and its complications.",
+            description: "The Farmer feeds exclusively on animals, avoiding the moral complications of feeding on humans. Animal blood is less nourishing but allows the vampire to maintain their humanity.",
             bonuses: [
                 PredatorPathBonus(type: .disciplineDot, description: "Animalism 1", disciplineName: "Animalism"),
-                PredatorPathBonus(type: .skillSpecialization, description: "Animal Ken specialization in specific animal type", skillName: "Animal Ken", specializationName: "Specific Animal")
+                PredatorPathBonus(type: .skillSpecialization, description: "Animal Ken (specific animal type)", skillName: "Animal Ken", specializationName: "Specific Animal")
             ],
             drawbacks: [
-                PredatorPathBonus(type: .feeding, description: "Animal blood is less nourishing; may need to feed more often")
+                PredatorPathBonus(type: .flaw, description: "Prey Exclusion (1 pt Flaw) - humans", flawName: "Prey Exclusion")
             ],
-            feedingDescription: "Feed exclusively on animals, maintaining your humanity at the cost of efficiency."
+            feedingDescription: "You feed exclusively on animals, preserving your humanity but requiring more frequent feeding due to the less nourishing nature of animal blood."
         ),
         
         PredatorPath(
             name: "Osiris",
-            description: "You maintain a group of devoted followers who willingly provide blood in exchange for your guidance.",
+            description: "The Osiris leads a group of devoted mortal followers who willingly provide blood in exchange for guidance, protection, or spiritual fulfillment. This predator type maintains a cult-like following.",
             bonuses: [
-                PredatorPathBonus(type: .merit, description: "Herd (3 pts)", meritName: "Herd"),
-                PredatorPathBonus(type: .skillSpecialization, description: "Leadership specialization in Cult", skillName: "Leadership", specializationName: "Cult")
+                PredatorPathBonus(type: .merit, description: "Herd 3", meritName: "Herd"),
+                PredatorPathBonus(type: .skillSpecialization, description: "Leadership (Cult)", skillName: "Leadership", specializationName: "Cult")
             ],
             drawbacks: [
-                PredatorPathBonus(type: .flaw, description: "Responsibility to maintain your followers"),
-                PredatorPathBonus(type: .feeding, description: "Must maintain follower loyalty and devotion")
+                PredatorPathBonus(type: .flaw, description: "Mythology (1 pt Flaw)", flawName: "Mythology")
             ],
-            feedingDescription: "Lead a group of devoted mortals who serve as willing blood sources."
+            feedingDescription: "You lead a devoted group of mortal followers who willingly provide blood in exchange for your guidance and protection."
         ),
         
         PredatorPath(
             name: "Sandman",
-            description: "You feed from sleeping victims, entering their homes and feeding while they remain unconscious.",
+            description: "The Sandman feeds from sleeping victims, entering their homes uninvited to feed while they slumber. This predator type relies on stealth and the vulnerability of sleep.",
             bonuses: [
-                PredatorPathBonus(type: .skillSpecialization, description: "Stealth specialization in Breaking and Entering", skillName: "Stealth", specializationName: "Breaking and Entering"),
-                PredatorPathBonus(type: .skillSpecialization, description: "Medicine specialization in Anesthesiology", skillName: "Medicine", specializationName: "Anesthesiology")
+                PredatorPathBonus(type: .skillSpecialization, description: "Stealth (Break-in)", skillName: "Stealth", specializationName: "Break-in"),
+                PredatorPathBonus(type: .skillSpecialization, description: "Medicine (Anesthesiology)", skillName: "Medicine", specializationName: "Anesthesiology")
             ],
             drawbacks: [
-                PredatorPathBonus(type: .flaw, description: "Dark Secret: Breaking and entering", flawName: "Dark Secret")
+                PredatorPathBonus(type: .flaw, description: "Obvious Predator (1 pt Flaw)", flawName: "Obvious Predator")
             ],
-            feedingDescription: "Feed from sleeping mortals, entering their homes at night."
+            feedingDescription: "You feed from sleeping mortals, entering their homes at night to feed while they remain unconscious and unaware."
         ),
         
         PredatorPath(
             name: "Scene Queen",
-            description: "You hunt at nightclubs, parties, and social gatherings, using the chaos to feed unnoticed.",
+            description: "The Scene Queen hunts at nightclubs, parties, concerts, and other social gatherings, using the chaos and crowd dynamics to feed unnoticed among the revelry.",
             bonuses: [
-                PredatorPathBonus(type: .skillSpecialization, description: "Etiquette specialization in High Society", skillName: "Etiquette", specializationName: "High Society"),
-                PredatorPathBonus(type: .skillSpecialization, description: "Performance specialization in Dancing", skillName: "Performance", specializationName: "Dancing")
+                PredatorPathBonus(type: .skillSpecialization, description: "Etiquette (Nightclub Scene)", skillName: "Etiquette", specializationName: "Nightclub Scene"),
+                PredatorPathBonus(type: .skillSpecialization, description: "Performance (Dancing)", skillName: "Performance", specializationName: "Dancing")
             ],
             drawbacks: [
-                PredatorPathBonus(type: .feeding, description: "Dependent on social scenes; may struggle in isolation")
+                PredatorPathBonus(type: .flaw, description: "Disallowed Cuisine (1 pt Flaw) - sober or isolated individuals", flawName: "Disallowed Cuisine")
             ],
-            feedingDescription: "Hunt at parties and social gatherings, blending in with the crowd."
+            feedingDescription: "You hunt at parties, clubs, and social gatherings, using the chaos and intoxicated state of crowds to feed unnoticed."
         ),
         
         PredatorPath(
             name: "Siren",
-            description: "You use seduction and attraction to lure willing victims into intimate situations for feeding.",
+            description: "The Siren uses seduction and sensuality to lure victims into intimate situations where feeding becomes possible. This predator type relies on attraction and desire.",
             bonuses: [
-                PredatorPathBonus(type: .skillSpecialization, description: "Persuasion specialization in Seduction", skillName: "Persuasion", specializationName: "Seduction"),
-                PredatorPathBonus(type: .skillSpecialization, description: "Subterfuge specialization in Lies", skillName: "Subterfuge", specializationName: "Lies")
+                PredatorPathBonus(type: .skillSpecialization, description: "Persuasion (Seduction)", skillName: "Persuasion", specializationName: "Seduction"),
+                PredatorPathBonus(type: .skillSpecialization, description: "Subterfuge (Emotional Manipulation)", skillName: "Subterfuge", specializationName: "Emotional Manipulation")
             ],
             drawbacks: [
-                PredatorPathBonus(type: .flaw, description: "Enemy: Spurned lovers or their allies", flawName: "Enemy")
+                PredatorPathBonus(type: .flaw, description: "Enemy (1 pt Flaw) - spurned lovers", flawName: "Enemy")
             ],
-            feedingDescription: "Seduce mortals into intimate situations where feeding is possible."
+            feedingDescription: "You seduce mortals into intimate situations where feeding becomes possible, using attraction and desire as your hunting tools."
         )
     ]
     

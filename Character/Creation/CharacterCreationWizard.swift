@@ -220,7 +220,7 @@ struct CharacterCreationWizard: View {
             case .clan:
                 return selectedCharacterType != .vampire || (viewModel.asVampire?.clan.isEmpty == false)
             case .predatorPath:
-                return selectedCharacterType != .vampire || (viewModel.asVampire?.predatorPath.isEmpty == false)
+                return true // Allow any predator path choice including "None"
             case .attributes:
                 return AttributesStage.areAllAttributesAssigned(character: viewModel.character)
             case .skills:
