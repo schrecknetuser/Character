@@ -112,6 +112,8 @@ class GhoulCharacter:CharacterBase, DisciplineCapable, CharacterWithHumanity {
         // Check advantages/flaws changes
         processBackgroundChanges(original: self.advantages, updated: other.advantages, name: "advantage", changes: &changes)
         processBackgroundChanges(original: self.flaws, updated: other.flaws, name: "flaw", changes: &changes)
+        processCharacterBackgroundChanges(original: self.backgroundMerits, updated: other.backgroundMerits, name: "background merit", changes: &changes)
+        processCharacterBackgroundChanges(original: self.backgroundFlaws, updated: other.backgroundFlaws, name: "background flaw", changes: &changes)
         
         if changes.isEmpty {
             return ""

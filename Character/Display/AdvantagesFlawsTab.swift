@@ -83,6 +83,8 @@ struct AdvantagesListView: View {
     @Binding var selectedAdvantages: [BackgroundBase]
     let characterType: CharacterType
     @State private var showingAddAdvantage = false
+    @State private var showingDeleteConfirmation = false
+    @State private var advantageToDelete: BackgroundBase?
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -103,7 +105,8 @@ struct AdvantagesListView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Button(action: {
-                        selectedAdvantages.removeAll { $0.id == advantage.id }
+                        advantageToDelete = advantage
+                        showingDeleteConfirmation = true
                     }) {
                         Text("Remove")
                             .font(.caption)
@@ -121,6 +124,18 @@ struct AdvantagesListView: View {
         }
         .sheet(isPresented: $showingAddAdvantage) {
             AddAdvantageView(selectedAdvantages: $selectedAdvantages, characterType: characterType, onRefresh: {})
+        }
+        .confirmationDialog("Delete merit?", isPresented: $showingDeleteConfirmation) {
+            Button("Delete", role: .destructive) {
+                if let advantage = advantageToDelete {
+                    selectedAdvantages.removeAll { $0.id == advantage.id }
+                }
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            if let advantage = advantageToDelete {
+                Text("Are you sure you want to delete '\(advantage.name)'? This action cannot be undone.")
+            }
         }
     }
 }
@@ -209,6 +224,8 @@ struct FlawsListView: View {
     @Binding var selectedFlaws: [BackgroundBase]
     let characterType: CharacterType
     @State private var showingAddFlaw = false
+    @State private var showingDeleteConfirmation = false
+    @State private var flawToDelete: BackgroundBase?
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -229,7 +246,8 @@ struct FlawsListView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Button(action: {
-                        selectedFlaws.removeAll { $0.id == flaw.id }
+                        flawToDelete = flaw
+                        showingDeleteConfirmation = true
                     }) {
                         Text("Remove")
                             .font(.caption)
@@ -247,6 +265,18 @@ struct FlawsListView: View {
         }
         .sheet(isPresented: $showingAddFlaw) {
             AddFlawView(selectedFlaws: $selectedFlaws, characterType: characterType, onRefresh: {})
+        }
+        .confirmationDialog("Delete flaw?", isPresented: $showingDeleteConfirmation) {
+            Button("Delete", role: .destructive) {
+                if let flaw = flawToDelete {
+                    selectedFlaws.removeAll { $0.id == flaw.id }
+                }
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            if let flaw = flawToDelete {
+                Text("Are you sure you want to delete '\(flaw.name)'? This action cannot be undone.")
+            }
         }
     }
 }
@@ -335,6 +365,13 @@ struct AdvantagesFlawsTab: View {
     @State private var captionFontSize: CGFloat = 12
     @State private var refreshID: UUID = UUID()
     
+    // Confirmation dialog states
+    @State private var showingMeritDeleteConfirmation = false
+    @State private var showingFlawDeleteConfirmation = false
+    @State private var showingBackgroundMeritDeleteConfirmation = false
+    @State private var showingBackgroundFlawDeleteConfirmation = false
+    @State private var itemToDelete: (id: UUID, name: String, type: String) = (UUID(), "", "")
+    
     var body: some View {
         GeometryReader { geometry in
             Form {
@@ -360,8 +397,8 @@ struct AdvantagesFlawsTab: View {
                                     }
                                 },
                                 onDelete: {
-                                    character.backgroundMerits.removeAll { $0.id == background.id }
-                                    refreshID = UUID()
+                                    itemToDelete = (background.id, background.name, "background merit")
+                                    showingBackgroundMeritDeleteConfirmation = true
                                 }
                             )
                         }
@@ -405,8 +442,8 @@ struct AdvantagesFlawsTab: View {
                                         .minimumScaleFactor(0.6)
                                     if isEditing {
                                         Button("Remove") {
-                                            character.advantages.removeAll { $0.id == advantage.id }
-                                            refreshID = UUID()
+                                            itemToDelete = (advantage.id, advantage.name, "merit")
+                                            showingMeritDeleteConfirmation = true
                                         }
                                         .font(.caption)
                                         .foregroundColor(.red)
@@ -464,8 +501,8 @@ struct AdvantagesFlawsTab: View {
                                     }
                                 },
                                 onDelete: {
-                                    character.backgroundFlaws.removeAll { $0.id == background.id }
-                                    refreshID = UUID()
+                                    itemToDelete = (background.id, background.name, "background flaw")
+                                    showingBackgroundFlawDeleteConfirmation = true
                                 }
                             )
                         }
@@ -509,8 +546,8 @@ struct AdvantagesFlawsTab: View {
                                         .minimumScaleFactor(0.6)
                                     if isEditing {
                                         Button("Remove") {
-                                            character.flaws.removeAll { $0.id == flaw.id }
-                                            refreshID = UUID()
+                                            itemToDelete = (flaw.id, flaw.name, "flaw")
+                                            showingFlawDeleteConfirmation = true
                                         }
                                         .font(.caption)
                                         .foregroundColor(.red)
@@ -556,6 +593,43 @@ struct AdvantagesFlawsTab: View {
             }
             .onChange(of: geometry.size) { _, newSize in
                 calculateOptimalFontSizes(for: newSize)
+            }
+            // Confirmation dialogs
+            .confirmationDialog("Delete \(itemToDelete.type)?", isPresented: $showingMeritDeleteConfirmation) {
+                Button("Delete", role: .destructive) {
+                    character.advantages.removeAll { $0.id == itemToDelete.id }
+                    refreshID = UUID()
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("Are you sure you want to delete '\(itemToDelete.name)'? This action cannot be undone.")
+            }
+            .confirmationDialog("Delete \(itemToDelete.type)?", isPresented: $showingFlawDeleteConfirmation) {
+                Button("Delete", role: .destructive) {
+                    character.flaws.removeAll { $0.id == itemToDelete.id }
+                    refreshID = UUID()
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("Are you sure you want to delete '\(itemToDelete.name)'? This action cannot be undone.")
+            }
+            .confirmationDialog("Delete \(itemToDelete.type)?", isPresented: $showingBackgroundMeritDeleteConfirmation) {
+                Button("Delete", role: .destructive) {
+                    character.backgroundMerits.removeAll { $0.id == itemToDelete.id }
+                    refreshID = UUID()
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("Are you sure you want to delete '\(itemToDelete.name)'? This action cannot be undone.")
+            }
+            .confirmationDialog("Delete \(itemToDelete.type)?", isPresented: $showingBackgroundFlawDeleteConfirmation) {
+                Button("Delete", role: .destructive) {
+                    character.backgroundFlaws.removeAll { $0.id == itemToDelete.id }
+                    refreshID = UUID()
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("Are you sure you want to delete '\(itemToDelete.name)'? This action cannot be undone.")
             }
         }
     }
