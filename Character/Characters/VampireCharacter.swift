@@ -10,9 +10,11 @@ class VampireCharacter: CharacterBase, DisciplineCapable, CharacterWithHumanity 
     @Published var humanityStates: [HumanityState]
     @Published var dateOfEmbrace: Date? = nil
     @Published var v5Disciplines: [V5Discipline] = []
+    @Published var predatorType: String = ""
+    @Published var customPredatorTypes: [PredatorType] = []
 
     enum CodingKeys: String, CodingKey {
-        case clan, generation, bloodPotency, humanity, hunger, disciplines, v5Disciplines, humanityStates, dateOfEmbrace
+        case clan, generation, bloodPotency, humanity, hunger, disciplines, v5Disciplines, humanityStates, dateOfEmbrace, predatorType, customPredatorTypes
     }
 
     override init(characterType: CharacterType = .vampire) {
@@ -45,6 +47,8 @@ class VampireCharacter: CharacterBase, DisciplineCapable, CharacterWithHumanity 
         self.v5Disciplines = try container.decodeIfPresent([V5Discipline].self, forKey: .v5Disciplines) ?? []
         self.humanityStates = try container.decode([HumanityState].self, forKey: .humanityStates)
         self.dateOfEmbrace = try container.decodeIfPresent(Date.self, forKey: .dateOfEmbrace)
+        self.predatorType = try container.decodeIfPresent(String.self, forKey: .predatorType) ?? ""
+        self.customPredatorTypes = try container.decodeIfPresent([PredatorType].self, forKey: .customPredatorTypes) ?? []
         try super.init(from: decoder)
     }
 
@@ -59,6 +63,8 @@ class VampireCharacter: CharacterBase, DisciplineCapable, CharacterWithHumanity 
         try container.encode(v5Disciplines, forKey: .v5Disciplines)
         try container.encode(humanityStates, forKey: .humanityStates)
         try container.encodeIfPresent(dateOfEmbrace, forKey: .dateOfEmbrace)
+        try container.encode(predatorType, forKey: .predatorType)
+        try container.encode(customPredatorTypes, forKey: .customPredatorTypes)
     }
     
     override func generateChangeSummary(for updated: any BaseCharacter) -> String {
@@ -84,6 +90,9 @@ class VampireCharacter: CharacterBase, DisciplineCapable, CharacterWithHumanity 
         }
         if self.clan != other.clan {
             changes.append("clan \(self.clan)→\(other.clan)")
+        }
+        if self.predatorType != other.predatorType {
+            changes.append("predator type \(self.predatorType)→\(other.predatorType)")
         }
         if self.generation != other.generation {
             changes.append("generation \(self.generation)→\(other.generation)")
@@ -169,6 +178,8 @@ class VampireCharacter: CharacterBase, DisciplineCapable, CharacterWithHumanity 
         copy.hunger = self.hunger
         copy.v5Disciplines = self.v5Disciplines
         copy.dateOfEmbrace = self.dateOfEmbrace
+        copy.predatorType = self.predatorType
+        copy.customPredatorTypes = self.customPredatorTypes
 
         return copy
     }

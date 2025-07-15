@@ -8,6 +8,8 @@ struct CharacterInfoTab: View {
     @State private var newInstrumentDescription: String = ""
     @State private var newInstrumentUsage: String = ""
     @State private var refreshID: UUID = UUID()
+    @State private var showPredatorTypeSelection: Bool = false
+    @State private var showPredatorTypeInfo: Bool = false
     
     var body: some View {
         GeometryReader { geometry in
@@ -121,6 +123,38 @@ struct CharacterInfoTab: View {
                                 if let dateOfEmbrace = vampire.dateOfEmbrace {
                                     Text(dateOfEmbrace, style: .date)
                                         .font(.system(size: dynamicFontSize))
+                                } else {
+                                    Text("Not set")
+                                        .foregroundColor(.secondary)
+                                        .font(.system(size: dynamicFontSize))
+                                }
+                            }
+                        }
+                        
+                        // Predator Path
+                        HStack {
+                            Text("Predator Type:")
+                                .fontWeight(.medium)
+                                .font(.system(size: dynamicFontSize))
+                            Spacer()
+                            if isEditing {
+                                Button(action: {
+                                    showPredatorTypeSelection = true
+                                }) {
+                                    Text(vampire.predatorType.isEmpty ? "Select Type" : vampire.predatorType)
+                                        .font(.system(size: dynamicFontSize))
+                                        .foregroundColor(vampire.predatorType.isEmpty ? .secondary : .primary)
+                                }
+                            } else {
+                                if !vampire.predatorType.isEmpty {
+                                    Button(action: {
+                                        showPredatorTypeInfo = true
+                                    }) {
+                                        Text(vampire.predatorType)
+                                            .font(.system(size: dynamicFontSize))
+                                            .foregroundColor(.blue)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
                                 } else {
                                     Text("Not set")
                                         .foregroundColor(.secondary)
@@ -341,6 +375,16 @@ struct CharacterInfoTab: View {
             }
             .onChange(of: geometry.size) { _, newSize in
                 calculateOptimalFontSize(for: newSize)
+            }
+            .sheet(isPresented: $showPredatorTypeSelection) {
+                if let vampire = character as? VampireCharacter {
+                    PredatorTypeSelectionModal(vampire: vampire, isPresented: $showPredatorTypeSelection)
+                }
+            }
+            .sheet(isPresented: $showPredatorTypeInfo) {
+                if let vampire = character as? VampireCharacter {
+                    PredatorTypeDisplayModal(vampire: vampire, isPresented: $showPredatorTypeInfo)
+                }
             }
         }
     }

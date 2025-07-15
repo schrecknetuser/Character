@@ -454,4 +454,276 @@ struct V5Constants {
     static func getCharacterBackgroundFlawsForCharacterType(_ characterType: CharacterType) -> [CharacterBackgroundDefinition] {
         return characterBackgroundFlawDefinitions.filter { $0.suitableCharacterTypes.contains(characterType) }
     }
+    
+    // MARK: - Predator Paths
+    
+    // Predefined predator types for vampires
+    static let predatorTypes: [PredatorType] = [
+        PredatorType(
+            name: "Alleycat",
+            description: "Feeds by brute force and intimidation, taking blood through violence and threats from whoever they can overpower.",
+            bonuses: [
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Intimidation (Stickups) or Brawl (Grappling)", skillName: "Intimidation", specializationName: "Stickups"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of either Celerity or Potence", disciplineName: "Celerity"),
+                PredatorTypeBonus(type: .merit, description: "Three dots of Criminal Contacts", meritName: "Criminal Contacts")
+            ],
+            drawbacks: [
+                PredatorTypeBonus(type: .flaw, description: "Lose one dot of Humanity", flawName: "Humanity Loss")
+            ],
+            feedingDescription: "Strength + Brawl is to take blood by force or threat. Wits + Streetwise can be used to find criminals as if a vigilante figure."
+        ),
+        
+        PredatorType(
+            name: "Bagger",
+            description: "Feeds from preserved blood, corpses, or blood bags using Iron Gullet ability. Often works in hospitals or black market.",
+            bonuses: [
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Larceny (Lock Picking) or Streetwise (Black Market)", skillName: "Larceny", specializationName: "Lock Picking"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Blood Sorcery (Tremere and Banu Haqim only), Oblivion (Hecata only), or Obfuscate", disciplineName: "Obfuscate"),
+                PredatorTypeBonus(type: .merit, description: "Iron Gullet Merit (3 pts)", meritName: "Iron Gullet")
+            ],
+            drawbacks: [
+                PredatorTypeBonus(type: .flaw, description: "Enemy Flaw (2 pts) - someone who believes this vampire owes them something", flawName: "Enemy")
+            ],
+            feedingDescription: "Intelligence + Streetwise can be used to find, gain access and purchase the goods."
+        ),
+        
+        PredatorType(
+            name: "Blood Leech",
+            description: "Rejects mortal blood and feeds exclusively on other vampires through hunting, coercion, or payment.",
+            bonuses: [
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Brawl (Kindred) or Stealth (Against Kindred)", skillName: "Brawl", specializationName: "Kindred"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Celerity or Protean", disciplineName: "Celerity"),
+                PredatorTypeBonus(type: .other, description: "Increase blood potency by one")
+            ],
+            drawbacks: [
+                PredatorTypeBonus(type: .flaw, description: "Lose one dot of Humanity", flawName: "Humanity Loss"),
+                PredatorTypeBonus(type: .flaw, description: "Dark Secret Flaw: Diablerist (2 pts), or Shunned Flaw (2 pts)", flawName: "Dark Secret"),
+                PredatorTypeBonus(type: .flaw, description: "Feeding Flaw: Prey Exclusion (Mortals) (2 pts)", flawName: "Prey Exclusion")
+            ],
+            feedingDescription: "This Predator Type is suggested to not be abstracted down to a dice pool."
+        ),
+        
+        PredatorType(
+            name: "Cleaver",
+            description: "Feeds from close family and friends while maintaining normal relationships, hiding their vampiric nature.",
+            bonuses: [
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Persuasion (Gaslighting) or Subterfuge (Coverups)", skillName: "Persuasion", specializationName: "Gaslighting"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Dominate or Animalism", disciplineName: "Dominate"),
+                PredatorTypeBonus(type: .merit, description: "Herd Advantage (2 pts)", meritName: "Herd")
+            ],
+            drawbacks: [
+                PredatorTypeBonus(type: .flaw, description: "Dark Secret Flaw: Cleaver (1 pt)", flawName: "Dark Secret")
+            ],
+            feedingDescription: "Manipulation + Subterfuge is used to condition the victims, socializing with them and feeding from them without the cover being blown."
+        ),
+        
+        PredatorType(
+            name: "Consensualist",
+            description: "Never feeds without consent, using medical pretenses, kink communities, or open admission to gain permission.",
+            bonuses: [
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Medicine (Phlebotomy) or Persuasion (Vessels)", skillName: "Medicine", specializationName: "Phlebotomy"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Auspex or Fortitude", disciplineName: "Auspex"),
+                PredatorTypeBonus(type: .merit, description: "Gain one dot of Humanity", meritName: "Humanity")
+            ],
+            drawbacks: [
+                PredatorTypeBonus(type: .flaw, description: "Dark Secret Flaw: Masquerade Breacher (1 pt)", flawName: "Dark Secret"),
+                PredatorTypeBonus(type: .flaw, description: "Feeding Flaw: Prey Exclusion (Non-consenting) (1 pt)", flawName: "Prey Exclusion")
+            ],
+            feedingDescription: "Manipulation + Persuasion allows the kindred to take blood by consent, under the guide of medical work or mutual kink."
+        ),
+        
+        PredatorType(
+            name: "Farmer",
+            description: "Feeds exclusively from animals, avoiding harming mortals despite the beast's hunger for human blood.",
+            bonuses: [
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Animal Ken (specific animal) or Survival (Hunting)", skillName: "Animal Ken", specializationName: "Specific Animal"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Animalism or Protean", disciplineName: "Animalism"),
+                PredatorTypeBonus(type: .merit, description: "Gain one dot of Humanity", meritName: "Humanity")
+            ],
+            drawbacks: [
+                PredatorTypeBonus(type: .flaw, description: "Feeding Flaw: Farmer (2 pts)", flawName: "Farmer")
+            ],
+            feedingDescription: "Composure + Animal Ken is the roll to find and catch the chosen animal."
+        ),
+        
+        PredatorType(
+            name: "Osiris",
+            description: "Celebrity or cult leader who feeds from their devoted fans and worshippers, enjoying easy access but attracting problems.",
+            bonuses: [
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Occult (specific tradition) or Performance (specific entertainment field)", skillName: "Occult", specializationName: "Specific Tradition"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Blood Sorcery (Tremere or Banu Haqim only) or Presence", disciplineName: "Presence"),
+                PredatorTypeBonus(type: .merit, description: "Spend three dots between Fame and Herd Backgrounds", meritName: "Fame and Herd")
+            ],
+            drawbacks: [
+                PredatorTypeBonus(type: .flaw, description: "Spend two dots between Enemies and Mythic Flaws", flawName: "Enemies and Mythic")
+            ],
+            feedingDescription: "Manipulation + Subterfuge or Intimidation + Fame are both used to feed from the adoring fans."
+        ),
+        
+        PredatorType(
+            name: "Sandman",
+            description: "Feeds from sleeping victims using stealth and disciplines, preferring the safety of unconscious prey.",
+            bonuses: [
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Medicine (Anesthetics) or Stealth (Break-in)", skillName: "Medicine", specializationName: "Anesthetics"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Auspex or Obfuscate", disciplineName: "Auspex"),
+                PredatorTypeBonus(type: .merit, description: "Resources (1 pt)", meritName: "Resources")
+            ],
+            drawbacks: [],
+            feedingDescription: "Dexterity + Stealth is for casing a location, breaking in and feeding without leaving a trace."
+        ),
+        
+        PredatorType(
+            name: "Scene Queen",
+            description: "Hunts within a specific subculture they belonged to in life, using their status and the disbelief of witnesses.",
+            bonuses: [
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Etiquette (specific scene), Leadership (specific scene), or Streetwise (specific scene)", skillName: "Etiquette", specializationName: "Specific Scene"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Dominate or Potence", disciplineName: "Dominate"),
+                PredatorTypeBonus(type: .merit, description: "Fame Advantage (1 pt)", meritName: "Fame"),
+                PredatorTypeBonus(type: .merit, description: "Contact Advantage (1 pt)", meritName: "Contact")
+            ],
+            drawbacks: [
+                PredatorTypeBonus(type: .flaw, description: "Either Influence Flaw: Disliked (outside their subculture) (1 pt) or Feeding Flaw: Prey Exclusion (a different subculture than theirs) (1 pt)", flawName: "Influence")
+            ],
+            feedingDescription: "Manipulation + Persuasion aids in feeding from those within the Kindred's subgroup, through conditioning and isolation to gain blood or gaslighting or forced silence."
+        ),
+        
+        PredatorType(
+            name: "Siren",
+            description: "Uses seduction and sexual attraction to lure victims, feeding during intimate encounters in clubs and nightlife.",
+            bonuses: [
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Persuasion (Seduction) or Subterfuge (Seduction)", skillName: "Persuasion", specializationName: "Seduction"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Fortitude or Presence", disciplineName: "Fortitude"),
+                PredatorTypeBonus(type: .merit, description: "Looks Merit: Beautiful (2 pts)", meritName: "Beautiful")
+            ],
+            drawbacks: [
+                PredatorTypeBonus(type: .flaw, description: "Enemy Flaw: spurned lover or jealous partner (1 pt)", flawName: "Enemy")
+            ],
+            feedingDescription: "Charisma + Subterfuge is how sirens feed under the guise of sexual acts."
+        ),
+        
+        PredatorType(
+            name: "Extortionist",
+            description: "Trades protection services for blood, often using fabricated threats to make deals more appealing.",
+            bonuses: [
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Intimidation (Coercion) or Larceny (Security)", skillName: "Intimidation", specializationName: "Coercion"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Dominate or Potence", disciplineName: "Dominate"),
+                PredatorTypeBonus(type: .merit, description: "Spend three dots between Contacts and Resources Backgrounds", meritName: "Contacts and Resources")
+            ],
+            drawbacks: [
+                PredatorTypeBonus(type: .flaw, description: "Enemy Flaw: police or escaped victim (2 pts)", flawName: "Enemy")
+            ],
+            feedingDescription: "Strength/Manipulation + Intimidation to feed through coercion."
+        ),
+        
+        PredatorType(
+            name: "Graverobber",
+            description: "Feeds from corpses and mourners around graveyards, morgues, and hospitals using Iron Gullet ability.",
+            bonuses: [
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Occult (Grave Rituals) or Medicine (Cadavers)", skillName: "Occult", specializationName: "Grave Rituals"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Fortitude or Oblivion", disciplineName: "Fortitude"),
+                PredatorTypeBonus(type: .merit, description: "Feeding Merit: Iron Gullet (3 pts)", meritName: "Iron Gullet"),
+                PredatorTypeBonus(type: .merit, description: "Haven Advantage (1 pt)", meritName: "Haven")
+            ],
+            drawbacks: [
+                PredatorTypeBonus(type: .flaw, description: "Herd Flaw: Obvious Predator (2 pts)", flawName: "Obvious Predator")
+            ],
+            feedingDescription: "Resolve + Medicine for sifting through the dead for a body with blood. Manipulation + Insight for moving among miserable mortals."
+        ),
+        
+        PredatorType(
+            name: "Roadside Killer",
+            description: "Always on the move, hunts transients and travelers who won't be missed when they disappear.",
+            bonuses: [
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Survival (the road) or Investigation (vampire cant)", skillName: "Survival", specializationName: "The Road"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Fortitude or Protean", disciplineName: "Fortitude"),
+                PredatorTypeBonus(type: .merit, description: "Two additional dots of migrating Herd", meritName: "Migrating Herd")
+            ],
+            drawbacks: [
+                PredatorTypeBonus(type: .flaw, description: "Feeding Flaw: Prey Exclusion (locals)", flawName: "Prey Exclusion")
+            ],
+            feedingDescription: "Dexterity/Charisma + Drive to feed by picking up down and outs with no other options."
+        ),
+        
+        PredatorType(
+            name: "Grim Reaper",
+            description: "Hunts in hospice facilities and medical centers, feeding from those near death with specific disease preferences.",
+            bonuses: [
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Awareness (Death) or Larceny (Forgery)", skillName: "Awareness", specializationName: "Death"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Auspex or Oblivion", disciplineName: "Auspex"),
+                PredatorTypeBonus(type: .merit, description: "One dot of Allies or Influence associated with the medical community", meritName: "Allies"),
+                PredatorTypeBonus(type: .merit, description: "Gain one dot of Humanity", meritName: "Humanity")
+            ],
+            drawbacks: [
+                PredatorTypeBonus(type: .flaw, description: "Feeding Flaw: Prey Exclusion (Healthy Mortals) (1 pt)", flawName: "Prey Exclusion")
+            ],
+            feedingDescription: "Intelligence + Awareness/Medicine in order to find victims."
+        ),
+        
+        PredatorType(
+            name: "Montero",
+            description: "Uses retainers to drive victims into carefully planned ambushes, following aristocratic Spanish hunting traditions.",
+            bonuses: [
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Leadership (Hunting Pack) or Stealth (Stakeout)", skillName: "Leadership", specializationName: "Hunting Pack"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Dominate or Obfuscate", disciplineName: "Dominate"),
+                PredatorTypeBonus(type: .merit, description: "Retainers (2 pts)", meritName: "Retainers")
+            ],
+            drawbacks: [
+                PredatorTypeBonus(type: .flaw, description: "Lose one dot of Humanity", flawName: "Humanity Loss")
+            ],
+            feedingDescription: "Intelligence + Stealth represents the expert planning of well-trained Retainers. Whereas a well-practiced plan and patient waiting is represented by Resolve + Stealth."
+        ),
+        
+        PredatorType(
+            name: "Pursuer",
+            description: "Stalks victims extensively, learning their routines before striking when no one will notice their absence.",
+            bonuses: [
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Investigation (Profiling) or Stealth (Shadowing)", skillName: "Investigation", specializationName: "Profiling"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Animalism or Auspex", disciplineName: "Animalism"),
+                PredatorTypeBonus(type: .merit, description: "Bloodhound Merit (1 pt)", meritName: "Bloodhound"),
+                PredatorTypeBonus(type: .merit, description: "One dot of Contacts from the morally flexible inhabitants", meritName: "Contacts")
+            ],
+            drawbacks: [
+                PredatorTypeBonus(type: .flaw, description: "Lose one dot of Humanity", flawName: "Humanity Loss")
+            ],
+            feedingDescription: "Intelligence + Investigation to locate and find a victim no one will notice is gone. Stamina + Stealth for long stalking of unaware urban victims."
+        ),
+        
+        PredatorType(
+            name: "Trapdoor",
+            description: "Builds elaborate lairs to lure victims inside, terrorizing or slowly draining them before release.",
+            bonuses: [
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Persuasion (Marketing) or Stealth (Ambushes or Traps)", skillName: "Persuasion", specializationName: "Marketing"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Protean or Obfuscate", disciplineName: "Protean"),
+                PredatorTypeBonus(type: .merit, description: "Haven (1 pt)", meritName: "Haven"),
+                PredatorTypeBonus(type: .merit, description: "One dot of either Retainers or Herd, or a second Haven dot", meritName: "Retainers or Herd")
+            ],
+            drawbacks: [
+                PredatorTypeBonus(type: .flaw, description: "One Haven Flaw, either Creepy (1 pt) or Haunted (1 pt)", flawName: "Haven Flaw")
+            ],
+            feedingDescription: "Charisma + Stealth for the victims that enter expecting a fun-filled night. Dexterity + Stealth to feed upon trespassers. Wits + Awareness + Haven dots is used to navigate the maze of the den itself."
+        ),
+        
+        PredatorType(
+            name: "Tithe Collector",
+            description: "Powerful enough to receive vessels as tribute from other Kindred, who deliver and maintain them.",
+            bonuses: [
+                PredatorTypeBonus(type: .skillSpecialization, description: "One specialty in either Intimidation (Kindred) or Leadership (Kindred)", skillName: "Intimidation", specializationName: "Kindred"),
+                PredatorTypeBonus(type: .disciplineDot, description: "One dot of Dominate or Presence", disciplineName: "Dominate"),
+                PredatorTypeBonus(type: .merit, description: "Three dots of Domain or Status", meritName: "Domain or Status")
+            ],
+            drawbacks: [
+                PredatorTypeBonus(type: .flaw, description: "Adversary (2 pts)", flawName: "Adversary")
+            ],
+            feedingDescription: "Authority and power allow this predator type to receive vessels from other Kindred as tribute."
+        )
+    ]
+    
+    // Helper methods for predator types
+    static func getPredatorType(named name: String) -> PredatorType? {
+        return predatorTypes.first { $0.name == name }
+    }
+    
+    static func getAllPredatorTypeNames() -> [String] {
+        return predatorTypes.map { $0.name }
+    }
 }
