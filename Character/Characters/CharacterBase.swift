@@ -126,8 +126,10 @@ protocol BaseCharacter: AnyObject, Identifiable, Codable, ObservableObject {
     
     var dateOfBirth: Date? { get set }
 
-    var advantages: [Background] { get set }
-    var flaws: [Background] { get set }
+    var advantages: [BackgroundBase] { get set }
+    var flaws: [BackgroundBase] { get set }
+    var backgroundMerits: [CharacterBackground] { get set }
+    var backgroundFlaws: [CharacterBackground] { get set }
     var convictions: [String] { get set }
     var touchstones: [String] { get set }
 
@@ -184,8 +186,10 @@ class CharacterBase: BaseCharacter {
     
     @Published var dateOfBirth: Date? = nil
 
-    @Published var advantages: [Background] = []
-    @Published var flaws: [Background] = []
+    @Published var advantages: [BackgroundBase] = []
+    @Published var flaws: [BackgroundBase] = []
+    @Published var backgroundMerits: [CharacterBackground] = []
+    @Published var backgroundFlaws: [CharacterBackground] = []
     @Published var convictions: [String] = []
     @Published var touchstones: [String] = []
 
@@ -204,7 +208,7 @@ class CharacterBase: BaseCharacter {
              physicalSkills, socialSkills, mentalSkills,
              willpower, experience, spentExperience,
              ambition, desire, chronicleName, concept, characterDescription, notes, dateOfBirth,
-             advantages, flaws, convictions, touchstones, chronicleTenets,
+             advantages, flaws, backgroundMerits, backgroundFlaws, convictions, touchstones, chronicleTenets,
              specializations, currentSession, changeLog, isArchived,
              health, healthStates, willpowerStates
     }
@@ -230,8 +234,10 @@ class CharacterBase: BaseCharacter {
         characterDescription = try container.decodeIfPresent(String.self, forKey: .characterDescription) ?? ""
         notes = try container.decodeIfPresent(String.self, forKey: .notes) ?? ""
         dateOfBirth = try container.decodeIfPresent(Date.self, forKey: .dateOfBirth)
-        advantages = try container.decode([Background].self, forKey: .advantages)
-        flaws = try container.decode([Background].self, forKey: .flaws)
+        advantages = try container.decode([BackgroundBase].self, forKey: .advantages)
+        flaws = try container.decode([BackgroundBase].self, forKey: .flaws)
+        backgroundMerits = try container.decodeIfPresent([CharacterBackground].self, forKey: .backgroundMerits) ?? []
+        backgroundFlaws = try container.decodeIfPresent([CharacterBackground].self, forKey: .backgroundFlaws) ?? []
         convictions = try container.decode([String].self, forKey: .convictions)
         touchstones = try container.decode([String].self, forKey: .touchstones)
         specializations = try container.decode([Specialization].self, forKey: .specializations)
@@ -266,6 +272,8 @@ class CharacterBase: BaseCharacter {
         try container.encodeIfPresent(dateOfBirth, forKey: .dateOfBirth)
         try container.encode(advantages, forKey: .advantages)
         try container.encode(flaws, forKey: .flaws)
+        try container.encode(backgroundMerits, forKey: .backgroundMerits)
+        try container.encode(backgroundFlaws, forKey: .backgroundFlaws)
         try container.encode(convictions, forKey: .convictions)
         try container.encode(touchstones, forKey: .touchstones)
         try container.encode(specializations, forKey: .specializations)
@@ -311,11 +319,11 @@ class CharacterBase: BaseCharacter {
     }
 
     var totalAdvantageCost: Int {
-        advantages.reduce(0) { $0 + $1.cost }
+        advantages.reduce(0) { $0 + $1.cost } + backgroundMerits.reduce(0) { $0 + $1.cost }
     }
 
     var totalFlawValue: Int {
-        flaws.reduce(0) { $0 + $1.cost }
+        flaws.reduce(0) { $0 + $1.cost } + backgroundFlaws.reduce(0) { $0 + $1.cost }
     }
 
     var netAdvantageFlawCost: Int {
@@ -393,7 +401,7 @@ class CharacterBase: BaseCharacter {
         return ""
     }
     
-    func processBackgroundChanges(original: [Background], updated: [Background], name: String, changes: inout [String])
+    func processBackgroundChanges(original: [BackgroundBase], updated: [BackgroundBase], name: String, changes: inout [String])
     {
         let originalSet = Set(original)
         let updatedSet = Set(updated)
@@ -409,6 +417,47 @@ class CharacterBase: BaseCharacter {
             if !added.isEmpty {
                 let addedNames = added.map { $0.name }.joined(separator: ", ")
                 changes.append("\(name)s added: \(addedNames)")
+            }
+        }
+    }
+    
+    func processCharacterBackgroundChanges(original: [CharacterBackground], updated: [CharacterBackground], name: String, changes: inout [String])
+    {
+        let originalSet = Set(original.map(\.id))
+        let updatedSet = Set(updated.map(\.id))
+
+        let removed = originalSet.subtracting(updatedSet)
+        let added = updatedSet.subtracting(originalSet)
+
+        if !removed.isEmpty || !added.isEmpty {
+            if !removed.isEmpty {
+                let removedBackgrounds = original.filter { removed.contains($0.id) }
+                let removedNames = removedBackgrounds.map { "\($0.name) (\($0.cost) pts)" }.joined(separator: ", ")
+                changes.append("\(name) removed: \(removedNames)")
+            }
+            if !added.isEmpty {
+                let addedBackgrounds = updated.filter { added.contains($0.id) }
+                let addedNames = addedBackgrounds.map { "\($0.name) (\($0.cost) pts)" }.joined(separator: ", ")
+                changes.append("\(name) added: \(addedNames)")
+            }
+        }
+        
+        // Check for changes in existing backgrounds (same ID but different content)
+        let commonIds = Set(original.map(\.id)).intersection(Set(updated.map(\.id)))
+        for id in commonIds {
+            if let originalBg = original.first(where: { $0.id == id }),
+               let updatedBg = updated.first(where: { $0.id == id }),
+               originalBg != updatedBg {
+                var changeDetails: [String] = []
+                if originalBg.cost != updatedBg.cost {
+                    changeDetails.append("cost \(originalBg.cost) → \(updatedBg.cost)")
+                }
+                if originalBg.comment != updatedBg.comment {
+                    changeDetails.append("comment updated")
+                }
+                if !changeDetails.isEmpty {
+                    changes.append("\(name) \(originalBg.name) modified: \(changeDetails.joined(separator: ", "))")
+                }
             }
         }
     }
@@ -472,6 +521,8 @@ class CharacterBase: BaseCharacter {
         copy.dateOfBirth = self.dateOfBirth
         copy.advantages = self.advantages
         copy.flaws = self.flaws
+        copy.backgroundMerits = self.backgroundMerits
+        copy.backgroundFlaws = self.backgroundFlaws
         copy.convictions = self.convictions
         copy.touchstones = self.touchstones
         copy.specializations = self.specializations
