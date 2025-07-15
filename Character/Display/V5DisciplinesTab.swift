@@ -351,6 +351,10 @@ struct V5DisciplineRowView<T: DisciplineCapable>: View {
         .alert("Delete Discipline", isPresented: $showDeleteConfirmation) {
             Button("Delete", role: .destructive) {
                 character.v5Disciplines.removeAll { $0.id == discipline.id }
+                // Recalculate derived values since discipline deletion may affect health/willpower
+                if let baseCharacter = character as? BaseCharacter {
+                    baseCharacter.recalculateDerivedValues()
+                }
                 refreshID = UUID()
             }
             Button("Cancel", role: .cancel) { }
@@ -449,6 +453,10 @@ struct V5DisciplinesTab<T: DisciplineCapable>: View {
         for index in offsets {
             let disciplineToDelete = sortedDisciplines[index]
             character.v5Disciplines.removeAll { $0.id == disciplineToDelete.id }
+        }
+        // Recalculate derived values since discipline deletion may affect health/willpower
+        if let baseCharacter = character as? BaseCharacter {
+            baseCharacter.recalculateDerivedValues()
         }
     }
 }
