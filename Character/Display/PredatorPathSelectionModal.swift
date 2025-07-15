@@ -23,8 +23,8 @@ struct PredatorPathSelectionModal: View {
         )
         paths.insert(nonePath, at: 0)
         
-        // Add custom paths if any exist
-        // TODO: Implement custom path storage
+        // Add custom paths from the vampire character
+        paths.append(contentsOf: vampire.customPredatorPaths)
         
         return paths
     }
@@ -39,8 +39,8 @@ struct PredatorPathSelectionModal: View {
                         }) {
                             VStack(alignment: .leading, spacing: 4) {
                                 HStack {
-                                    Image(systemName: selectedPath?.id == path.id ? "circle.fill" : "circle")
-                                        .foregroundColor(selectedPath?.id == path.id ? .accentColor : .secondary)
+                                    Image(systemName: selectedPath?.name == path.name ? "circle.fill" : "circle")
+                                        .foregroundColor(selectedPath?.name == path.name ? .accentColor : .secondary)
                                     Text(path.name)
                                         .font(.headline)
                                         .foregroundColor(.primary)
@@ -104,18 +104,22 @@ struct PredatorPathSelectionModal: View {
             }
             .navigationTitle("Predator Path")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarItems(
-                leading: Button("Cancel") {
-                    isPresented = false
-                },
-                trailing: Button("Done") {
-                    if let selectedPath = selectedPath {
-                        vampire.predatorPath = selectedPath.name == "None" ? "" : selectedPath.name
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
+                        isPresented = false
                     }
-                    isPresented = false
                 }
-                .disabled(selectedPath == nil)
-            )
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        if let selectedPath = selectedPath {
+                            vampire.predatorPath = selectedPath.name == "None" ? "" : selectedPath.name
+                        }
+                        isPresented = false
+                    }
+                    .disabled(selectedPath == nil)
+                }
+            }
         }
         .onAppear {
             // Set initial selection based on current vampire predator path
@@ -132,8 +136,13 @@ struct PredatorPathSelectionModal: View {
                 pathDescription: $customPathDescription,
                 feedingDescription: $customPathFeedingDescription,
                 onSave: { path in
+                    // Add to vampire's custom paths
+                    vampire.customPredatorPaths.append(path)
                     selectedPath = path
-                    // TODO: Save custom path for future use
+                    // Clear form fields
+                    customPathName = ""
+                    customPathDescription = ""
+                    customPathFeedingDescription = ""
                 }
             )
         }
@@ -178,23 +187,27 @@ struct CustomPredatorPathForm: View {
             }
             .navigationTitle("Custom Path")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarItems(
-                leading: Button("Cancel") {
-                    isPresented = false
-                },
-                trailing: Button("Save") {
-                    let customPath = PredatorPath(
-                        name: pathName.trim(),
-                        description: pathDescription.trim(),
-                        bonuses: [],
-                        drawbacks: [],
-                        feedingDescription: feedingDescription.trim()
-                    )
-                    onSave(customPath)
-                    isPresented = false
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
+                        isPresented = false
+                    }
                 }
-                .disabled(pathName.trim().isEmpty || pathDescription.trim().isEmpty)
-            )
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Save") {
+                        let customPath = PredatorPath(
+                            name: pathName.trim(),
+                            description: pathDescription.trim(),
+                            bonuses: [],
+                            drawbacks: [],
+                            feedingDescription: feedingDescription.trim()
+                        )
+                        onSave(customPath)
+                        isPresented = false
+                    }
+                    .disabled(pathName.trim().isEmpty || pathDescription.trim().isEmpty)
+                }
+            }
         }
     }
 }

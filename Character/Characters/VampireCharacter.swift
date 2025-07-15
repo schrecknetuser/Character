@@ -11,9 +11,10 @@ class VampireCharacter: CharacterBase, DisciplineCapable, CharacterWithHumanity 
     @Published var dateOfEmbrace: Date? = nil
     @Published var v5Disciplines: [V5Discipline] = []
     @Published var predatorPath: String = ""
+    @Published var customPredatorPaths: [PredatorPath] = []
 
     enum CodingKeys: String, CodingKey {
-        case clan, generation, bloodPotency, humanity, hunger, disciplines, v5Disciplines, humanityStates, dateOfEmbrace, predatorPath
+        case clan, generation, bloodPotency, humanity, hunger, disciplines, v5Disciplines, humanityStates, dateOfEmbrace, predatorPath, customPredatorPaths
     }
 
     override init(characterType: CharacterType = .vampire) {
@@ -47,6 +48,7 @@ class VampireCharacter: CharacterBase, DisciplineCapable, CharacterWithHumanity 
         self.humanityStates = try container.decode([HumanityState].self, forKey: .humanityStates)
         self.dateOfEmbrace = try container.decodeIfPresent(Date.self, forKey: .dateOfEmbrace)
         self.predatorPath = try container.decodeIfPresent(String.self, forKey: .predatorPath) ?? ""
+        self.customPredatorPaths = try container.decodeIfPresent([PredatorPath].self, forKey: .customPredatorPaths) ?? []
         try super.init(from: decoder)
     }
 
@@ -62,6 +64,7 @@ class VampireCharacter: CharacterBase, DisciplineCapable, CharacterWithHumanity 
         try container.encode(humanityStates, forKey: .humanityStates)
         try container.encodeIfPresent(dateOfEmbrace, forKey: .dateOfEmbrace)
         try container.encode(predatorPath, forKey: .predatorPath)
+        try container.encode(customPredatorPaths, forKey: .customPredatorPaths)
     }
     
     override func generateChangeSummary(for updated: any BaseCharacter) -> String {
@@ -176,6 +179,7 @@ class VampireCharacter: CharacterBase, DisciplineCapable, CharacterWithHumanity 
         copy.v5Disciplines = self.v5Disciplines
         copy.dateOfEmbrace = self.dateOfEmbrace
         copy.predatorPath = self.predatorPath
+        copy.customPredatorPaths = self.customPredatorPaths
 
         return copy
     }
