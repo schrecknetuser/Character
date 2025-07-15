@@ -425,19 +425,19 @@ struct V5Constants {
                     V5DisciplinePower(name: "Aura of Decay", description: "Make plants wilt, animals/humans sick, and food spoil.\nDice pool: Stamina + Oblivion\nOpposing pool: Stamina + Medicine/Fortitude\nAll social rolls take a -2 dice penalty while active. Contaminated food causes 2 Superficial Damage.", level: 3),
                     V5DisciplinePower(name: "Passion Feast", description: "Slake Hunger on the passion of wraiths.\nDice pool: Resolve + Oblivion\nOpposing pool: Resolve + Composure\nHunger consumed does not return the next night.", level: 3),
                     V5DisciplinePower(name: "Shadow Perspective", description: "Project senses into a shadow within line of sight.\nUndetectable except via supernatural means.", level: 3),
-                    V5DisciplinePower(name: "Shadow Servant", description: "Use a shadow to spy or scare.", level: 3)
+                    V5DisciplinePower(name: "Shadow Servant", description: "Use a shadow to spy or scare.\nThe servant has no mind and can be destroyed by bright light.", level: 3),
+                    V5DisciplinePower(name: "Touch of Oblivion", description: "Withers a body part on touch.\nInflicting damage may cause Stains. Requires the user to grip the target.", level: 3)
                 ],
                 4: [
-                    V5DisciplinePower(name: "Grave's Decay", description: "Accelerate decomposition of organic matter.\nDice pool: Stamina + Oblivion\nOpposing pool: Stamina + Fortitude\nCauses rapid aging and decay of target's body.", level: 4),
-                    V5DisciplinePower(name: "Necrotic Soil", description: "Turn earth into death-aspected ground that harms the living.\nDice pool: Intelligence + Oblivion\nArea becomes hostile to living creatures, causing damage over time.", level: 4),
-                    V5DisciplinePower(name: "Shadow Body", description: "Transform into a being of living shadow.\nGain immunity to physical attacks but vulnerable to light.\nEffect lasts for one scene.", level: 4),
-                    V5DisciplinePower(name: "Stygian Shroud", description: "Summon a supernatural darkness that follows you.\nDice pool: Wits + Oblivion\nDarkness blocks normal vision and enhances fear in living beings.", level: 4)
+                    V5DisciplinePower(name: "Necrotic Plague", description: "Manifest supernatural illness.\nDice pool: Intelligence + Oblivion\nOpposing pool: Stamina + Medicine/Fortitude\nCan only be healed via vitae. Cannot be treated medically.", level: 4),
+                    V5DisciplinePower(name: "Stygian Shroud", description: "Darkness spews out of a nearby shadow to cover area.\nShadow can extend up to twice Oblivion rating in meters.", level: 4),
+                    V5DisciplinePower(name: "Umbrous Clutch", description: "Use victim's shadow to teleport them to user.\nDice pool: Wits + Oblivion\nOpposing pool: Dexterity + Wits\nMortals are terrified; vampires make Difficulty 4 frenzy test.", level: 4)
                 ],
                 5: [
-                    V5DisciplinePower(name: "Shadowstep", description: "Travel instantly through shadows across great distances.\nDice pool: Dexterity + Oblivion\nCan appear in any shadow within several miles.", level: 5),
-                    V5DisciplinePower(name: "Night's Calling", description: "Summon powerful wraiths to serve your will.\nDice pool: Charisma + Oblivion\nOpposing pool: Resolve + Composure (for wraiths)\nSummoned wraiths remain for the scene.", level: 5),
-                    V5DisciplinePower(name: "Tenebrous Form", description: "Become one with darkness itself.\nGain immunity to most attacks except light-based.\nCan pass through solid objects. Effect lasts one scene.", level: 5),
-                    V5DisciplinePower(name: "Withering", description: "Drain life force from all living things in a large area.\nDice pool: Resolve + Oblivion\nOpposing pool: Stamina + Resolve\nCauses Aggravated damage and ages targets.", level: 5)
+                    V5DisciplinePower(name: "Shadow Step", description: "Step into one shadow and appear in another.\nA willing person may be taken but will share Stains if any occur.", level: 5),
+                    V5DisciplinePower(name: "Skuld Fulfilled", description: "Reintroduce illnesses the victim has recovered from.\nDice pool: Stamina + Oblivion\nOpposing pool: Stamina + Stamina/Fortitude\nRemoves ghoul immunity to aging and vitae.", level: 5),
+                    V5DisciplinePower(name: "Tenebrous Avatar", description: "Turn body into a shadow to move freely.\nUser is immune to damage except sunlight and fire.", level: 5),
+                    V5DisciplinePower(name: "Withering Spirit", description: "Erode a victim's spirit.\nDice pool: Resolve + Oblivion\nOpposing pool: Resolve + Occult/Fortitude\nIf target is Impaired, they won't return as a wraith.", level: 5)
                 ]
             ]
         ),
