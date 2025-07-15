@@ -3,6 +3,7 @@ import SwiftUI
 struct DataModalView: View {
     @Binding var character: any BaseCharacter
     @Binding var isPresented: Bool
+    var store: CharacterStore?
     @State private var dynamicFontSize: CGFloat = 16
     @State var refreshID: UUID = UUID()
     
@@ -15,7 +16,16 @@ struct DataModalView: View {
                             if character.currentSession > 1 {
                                 Button(action: {
                                     if character.currentSession > 1 {
+                                        let oldSession = character.currentSession
                                         character.currentSession -= 1
+                                        
+                                        // Log the session change immediately
+                                        let logEntry = ChangeLogEntry(summary: "Session changed from \(oldSession) to \(character.currentSession)")
+                                        character.changeLog.append(logEntry)
+                                        
+                                        // Update character in store if available
+                                        store?.updateCharacter(character)
+                                        
                                         refreshID = UUID()
                                     }
                                 }) {
@@ -32,7 +42,16 @@ struct DataModalView: View {
                             Spacer()
                             
                             Button(action: {
+                                let oldSession = character.currentSession
                                 character.currentSession += 1
+                                
+                                // Log the session change immediately
+                                let logEntry = ChangeLogEntry(summary: "Session changed from \(oldSession) to \(character.currentSession)")
+                                character.changeLog.append(logEntry)
+                                
+                                // Update character in store if available
+                                store?.updateCharacter(character)
+                                
                                 refreshID = UUID()
                             }) {
                                 Image(systemName: "plus.circle")
@@ -62,6 +81,7 @@ struct DataModalView: View {
                                 }
                                 .padding(.vertical, 2)
                             }
+                            .id(refreshID) // Force refresh when refreshID changes
                         }
                     }
                 }

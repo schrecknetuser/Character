@@ -40,7 +40,8 @@ struct FloatingButtonTests {
         
         let dataModal = DataModalView(
             character: characterBinding,
-            isPresented: isPresented
+            isPresented: isPresented,
+            store: nil
         )
         
         // Basic existence test
@@ -74,17 +75,17 @@ struct FloatingButtonTests {
         // Test vampire
         let vampireBinding = Binding<any BaseCharacter>.constant(vampire)
         let vampireStatusModal = StatusModalView(character: vampireBinding, isPresented: isPresented, store: store)
-        let vampireDataModal = DataModalView(character: vampireBinding, isPresented: isPresented)
+        let vampireDataModal = DataModalView(character: vampireBinding, isPresented: isPresented, store: nil)
         
         // Test mage
         let mageBinding = Binding<any BaseCharacter>.constant(mage)
         let mageStatusModal = StatusModalView(character: mageBinding, isPresented: isPresented, store: store)
-        let mageDataModal = DataModalView(character: mageBinding, isPresented: isPresented)
+        let mageDataModal = DataModalView(character: mageBinding, isPresented: isPresented, store: nil)
         
         // Test ghoul
         let ghoulBinding = Binding<any BaseCharacter>.constant(ghoul)
         let ghoulStatusModal = StatusModalView(character: ghoulBinding, isPresented: isPresented, store: store)
-        let ghoulDataModal = DataModalView(character: ghoulBinding, isPresented: isPresented)
+        let ghoulDataModal = DataModalView(character: ghoulBinding, isPresented: isPresented, store: nil)
         
         // All modals should be creatable
         #expect(vampireStatusModal != nil)
