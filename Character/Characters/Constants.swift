@@ -474,9 +474,25 @@ struct V5Constants {
             name: "Blood Sorcery Rituals",
             powers: [
                 1: [
-                    V5DisciplinePower(name: "Communicate with Kindred Sire", description: "Telepathically contact your sire across any distance.\nDice pool: Resolve + Blood Sorcery\nAllows brief mental communication for one scene.", level: 1),
-                    V5DisciplinePower(name: "Preserve Blood", description: "Prevent blood from spoiling or coagulating.\nDice pool: Intelligence + Blood Sorcery\nBlood remains fresh for months.", level: 1),
-                    V5DisciplinePower(name: "Wake with Evening's Freshness", description: "Awaken fully alert regardless of damage or torpor.\nDice pool: Stamina + Blood Sorcery\nIgnore all penalties from damage when awakening.", level: 1)
+                    V5DisciplinePower(name: "Astromancy", description: "Learn information such as Skills, Desires and Convictions about someone.\nRitual roll: Intelligence + Blood Sorcery\nAdd 1 die if caster knows either Birth or Embrace date (not both).", level: 1),
+                    V5DisciplinePower(name: "Beelzebeatit", description: "Animals avoid the area.\nRitual roll: Intelligence + Blood Sorcery\nDoes not repel directed or controlled animals.", level: 1),
+                    V5DisciplinePower(name: "Bind the Accusing Tongue", description: "Prevent someone from speaking ill of the caster.\nRitual roll: Intelligence + Blood Sorcery\nVictim can resist by rolling Composure + Resolve.", level: 1),
+                    V5DisciplinePower(name: "Blood Apocrypha", description: "Embed messages into blood or vessels.\nRitual roll: Intelligence + Blood Sorcery\nFirst person to taste receives the message if they are the target or have A Taste for Blood.", level: 1),
+                    V5DisciplinePower(name: "Blood Walk", description: "Learn generation, name, and sire of a subject.\nRitual roll: Intelligence + Blood Sorcery\nRequires a Rouse Check from the subject.", level: 1),
+                    V5DisciplinePower(name: "Bloody Message", description: "Reveal a message to specific individuals that disappears after being read.\nRitual roll: Intelligence + Blood Sorcery\nRoll when enchanting the surface.", level: 1),
+                    V5DisciplinePower(name: "Blood to Water", description: "Transform blood into water.\nRitual roll: Intelligence + Blood Sorcery\nRemoves all traces of blood.", level: 1),
+                    V5DisciplinePower(name: "Clinging of the Insect", description: "Allows caster to cling to surfaces.\nRitual roll: Intelligence + Blood Sorcery\nRequires hands and feet to cling.", level: 1),
+                    V5DisciplinePower(name: "Coax the Garden", description: "Use nearby plant life for defense.\nRitual roll: Intelligence + Blood Sorcery\nPlants target all but the caster.", level: 1),
+                    V5DisciplinePower(name: "Craft Bloodstone", description: "Create a tracking stone.\nRitual roll: Intelligence + Blood Sorcery\nLimit equals Resolve in number of stones.", level: 1),
+                    V5DisciplinePower(name: "Douse the Fear", description: "Suppress fear of fire temporarily.\nRitual roll: Intelligence + Blood Sorcery\nWears off at end of scene.", level: 1),
+                    V5DisciplinePower(name: "Enrich the Blood", description: "Make a mortal more nourishing.\nRitual roll: Intelligence + Blood Sorcery\nDoes not affect Kindred vitae.", level: 1),
+                    V5DisciplinePower(name: "Herd Ward (Minor)", description: "Ward a kine to prevent feeding.\nRitual roll: Intelligence + Blood Sorcery\nRoll is made when feeding attempt occurs.", level: 1),
+                    V5DisciplinePower(name: "Letter Ward", description: "Ward a letter against unwanted readers.\nRitual roll: Intelligence + Blood Sorcery\nRoll when letter is opened by someone else.", level: 1),
+                    V5DisciplinePower(name: "Revealing the Crimson Trail", description: "Reveal blood traces.\nRitual roll: Intelligence + Blood Sorcery\nVery old traces may require Resolve + Awareness.", level: 1),
+                    V5DisciplinePower(name: "Seal the Brand", description: "Make a tattoo permanent on a vampire.\nRitual roll: Intelligence + Blood Sorcery\nInflicts 1 Superficial damage.", level: 1),
+                    V5DisciplinePower(name: "Shared Memory", description: "Experience another's Memoriam.\nRitual roll: Intelligence + Blood Sorcery\nCan observe but not influence.", level: 1),
+                    V5DisciplinePower(name: "Wake with Evening's Freshness", description: "Awaken during the day when danger is near.\nRitual roll: Intelligence + Blood Sorcery\nRoll made only if real danger appears.", level: 1),
+                    V5DisciplinePower(name: "Ward Against Ghouls", description: "Protect against Ghouls.\nRitual roll: Intelligence + Blood Sorcery\nUses standard Ward rules.", level: 1)
                 ],
                 2: [
                     V5DisciplinePower(name: "Ward vs. Spirits", description: "Protect an area from spiritual intrusion.\nDice pool: Intelligence + Blood Sorcery\nWard lasts for one month and repels ghosts.", level: 2),
