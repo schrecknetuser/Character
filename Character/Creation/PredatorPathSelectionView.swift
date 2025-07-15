@@ -151,6 +151,8 @@ struct CustomPredatorPathForm: View {
     @Binding var feedingDescription: String
     var onSave: (PredatorPath) -> Void
     
+    @Environment(\.dismiss) private var dismiss
+    
     var body: some View {
         NavigationView {
             Form {
@@ -185,7 +187,7 @@ struct CustomPredatorPathForm: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
-                        isPresented = false
+                        dismiss()
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -198,7 +200,7 @@ struct CustomPredatorPathForm: View {
                             feedingDescription: feedingDescription.trim()
                         )
                         onSave(customPath)
-                        isPresented = false
+                        dismiss()
                     }
                     .disabled(pathName.trim().isEmpty || pathDescription.trim().isEmpty)
                 }
