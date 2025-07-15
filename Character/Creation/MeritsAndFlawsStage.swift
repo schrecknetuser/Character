@@ -70,14 +70,15 @@ struct MeritsAndFlawsStage: View {
                             .foregroundColor(.red)
                         }
                     }
-                    
-                    HStack {
-                        Text("Total Merit Cost:")
-                            .fontWeight(.semibold)
-                        Spacer()
-                        Text("\(character.totalAdvantageCost) pts")
-                            .fontWeight(.semibold)
-                    }
+                }
+                
+                // Always display total merit cost (including backgrounds)
+                HStack {
+                    Text("Total Merit Cost:")
+                        .fontWeight(.semibold)
+                    Spacer()
+                    Text("\(character.totalAdvantageCost) pts")
+                        .fontWeight(.semibold)
                 }
                 
                 CreationMeritsListView(selectedMerits: $character.advantages, characterType: character.characterType)
@@ -140,14 +141,15 @@ struct MeritsAndFlawsStage: View {
                             .foregroundColor(.red)
                         }
                     }
-                    
-                    HStack {
-                        Text("Total Flaw Value:")
-                            .fontWeight(.semibold)
-                        Spacer()
-                        Text("\(character.totalFlawValue) pts")
-                            .fontWeight(.semibold)
-                    }
+                }
+                
+                // Always display total flaw value (including backgrounds)
+                HStack {
+                    Text("Total Flaw Value:")
+                        .fontWeight(.semibold)
+                    Spacer()
+                    Text("\(character.totalFlawValue) pts")
+                        .fontWeight(.semibold)
                 }
                 
                 CreationFlawsListView(selectedFlaws: $character.flaws, characterType: character.characterType)

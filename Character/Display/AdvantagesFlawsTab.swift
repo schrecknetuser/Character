@@ -531,17 +531,19 @@ struct AdvantagesFlawsTab: View {
                                 }
                             )
                         }
-                        HStack {
-                            Text("Total Merit Cost:")
-                                .font(.system(size: dynamicFontSize, weight: .semibold))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.6)
-                            Spacer()
-                            Text("\(character.totalAdvantageCost) pts")
-                                .font(.system(size: dynamicFontSize, weight: .semibold))
-                                .foregroundColor(.primary)
-                                .lineLimit(1)
-                        }
+                    }
+                    
+                    // Always display total merit cost (including backgrounds)
+                    HStack {
+                        Text("Total Merit Cost:")
+                            .font(.system(size: dynamicFontSize, weight: .semibold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
+                        Spacer()
+                        Text("\(character.totalAdvantageCost) pts")
+                            .font(.system(size: dynamicFontSize, weight: .semibold))
+                            .foregroundColor(.primary)
+                            .lineLimit(1)
                     }
                     
                     if isEditing {
@@ -617,17 +619,19 @@ struct AdvantagesFlawsTab: View {
                                 }
                             )
                         }
-                        HStack {
-                            Text("Total Flaw Value:")
-                                .font(.system(size: dynamicFontSize, weight: .semibold))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.6)
-                            Spacer()
-                            Text("\(character.totalFlawValue) pts")
-                                .font(.system(size: dynamicFontSize, weight: .semibold))
-                                .foregroundColor(.primary)
-                                .lineLimit(1)
-                        }
+                    }
+                    
+                    // Always display total flaw value (including backgrounds)
+                    HStack {
+                        Text("Total Flaw Value:")
+                            .font(.system(size: dynamicFontSize, weight: .semibold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
+                        Spacer()
+                        Text("\(character.totalFlawValue) pts")
+                            .font(.system(size: dynamicFontSize, weight: .semibold))
+                            .foregroundColor(.primary)
+                            .lineLimit(1)
                     }
                     
                     if isEditing {
