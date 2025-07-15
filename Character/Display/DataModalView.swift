@@ -3,8 +3,10 @@ import SwiftUI
 struct DataModalView: View {
     @Binding var character: any BaseCharacter
     @Binding var isPresented: Bool
+    var store: CharacterStore?
     @State private var dynamicFontSize: CGFloat = 16
     @State var refreshID: UUID = UUID()
+    @State private var initialSessionCount: Int = 1
     
     var body: some View {
         NavigationView {
@@ -67,6 +69,7 @@ struct DataModalView: View {
                 }
                 .onAppear {
                     calculateOptimalFontSize(for: geometry.size)
+                    initialSessionCount = character.currentSession
                 }
                 .onChange(of: geometry.size) { _, newSize in
                     calculateOptimalFontSize(for: newSize)
@@ -77,6 +80,14 @@ struct DataModalView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
+                        // Check if session count has changed and log it
+                        if character.currentSession != initialSessionCount {
+                            let logEntry = ChangeLogEntry(summary: "Session changed from \(initialSessionCount) to \(character.currentSession)")
+                            character.changeLog.append(logEntry)
+                            
+                            // Update character in store if available
+                            store?.updateCharacter(character)
+                        }
                         isPresented = false
                     }
                 }

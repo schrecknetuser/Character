@@ -226,7 +226,7 @@ struct CharacterDetailView: View {
                 StatusModalView(character: activeCharacterBinding, isPresented: $showingStatusModal, store: store)
             }
             .sheet(isPresented: $showingDataModal) {
-                DataModalView(character: activeCharacterBinding, isPresented: $showingDataModal)
+                DataModalView(character: activeCharacterBinding, isPresented: $showingDataModal, store: store)
             }
             .onDisappear {
                 if isEditing {
