@@ -143,6 +143,22 @@ struct V5DisciplinePower: Identifiable, Codable, Hashable {
         self.addToHealth = addToHealth
         self.addToWillpower = addToWillpower
     }
+    
+    // Custom coding to maintain backwards compatibility
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        description = try container.decode(String.self, forKey: .description)
+        level = try container.decode(Int.self, forKey: .level)
+        isCustom = try container.decodeIfPresent(Bool.self, forKey: .isCustom) ?? false
+        addToHealth = try container.decodeIfPresent(Bool.self, forKey: .addToHealth) ?? false
+        addToWillpower = try container.decodeIfPresent(Bool.self, forKey: .addToWillpower) ?? false
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case id, name, description, level, isCustom, addToHealth, addToWillpower
+    }
 }
 
 // Data structure for a complete V5 discipline with powers per level and progress tracking
