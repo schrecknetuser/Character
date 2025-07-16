@@ -353,7 +353,7 @@ struct CharacterInfoTab: View {
                                 .font(.system(size: dynamicFontSize - 2))
                                 .foregroundColor(.secondary)
                                 .italic()
-                            Text("\(mageCharacter.essence.displayName): \(mageCharacter.essence.description)")
+                            Text("\((character as! MageCharacter).essence.displayName): \((character as! MageCharacter).essence.description)")
                                 .font(.system(size: dynamicFontSize - 2))
                                 .foregroundColor(.blue)
                         }
@@ -385,7 +385,7 @@ struct CharacterInfoTab: View {
                                 .font(.system(size: dynamicFontSize - 2))
                                 .foregroundColor(.secondary)
                                 .italic()
-                            Text("\(mageCharacter.resonance.displayName): \(mageCharacter.resonance.description)")
+                            Text("\((character as! MageCharacter).resonance.displayName): \((character as! MageCharacter).resonance.description)")
                                 .font(.system(size: dynamicFontSize - 2))
                                 .foregroundColor(.blue)
                         }
@@ -417,7 +417,7 @@ struct CharacterInfoTab: View {
                                 .font(.system(size: dynamicFontSize - 2))
                                 .foregroundColor(.secondary)
                                 .italic()
-                            Text("\(mageCharacter.synergy.displayName): \(mageCharacter.synergy.description)")
+                            Text("\((character as! MageCharacter).synergy.displayName): \((character as! MageCharacter).synergy.description)")
                                 .font(.system(size: dynamicFontSize - 2))
                                 .foregroundColor(.blue)
                         }
