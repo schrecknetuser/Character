@@ -69,6 +69,12 @@ class GhoulCharacter:CharacterBase, DisciplineCapable, CharacterWithHumanity {
         if self.desire != other.desire {
             changes.append("desire \(self.desire)→\(other.desire)")
         }
+        if self.characterDescription != other.characterDescription {
+            changes.append("character description updated")
+        }
+        if self.notes != other.notes {
+            changes.append("notes updated")
+        }
         
         // Check convictions and touchstones changes
         processStringArrayChanges(original: self.convictions, updated: other.convictions, name: "convictions", changes: &changes)

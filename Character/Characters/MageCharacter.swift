@@ -92,6 +92,12 @@ class MageCharacter: CharacterBase {
         if self.practice != other.practice {
             changes.append("practice \(self.practice)→\(other.practice)")
         }
+        if self.characterDescription != other.characterDescription {
+            changes.append("character description updated")
+        }
+        if self.notes != other.notes {
+            changes.append("notes updated")
+        }
         
         // Check convictions and touchstones changes
         processStringArrayChanges(original: self.convictions, updated: other.convictions, name: "convictions", changes: &changes)

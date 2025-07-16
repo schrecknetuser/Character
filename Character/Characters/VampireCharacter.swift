@@ -88,6 +88,12 @@ class VampireCharacter: CharacterBase, DisciplineCapable, CharacterWithHumanity 
         if self.desire != other.desire {
             changes.append("desire \(self.desire)→\(other.desire)")
         }
+        if self.characterDescription != other.characterDescription {
+            changes.append("character description updated")
+        }
+        if self.notes != other.notes {
+            changes.append("notes updated")
+        }
         if self.clan != other.clan {
             changes.append("clan \(self.clan)→\(other.clan)")
         }
