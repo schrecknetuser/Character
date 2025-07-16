@@ -616,8 +616,6 @@ struct V5Constants {
     
     // Predefined V5 Advantages with costs - Comprehensive Merit System
     static let predefinedAdvantages = [
-        // MARK: - Linguistics
-        BackgroundBase(name: "Linguistics", cost: 1, description: "Each dot of Linguistics allows the character to read, write and speak fluently in another language outside of the default two they already know, which is their native language and the language of the Domain.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
         
         // MARK: - Looks
         BackgroundBase(name: "Beautiful", cost: 2, description: "Add one die to related Social pools", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
@@ -630,15 +628,12 @@ struct V5Constants {
         BackgroundBase(name: "Up All Night (Enhanced)", cost: 4, description: "Treat Humanity as two higher (Max 10) when using Blush of Life, eating, drinking, or sexual intercourse.", suitableCharacterTypes: [.vampire]),
         
         // MARK: - Substance Use
-        BackgroundBase(name: "High Functioning Addict", cost: 1, description: "Add one die to either Physical, Social, or Mental pool when the last feeding had the drug of their desire.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "High Functioning Addict", cost: 1, description: "Add one die to either Physical, Social, or Mental pool when the last feeding had the drug of their desire.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
         
         // MARK: - Archaic
         BackgroundBase(name: "Custodian of History", cost: 1, description: "Grants +1 to all relevant Skill tests pertaining to a chosen period or character in Kindred lore.", suitableCharacterTypes: [.vampire]),
         
         // MARK: - Bonding
-        BackgroundBase(name: "Bond Resistance", cost: 1, description: "Add one die to resist Blood Bonds per level of this merit.", suitableCharacterTypes: [.vampire]),
-        BackgroundBase(name: "Bond Resistance (Enhanced)", cost: 2, description: "Add two dice to resist Blood Bonds.", suitableCharacterTypes: [.vampire]),
-        BackgroundBase(name: "Bond Resistance (Superior)", cost: 3, description: "Add three dice to resist Blood Bonds.", suitableCharacterTypes: [.vampire]),
         BackgroundBase(name: "Short Bond", cost: 2, description: "Bonds decrease by two levels each month if not reinforced.", suitableCharacterTypes: [.vampire]),
         BackgroundBase(name: "Unbondable", cost: 5, description: "Unable to be bonded.", suitableCharacterTypes: [.vampire]),
         BackgroundBase(name: "Bonds of Fealty", cost: 3, description: "Their Dominate powers do not require eye contacts on those bound to them. The character must have Dominate in order to take this.", suitableCharacterTypes: [.vampire]),
@@ -653,7 +648,7 @@ struct V5Constants {
         BackgroundBase(name: "Eat Food", cost: 2, description: "Can consume food but still with no nourishment.", suitableCharacterTypes: [.vampire]),
         BackgroundBase(name: "Cold Dead Hunger", cost: 3, description: "Add two dice to resist Hunger frenzy.", suitableCharacterTypes: [.vampire]),
         BackgroundBase(name: "Pack Diablerie", cost: 2, description: "The character will always be the one to take the soul unless they otherwise choose during Diablerie. Additionally, if they help another consume the soul, they gain 5 experience points to spend in the same manner as if they'd committed the Diablerie themselves.", suitableCharacterTypes: [.vampire]),
-        BackgroundBase(name: "Luck of the Devil", cost: 4, description: "Once per session when misfortune occurs it can be redirected towards someone close to them for the victim to take the fall.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Luck of the Devil", cost: 4, description: "Once per session when misfortune occurs it can be redirected towards someone close to them for the victim to take the fall.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
         BackgroundBase(name: "Nuit Mode", cost: 2, description: "The Kindred's body does not revert to it's death-state each night, enabling them to keep new haircuts and body modifications. They can mend these changes anytime as if they were Aggravated damage. This does not work for characters with BP higher than 1.", suitableCharacterTypes: [.vampire]),
         BackgroundBase(name: "Object of Power (Minor)", cost: 1, description: "Reroll one die per story, excluding Hunger.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
         BackgroundBase(name: "Object of Power (Moderate)", cost: 2, description: "Gain one bonus die to all Level 1 Ritual tests.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
@@ -662,14 +657,6 @@ struct V5Constants {
         // MARK: - Psychological
         BackgroundBase(name: "Unholy Will", cost: 2, description: "Add one die to any pool when resisting or contesting against an individual with True Faith when related to their faith. The character also suffers one less point of damage from holy sources.", suitableCharacterTypes: [.vampire]),
         BackgroundBase(name: "Unholy Will (Enhanced)", cost: 4, description: "Add two dice to any pool when resisting or contesting against an individual with True Faith when related to their faith. The character also suffers two fewer points of damage from holy sources.", suitableCharacterTypes: [.vampire]),
-        BackgroundBase(name: "Zealotry", cost: 1, description: "Once per session when succeeding with a normal roll that relates or aligns to the character's Conviction, turn it into a messy critical.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Zealotry (Enhanced)", cost: 2, description: "Twice per session when succeeding with a normal roll that relates or aligns to the character's Conviction, turn it into a messy critical.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Zealotry (Superior)", cost: 3, description: "Three times per session when succeeding with a normal roll that relates or aligns to the character's Conviction, turn it into a messy critical.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Penitence", cost: 1, description: "Once per session, take one point of self-inflicted Superficial Health Damage in exchange for one point of Superficial Willpower damage.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Penitence (Enhanced)", cost: 2, description: "Twice per session, take one point of self-inflicted Superficial Health Damage in exchange for one point of Superficial Willpower damage.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Penitence (Superior)", cost: 3, description: "Three times per session, take one point of self-inflicted Superficial Health Damage in exchange for one point of Superficial Willpower damage.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Penitence (Exceptional)", cost: 4, description: "Four times per session, take one point of self-inflicted Superficial Health Damage in exchange for one point of Superficial Willpower damage.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Penitence (Legendary)", cost: 5, description: "Five times per session, take one point of self-inflicted Superficial Health Damage in exchange for one point of Superficial Willpower damage.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
         BackgroundBase(name: "Soothed Beast", cost: 1, description: "With a SPC as an obsession, once per session they can ignore one Bestial or Messy Critical. Gain three Stains if they die.", suitableCharacterTypes: [.vampire]),
         BackgroundBase(name: "False Love", cost: 1, description: "With a SPC as an obsession, when in their presence treat the character's treat Humanity as one higher (Max 10) for purposes of using Blush of Life, eating, drinking, or sexual intercourse. Gain three Stains if they die.", suitableCharacterTypes: [.vampire]),
         
@@ -682,7 +669,7 @@ struct V5Constants {
         // MARK: - Other
         BackgroundBase(name: "Check the Trunk", cost: 1, description: "Easy access to an armory or cache of tools, none of these items can exceed the value of something a Resources 2 character could access. Add two dice to Preperation Rolls.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
         BackgroundBase(name: "Side Hustler", cost: 2, description: "Once per session they can get their hands on an item, information, or access to an event as if they had two dots in the related Resources, Contacts, or Influence.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Tempered Will", cost: 3, description: "They are always aware when someone is attempting to use Dominate or Presence against them. They may add two additional dice to resistance pools once per session, which can only be taken by those with no dots in Dominate or Presence.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        BackgroundBase(name: "Tempered Will", cost: 3, description: "They are always aware when someone is attempting to use Dominate or Presence against them. They may add two additional dice to resistance pools once per session, which can only be taken by those with no dots in Dominate or Presence.", suitableCharacterTypes: [.vampire, .ghoul]),
         BackgroundBase(name: "Untouchable", cost: 5, description: "Once per story they are able to escape all official punishment for a crime that would otherwise see them destroyed.", suitableCharacterTypes: [.vampire]),
         
         // MARK: - Caitiff Only
@@ -713,25 +700,51 @@ struct V5Constants {
         BackgroundBase(name: "Unseemly Aura", cost: 2, description: "Their aura has become indistinguishable from a Kindred.", suitableCharacterTypes: [.ghoul]),
         
         // MARK: - Cults
-        BackgroundBase(name: "Apocryphal Texts", cost: 1, description: "The character possesses writings from one of the church's leaders or prominent figures. On applicable rolls gain two dice Intelligence rolls. As a 1 dot optional flaw that can come with this merit the Willpower damage modifier for social combat is increased by 1.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Inspired Artist", cost: 2, description: "When using the cult's symbols or message in art, add a 1-die penalty to onlookers to resist Social rolls from cult members.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        BackgroundBase(name: "Apocryphal Texts", cost: 1, description: "The character possesses writings from one of the church's leaders or prominent figures. On applicable rolls gain two dice Intelligence rolls. As a 1 dot optional flaw that can come with this merit the Willpower damage modifier for social combat is increased by 1.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Inspired Artist", cost: 2, description: "When using the cult's symbols or message in art, add a 1-die penalty to onlookers to resist Social rolls from cult members.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Traveling Preacher", cost: 2, description: "Having spread the cult's message where they go, reduce the difficulty on rolls to avoid the Second Inquisition by 1.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Memories of the Fallen (Thin-bloods)", cost: 2, description: "On Blood Alchemy rolls related to Ashe, one rolled 10 counts as two 10s. Two rolled 10s still count as four.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Streamer", cost: 2, description: "Once per story, the character can call upon their fanbase to perform something simple and nonviolent for them.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Dark Mother's Song", cost: 2, description: "Add three dice in Manipulation rolls when convincing others to worship Lilith.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Fire Resistant", cost: 1, description: "Convert Aggravated Health damage from fire to Superficial Health damage equal to their Blood Potency for one Rouse Check instead of three during daysleep.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Vigilant", cost: 2, description: "The character knows when they are being watched unless it's through supernatural means, they still must roll to know who and where from.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Fixer", cost: 2, description: "Once per story, call in a favor or threaten a former client.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Go to Ground", cost: 1, description: "Add two dice on rolls when evading pursuit.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Insidious Whispers", cost: 2, description: "When making a Social roll to undermine a Conviction, one rolled 10 counts as two 10s. Two rolled 10s still count as four.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Gematria", cost: 1, description: "The ability to understand a coded cipher allowing both encrypting and decrypting messages.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Bull-Slayer", cost: 3, description: "During Extended Tests, The character can reroll up to three regular dice without spending Willpower once per scene.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Bargainer", cost: 1, description: "Reduce the Difficulty to assess a transaction by 1.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Archangel's Grace", cost: 2, description: "Replace the Athletics Skill with the Performance Skill or vice versa when doing something akin to heavy cardio.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Mask (1)", cost: 1, description: "A fake identity that allows the vampire to keep their true selves away from mortal's prying eyes, including getting bank accounts, a birth certificate and everything else a vampire might need to masquerade as a human.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Mask (2)", cost: 2, description: "A fake identity that allows the vampire to keep their true selves away from mortal's prying eyes, including getting bank accounts, a birth certificate and everything else a vampire might need to masquerade as a human.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Zeroed", cost: 1, description: "All of the character's past self has been purged from all systems as if they never existed. The character must have a 2-dot mask in order to take this.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Cobbler", cost: 1, description: "The ability to create or source out masks. Making a mask takes 3 days per dot. The character must have a 2-dot mask in order to take this.", suitableCharacterTypes: [.vampire]),
         
-        // Legacy backgrounds from original system for backwards compatibility
-        BackgroundBase(name: "Allies", cost: 3, description: "Friends and supporters who provide assistance", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Contacts", cost: 1, description: "Network of information sources", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Fame", cost: 1, description: "Public recognition and celebrity status", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Influence", cost: 2, description: "Political or social power within institutions", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Resources", cost: 3, description: "Financial wealth and material assets", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Retainers", cost: 2, description: "Loyal servants and subordinates", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Status", cost: 2, description: "Formal rank or position in society", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Herd", cost: 3, description: "Reliable group of mortal blood sources", suitableCharacterTypes: [.vampire]),
-        BackgroundBase(name: "Haven", cost: 2, description: "Secure and well-equipped dwelling", suitableCharacterTypes: [.vampire]),
-        BackgroundBase(name: "Feeding Grounds", cost: 1, description: "Territory rich in potential prey", suitableCharacterTypes: [.vampire]),
-        BackgroundBase(name: "Domain", cost: 2, description: "Area under your control and influence", suitableCharacterTypes: [.vampire]),
-        BackgroundBase(name: "Iron Will", cost: 5, description: "Exceptional mental fortitude and resistance", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Time Sense", cost: 1, description: "Innate ability to track time precisely", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Eidetic Memory", cost: 2, description: "Perfect recall of past events and information", suitableCharacterTypes: [.vampire, .ghoul, .mage])
-    ]
+        BackgroundBase(name: "Capacious Avatar", cost: 2, description: "Your Avatar is unusually capacious. Your capacity for Quintessence Empowerment is equal to one more than normal.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Mighty Avatar", cost: 4, description: "Your Avatar is especially mighty. Your capacity for Quintessence Empowerment is equal to two more than normal.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Avatar Resonance (2)", cost: 2, description: "Your resonance is especially in tune with your dominant emotion. Whether it is kindness, hate, anger, sadness, or curiosity. When you pick this merit pick an emotion, typically one tied to your Essence. When you are in severely affected by this emotion you may choose to gain a bonus of +1 on any casting rolls, however after you do this you must immediately make a Disassociation Roll with a penalty equal to the number of times you have used this this chapter as the paradox and your emotion mix.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Avatar Resonance (4)", cost: 4, description: "Your resonance is especially in tune with your dominant emotion. Whether it is kindness, hate, anger, sadness, or curiosity. When you pick this merit pick an emotion, typically one tied to your Essence. When you are in severely affected by this emotion you may choose to gain a bonus of +2 on any casting rolls, however after you do this you must immediately make a Disassociation Roll with a penalty equal to the number of times you have used this this chapter as the paradox and your emotion mix.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Brutal Avatar", cost: 2, description: "+1 to your Spellcasting rolls. All rolls to counterspell your magic gain 2 dice provided they are capable of counterspelling.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Beast Affinity", cost: 1, description: "Animals are unusually drawn to you, although you can’t speak to them you can communicate on a limited level based on body language and tone. One specific type of animal is affected (i.e. Crows).", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Beast Kinship", cost: 2, description: "Animals are unusually drawn to you, although you can’t speak to them you can communicate on a limited level based on body language and tone. One specific group of animal is affected (i.e. Birds).", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Beast Mastery", cost: 3, description: "Animals are unusually drawn to you, although you can’t speak to them you can communicate on a limited level based on body language and tone. All natural animals are affected.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Beast Mastery", cost: 5, description: "Animals are unusually drawn to you, although you can’t speak to them you can communicate on a limited level based on body language and tone. Even super natural animals are affected by your aura, although it only covers non-sapient creatures.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Combat Tool", cost: 2, description: "Your character has studied extensively in akashayana Do, magical swords, hypertech gun, ecstatic dance or in another skill that can be used as a magickal tool. This allows her to use combat techniques as Tools for instant spells. When taking this Merit, choose a Skill, which your character must have three or more dots in. This Merit allows use of that Skill in combat as a Tool, adding dice to a spell cast on subsequent turns, or to a spell cast reflexively in the same turn as the combat action. You may purchase this Merit multiple times to reflect the other styles.", suitableCharacterTypes: [.mage]),
+       BackgroundBase(name: "True Grit", cost: 3, description: "You refuse to go down in a fight extends beyond the limits of normal human bodies. You may take a point of aggravated will power damage to temporarily gain 3 health boxes that disappear at the end of the scene. Any damage in them is shifted to your remaining health when they are removed, this can result in superficial converting to aggravated, and can cause you to keel over and die when the fighting ends.", suitableCharacterTypes: [.mage]),
+       BackgroundBase(name: "Eidetic Memory", cost: 2, description: "Your memory is picture perfect. You roll all memory checks at up to plus 3 depending on visual element and may remember forgettable visual details.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+       BackgroundBase(name: "Paradox Magnet", cost: 2, description: "Your memory is picture perfect. You roll all memory checks at up to plus 3 depending on visual element and may remember forgettable visual details.", suitableCharacterTypes: [.mage]),
+       BackgroundBase(name: "Paradoxical Dispersal", cost: 2, description: "Whenever you lose Paradox without Backlashing you lose an extra point of paradox for each 10 rolled.", suitableCharacterTypes: [.mage]),
+       BackgroundBase(name: "Feel The Burn", cost: 3, description: "Whenever someone suffers Burn nearby you may spend a number of Will power points to take that much Burn instead of the target. You may use this a maximum of once per story.", suitableCharacterTypes: [.mage]),
+       BackgroundBase(name: "Paradox Magnet", cost: 2, description: "Your memory is picture perfect. You roll all memory checks at up to plus 3 depending on visual element and may remember forgettable visual details.", suitableCharacterTypes: [.mage]),
+       BackgroundBase(name: "Quickening", cost: 3, description: "You can maintain 1 extra spell per penalty over normal before increasing your penalty.", suitableCharacterTypes: [.mage]),
+       BackgroundBase(name: "Branch Sect", cost: 1, description: "This individual’s sect is incredibly similar to a specific sect with whom they are currently considered as ‘Different’. Treat them as part of that sect for the purposes of multi-casting penalties. Cannot be bought by non- Disparate sects.", suitableCharacterTypes: [.mage]),
+       BackgroundBase(name: "Branch Sect", cost: 1, description: "This individual’s sect is incredibly similar to a specific sect with whom they are currently considered as ‘Different’. Treat them as part of that sect for the purposes of multi-casting penalties. Cannot be bought by non- Disparate sects.", suitableCharacterTypes: [.mage]),
+       BackgroundBase(name: "Compatible Sect", cost: 2, description: "This individual’s sect is compatible in its methods with a certain faction outside of its own. Treat them as ‘Different’ instead of ‘Radically Different’ with the selected sect fac tion. Cannot be bought by non-Disparate sects.", suitableCharacterTypes: [.mage]),
+       BackgroundBase(name: "Umbral Sight", cost: 3, description: "You instinctively recognize spirits from the Umbral, you gain an additional 3 to your dice pool when rolling to recognize spirits from the Umbra and you may make awareness tests to pierce their veils and deceit even when you would normally require the Spirit sphere to do so.", suitableCharacterTypes: [.mage]),
+       BackgroundBase(name: "Stomping Ground", cost: 1, description: "You know your do main (no more than a half dozen city blocks) like the back of your hand. Roll one more die any time you roll for any test related to local knowledge.", suitableCharacterTypes: [.mage]),
+       BackgroundBase(name: "My City", cost: 3, description: "Cab drivers come to you for directions. In your domain (up to the size of a major city) you gain an automatic success in addition to your roll anytime you roll for a test related to local knowledge.", suitableCharacterTypes: [.mage]),
+       BackgroundBase(name: "Iron Will", cost: 5, description: "When rolling Willpower tests, you do so ignoring superficial willpower damage.", suitableCharacterTypes: [.mage])
+        ]
     
     // Predefined V5 Flaws with costs (negative values as they give points back) - Comprehensive Flaw System
     static let predefinedFlaws = [
@@ -781,9 +794,9 @@ struct V5Constants {
         
         // MARK: - Psychological
         BackgroundBase(name: "Beacon of Profanity", cost: -1, description: "Mortals with any amount of True Faith can sense your presence, regardless of True Faith level.", suitableCharacterTypes: [.vampire]),
-        BackgroundBase(name: "Crisis of Faith", cost: -1, description: "Whenever there is a bestial failure, take one point of superficial Willpower damage in addition to other outcomes.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Horrible Scars of Penitence", cost: -1, description: "This flaw is equivalent to Repulsive when around those not within the cult.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Groveling Worm", cost: -2, description: "The character must find the time to scourge their own flesh once per session for two points of Superficial Health damage or they suffer one point of Aggravated Willpower damage at the next session. Cannot be taken with Penitence Merit.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        BackgroundBase(name: "Crisis of Faith", cost: -1, description: "Whenever there is a bestial failure, take one point of superficial Willpower damage in addition to other outcomes.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Horrible Scars of Penitence", cost: -1, description: "This flaw is equivalent to Repulsive when around those not within the cult.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Groveling Worm", cost: -2, description: "The character must find the time to scourge their own flesh once per session for two points of Superficial Health damage or they suffer one point of Aggravated Willpower damage at the next session. Cannot be taken with Penitence Merit.", suitableCharacterTypes: [.vampire]),
         
         // MARK: - Contagion
         BackgroundBase(name: "Disease Vector", cost: -1, description: "When feeding from a sick mortal, the illness is always contracted and will be passed onto the next vessel.", suitableCharacterTypes: [.vampire]),
@@ -833,22 +846,55 @@ struct V5Constants {
         BackgroundBase(name: "Distressing Fangs", cost: -1, description: "Having developed fangs like kindred, the character suffers one die on Social pools with mortals.", suitableCharacterTypes: [.ghoul]),
         
         // MARK: - Cults
-        BackgroundBase(name: "Excommunicated", cost: -1, description: "They've done something to be cast out. Subtract two dice from all rolls dealing with the cult.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Excommunicated (Enhanced)", cost: -2, description: "They've done something to be cast out. The cult actively seeks to destroy you in any way possible.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Faithless", cost: -2, description: "Being a member for the benefits instead of being a true believer. Lose two dice on rolls pertaining to the Cult from Resolve and Composure rolls.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        BackgroundBase(name: "Excommunicated", cost: -1, description: "They've done something to be cast out. Subtract two dice from all rolls dealing with the cult.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Excommunicated (Enhanced)", cost: -2, description: "They've done something to be cast out. The cult actively seeks to destroy you in any way possible.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Faithless", cost: -2, description: "Being a member for the benefits instead of being a true believer. Lose two dice on rolls pertaining to the Cult from Resolve and Composure rolls.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Ashe Addiction", cost: -2, description: "In addition to the Ashe rules in Cults of the Blood Gods, after a failed Blood Alchemy roll, take a two dice penalty for all actions till the session ends", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Schism (Lasombra)", cost: -1, description: "Suffer a two-dice penalty on Social rolls with members of your cult.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "False Alarm", cost: -1, description: "Every failed Awareness roll counts as a total failure.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Empty", cost: -1, description: "People attempt to remove themselves from the character's unnerving presence. Subtract two dice from Social rolls", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Failed Initiate", cost: -1, description: "The character faltered during the process of becoming a member, being assigned a guide who will interrupt plans, offer instruction, or demand the character prove themselves at any time.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Yearning", cost: -1, description: "Missing their master, they must spend two Willpower to work against their master's wishes.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Disliked", cost: -1, description: "Subtract one die from Social tests involving groups outside of the character's loyal followers.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        BackgroundBase(name: "Despised", cost: -2, description: "One group/region of the city goes out of its way to destroy the character's plans.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        BackgroundBase(name: "Obvious Predator", cost: -2, description: "A predatory vibe removes two dice from any hunting pool except Physical stalking, chasing, and killing. Lose on die from any Social test intended to calm humans. Cannot maintain a Herd.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Known Corpse", cost: -1, description: "People know the vampire died recently and react in turn if they see them.", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Known Blankbody", cost: -2, description: "The character's name, history, associates, and more are all in several agency databases. Inquisition can recognize them as a vampire.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        BackgroundBase(name: "Shameful Childe", cost: -1, description: "Embraced a childe but abandoned them", suitableCharacterTypes: [.vampire]),
+        BackgroundBase(name: "Touchstone Embraced by your Enemies", cost: -2, description: "A former Touchstone didn't die or change as a person, someone Embraced them. This is a single Neonate, but they have allies and confrontation carries the risk of Stains.", suitableCharacterTypes: [.vampire, .ghoul]),
+        BackgroundBase(name: "Destitute", cost: -1, description: "No money, no home, and no monetary value beyond themselves.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        BackgroundBase(name: "Stalkers", cost: -1, description: "Something about the character tends to attract others who get a little bit too attached and just won't let go. Be it a former retainer or a past lover, should they get rid of them, another soon appears.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        BackgroundBase(name: "Suspect", cost: -1, description: "Breaking the rules or weaseling out of something owed has netted this character the ire of this Sect. Stay out of sight and mind and nothing will happen until they prove their worth again but until then take a 2 dice penalty to Social tests with the offended Factions.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        BackgroundBase(name: "Shunned", cost: -2, description: "Despised by a Sect, a line was crossed that never should have been, and now members of this group actively work against them at any opportunity.", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
         
-        // Legacy flaws from original system for backwards compatibility
-        BackgroundBase(name: "Enemy", cost: -1, description: "Someone who actively works against you", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Dark Secret", cost: -1, description: "Hidden information that could ruin you if revealed", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Hunted", cost: -3, description: "Actively pursued by dangerous individuals or groups", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Anachronism", cost: -1, description: "Outdated mannerisms that mark you as old-fashioned", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Disgraced", cost: -2, description: "Fallen from favor and social standing", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Shunned", cost: -1, description: "Rejected by certain social groups or communities", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Suspect", cost: -2, description: "Under constant suspicion for past actions", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        BackgroundBase(name: "Feeding Restriction", cost: -1, description: "Limited to specific types of blood or prey", suitableCharacterTypes: [.vampire]),
-        BackgroundBase(name: "Obvious Predator", cost: -2, description: "Difficulty hiding your predatory nature", suitableCharacterTypes: [.vampire]),
-        BackgroundBase(name: "Thin-Blooded", cost: -4, description: "Weak vampiric blood with reduced powers", suitableCharacterTypes: [.vampire]),
-        BackgroundBase(name: "Caitiff", cost: -2, description: "Clanless vampire with no inherited abilities", suitableCharacterTypes: [.vampire])
+        BackgroundBase(name: "Limited Avatar", cost: -2, description: "Your Avatar is poor. Your capacity for Quintessence Empowerment is equal to one less than normal.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Bard’s Tongue", cost: -2, description: "Things you say sometime become true in unfortunate ways. The Storyteller should use this to hamper your character with ill fortune but not necessarily directly imperil you.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Curiosity", cost: -1, description: "Your curiosity overrides your common sense. Resisting temptation requires a successful Wits + Resolve (2) check.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Slight Curse", cost: -1, description: "Tech fails around you, traffic jams occur whenever you drive, tires go flat.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Moderate Curse", cost: -2, description: "Your car breaks down when you need it, your expensive clothes end up stained, and tools break when you use them.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Severe Curse", cost: -3, description: "Accidents happen frequent to you, your bank account and internet accounts are frequently hacked, you keep getting your wallet and phone stolen, and driving anywhere is a risk.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Slight Echoes", cost: -1, description: "Animals shy away from you, milks sours in your presence, a strange smell appropriate to your nature follows and proceeds you or similar. Sensitive people might get odd feelings around you. Typically, this will be associated with your Affinity Sphere.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Slight Echoes", cost: -2, description: "People who know what to look for recognize you on sight. Flowers loom or wither in your presence or music echoes through the air. Holy or unholy symbols repulse you and might force you to make a willpower check.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Major Echoes", cost: -3, description: "Even sleepers notice how you stand out. Your shadow moves of its own accord, you don’t cast reflections, cold winds follow you, or people feel nauseous in your presence. People who know folklore might know the precautions to take (Intelligence + Occult maybe used to counterspell against you, Resolve + Occult vs your Willpower may be used to keep you at bay physically).", suitableCharacterTypes: [.mage]),
+        
+        BackgroundBase(name: "Folkloric Bane - Fire", cost: -3, description: "Fire burns you more than most. When using mystical methods to avoid, reduce, or otherwise diminish flames you roll 1 less dice and all flame-based attacks deal 1 extra point of aggra-vated damage against you.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Folkloric Bane - Threshold (1)", cost: -1, description: "When crossing into private property where someone lives you lose 1 Arete while there unless explicitly invited by someone who lives there.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Folkloric Bane - Threshold (2)", cost: -2, description: "When crossing into private property where someone lives you lose 2 Arete while there unless explicitly invited by someone who lives there.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Folkloric Bane - Threshold (3)", cost: -3, description: "When crossing into private property where someone lives you lose 3 Arete while there unless explicitly invited by someone who lives there.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Folkloric Bane - Running Water", cost: -2, description: "Standing over bodies of water causes your magic to seep away in proportion to the volume and speed at which it is flowing. In game terms you take a penalty to your Arete: around 1 for a small stream, heavy rain or sewers, 2 for a small sedate river, torrential rain or deep lake, 4 for a major rushing river or deep ocean and 5 for Niagara Falls. If this penalty reduces your Arete to 0 or below you may not cast and any ongoing spells you are maintaining end.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Folkloric Bane - Sleeper Bane", cost: -2, description: "Mundane humans are your downfall. Sleepers count as having rolled 1 success more with any successful attack against you and your mystical methods of reducing the damage reduce it by 1 less.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Haunted", cost: -3, description: "A wraith plagues you for some reason and makes your life hell. It can possess you or people you know, slam doors, twist your dreams, and throw things around.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Lifesaver", cost: -3, description: "You refuse to kill under even the most significant or dire of circumstances, or work directly with people who do. When you or your allies kill another human or partly human, being permanently lose 1 point of Willpower until the end of the chronicle. The storyteller may rule that excessive torture or similar will count for this too.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Love", cost: -1, description: "There is someone you would do anything to protect. You must spend willpower to roll Willpower (dificulty 3) to resist protecting or defending them via the most direct means possible.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Bloodthirsty", cost: -2, description: "You enjoy killing. Whenever you are faced with the chance to kill someone you must succeed on a Willpower (difficulty 2) roll not to.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Masochist", cost: -1, description: "Take –1 to all rolls when you have no physical damage and +1 when you have half your health left (rounded up) or less.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Permanent Paradox (2)", cost: -2, description: "You’ve caused some serious backlash in the past and you have 1 points of paradox that can never be removed for any reason.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Permanent Paradox (2)", cost: -5, description: "You’ve caused some serious backlash in the past and you have 2 points of paradox that can never be removed for any reason.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Painful Paradox", cost: -2, description: "Regardless of the reason, burn damage you cause due to backlash is always physical.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Phylactery", cost: -3, description: "Your avatar is trapped and sealed in an object for some reason. You may only cast spells when this object is on your immediate person.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Divergent Sect", cost: -3, description: "The individual’s sect uses techniques similar to either the Technocracy or the Traditions, allowing them to multi-cast with the group (treat ‘Radically Different Sect’ as just ‘Different Sect’). However, their techniques have diverged from most mainstream sects of his faction. Any multicast with other sects they are part of takes a –1 penalty. Cannot be bought by non-Disparate sects.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Insular", cost: -1, description: "You rarely leave your domain (no larger than a half dozen city blocks). Roll one less die anytime you roll for any test related to local knowledge.", suitableCharacterTypes: [.mage]),
+        BackgroundBase(name: "Weak Willed", cost: -1, description: "You permanently have a point of aggravated willpower damage that may not be removed under any circumstance.", suitableCharacterTypes: [.mage]),
     ]
     
     // Character Background definitions (separate from merits/flaws)
@@ -863,18 +909,39 @@ struct V5Constants {
     }
     
     static let characterBackgroundMeritDefinitions = [
-        CharacterBackgroundDefinition(name: "Haven", suitableCharacterTypes: [.vampire]),
-        CharacterBackgroundDefinition(name: "Resources", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        CharacterBackgroundDefinition(name: "Bond resistance", suitableCharacterTypes: [.vampire]),
         CharacterBackgroundDefinition(name: "Allies", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        CharacterBackgroundDefinition(name: "Retainers", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
         CharacterBackgroundDefinition(name: "Contacts", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        CharacterBackgroundDefinition(name: "City Secrets", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
         CharacterBackgroundDefinition(name: "Domain", suitableCharacterTypes: [.vampire]),
-        CharacterBackgroundDefinition(name: "Languages", suitableCharacterTypes: [.vampire, .ghoul, .mage])
+        CharacterBackgroundDefinition(name: "Demesne", suitableCharacterTypes: [.mage]),
+        CharacterBackgroundDefinition(name: "Enhancement", suitableCharacterTypes: [.mage]),
+        CharacterBackgroundDefinition(name: "Fame", suitableCharacterTypes: [.vampire]),
+        CharacterBackgroundDefinition(name: "Familiar", suitableCharacterTypes: [.mage]),
+        CharacterBackgroundDefinition(name: "Gardener", suitableCharacterTypes: [.vampire]),
+        CharacterBackgroundDefinition(name: "Haven", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        CharacterBackgroundDefinition(name: "Influence", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        CharacterBackgroundDefinition(name: "Herd", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        CharacterBackgroundDefinition(name: "Linguistics", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        CharacterBackgroundDefinition(name: "Mawla", suitableCharacterTypes: [.vampire]),
+        CharacterBackgroundDefinition(name: "Penitence", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        CharacterBackgroundDefinition(name: "Resources", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        CharacterBackgroundDefinition(name: "Retainers", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        CharacterBackgroundDefinition(name: "Requisitions", suitableCharacterTypes: [.mage]),
+        CharacterBackgroundDefinition(name: "Status", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        CharacterBackgroundDefinition(name: "True Faith", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        CharacterBackgroundDefinition(name: "Wonder", suitableCharacterTypes: [.mage]),
+        CharacterBackgroundDefinition(name: "Zealotry", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
     ]
     
     static let characterBackgroundFlawDefinitions = [
         CharacterBackgroundDefinition(name: "Adversary", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
-        CharacterBackgroundDefinition(name: "Enemy", suitableCharacterTypes: [.vampire, .ghoul, .mage])
+        CharacterBackgroundDefinition(name: "Banned From", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        CharacterBackgroundDefinition(name: "Dark Secret", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        CharacterBackgroundDefinition(name: "Enemy", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        CharacterBackgroundDefinition(name: "Infamy", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        CharacterBackgroundDefinition(name: "Secret Master", suitableCharacterTypes: [.vampire, .ghoul, .mage]),
+        
     ]
     
     // Legacy string arrays for backward compatibility
