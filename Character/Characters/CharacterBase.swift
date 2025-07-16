@@ -586,6 +586,8 @@ class CharacterBase: BaseCharacter {
         copy.desire = self.desire
         copy.chronicleName = self.chronicleName
         copy.concept = self.concept
+        copy.characterDescription = self.characterDescription
+        copy.notes = self.notes
         copy.dateOfBirth = self.dateOfBirth
         copy.advantages = self.advantages
         copy.flaws = self.flaws
