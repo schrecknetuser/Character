@@ -14,9 +14,12 @@ class MageCharacter: CharacterBase {
     @Published var practice: String
     @Published var instruments: [Instrument]
     @Published var dateOfAwakening: Date? = nil
+    @Published var essence: MageEssence
+    @Published var resonance: MageResonance
+    @Published var synergy: MageSynergy
 
     enum CodingKeys: String, CodingKey {
-        case spheres, paradox, hubris, quiet, arete, hubrisStates, quietStates, paradigm, practice, instruments, dateOfAwakening
+        case spheres, paradox, hubris, quiet, arete, hubrisStates, quietStates, paradigm, practice, instruments, dateOfAwakening, essence, resonance, synergy
     }
 
     override init(characterType: CharacterType = .mage) {
@@ -30,6 +33,9 @@ class MageCharacter: CharacterBase {
         self.paradigm = ""
         self.practice = ""
         self.instruments = []
+        self.essence = .none
+        self.resonance = .none
+        self.synergy = .none
         super.init(characterType: characterType)
     }
 
@@ -46,6 +52,9 @@ class MageCharacter: CharacterBase {
         self.practice = try container.decodeIfPresent(String.self, forKey: .practice) ?? ""
         self.instruments = try container.decodeIfPresent([Instrument].self, forKey: .instruments) ?? []
         self.dateOfAwakening = try container.decodeIfPresent(Date.self, forKey: .dateOfAwakening)
+        self.essence = try container.decodeIfPresent(MageEssence.self, forKey: .essence) ?? .none
+        self.resonance = try container.decodeIfPresent(MageResonance.self, forKey: .resonance) ?? .none
+        self.synergy = try container.decodeIfPresent(MageSynergy.self, forKey: .synergy) ?? .none
         try super.init(from: decoder)
     }
 
@@ -63,6 +72,9 @@ class MageCharacter: CharacterBase {
         try container.encode(practice, forKey: .practice)
         try container.encode(instruments, forKey: .instruments)
         try container.encodeIfPresent(dateOfAwakening, forKey: .dateOfAwakening)
+        try container.encode(essence, forKey: .essence)
+        try container.encode(resonance, forKey: .resonance)
+        try container.encode(synergy, forKey: .synergy)
     }
     
     override func generateChangeSummary(for updated: any BaseCharacter) -> String {
@@ -79,6 +91,15 @@ class MageCharacter: CharacterBase {
         }
         if self.practice != other.practice {
             changes.append("practice \(self.practice)→\(other.practice)")
+        }
+        if self.essence != other.essence {
+            changes.append("essence \(self.essence.displayName)→\(other.essence.displayName)")
+        }
+        if self.resonance != other.resonance {
+            changes.append("resonance \(self.resonance.displayName)→\(other.resonance.displayName)")
+        }
+        if self.synergy != other.synergy {
+            changes.append("synergy \(self.synergy.displayName)→\(other.synergy.displayName)")
         }
         if self.arete != other.arete {
             changes.append("arete \(self.arete)→\(other.arete)")
@@ -133,6 +154,9 @@ class MageCharacter: CharacterBase {
         copy.practice = self.practice
         copy.instruments = self.instruments
         copy.dateOfAwakening = self.dateOfAwakening
+        copy.essence = self.essence
+        copy.resonance = self.resonance
+        copy.synergy = self.synergy
 
         return copy
     }

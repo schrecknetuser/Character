@@ -323,6 +323,95 @@ struct CharacterInfoTab: View {
                     }
                 }
                 
+                // Add mage essence, resonance, and synergy section for mage characters
+                if let mageCharacter = character as? MageCharacter {
+                    Section(header: Text("Mage Traits")) {
+                        // Essence
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Text("Essence:")
+                                    .fontWeight(.medium)
+                                    .font(.system(size: dynamicFontSize))
+                                Spacer()
+                                if isEditing {
+                                    Picker("Essence", selection: Binding(
+                                        get: { mageCharacter.essence },
+                                        set: { mageCharacter.essence = $0 }
+                                    )) {
+                                        ForEach(MageEssence.allCases, id: \.self) { essence in
+                                            Text(essence.displayName).tag(essence)
+                                        }
+                                    }
+                                    .pickerStyle(MenuPickerStyle())
+                                    .font(.system(size: dynamicFontSize))
+                                } else {
+                                    Text(mageCharacter.essence.displayName)
+                                        .font(.system(size: dynamicFontSize))
+                                }
+                            }
+                            Text("Description: \(mageCharacter.essence.description)")
+                                .font(.system(size: dynamicFontSize - 2))
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        // Resonance
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Text("Resonance:")
+                                    .fontWeight(.medium)
+                                    .font(.system(size: dynamicFontSize))
+                                Spacer()
+                                if isEditing {
+                                    Picker("Resonance", selection: Binding(
+                                        get: { mageCharacter.resonance },
+                                        set: { mageCharacter.resonance = $0 }
+                                    )) {
+                                        ForEach(MageResonance.allCases, id: \.self) { resonance in
+                                            Text(resonance.displayName).tag(resonance)
+                                        }
+                                    }
+                                    .pickerStyle(MenuPickerStyle())
+                                    .font(.system(size: dynamicFontSize))
+                                } else {
+                                    Text(mageCharacter.resonance.displayName)
+                                        .font(.system(size: dynamicFontSize))
+                                }
+                            }
+                            Text("Description: \(mageCharacter.resonance.description)")
+                                .font(.system(size: dynamicFontSize - 2))
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        // Synergy
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Text("Synergy:")
+                                    .fontWeight(.medium)
+                                    .font(.system(size: dynamicFontSize))
+                                Spacer()
+                                if isEditing {
+                                    Picker("Synergy", selection: Binding(
+                                        get: { mageCharacter.synergy },
+                                        set: { mageCharacter.synergy = $0 }
+                                    )) {
+                                        ForEach(MageSynergy.allCases, id: \.self) { synergy in
+                                            Text(synergy.displayName).tag(synergy)
+                                        }
+                                    }
+                                    .pickerStyle(MenuPickerStyle())
+                                    .font(.system(size: dynamicFontSize))
+                                } else {
+                                    Text(mageCharacter.synergy.displayName)
+                                        .font(.system(size: dynamicFontSize))
+                                }
+                            }
+                            Text("Description: \(mageCharacter.synergy.description)")
+                                .font(.system(size: dynamicFontSize - 2))
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+                
                 Section(header: Text("Experience")) {
                     HStack {
                         Text("Total Experience:")

@@ -123,6 +123,120 @@ struct Instrument: Identifiable, Codable, Hashable {
     }
 }
 
+// MARK: - Mage Essence, Resonance, and Synergy
+
+// Mage Essence enum - mystical connection to the universe's foundational forces
+enum MageEssence: String, Codable, CaseIterable {
+    case none = "none"
+    case dynamic = "dynamic"
+    case `static` = "static"
+    case primordial = "primordial"
+    case questing = "questing"
+    
+    var displayName: String {
+        switch self {
+        case .none:
+            return "None"
+        case .dynamic:
+            return "Dynamic"
+        case .`static`:
+            return "Static"
+        case .primordial:
+            return "Primordial"
+        case .questing:
+            return "Questing"
+        }
+    }
+    
+    var description: String {
+        switch self {
+        case .none:
+            return "Undeveloped essence."
+        case .dynamic:
+            return "Passionate force for progress and change"
+        case .`static`:
+            return "Grounded agent of secure stability"
+        case .primordial:
+            return "Elusive figure of primal mystery"
+        case .questing:
+            return "Wandering dreamer of new horizons"
+        }
+    }
+}
+
+// Mage Resonance enum - unique emotional and thematic flavor of a mage's magic
+enum MageResonance: String, Codable, CaseIterable {
+    case none = "none"
+    case devotional = "devotional"
+    case elemental = "elemental"
+    case stabilizing = "stabilizing"
+    case temperamental = "temperamental"
+    
+    var displayName: String {
+        switch self {
+        case .none:
+            return "None"
+        case .devotional:
+            return "Devotional"
+        case .elemental:
+            return "Elemental"
+        case .stabilizing:
+            return "Stabilizing"
+        case .temperamental:
+            return "Temperamental"
+        }
+    }
+    
+    var description: String {
+        switch self {
+        case .none:
+            return "No resonance."
+        case .devotional:
+            return "Reflection of dedication to a cause, belief, society, or ethic."
+        case .elemental:
+            return "Reflection of affinity for creatures, spirits, or forces of nature."
+        case .stabilizing:
+            return "Reflection of calmness, structure, control, and integrity."
+        case .temperamental:
+            return "Reflections of dominant emotional state."
+        }
+    }
+}
+
+// Mage Synergy enum - inward flow of cosmic principles through a mage
+enum MageSynergy: String, Codable, CaseIterable {
+    case none = "none"
+    case dynamic = "dynamic"
+    case entropic = "entropic"
+    case `static` = "static"
+    
+    var displayName: String {
+        switch self {
+        case .none:
+            return "None"
+        case .dynamic:
+            return "Dynamic"
+        case .entropic:
+            return "Entropic"
+        case .`static`:
+            return "Static"
+        }
+    }
+    
+    var description: String {
+        switch self {
+        case .none:
+            return "No synergy."
+        case .dynamic:
+            return "Affinity for active, vibrant, chaotic energies."
+        case .entropic:
+            return "Affinity for destructive, random, disintegrative energies."
+        case .`static`:
+            return "Affinity for stable, controlling, preserving energies."
+        }
+    }
+}
+
 // MARK: - V5 Discipline System
 
 // Data structure for a single discipline power

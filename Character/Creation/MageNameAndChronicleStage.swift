@@ -73,6 +73,48 @@ struct MageNameAndChronicleStage: View {
                     }
                     
                     VStack(alignment: .leading, spacing: 8) {
+                        Text("Essence")
+                            .font(.headline)
+                        Picker("Essence", selection: $character.essence) {
+                            ForEach(MageEssence.allCases, id: \.self) { essence in
+                                Text(essence.displayName).tag(essence)
+                            }
+                        }
+                        .pickerStyle(MenuPickerStyle())
+                        Text(character.essence.description)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Resonance")
+                            .font(.headline)
+                        Picker("Resonance", selection: $character.resonance) {
+                            ForEach(MageResonance.allCases, id: \.self) { resonance in
+                                Text(resonance.displayName).tag(resonance)
+                            }
+                        }
+                        .pickerStyle(MenuPickerStyle())
+                        Text(character.resonance.description)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Synergy")
+                            .font(.headline)
+                        Picker("Synergy", selection: $character.synergy) {
+                            ForEach(MageSynergy.allCases, id: \.self) { synergy in
+                                Text(synergy.displayName).tag(synergy)
+                            }
+                        }
+                        .pickerStyle(MenuPickerStyle())
+                        Text(character.synergy.description)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 8) {
                         Text("Instruments")
                             .font(.headline)
                         
