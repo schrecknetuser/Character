@@ -16,6 +16,13 @@ class PDFGenerator {
         return renderer.pdfData { context in
             context.beginPage()
             
+            // Try to use the template first
+            if drawTemplateBasedSheet(for: character, context: context, pageSize: pageSize) {
+                // Template successfully used
+                return
+            }
+            
+            // Fall back to custom layout if template fails
             switch character.characterType {
             case .vampire:
                 if let vampire = character as? VampireCharacter {
@@ -957,5 +964,300 @@ class PDFGenerator {
         }
         
         return 60
+    }
+    
+    // MARK: - Template-based PDF Generation
+    
+    @discardableResult
+    private static func drawTemplateBasedSheet(for character: any BaseCharacter, context: UIGraphicsPDFRendererContext, pageSize: CGSize) -> Bool {
+        // Try to load the template PDF from the main bundle first, then from the file system
+        var templatePath: String?
+        
+        // First try the bundle
+        if let bundlePath = Bundle.main.path(forResource: "VtM5e_ENG_CharacterSheet_2pLAYER", ofType: "pdf") {
+            templatePath = bundlePath
+        } else {
+            // Fall back to checking common locations where the template might be
+            let possiblePaths = [
+                "./VtM5e_ENG_CharacterSheet_2pLAYER.pdf",
+                "../VtM5e_ENG_CharacterSheet_2pLAYER.pdf",
+                FileManager.default.currentDirectoryPath + "/VtM5e_ENG_CharacterSheet_2pLAYER.pdf"
+            ]
+            
+            for path in possiblePaths {
+                if FileManager.default.fileExists(atPath: path) {
+                    templatePath = path
+                    break
+                }
+            }
+        }
+        
+        guard let validTemplatePath = templatePath,
+              let templateURL = URL(string: "file://\(validTemplatePath)"),
+              let templateDoc = CGPDFDocument(templateURL as CFURL),
+              let templatePage = templateDoc.page(at: 1) else {
+            return false
+        }
+        
+        // Draw the template as background
+        let templateRect = templatePage.getBoxRect(.mediaBox)
+        let scaleX = pageSize.width / templateRect.width
+        let scaleY = pageSize.height / templateRect.height
+        let scale = min(scaleX, scaleY)
+        
+        let scaledWidth = templateRect.width * scale
+        let scaledHeight = templateRect.height * scale
+        let offsetX = (pageSize.width - scaledWidth) / 2
+        let offsetY = (pageSize.height - scaledHeight) / 2
+        
+        context.cgContext.saveGState()
+        context.cgContext.translateBy(x: offsetX, y: offsetY + scaledHeight)
+        context.cgContext.scaleBy(x: scale, y: -scale)
+        context.cgContext.drawPDFPage(templatePage)
+        context.cgContext.restoreGState()
+        
+        // Overlay character data based on character type
+        switch character.characterType {
+        case .vampire:
+            if let vampire = character as? VampireCharacter {
+                overlayVampireDataOnTemplate(vampire: vampire, offsetX: offsetX, offsetY: offsetY, scale: scale)
+            }
+        case .ghoul:
+            if let ghoul = character as? GhoulCharacter {
+                overlayGhoulDataOnTemplate(ghoul: ghoul, offsetX: offsetX, offsetY: offsetY, scale: scale)
+            }
+        case .mage:
+            if let mage = character as? MageCharacter {
+                overlayMageDataOnTemplate(mage: mage, offsetX: offsetX, offsetY: offsetY, scale: scale)
+            }
+        }
+        
+        return true
+    }
+    
+    private static func overlayVampireDataOnTemplate(vampire: VampireCharacter, offsetX: CGFloat, offsetY: CGFloat, scale: CGFloat) {
+        let font = UIFont.systemFont(ofSize: 10)
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: font,
+            .foregroundColor: UIColor.black
+        ]
+        
+        // Basic character information with approximate coordinates
+        // These coordinates need to be fine-tuned to match the actual template layout
+        
+        // Name (top left field)
+        drawTextAtTemplatePosition(vampire.name, 
+                                 at: CGPoint(x: 85, y: 105), 
+                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
+                                 attributes: attributes)
+        
+        // Player field (center top)
+        drawTextAtTemplatePosition("Player", 
+                                 at: CGPoint(x: 260, y: 105), 
+                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
+                                 attributes: attributes)
+        
+        // Chronicle (top right)
+        drawTextAtTemplatePosition(vampire.chronicle, 
+                                 at: CGPoint(x: 430, y: 105), 
+                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
+                                 attributes: attributes)
+        
+        // Concept
+        drawTextAtTemplatePosition(vampire.concept, 
+                                 at: CGPoint(x: 85, y: 140), 
+                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
+                                 attributes: attributes)
+        
+        // Clan
+        drawTextAtTemplatePosition(vampire.clan, 
+                                 at: CGPoint(x: 260, y: 140), 
+                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
+                                 attributes: attributes)
+        
+        // Generation
+        drawTextAtTemplatePosition("\(vampire.generation)", 
+                                 at: CGPoint(x: 430, y: 140), 
+                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
+                                 attributes: attributes)
+        
+        // Sire
+        drawTextAtTemplatePosition(vampire.sire, 
+                                 at: CGPoint(x: 85, y: 175), 
+                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
+                                 attributes: attributes)
+        
+        // Ambition
+        drawTextAtTemplatePosition(vampire.ambition, 
+                                 at: CGPoint(x: 260, y: 175), 
+                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
+                                 attributes: attributes)
+        
+        // Predator Type
+        drawTextAtTemplatePosition(vampire.predatorType.rawValue, 
+                                 at: CGPoint(x: 85, y: 210), 
+                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
+                                 attributes: attributes)
+        
+        // Overlay attributes and skills with dots
+        overlayAttributesOnTemplate(character: vampire, offsetX: offsetX, offsetY: offsetY, scale: scale)
+        overlaySkillsOnTemplate(character: vampire, offsetX: offsetX, offsetY: offsetY, scale: scale)
+        overlayVampireTraitsOnTemplate(vampire: vampire, offsetX: offsetX, offsetY: offsetY, scale: scale)
+    }
+    
+    private static func overlayGhoulDataOnTemplate(ghoul: GhoulCharacter, offsetX: CGFloat, offsetY: CGFloat, scale: CGFloat) {
+        // Basic implementation for ghouls - similar to vampires but simplified
+        let font = UIFont.systemFont(ofSize: 10)
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: font,
+            .foregroundColor: UIColor.black
+        ]
+        
+        drawTextAtTemplatePosition(ghoul.name, 
+                                 at: CGPoint(x: 85, y: 105), 
+                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
+                                 attributes: attributes)
+        
+        drawTextAtTemplatePosition(ghoul.concept, 
+                                 at: CGPoint(x: 85, y: 140), 
+                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
+                                 attributes: attributes)
+    }
+    
+    private static func overlayMageDataOnTemplate(mage: MageCharacter, offsetX: CGFloat, offsetY: CGFloat, scale: CGFloat) {
+        // Basic implementation for mages - minimal for now
+        let font = UIFont.systemFont(ofSize: 10)
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: font,
+            .foregroundColor: UIColor.black
+        ]
+        
+        drawTextAtTemplatePosition(mage.name, 
+                                 at: CGPoint(x: 85, y: 105), 
+                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
+                                 attributes: attributes)
+    }
+    
+    private static func drawTextAtTemplatePosition(_ text: String, at point: CGPoint, offsetX: CGFloat, offsetY: CGFloat, scale: CGFloat, attributes: [NSAttributedString.Key: Any]) {
+        // Convert template coordinates to actual PDF coordinates
+        let adjustedX = offsetX + (point.x * scale)
+        let adjustedY = offsetY + ((841.89 - point.y) * scale) // Flip Y coordinate for PDF
+        
+        let textString = NSAttributedString(string: text, attributes: attributes)
+        textString.draw(at: CGPoint(x: adjustedX, y: adjustedY))
+    }
+    
+    private static func overlayAttributesOnTemplate(character: any BaseCharacter, offsetX: CGFloat, offsetY: CGFloat, scale: CGFloat) {
+        let dotAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: 8),
+            .foregroundColor: UIColor.black
+        ]
+        
+        // Estimated coordinates for attributes section - will need fine-tuning
+        var currentY: CGFloat = 310
+        
+        // Physical attributes
+        for attribute in V5Constants.physicalAttributes {
+            let value = character.getAttributeValue(attribute: attribute)
+            let dots = createDotString(value: value, maxDots: 5)
+            drawTextAtTemplatePosition(dots, 
+                                     at: CGPoint(x: 150, y: currentY), 
+                                     offsetX: offsetX, offsetY: offsetY, scale: scale, 
+                                     attributes: dotAttributes)
+            currentY += 18
+        }
+        
+        // Social attributes
+        currentY = 310
+        for attribute in V5Constants.socialAttributes {
+            let value = character.getAttributeValue(attribute: attribute)
+            let dots = createDotString(value: value, maxDots: 5)
+            drawTextAtTemplatePosition(dots, 
+                                     at: CGPoint(x: 260, y: currentY), 
+                                     offsetX: offsetX, offsetY: offsetY, scale: scale, 
+                                     attributes: dotAttributes)
+            currentY += 18
+        }
+        
+        // Mental attributes
+        currentY = 310
+        for attribute in V5Constants.mentalAttributes {
+            let value = character.getAttributeValue(attribute: attribute)
+            let dots = createDotString(value: value, maxDots: 5)
+            drawTextAtTemplatePosition(dots, 
+                                     at: CGPoint(x: 370, y: currentY), 
+                                     offsetX: offsetX, offsetY: offsetY, scale: scale, 
+                                     attributes: dotAttributes)
+            currentY += 18
+        }
+    }
+    
+    private static func overlaySkillsOnTemplate(character: any BaseCharacter, offsetX: CGFloat, offsetY: CGFloat, scale: CGFloat) {
+        let dotAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: 8),
+            .foregroundColor: UIColor.black
+        ]
+        
+        // Estimated coordinates for skills section - will need fine-tuning
+        var currentY: CGFloat = 450
+        
+        // Physical skills
+        for skill in V5Constants.physicalSkills {
+            let value = character.getSkillValue(skill: skill)
+            let dots = createDotString(value: value, maxDots: 5)
+            drawTextAtTemplatePosition(dots, 
+                                     at: CGPoint(x: 150, y: currentY), 
+                                     offsetX: offsetX, offsetY: offsetY, scale: scale, 
+                                     attributes: dotAttributes)
+            currentY += 15
+        }
+        
+        // Social skills
+        currentY = 450
+        for skill in V5Constants.socialSkills {
+            let value = character.getSkillValue(skill: skill)
+            let dots = createDotString(value: value, maxDots: 5)
+            drawTextAtTemplatePosition(dots, 
+                                     at: CGPoint(x: 260, y: currentY), 
+                                     offsetX: offsetX, offsetY: offsetY, scale: scale, 
+                                     attributes: dotAttributes)
+            currentY += 15
+        }
+        
+        // Mental skills
+        currentY = 450
+        for skill in V5Constants.mentalSkills {
+            let value = character.getSkillValue(skill: skill)
+            let dots = createDotString(value: value, maxDots: 5)
+            drawTextAtTemplatePosition(dots, 
+                                     at: CGPoint(x: 370, y: currentY), 
+                                     offsetX: offsetX, offsetY: offsetY, scale: scale, 
+                                     attributes: dotAttributes)
+            currentY += 15
+        }
+    }
+    
+    private static func overlayVampireTraitsOnTemplate(vampire: VampireCharacter, offsetX: CGFloat, offsetY: CGFloat, scale: CGFloat) {
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: 10),
+            .foregroundColor: UIColor.black
+        ]
+        
+        // Vampire-specific traits - coordinates will need adjustment
+        drawTextAtTemplatePosition("\(vampire.bloodPotency)", 
+                                 at: CGPoint(x: 100, y: 650), 
+                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
+                                 attributes: attributes)
+        
+        drawTextAtTemplatePosition("\(vampire.humanity)", 
+                                 at: CGPoint(x: 200, y: 650), 
+                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
+                                 attributes: attributes)
+    }
+    
+    private static func createDotString(value: Int, maxDots: Int) -> String {
+        let filledDots = String(repeating: "●", count: min(value, maxDots))
+        let emptyDots = String(repeating: "○", count: max(0, maxDots - value))
+        return filledDots + emptyDots
     }
 }
