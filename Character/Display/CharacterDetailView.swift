@@ -9,6 +9,7 @@ struct CharacterDetailView: View {
     @State private var selectedTab = 0
     @State private var showingStatusModal = false
     @State private var showingDataModal = false
+    @State private var showingPDFExport = false
     
     var activeCharacterBinding: Binding<any BaseCharacter> {
         Binding(
@@ -193,6 +194,21 @@ struct CharacterDetailView: View {
                             }
                             .accessibilityLabel("Data")
                             .accessibilityHint("Shows character data and change log")
+                            
+                            // PDF Export Button
+                            Button(action: {
+                                showingPDFExport = true
+                            }) {
+                                Image(systemName: "square.and.arrow.up")
+                                    .font(.title2)
+                                    .foregroundColor(.white)
+                                    .frame(width: UIConstants.floatingButtonSize, height: UIConstants.floatingButtonSize)
+                                    .background(Color.green)
+                                    .clipShape(Circle())
+                                    .shadow(radius: 4)
+                            }
+                            .accessibilityLabel("Export PDF")
+                            .accessibilityHint("Export character sheet as PDF")
                         }
                         .padding(.trailing, UIConstants.screenEdgeSpacing)
                         .padding(.bottom, UIConstants.floatingButtonBottomPadding())
@@ -227,6 +243,9 @@ struct CharacterDetailView: View {
             }
             .sheet(isPresented: $showingDataModal) {
                 DataModalView(character: activeCharacterBinding, isPresented: $showingDataModal, store: store)
+            }
+            .sheet(isPresented: $showingPDFExport) {
+                PDFExportView(character: character, isPresented: $showingPDFExport)
             }
             .onDisappear {
                 if isEditing {
