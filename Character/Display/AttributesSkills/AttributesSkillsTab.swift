@@ -29,9 +29,9 @@ struct AttributesSkillsTab: View {
                             ).frame(maxWidth: .infinity)
                             
                             AttributeColumnView(
-                                title: "Mental",
-                                attributes: V5Constants.mentalAttributes,
-                                attributeValues: $character.mentalAttributes,
+                                title: "Social",
+                                attributes: V5Constants.socialAttributes,
+                                attributeValues: $character.socialAttributes,
                                 isEditing: isEditing,
                                 dynamicFontSize: dynamicFontSize,
                                 headerFontSize: headerFontSize,
@@ -39,9 +39,9 @@ struct AttributesSkillsTab: View {
                             ).frame(maxWidth: .infinity)
                             
                             AttributeColumnView(
-                                title: "Social",
-                                attributes: V5Constants.socialAttributes,
-                                attributeValues: $character.socialAttributes,
+                                title: "Mental",
+                                attributes: V5Constants.mentalAttributes,
+                                attributeValues: $character.mentalAttributes,
                                 isEditing: isEditing,
                                 dynamicFontSize: dynamicFontSize,
                                 headerFontSize: headerFontSize,
