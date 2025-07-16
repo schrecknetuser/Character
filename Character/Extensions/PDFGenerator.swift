@@ -2,28 +2,39 @@ import SwiftUI
 import UIKit
 import PDFKit
 
+extension String {
+    func `repeat`(_ count: Int) -> String {
+        return String(repeating: self, count: count)
+    }
+}
+
 class PDFGenerator {
     static func generateCharacterPDF(for character: any BaseCharacter) -> Data? {
         let pageSize = CGSize(width: 595.2, height: 841.8) // A4 size in points
         let renderer = UIGraphicsPDFRenderer(bounds: CGRect(origin: .zero, size: pageSize))
         
-        return renderer.pdfData { context in
-            context.beginPage()
-            
-            switch character.characterType {
-            case .vampire:
-                if let vampire = character as? VampireCharacter {
-                    drawVampireCharacterSheet(vampire: vampire, in: context.cgContext, pageSize: pageSize)
-                }
-            case .ghoul:
-                if let ghoul = character as? GhoulCharacter {
-                    drawGhoulCharacterSheet(ghoul: ghoul, in: context.cgContext, pageSize: pageSize)
-                }
-            case .mage:
-                if let mage = character as? MageCharacter {
-                    drawMageCharacterSheet(mage: mage, in: context.cgContext, pageSize: pageSize)
+        do {
+            return renderer.pdfData { context in
+                context.beginPage()
+                
+                switch character.characterType {
+                case .vampire:
+                    if let vampire = character as? VampireCharacter {
+                        drawVampireCharacterSheet(vampire: vampire, in: context.cgContext, pageSize: pageSize)
+                    }
+                case .ghoul:
+                    if let ghoul = character as? GhoulCharacter {
+                        drawGhoulCharacterSheet(ghoul: ghoul, in: context.cgContext, pageSize: pageSize)
+                    }
+                case .mage:
+                    if let mage = character as? MageCharacter {
+                        drawMageCharacterSheet(mage: mage, in: context.cgContext, pageSize: pageSize)
+                    }
                 }
             }
+        } catch {
+            print("PDF generation error: \(error)")
+            return nil
         }
     }
     
@@ -78,6 +89,29 @@ class PDFGenerator {
                            maxWidth: thirdWidth - 10)
         currentY += 25
         
+        // Experience and other traits row
+        let fourthWidth = workingWidth / 4
+        currentY = drawLabeledField("Experience:", "\(vampire.experience)", 
+                                  at: CGPoint(x: margin, y: currentY), 
+                                  in: context, 
+                                  maxWidth: fourthWidth - 10)
+        
+        _ = drawLabeledField("Spent XP:", "\(vampire.spentExperience)", 
+                           at: CGPoint(x: margin + fourthWidth, y: currentY), 
+                           in: context, 
+                           maxWidth: fourthWidth - 10)
+        
+        _ = drawLabeledField("Blood Potency:", "\(vampire.bloodPotency)", 
+                           at: CGPoint(x: margin + (fourthWidth * 2), y: currentY), 
+                           in: context, 
+                           maxWidth: fourthWidth - 10)
+        
+        _ = drawLabeledField("Hunger:", "\(vampire.hunger)", 
+                           at: CGPoint(x: margin + (fourthWidth * 3), y: currentY), 
+                           in: context, 
+                           maxWidth: fourthWidth - 10)
+        currentY += 25
+        
         // Attributes Section
         currentY = drawAttributesSection(character: vampire, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
         currentY += 20
@@ -88,6 +122,10 @@ class PDFGenerator {
         
         // Vampire-specific traits
         currentY = drawVampireTraits(vampire: vampire, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
+        currentY += 20
+        
+        // Health and Willpower
+        currentY = drawHealthWillpower(character: vampire, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
         currentY += 20
         
         // Disciplines
@@ -141,6 +179,10 @@ class PDFGenerator {
         
         // Ghoul-specific traits
         currentY = drawGhoulTraits(ghoul: ghoul, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
+        currentY += 20
+        
+        // Health and Willpower
+        currentY = drawHealthWillpower(character: ghoul, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
         currentY += 20
         
         // Disciplines
@@ -295,19 +337,73 @@ class PDFGenerator {
         return currentY + 10
     }
     
+    private static func drawHealthWillpower(character: any BaseCharacter, at point: CGPoint, in context: CGContext, maxWidth: CGFloat) -> CGFloat {
+        var currentY = point.y
+        
+        currentY = drawText("HEALTH & WILLPOWER", at: CGPoint(x: point.x, y: currentY), fontSize: 14, bold: true, in: context, maxWidth: maxWidth)
+        currentY += 5
+        
+        let halfWidth = maxWidth / 2
+        
+        // Health
+        var healthText = "Health: "
+        for i in 0..<character.health {
+            if i < character.healthStates.count {
+                switch character.healthStates[i] {
+                case .ok:
+                    healthText += "□ "
+                case .superficial:
+                    healthText += "/ "
+                case .aggravated:
+                    healthText += "✗ "
+                }
+            } else {
+                healthText += "□ "
+            }
+        }
+        currentY = drawText(healthText, at: CGPoint(x: point.x, y: currentY), fontSize: 10, bold: false, in: context, maxWidth: halfWidth)
+        
+        // Willpower
+        var willpowerText = "Willpower: "
+        for i in 0..<character.willpower {
+            if i < character.willpowerStates.count {
+                switch character.willpowerStates[i] {
+                case .ok:
+                    willpowerText += "□ "
+                case .superficial:
+                    willpowerText += "/ "
+                case .aggravated:
+                    willpowerText += "✗ "
+                }
+            } else {
+                willpowerText += "□ "
+            }
+        }
+        _ = drawText(willpowerText, at: CGPoint(x: point.x + halfWidth, y: point.y + 20), fontSize: 10, bold: false, in: context, maxWidth: halfWidth)
+        
+        return currentY + 10
+    }
+    
     private static func drawDisciplinesSection(character: any DisciplineCapable, at point: CGPoint, in context: CGContext, maxWidth: CGFloat) -> CGFloat {
         var currentY = point.y
         
         currentY = drawText("DISCIPLINES", at: CGPoint(x: point.x, y: currentY), fontSize: 14, bold: true, in: context, maxWidth: maxWidth)
         currentY += 5
         
-        for discipline in character.v5Disciplines {
-            currentY = drawText("• \(discipline.name) (\(discipline.currentLevel()))", 
-                               at: CGPoint(x: point.x + 10, y: currentY), 
-                               fontSize: 10, 
-                               bold: false, 
-                               in: context, 
-                               maxWidth: maxWidth - 20)
+        if character.v5Disciplines.isEmpty {
+            currentY = drawText("No disciplines learned", at: CGPoint(x: point.x + 10, y: currentY), fontSize: 10, bold: false, in: context, maxWidth: maxWidth - 20)
+        } else {
+            for discipline in character.v5Disciplines {
+                let level = discipline.currentLevel()
+                let selectedPowers = discipline.getAllSelectedPowerNames()
+                let powersText = selectedPowers.isEmpty ? "" : " - \(Array(selectedPowers).sorted().joined(separator: ", "))"
+                currentY = drawText("• \(discipline.name) \(level > 0 ? "●".repeat(level) : "○")\(powersText)", 
+                                   at: CGPoint(x: point.x + 10, y: currentY), 
+                                   fontSize: 10, 
+                                   bold: false, 
+                                   in: context, 
+                                   maxWidth: maxWidth - 20)
+            }
         }
         
         return currentY + 10
