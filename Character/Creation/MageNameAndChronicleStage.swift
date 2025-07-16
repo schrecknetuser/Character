@@ -75,43 +75,55 @@ struct MageNameAndChronicleStage: View {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Essence")
                             .font(.headline)
+                        Text(V5Constants.mageEssenceDescription)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .italic()
                         Picker("Essence", selection: $character.essence) {
                             ForEach(MageEssence.allCases, id: \.self) { essence in
                                 Text(essence.displayName).tag(essence)
                             }
                         }
                         .pickerStyle(MenuPickerStyle())
-                        Text(character.essence.description)
+                        Text("\(character.essence.displayName): \(character.essence.description)")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.blue)
                     }
                     
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Resonance")
                             .font(.headline)
+                        Text(V5Constants.mageResonanceDescription)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .italic()
                         Picker("Resonance", selection: $character.resonance) {
                             ForEach(MageResonance.allCases, id: \.self) { resonance in
                                 Text(resonance.displayName).tag(resonance)
                             }
                         }
                         .pickerStyle(MenuPickerStyle())
-                        Text(character.resonance.description)
+                        Text("\(character.resonance.displayName): \(character.resonance.description)")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.blue)
                     }
                     
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Synergy")
                             .font(.headline)
+                        Text(V5Constants.mageSynergyDescription)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .italic()
                         Picker("Synergy", selection: $character.synergy) {
                             ForEach(MageSynergy.allCases, id: \.self) { synergy in
                                 Text(synergy.displayName).tag(synergy)
                             }
                         }
                         .pickerStyle(MenuPickerStyle())
-                        Text(character.synergy.description)
+                        Text("\(character.synergy.displayName): \(character.synergy.description)")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.blue)
                     }
                     
                     VStack(alignment: .leading, spacing: 8) {
