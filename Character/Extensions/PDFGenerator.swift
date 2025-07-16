@@ -39,392 +39,429 @@ class PDFGenerator {
     }
     
     private static func drawVampireCharacterSheet(vampire: VampireCharacter, in context: CGContext, pageSize: CGSize) {
-        let margin: CGFloat = 40
+        let margin: CGFloat = 30
         let workingWidth = pageSize.width - (margin * 2)
         var currentY: CGFloat = margin
         
-        // Title
-        currentY = drawText("VAMPIRE: THE MASQUERADE CHARACTER SHEET", 
-                           at: CGPoint(x: margin, y: currentY), 
-                           fontSize: 18, 
-                           bold: true, 
-                           in: context, 
-                           maxWidth: workingWidth)
-        currentY += 20
-        
-        // Character Name
-        currentY = drawLabeledField("Name:", vampire.name, 
-                                  at: CGPoint(x: margin, y: currentY), 
-                                  in: context, 
-                                  maxWidth: workingWidth)
-        currentY += 5
-        
-        // Basic Info Row
+        // Header Info Row 1: Name, Player, Chronicle
         let thirdWidth = workingWidth / 3
-        currentY = drawLabeledField("Concept:", vampire.concept, 
-                                  at: CGPoint(x: margin, y: currentY), 
-                                  in: context, 
-                                  maxWidth: thirdWidth - 10)
+        currentY = drawFormField("Name", value: vampire.name, 
+                                at: CGPoint(x: margin, y: currentY), 
+                                width: thirdWidth - 5, in: context)
         
-        _ = drawLabeledField("Clan:", vampire.clan, 
-                           at: CGPoint(x: margin + thirdWidth, y: currentY), 
-                           in: context, 
-                           maxWidth: thirdWidth - 10)
+        _ = drawFormField("Player", value: "", 
+                         at: CGPoint(x: margin + thirdWidth, y: currentY), 
+                         width: thirdWidth - 5, in: context)
         
-        _ = drawLabeledField("Generation:", "\(vampire.generation)", 
-                           at: CGPoint(x: margin + (thirdWidth * 2), y: currentY), 
-                           in: context, 
-                           maxWidth: thirdWidth - 10)
-        currentY += 25
+        _ = drawFormField("Chronicle", value: vampire.chronicleName, 
+                         at: CGPoint(x: margin + (thirdWidth * 2), y: currentY), 
+                         width: thirdWidth - 5, in: context)
+        currentY += 35
         
-        // Chronicle and Predator Type
-        currentY = drawLabeledField("Chronicle:", vampire.chronicleName, 
-                                  at: CGPoint(x: margin, y: currentY), 
-                                  in: context, 
-                                  maxWidth: thirdWidth * 2 - 10)
+        // Header Info Row 2: Concept, Sire, Ambition
+        currentY = drawFormField("Concept", value: vampire.concept, 
+                                at: CGPoint(x: margin, y: currentY), 
+                                width: thirdWidth - 5, in: context)
         
-        _ = drawLabeledField("Predator Type:", vampire.predatorType, 
-                           at: CGPoint(x: margin + (thirdWidth * 2), y: currentY), 
-                           in: context, 
-                           maxWidth: thirdWidth - 10)
-        currentY += 25
+        _ = drawFormField("Sire", value: "", 
+                         at: CGPoint(x: margin + thirdWidth, y: currentY), 
+                         width: thirdWidth - 5, in: context)
         
-        // Experience and other traits row
-        let fourthWidth = workingWidth / 4
-        currentY = drawLabeledField("Experience:", "\(vampire.experience)", 
-                                  at: CGPoint(x: margin, y: currentY), 
-                                  in: context, 
-                                  maxWidth: fourthWidth - 10)
+        _ = drawFormField("Ambition", value: "", 
+                         at: CGPoint(x: margin + (thirdWidth * 2), y: currentY), 
+                         width: thirdWidth - 5, in: context)
+        currentY += 35
         
-        _ = drawLabeledField("Spent XP:", "\(vampire.spentExperience)", 
-                           at: CGPoint(x: margin + fourthWidth, y: currentY), 
-                           in: context, 
-                           maxWidth: fourthWidth - 10)
+        // Header Info Row 3: Clan, Predator, Generation
+        currentY = drawFormField("Clan", value: vampire.clan, 
+                                at: CGPoint(x: margin, y: currentY), 
+                                width: thirdWidth - 5, in: context)
         
-        _ = drawLabeledField("Blood Potency:", "\(vampire.bloodPotency)", 
-                           at: CGPoint(x: margin + (fourthWidth * 2), y: currentY), 
-                           in: context, 
-                           maxWidth: fourthWidth - 10)
+        _ = drawFormField("Predator", value: vampire.predatorType, 
+                         at: CGPoint(x: margin + thirdWidth, y: currentY), 
+                         width: thirdWidth - 5, in: context)
         
-        _ = drawLabeledField("Hunger:", "\(vampire.hunger)", 
-                           at: CGPoint(x: margin + (fourthWidth * 3), y: currentY), 
-                           in: context, 
-                           maxWidth: fourthWidth - 10)
-        currentY += 25
+        _ = drawFormField("Generation", value: "\(vampire.generation)", 
+                         at: CGPoint(x: margin + (thirdWidth * 2), y: currentY), 
+                         width: thirdWidth - 5, in: context)
+        currentY += 50
         
         // Attributes Section
-        currentY = drawAttributesSection(character: vampire, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
-        currentY += 20
+        currentY = drawAttributesFormSection(character: vampire, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
+        currentY += 15
+        
+        // Health and Willpower (side by side with attributes)
+        let healthWillpowerY = currentY - 80  // Position next to attributes
+        drawHealthWillpowerBoxes(character: vampire, at: CGPoint(x: margin + workingWidth - 200, y: healthWillpowerY), in: context)
         
         // Skills Section  
-        currentY = drawSkillsSection(character: vampire, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
+        currentY = drawSkillsFormSection(character: vampire, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
         currentY += 20
         
-        // Vampire-specific traits
-        currentY = drawVampireTraits(vampire: vampire, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
-        currentY += 20
+        // Disciplines Section
+        currentY = drawDisciplinesFormSection(character: vampire, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
+        currentY += 15
         
-        // Health and Willpower
-        currentY = drawHealthWillpower(character: vampire, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
-        currentY += 20
+        // Vampire-specific traits section
+        currentY = drawVampireTraitsForm(vampire: vampire, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
+        currentY += 15
         
-        // Disciplines
-        currentY = drawDisciplinesSection(character: vampire, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
-        
-        // Unfilled fields as requested
-        drawUnfilledFields(at: CGPoint(x: margin, y: pageSize.height - 150), in: context, maxWidth: workingWidth)
+        // Experience and Notes section
+        if currentY < pageSize.height - 100 {
+            drawExperienceAndNotes(vampire: vampire, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
+        }
     }
     
     private static func drawGhoulCharacterSheet(ghoul: GhoulCharacter, in context: CGContext, pageSize: CGSize) {
-        let margin: CGFloat = 40
+        let margin: CGFloat = 30
         let workingWidth = pageSize.width - (margin * 2)
         var currentY: CGFloat = margin
         
-        // Title
-        currentY = drawText("GHOUL CHARACTER SHEET", 
-                           at: CGPoint(x: margin, y: currentY), 
-                           fontSize: 18, 
-                           bold: true, 
-                           in: context, 
-                           maxWidth: workingWidth)
-        currentY += 20
+        // Header Info Row 1: Name, Player, Chronicle
+        let thirdWidth = workingWidth / 3
+        currentY = drawFormField("Name", value: ghoul.name, 
+                                at: CGPoint(x: margin, y: currentY), 
+                                width: thirdWidth - 5, in: context)
         
-        // Character Name
-        currentY = drawLabeledField("Name:", ghoul.name, 
-                                  at: CGPoint(x: margin, y: currentY), 
-                                  in: context, 
-                                  maxWidth: workingWidth)
-        currentY += 5
+        _ = drawFormField("Player", value: "", 
+                         at: CGPoint(x: margin + thirdWidth, y: currentY), 
+                         width: thirdWidth - 5, in: context)
         
-        // Basic Info Row
-        let halfWidth = workingWidth / 2
-        currentY = drawLabeledField("Concept:", ghoul.concept, 
-                                  at: CGPoint(x: margin, y: currentY), 
-                                  in: context, 
-                                  maxWidth: halfWidth - 10)
+        _ = drawFormField("Chronicle", value: ghoul.chronicleName, 
+                         at: CGPoint(x: margin + (thirdWidth * 2), y: currentY), 
+                         width: thirdWidth - 5, in: context)
+        currentY += 35
         
-        _ = drawLabeledField("Chronicle:", ghoul.chronicleName, 
-                           at: CGPoint(x: margin + halfWidth, y: currentY), 
-                           in: context, 
-                           maxWidth: halfWidth - 10)
-        currentY += 25
+        // Header Info Row 2: Concept, Sire, Ambition
+        currentY = drawFormField("Concept", value: ghoul.concept, 
+                                at: CGPoint(x: margin, y: currentY), 
+                                width: thirdWidth - 5, in: context)
+        
+        _ = drawFormField("Sire", value: "", 
+                         at: CGPoint(x: margin + thirdWidth, y: currentY), 
+                         width: thirdWidth - 5, in: context)
+        
+        _ = drawFormField("Ambition", value: "", 
+                         at: CGPoint(x: margin + (thirdWidth * 2), y: currentY), 
+                         width: thirdWidth - 5, in: context)
+        currentY += 50
         
         // Attributes Section
-        currentY = drawAttributesSection(character: ghoul, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
-        currentY += 20
+        currentY = drawAttributesFormSection(character: ghoul, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
+        currentY += 15
+        
+        // Health and Willpower (side by side with attributes)
+        let healthWillpowerY = currentY - 80  // Position next to attributes
+        drawHealthWillpowerBoxes(character: ghoul, at: CGPoint(x: margin + workingWidth - 200, y: healthWillpowerY), in: context)
         
         // Skills Section  
-        currentY = drawSkillsSection(character: ghoul, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
+        currentY = drawSkillsFormSection(character: ghoul, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
         currentY += 20
         
-        // Ghoul-specific traits
-        currentY = drawGhoulTraits(ghoul: ghoul, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
-        currentY += 20
+        // Disciplines Section
+        currentY = drawDisciplinesFormSection(character: ghoul, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
+        currentY += 15
         
-        // Health and Willpower
-        currentY = drawHealthWillpower(character: ghoul, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
-        currentY += 20
+        // Ghoul-specific traits section
+        currentY = drawGhoulTraitsForm(ghoul: ghoul, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
+        currentY += 15
         
-        // Disciplines
-        currentY = drawDisciplinesSection(character: ghoul, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
-        
-        // Unfilled fields as requested
-        drawUnfilledFields(at: CGPoint(x: margin, y: pageSize.height - 150), in: context, maxWidth: workingWidth)
+        // Experience and Notes section
+        if currentY < pageSize.height - 100 {
+            drawGhoulExperienceAndNotes(ghoul: ghoul, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
+        }
     }
     
     private static func drawMageCharacterSheet(mage: MageCharacter, in context: CGContext, pageSize: CGSize) {
-        let margin: CGFloat = 40
+        let margin: CGFloat = 30
         let workingWidth = pageSize.width - (margin * 2)
         var currentY: CGFloat = margin
         
         // Title
-        currentY = drawText("MAGE CHARACTER SHEET (STUB)", 
+        currentY = drawText("MAGE CHARACTER SHEET", 
                            at: CGPoint(x: margin, y: currentY), 
-                           fontSize: 18, 
+                           fontSize: 16, 
                            bold: true, 
                            in: context, 
                            maxWidth: workingWidth)
-        currentY += 20
+        currentY += 10
         
-        // Character Name
-        currentY = drawLabeledField("Name:", mage.name, 
-                                  at: CGPoint(x: margin, y: currentY), 
-                                  in: context, 
-                                  maxWidth: workingWidth)
-        currentY += 5
-        
-        // Basic Info
-        currentY = drawLabeledField("Concept:", mage.concept, 
-                                  at: CGPoint(x: margin, y: currentY), 
-                                  in: context, 
-                                  maxWidth: workingWidth)
-        currentY += 25
-        
-        // Placeholder text for stub implementation
-        currentY = drawText("Full Mage character sheet implementation coming soon...", 
+        currentY = drawText("(Stub Implementation - Full sheet coming soon)", 
                            at: CGPoint(x: margin, y: currentY), 
-                           fontSize: 14, 
+                           fontSize: 12, 
                            bold: false, 
                            in: context, 
                            maxWidth: workingWidth)
-        
-        // Basic Attributes Section
         currentY += 30
-        currentY = drawAttributesSection(character: mage, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
+        
+        // Basic character info
+        let thirdWidth = workingWidth / 3
+        currentY = drawFormField("Name", value: mage.name, 
+                                at: CGPoint(x: margin, y: currentY), 
+                                width: thirdWidth - 5, in: context)
+        
+        _ = drawFormField("Player", value: "", 
+                         at: CGPoint(x: margin + thirdWidth, y: currentY), 
+                         width: thirdWidth - 5, in: context)
+        
+        _ = drawFormField("Chronicle", value: mage.chronicleName, 
+                         at: CGPoint(x: margin + (thirdWidth * 2), y: currentY), 
+                         width: thirdWidth - 5, in: context)
+        currentY += 35
+        
+        currentY = drawFormField("Concept", value: mage.concept, 
+                                at: CGPoint(x: margin, y: currentY), 
+                                width: workingWidth, in: context)
+        currentY += 50
+        
+        // Basic Attributes Section (just the headers for now)
+        currentY = drawAttributesFormSection(character: mage, at: CGPoint(x: margin, y: currentY), in: context, maxWidth: workingWidth)
     }
     
-    // MARK: - Section Drawing Methods
+    // MARK: - Form-based Section Drawing Methods
     
-    private static func drawAttributesSection(character: any BaseCharacter, at point: CGPoint, in context: CGContext, maxWidth: CGFloat) -> CGFloat {
+    private static func drawFormField(_ label: String, value: String, at point: CGPoint, width: CGFloat, in context: CGContext) -> CGFloat {
+        let labelY = drawText(label, at: point, fontSize: 10, bold: true, in: context, maxWidth: width)
+        
+        // Draw underline for the field
+        context.setStrokeColor(UIColor.black.cgColor)
+        context.setLineWidth(0.5)
+        context.move(to: CGPoint(x: point.x, y: labelY + 8))
+        context.addLine(to: CGPoint(x: point.x + width, y: labelY + 8))
+        context.strokePath()
+        
+        // Draw the value above the line
+        if !value.isEmpty {
+            _ = drawText(value, at: CGPoint(x: point.x, y: labelY - 5), fontSize: 10, bold: false, in: context, maxWidth: width)
+        }
+        
+        return labelY + 15
+    }
+    
+    private static func drawAttributesFormSection(character: any BaseCharacter, at point: CGPoint, in context: CGContext, maxWidth: CGFloat) -> CGFloat {
         var currentY = point.y
         
-        currentY = drawText("ATTRIBUTES", at: CGPoint(x: point.x, y: currentY), fontSize: 14, bold: true, in: context, maxWidth: maxWidth)
-        currentY += 5
+        currentY = drawText("ATTRIBUTES", at: CGPoint(x: point.x, y: currentY), fontSize: 12, bold: true, in: context, maxWidth: maxWidth)
+        currentY += 10
         
-        let columnWidth = maxWidth / 3
+        let columnWidth = (maxWidth - 200) / 3 // Leave space for health/willpower
+        
+        // Column headers
+        _ = drawText("Physical", at: CGPoint(x: point.x, y: currentY), fontSize: 10, bold: true, in: context, maxWidth: columnWidth)
+        _ = drawText("Social", at: CGPoint(x: point.x + columnWidth, y: currentY), fontSize: 10, bold: true, in: context, maxWidth: columnWidth)
+        _ = drawText("Mental", at: CGPoint(x: point.x + (columnWidth * 2), y: currentY), fontSize: 10, bold: true, in: context, maxWidth: columnWidth)
+        currentY += 15
         
         // Physical Attributes
         var physicalY = currentY
-        physicalY = drawText("Physical", at: CGPoint(x: point.x, y: physicalY), fontSize: 12, bold: true, in: context, maxWidth: columnWidth)
         for attribute in V5Constants.physicalAttributes {
             let value = character.getAttributeValue(attribute: attribute)
-            physicalY = drawDottedAttribute(attribute, value: value, at: CGPoint(x: point.x, y: physicalY), in: context, maxWidth: columnWidth - 10)
+            physicalY = drawAttributeWithDots(attribute, value: value, at: CGPoint(x: point.x, y: physicalY), in: context, maxWidth: columnWidth - 10)
         }
         
         // Social Attributes
         var socialY = currentY
-        socialY = drawText("Social", at: CGPoint(x: point.x + columnWidth, y: socialY), fontSize: 12, bold: true, in: context, maxWidth: columnWidth)
         for attribute in V5Constants.socialAttributes {
             let value = character.getAttributeValue(attribute: attribute)
-            socialY = drawDottedAttribute(attribute, value: value, at: CGPoint(x: point.x + columnWidth, y: socialY), in: context, maxWidth: columnWidth - 10)
+            socialY = drawAttributeWithDots(attribute, value: value, at: CGPoint(x: point.x + columnWidth, y: socialY), in: context, maxWidth: columnWidth - 10)
         }
         
         // Mental Attributes
         var mentalY = currentY
-        mentalY = drawText("Mental", at: CGPoint(x: point.x + (columnWidth * 2), y: mentalY), fontSize: 12, bold: true, in: context, maxWidth: columnWidth)
         for attribute in V5Constants.mentalAttributes {
             let value = character.getAttributeValue(attribute: attribute)
-            mentalY = drawDottedAttribute(attribute, value: value, at: CGPoint(x: point.x + (columnWidth * 2), y: mentalY), in: context, maxWidth: columnWidth - 10)
+            mentalY = drawAttributeWithDots(attribute, value: value, at: CGPoint(x: point.x + (columnWidth * 2), y: mentalY), in: context, maxWidth: columnWidth - 10)
         }
         
         return max(physicalY, max(socialY, mentalY)) + 10
     }
     
-    private static func drawSkillsSection(character: any BaseCharacter, at point: CGPoint, in context: CGContext, maxWidth: CGFloat) -> CGFloat {
+    private static func drawSkillsFormSection(character: any BaseCharacter, at point: CGPoint, in context: CGContext, maxWidth: CGFloat) -> CGFloat {
         var currentY = point.y
         
-        currentY = drawText("SKILLS", at: CGPoint(x: point.x, y: currentY), fontSize: 14, bold: true, in: context, maxWidth: maxWidth)
-        currentY += 5
+        currentY = drawText("SKILLS", at: CGPoint(x: point.x, y: currentY), fontSize: 12, bold: true, in: context, maxWidth: maxWidth)
+        currentY += 10
         
         let columnWidth = maxWidth / 3
         
         // Physical Skills
         var physicalY = currentY
-        physicalY = drawText("Physical", at: CGPoint(x: point.x, y: physicalY), fontSize: 12, bold: true, in: context, maxWidth: columnWidth)
         for skill in V5Constants.physicalSkills {
             let value = character.getSkillValue(skill: skill)
-            physicalY = drawDottedAttribute(skill, value: value, at: CGPoint(x: point.x, y: physicalY), in: context, maxWidth: columnWidth - 10)
+            let specialization = getSkillSpecialization(character: character, skill: skill)
+            let displayName = specialization.isEmpty ? skill : "\(skill) (\(specialization))"
+            physicalY = drawAttributeWithDots(displayName, value: value, at: CGPoint(x: point.x, y: physicalY), in: context, maxWidth: columnWidth - 10)
         }
         
         // Social Skills
         var socialY = currentY
-        socialY = drawText("Social", at: CGPoint(x: point.x + columnWidth, y: socialY), fontSize: 12, bold: true, in: context, maxWidth: columnWidth)
         for skill in V5Constants.socialSkills {
             let value = character.getSkillValue(skill: skill)
-            socialY = drawDottedAttribute(skill, value: value, at: CGPoint(x: point.x + columnWidth, y: socialY), in: context, maxWidth: columnWidth - 10)
+            let specialization = getSkillSpecialization(character: character, skill: skill)
+            let displayName = specialization.isEmpty ? skill : "\(skill) (\(specialization))"
+            socialY = drawAttributeWithDots(displayName, value: value, at: CGPoint(x: point.x + columnWidth, y: socialY), in: context, maxWidth: columnWidth - 10)
         }
         
         // Mental Skills
         var mentalY = currentY
-        mentalY = drawText("Mental", at: CGPoint(x: point.x + (columnWidth * 2), y: mentalY), fontSize: 12, bold: true, in: context, maxWidth: columnWidth)
         for skill in V5Constants.mentalSkills {
             let value = character.getSkillValue(skill: skill)
-            mentalY = drawDottedAttribute(skill, value: value, at: CGPoint(x: point.x + (columnWidth * 2), y: mentalY), in: context, maxWidth: columnWidth - 10)
+            let specialization = getSkillSpecialization(character: character, skill: skill)
+            let displayName = specialization.isEmpty ? skill : "\(skill) (\(specialization))"
+            mentalY = drawAttributeWithDots(displayName, value: value, at: CGPoint(x: point.x + (columnWidth * 2), y: mentalY), in: context, maxWidth: columnWidth - 10)
         }
         
         return max(physicalY, max(socialY, mentalY)) + 10
     }
     
-    private static func drawVampireTraits(vampire: VampireCharacter, at point: CGPoint, in context: CGContext, maxWidth: CGFloat) -> CGFloat {
+    private static func drawDisciplinesFormSection(character: any DisciplineCapable, at point: CGPoint, in context: CGContext, maxWidth: CGFloat) -> CGFloat {
         var currentY = point.y
         
-        currentY = drawText("VAMPIRE TRAITS", at: CGPoint(x: point.x, y: currentY), fontSize: 14, bold: true, in: context, maxWidth: maxWidth)
-        currentY += 5
+        currentY = drawText("DISCIPLINES", at: CGPoint(x: point.x, y: currentY), fontSize: 12, bold: true, in: context, maxWidth: maxWidth)
+        currentY += 10
         
-        let columnWidth = maxWidth / 4
-        
-        // Blood Potency
-        currentY = drawDottedAttribute("Blood Potency", value: vampire.bloodPotency, at: CGPoint(x: point.x, y: currentY), in: context, maxWidth: columnWidth)
-        
-        // Humanity  
-        _ = drawDottedAttribute("Humanity", value: vampire.humanity, at: CGPoint(x: point.x + columnWidth, y: point.y + 20), in: context, maxWidth: columnWidth)
-        
-        // Hunger
-        _ = drawDottedAttribute("Hunger", value: vampire.hunger, at: CGPoint(x: point.x + (columnWidth * 2), y: point.y + 20), in: context, maxWidth: columnWidth)
-        
-        return currentY + 10
-    }
-    
-    private static func drawGhoulTraits(ghoul: GhoulCharacter, at point: CGPoint, in context: CGContext, maxWidth: CGFloat) -> CGFloat {
-        var currentY = point.y
-        
-        currentY = drawText("GHOUL TRAITS", at: CGPoint(x: point.x, y: currentY), fontSize: 14, bold: true, in: context, maxWidth: maxWidth)
-        currentY += 5
-        
-        // Humanity  
-        currentY = drawDottedAttribute("Humanity", value: ghoul.humanity, at: CGPoint(x: point.x, y: currentY), in: context, maxWidth: maxWidth / 2)
-        
-        return currentY + 10
-    }
-    
-    private static func drawHealthWillpower(character: any BaseCharacter, at point: CGPoint, in context: CGContext, maxWidth: CGFloat) -> CGFloat {
-        var currentY = point.y
-        
-        currentY = drawText("HEALTH & WILLPOWER", at: CGPoint(x: point.x, y: currentY), fontSize: 14, bold: true, in: context, maxWidth: maxWidth)
-        currentY += 5
-        
-        let halfWidth = maxWidth / 2
-        
-        // Health
-        var healthText = "Health: "
-        for i in 0..<character.health {
-            if i < character.healthStates.count {
-                switch character.healthStates[i] {
-                case .ok:
-                    healthText += "□ "
-                case .superficial:
-                    healthText += "/ "
-                case .aggravated:
-                    healthText += "✗ "
-                }
-            } else {
-                healthText += "□ "
-            }
-        }
-        currentY = drawText(healthText, at: CGPoint(x: point.x, y: currentY), fontSize: 10, bold: false, in: context, maxWidth: halfWidth)
-        
-        // Willpower
-        var willpowerText = "Willpower: "
-        for i in 0..<character.willpower {
-            if i < character.willpowerStates.count {
-                switch character.willpowerStates[i] {
-                case .ok:
-                    willpowerText += "□ "
-                case .superficial:
-                    willpowerText += "/ "
-                case .aggravated:
-                    willpowerText += "✗ "
-                }
-            } else {
-                willpowerText += "□ "
-            }
-        }
-        _ = drawText(willpowerText, at: CGPoint(x: point.x + halfWidth, y: point.y + 20), fontSize: 10, bold: false, in: context, maxWidth: halfWidth)
-        
-        return currentY + 10
-    }
-    
-    private static func drawDisciplinesSection(character: any DisciplineCapable, at point: CGPoint, in context: CGContext, maxWidth: CGFloat) -> CGFloat {
-        var currentY = point.y
-        
-        currentY = drawText("DISCIPLINES", at: CGPoint(x: point.x, y: currentY), fontSize: 14, bold: true, in: context, maxWidth: maxWidth)
-        currentY += 5
+        let columnWidth = maxWidth / 2
+        var leftY = currentY
+        var rightY = currentY
+        var useLeftColumn = true
         
         if character.v5Disciplines.isEmpty {
-            currentY = drawText("No disciplines learned", at: CGPoint(x: point.x + 10, y: currentY), fontSize: 10, bold: false, in: context, maxWidth: maxWidth - 20)
+            currentY = drawText("(No disciplines learned)", at: CGPoint(x: point.x, y: currentY), fontSize: 10, bold: false, in: context, maxWidth: maxWidth)
         } else {
             for discipline in character.v5Disciplines {
                 let level = discipline.currentLevel()
+                let xPos = useLeftColumn ? point.x : point.x + columnWidth
+                var yPos = useLeftColumn ? leftY : rightY
+                
+                // Draw discipline name with dots
+                let dots = String(repeating: "●", count: min(level, 5)) + String(repeating: "○", count: max(0, 5 - level))
+                yPos = drawText("\(discipline.name)", at: CGPoint(x: xPos, y: yPos), fontSize: 10, bold: true, in: context, maxWidth: columnWidth - 10)
+                yPos = drawText("[\(dots)]", at: CGPoint(x: xPos, y: yPos - 5), fontSize: 8, bold: false, in: context, maxWidth: columnWidth - 10)
+                
+                // Draw powers
                 let selectedPowers = discipline.getAllSelectedPowerNames()
-                let powersText = selectedPowers.isEmpty ? "" : " - \(Array(selectedPowers).sorted().joined(separator: ", "))"
-                currentY = drawText("• \(discipline.name) \(level > 0 ? "●".repeat(level) : "○")\(powersText)", 
-                                   at: CGPoint(x: point.x + 10, y: currentY), 
-                                   fontSize: 10, 
-                                   bold: false, 
-                                   in: context, 
-                                   maxWidth: maxWidth - 20)
+                for power in Array(selectedPowers).sorted() {
+                    yPos = drawText("• \(power)", at: CGPoint(x: xPos + 10, y: yPos), fontSize: 9, bold: false, in: context, maxWidth: columnWidth - 20)
+                }
+                yPos += 5
+                
+                if useLeftColumn {
+                    leftY = yPos
+                } else {
+                    rightY = yPos
+                }
+                useLeftColumn.toggle()
             }
         }
+        
+        return max(leftY, rightY) + 10
+    }
+    
+    private static func drawHealthWillpowerBoxes(character: any BaseCharacter, at point: CGPoint, in context: CGContext) {
+        let boxSize: CGFloat = 12
+        let spacing: CGFloat = 2
+        
+        // Health section
+        var currentY = drawText("Health", at: point, fontSize: 10, bold: true, in: context, maxWidth: 150)
+        
+        let healthBoxesPerRow = 5
+        for i in 0..<character.health {
+            let row = i / healthBoxesPerRow
+            let col = i % healthBoxesPerRow
+            let x = point.x + CGFloat(col) * (boxSize + spacing)
+            let y = currentY + CGFloat(row) * (boxSize + spacing)
+            
+            drawHealthBox(at: CGPoint(x: x, y: y), size: boxSize, state: i < character.healthStates.count ? character.healthStates[i] : .ok, in: context)
+        }
+        currentY += CGFloat((character.health - 1) / healthBoxesPerRow + 1) * (boxSize + spacing) + 10
+        
+        // Willpower section
+        currentY = drawText("Willpower", at: CGPoint(x: point.x, y: currentY), fontSize: 10, bold: true, in: context, maxWidth: 150)
+        
+        for i in 0..<character.willpower {
+            let row = i / healthBoxesPerRow
+            let col = i % healthBoxesPerRow
+            let x = point.x + CGFloat(col) * (boxSize + spacing)
+            let y = currentY + CGFloat(row) * (boxSize + spacing)
+            
+            drawHealthBox(at: CGPoint(x: x, y: y), size: boxSize, state: i < character.willpowerStates.count ? character.willpowerStates[i] : .ok, in: context)
+        }
+    }
+    
+    private static func drawVampireTraitsForm(vampire: VampireCharacter, at point: CGPoint, in context: CGContext, maxWidth: CGFloat) -> CGFloat {
+        var currentY = point.y
+        
+        let halfWidth = maxWidth / 2
+        
+        // Left column - Hunger, Humanity, Blood Potency
+        var leftY = currentY
+        leftY = drawFormField("Hunger", value: "\(vampire.hunger)", at: CGPoint(x: point.x, y: leftY), width: halfWidth - 20, in: context)
+        leftY = drawFormField("Humanity", value: "\(vampire.humanity)", at: CGPoint(x: point.x, y: leftY), width: halfWidth - 20, in: context)
+        leftY = drawFormField("Blood Potency", value: "\(vampire.bloodPotency)", at: CGPoint(x: point.x, y: leftY), width: halfWidth - 20, in: context)
+        
+        // Right column - Advantages section
+        var rightY = currentY
+        rightY = drawText("Advantages", at: CGPoint(x: point.x + halfWidth, y: rightY), fontSize: 10, bold: true, in: context, maxWidth: halfWidth)
+        rightY = drawFormField("Blood Surge", value: "", at: CGPoint(x: point.x + halfWidth, y: rightY), width: halfWidth - 20, in: context)
+        rightY = drawFormField("Power Bonus", value: "", at: CGPoint(x: point.x + halfWidth, y: rightY), width: halfWidth - 20, in: context)
+        rightY = drawFormField("Mend Amount", value: "", at: CGPoint(x: point.x + halfWidth, y: rightY), width: halfWidth - 20, in: context)
+        rightY = drawFormField("Rouse Re-Roll", value: "", at: CGPoint(x: point.x + halfWidth, y: rightY), width: halfWidth - 20, in: context)
+        rightY = drawFormField("Feeding Penalty", value: "", at: CGPoint(x: point.x + halfWidth, y: rightY), width: halfWidth - 20, in: context)
+        
+        currentY = max(leftY, rightY) + 10
+        
+        // Full width fields
+        currentY = drawFormField("Clan Bane", value: "", at: CGPoint(x: point.x, y: currentY), width: maxWidth, in: context)
+        currentY += 10
+        currentY = drawFormField("Clan Compulsion", value: "", at: CGPoint(x: point.x, y: currentY), width: maxWidth, in: context)
         
         return currentY + 10
     }
     
-    private static func drawUnfilledFields(at point: CGPoint, in context: CGContext, maxWidth: CGFloat) {
+    private static func drawExperienceAndNotes(vampire: VampireCharacter, at point: CGPoint, in context: CGContext, maxWidth: CGFloat) {
+        var currentY = point.y
+        let halfWidth = maxWidth / 2
+        
+        // Experience tracking
+        currentY = drawFormField("Experience", value: "\(vampire.experience)", at: CGPoint(x: point.x, y: currentY), width: halfWidth - 20, in: context)
+        _ = drawFormField("Spent Experience", value: "\(vampire.spentExperience)", at: CGPoint(x: point.x + halfWidth, y: point.y), width: halfWidth - 20, in: context)
+        currentY += 10
+        
+        // Notes section
+        currentY = drawFormField("Notes", value: "", at: CGPoint(x: point.x, y: currentY), width: maxWidth, in: context)
+        currentY += 10
+        currentY = drawFormField("Chronicle Tenets", value: "", at: CGPoint(x: point.x, y: currentY), width: maxWidth, in: context)
+        currentY += 10
+        currentY = drawFormField("Convictions & Touchstones", value: "", at: CGPoint(x: point.x, y: currentY), width: maxWidth, in: context)
+    }
+    
+    private static func drawGhoulTraitsForm(ghoul: GhoulCharacter, at point: CGPoint, in context: CGContext, maxWidth: CGFloat) -> CGFloat {
         var currentY = point.y
         
-        currentY = drawText("UNFILLED FIELDS", at: CGPoint(x: point.x, y: currentY), fontSize: 12, bold: true, in: context, maxWidth: maxWidth)
-        currentY += 5
+        let halfWidth = maxWidth / 2
         
-        let fields = ["Blood Surge: ____", "Power Bonus: ____", "Mend Amount: ____", 
-                     "Rouse Re-roll: ____", "Feeding Penalty: ____", "Clan Bane: ____", 
-                     "Clan Compulsion: ____"]
+        // Left column - Humanity
+        currentY = drawFormField("Humanity", value: "\(ghoul.humanity)", at: CGPoint(x: point.x, y: currentY), width: halfWidth - 20, in: context)
         
-        let columnWidth = maxWidth / 2
-        for (index, field) in fields.enumerated() {
-            let x = point.x + (index % 2 == 0 ? 0 : columnWidth)
-            let y = currentY + CGFloat(index / 2) * 15
-            _ = drawText(field, at: CGPoint(x: x, y: y), fontSize: 10, bold: false, in: context, maxWidth: columnWidth - 10)
-        }
+        // Add space for ghoul-specific traits if needed
+        return currentY + 10
+    }
+    
+    private static func drawGhoulExperienceAndNotes(ghoul: GhoulCharacter, at point: CGPoint, in context: CGContext, maxWidth: CGFloat) {
+        var currentY = point.y
+        let halfWidth = maxWidth / 2
+        
+        // Experience tracking
+        currentY = drawFormField("Experience", value: "\(ghoul.experience)", at: CGPoint(x: point.x, y: currentY), width: halfWidth - 20, in: context)
+        _ = drawFormField("Spent Experience", value: "\(ghoul.spentExperience)", at: CGPoint(x: point.x + halfWidth, y: point.y), width: halfWidth - 20, in: context)
+        currentY += 10
+        
+        // Notes section
+        currentY = drawFormField("Notes", value: "", at: CGPoint(x: point.x, y: currentY), width: maxWidth, in: context)
+        currentY += 10
+        currentY = drawFormField("Chronicle Tenets", value: "", at: CGPoint(x: point.x, y: currentY), width: maxWidth, in: context)
+        currentY += 10
+        currentY = drawFormField("Convictions & Touchstones", value: "", at: CGPoint(x: point.x, y: currentY), width: maxWidth, in: context)
     }
     
     // MARK: - Helper Drawing Methods
@@ -451,15 +488,71 @@ class PDFGenerator {
     }
     
     @discardableResult
-    private static func drawLabeledField(_ label: String, _ value: String, at point: CGPoint, in context: CGContext, maxWidth: CGFloat) -> CGFloat {
-        let labelY = drawText(label, at: point, fontSize: 10, bold: true, in: context, maxWidth: maxWidth)
-        return drawText(value.isEmpty ? "____" : value, at: CGPoint(x: point.x, y: labelY - 5), fontSize: 10, bold: false, in: context, maxWidth: maxWidth)
+    private static func drawAttributeWithDots(_ name: String, value: Int, at point: CGPoint, in context: CGContext, maxWidth: CGFloat) -> CGFloat {
+        // Draw attribute name first
+        let nameY = drawText(name, at: point, fontSize: 9, bold: false, in: context, maxWidth: maxWidth)
+        
+        // Draw dots on the same line as the name
+        let dotSize: CGFloat = 6
+        let dotSpacing: CGFloat = 2
+        let startX = point.x + 5
+        let dotY = nameY - 12
+        
+        for i in 0..<5 {
+            let x = startX + CGFloat(i) * (dotSize + dotSpacing)
+            let dotRect = CGRect(x: x, y: dotY, width: dotSize, height: dotSize)
+            
+            context.setStrokeColor(UIColor.black.cgColor)
+            context.setLineWidth(0.5)
+            
+            if i < value {
+                // Filled dot
+                context.setFillColor(UIColor.black.cgColor)
+                context.fillEllipse(in: dotRect)
+            } else {
+                // Empty dot
+                context.strokeEllipse(in: dotRect)
+            }
+        }
+        
+        return nameY + 3
     }
     
-    @discardableResult
-    private static func drawDottedAttribute(_ name: String, value: Int, at point: CGPoint, in context: CGContext, maxWidth: CGFloat) -> CGFloat {
-        let dots = String(repeating: "●", count: min(value, 5)) + String(repeating: "○", count: max(0, 5 - value))
-        let text = "\(name): \(dots)"
-        return drawText(text, at: point, fontSize: 10, bold: false, in: context, maxWidth: maxWidth)
+    private static func drawHealthBox(at point: CGPoint, size: CGFloat, state: HealthState, in context: CGContext) {
+        let rect = CGRect(x: point.x, y: point.y, width: size, height: size)
+        
+        // Draw box outline
+        context.setStrokeColor(UIColor.black.cgColor)
+        context.setLineWidth(0.5)
+        context.stroke(rect)
+        
+        // Fill based on state
+        switch state {
+        case .ok:
+            // Empty box - do nothing
+            break
+        case .superficial:
+            // Draw diagonal line
+            context.setStrokeColor(UIColor.black.cgColor)
+            context.setLineWidth(1)
+            context.move(to: CGPoint(x: point.x, y: point.y))
+            context.addLine(to: CGPoint(x: point.x + size, y: point.y + size))
+            context.strokePath()
+        case .aggravated:
+            // Draw X
+            context.setStrokeColor(UIColor.black.cgColor)
+            context.setLineWidth(1)
+            context.move(to: CGPoint(x: point.x, y: point.y))
+            context.addLine(to: CGPoint(x: point.x + size, y: point.y + size))
+            context.move(to: CGPoint(x: point.x + size, y: point.y))
+            context.addLine(to: CGPoint(x: point.x, y: point.y + size))
+            context.strokePath()
+        }
+    }
+    
+    private static func getSkillSpecialization(character: any BaseCharacter, skill: String) -> String {
+        // This is a placeholder - in a real implementation you'd check for skill specializations
+        // For now, return empty string since specializations aren't implemented in the data model
+        return ""
     }
 }
