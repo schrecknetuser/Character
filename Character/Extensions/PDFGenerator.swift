@@ -16,13 +16,7 @@ class PDFGenerator {
         return renderer.pdfData { context in
             context.beginPage()
             
-            // Try to use the template first
-            if drawTemplateBasedSheet(for: character, context: context, pageSize: pageSize) {
-                // Template successfully used
-                return
-            }
-            
-            // Fall back to custom layout if template fails
+            // Use clean custom layout that matches VtM5e template style
             switch character.characterType {
             case .vampire:
                 if let vampire = character as? VampireCharacter {
@@ -44,133 +38,118 @@ class PDFGenerator {
     // MARK: - Character Sheet Drawing Methods
     
     private static func drawVampireCharacterSheet(vampire: VampireCharacter, context: UIGraphicsPDFRendererContext, pageSize: CGSize) {
-        let margin: CGFloat = 30
+        let margin: CGFloat = 40
         
-        // Draw decorative red border frame
-        drawVTMStyleBorder(pageSize: pageSize, margin: 20)
+        // Draw professional border matching VtM style
+        drawOfficialVtMBorder(pageSize: pageSize, margin: margin)
         
-        var currentY: CGFloat = margin
+        var currentY: CGFloat = margin + 15
         
         // Header with VTM logo and title
-        currentY += drawVTMHeader(at: CGPoint(x: margin, y: currentY), pageSize: pageSize)
+        currentY += drawOfficialVtMHeader(at: CGPoint(x: margin, y: currentY), pageSize: pageSize)
+        currentY += 25
+        
+        // Character identity section
+        currentY += drawOfficialCharacterInfo(character: vampire, startY: currentY, margin: margin, pageSize: pageSize)
         currentY += 20
         
-        // Character identity row (Name, Player, Chronicle)
-        currentY += drawCharacterIdentityRow(character: vampire, startY: currentY, margin: margin, pageSize: pageSize)
-        currentY += 15
+        // Attributes section with proper form styling
+        currentY += drawOfficialAttributesSection(character: vampire, startY: currentY, margin: margin, pageSize: pageSize)
+        currentY += 25
         
-        // Character details rows (Concept, Clan, Generation, Sire, Ambition)
-        currentY += drawVampireDetailsRows(vampire: vampire, startY: currentY, margin: margin, pageSize: pageSize)
-        currentY += 20
-        
-        // Attributes section
-        currentY += drawAttributesGrid(character: vampire, startY: currentY, margin: margin, pageSize: pageSize)
-        currentY += 20
-        
-        // Skills section
-        currentY += drawSkillsGrid(character: vampire, startY: currentY, margin: margin, pageSize: pageSize)
-        currentY += 20
-        
-        // Health and Willpower (blank boxes only)
-        currentY += drawHealthWillpowerBoxes(character: vampire, startY: currentY, margin: margin, pageSize: pageSize)
-        currentY += 20
+        // Skills section with proper form styling
+        currentY += drawOfficialSkillsSection(character: vampire, startY: currentY, margin: margin, pageSize: pageSize)
+        currentY += 25
         
         // Check if we need a second page
-        if currentY > pageSize.height - 300 {
+        if currentY > pageSize.height - 350 {
             context.beginPage()
-            currentY = margin
-            drawVTMStyleBorder(pageSize: pageSize, margin: 20)
+            currentY = margin + 15
+            drawOfficialVtMBorder(pageSize: pageSize, margin: margin)
             currentY += 30
         }
         
+        // Health and Willpower (always blank for printing)
+        currentY += drawOfficialHealthWillpower(character: vampire, startY: currentY, margin: margin, pageSize: pageSize)
+        currentY += 25
+        
         // Vampire-specific traits
-        currentY += drawVampireTraitsGrid(vampire: vampire, startY: currentY, margin: margin, pageSize: pageSize)
-        currentY += 20
+        currentY += drawOfficialVampireTraits(vampire: vampire, startY: currentY, margin: margin, pageSize: pageSize)
+        currentY += 25
         
-        // Disciplines with powers
-        currentY += drawDisciplinesWithPowers(character: vampire, startY: currentY, margin: margin, pageSize: pageSize, maxHeight: min(250, pageSize.height - currentY - 150))
-        currentY += 20
+        // Disciplines section
+        currentY += drawOfficialDisciplines(character: vampire, startY: currentY, margin: margin, pageSize: pageSize, maxHeight: min(200, pageSize.height - currentY - 100))
         
-        // Check if we need a third page for merits/flaws
-        if currentY > pageSize.height - 200 {
+        // Check if we need a third page for remaining content
+        if currentY > pageSize.height - 150 {
             context.beginPage()
-            currentY = margin
-            drawVTMStyleBorder(pageSize: pageSize, margin: 20)
+            currentY = margin + 15
+            drawOfficialVtMBorder(pageSize: pageSize, margin: margin)
             currentY += 30
         }
         
         // Merits, Flaws, and Experience
-        currentY += drawMeritsFlawsAndExperience(character: vampire, startY: currentY, margin: margin, pageSize: pageSize, maxHeight: pageSize.height - currentY - 100)
-        
-        // Notes section at bottom if space remains
-        if currentY < pageSize.height - 80 {
-            currentY += 15
-            drawNotesAndBiography(character: vampire, startY: currentY, margin: margin, pageSize: pageSize)
-        }
+        currentY += drawOfficialMeritsFlaws(character: vampire, startY: currentY, margin: margin, pageSize: pageSize, maxHeight: pageSize.height - currentY - 80)
     }
     
     
     private static func drawGhoulCharacterSheet(ghoul: GhoulCharacter, context: UIGraphicsPDFRendererContext, pageSize: CGSize) {
-        let margin: CGFloat = 30
+        let margin: CGFloat = 40
         
         // Draw VTM-style border
-        drawVTMStyleBorder(pageSize: pageSize, margin: 20)
+        drawOfficialVtMBorder(pageSize: pageSize, margin: margin)
         
-        var currentY: CGFloat = margin
+        var currentY: CGFloat = margin + 15
         
         // Header for ghoul
         currentY += drawGhoulHeader(at: CGPoint(x: margin, y: currentY), pageSize: pageSize)
-        currentY += 20
+        currentY += 25
         
         // Character identity
-        currentY += drawCharacterIdentityRow(character: ghoul, startY: currentY, margin: margin, pageSize: pageSize)
-        currentY += 15
-        
-        // Ghoul-specific details
-        currentY += drawGhoulDetailsRow(ghoul: ghoul, startY: currentY, margin: margin, pageSize: pageSize)
+        currentY += drawOfficialCharacterInfo(character: ghoul, startY: currentY, margin: margin, pageSize: pageSize)
         currentY += 20
         
         // Attributes and Skills
-        currentY += drawAttributesGrid(character: ghoul, startY: currentY, margin: margin, pageSize: pageSize)
-        currentY += 20
-        currentY += drawSkillsGrid(character: ghoul, startY: currentY, margin: margin, pageSize: pageSize)
-        currentY += 20
+        currentY += drawOfficialAttributesSection(character: ghoul, startY: currentY, margin: margin, pageSize: pageSize)
+        currentY += 25
+        currentY += drawOfficialSkillsSection(character: ghoul, startY: currentY, margin: margin, pageSize: pageSize)
+        currentY += 25
         
         // Health and Willpower (blank)
-        currentY += drawHealthWillpowerBoxes(character: ghoul, startY: currentY, margin: margin, pageSize: pageSize)
-        currentY += 20
+        currentY += drawOfficialHealthWillpower(character: ghoul, startY: currentY, margin: margin, pageSize: pageSize)
+        currentY += 25
         
         // Ghoul humanity and disciplines if space allows
         if currentY < pageSize.height - 150 {
             currentY += drawGhoulTraits(ghoul: ghoul, startY: currentY, margin: margin, pageSize: pageSize)
-            currentY += 15
-            currentY += drawDisciplinesWithPowers(character: ghoul, startY: currentY, margin: margin, pageSize: pageSize, maxHeight: pageSize.height - currentY - 50)
+            currentY += 20
+            currentY += drawOfficialDisciplines(character: ghoul, startY: currentY, margin: margin, pageSize: pageSize, maxHeight: pageSize.height - currentY - 50)
         }
     }
     
     private static func drawMageCharacterSheet(mage: MageCharacter, context: UIGraphicsPDFRendererContext, pageSize: CGSize) {
-        let margin: CGFloat = 30
+        let margin: CGFloat = 40
         
         // Draw border
-        drawVTMStyleBorder(pageSize: pageSize, margin: 20)
+        drawOfficialVtMBorder(pageSize: pageSize, margin: margin)
         
-        var currentY: CGFloat = margin
+        var currentY: CGFloat = margin + 15
         
         // Header for mage
         currentY += drawMageHeader(at: CGPoint(x: margin, y: currentY), pageSize: pageSize)
-        currentY += 20
+        currentY += 25
         
         // Character identity
-        currentY += drawCharacterIdentityRow(character: mage, startY: currentY, margin: margin, pageSize: pageSize)
-        currentY += 15
+        currentY += drawOfficialCharacterInfo(character: mage, startY: currentY, margin: margin, pageSize: pageSize)
+        currentY += 20
         
         // Basic mage details
         currentY += drawMageDetailsRow(mage: mage, startY: currentY, margin: margin, pageSize: pageSize)
-        currentY += 20
+        currentY += 25
         
         // Attributes and Skills
-        currentY += drawAttributesGrid(character: mage, startY: currentY, margin: margin, pageSize: pageSize)
-        currentY += 20
+        currentY += drawOfficialAttributesSection(character: mage, startY: currentY, margin: margin, pageSize: pageSize)
+        currentY += 25
         
         // Note about implementation
         let font = UIFont.italicSystemFont(ofSize: 12)
@@ -180,13 +159,13 @@ class PDFGenerator {
         ]
         let noteText = "Full Mage character sheet implementation coming soon"
         let noteString = NSAttributedString(string: noteText, attributes: attributes)
-        noteString.draw(at: CGPoint(x: margin, y: currentY))
+        noteString.draw(at: CGPoint(x: margin + 15, y: currentY))
     }
     
     // Helper methods for ghoul and mage headers
     @discardableResult
     private static func drawGhoulHeader(at point: CGPoint, pageSize: CGSize) -> CGFloat {
-        let titleFont = UIFont.boldSystemFont(ofSize: 20)
+        let titleFont = UIFont.boldSystemFont(ofSize: 24)
         let titleAttributes: [NSAttributedString.Key: Any] = [
             .font: titleFont,
             .foregroundColor: UIColor.black
@@ -194,21 +173,22 @@ class PDFGenerator {
         let titleString = NSAttributedString(string: "VAMPIRE: THE MASQUERADE", attributes: titleAttributes)
         titleString.draw(at: point)
         
-        let subtitleY = point.y + 22
-        let subtitleFont = UIFont.boldSystemFont(ofSize: 11)
+        let subtitleY = point.y + 28
+        let subtitleFont = UIFont.boldSystemFont(ofSize: 14)
         let subtitleAttributes: [NSAttributedString.Key: Any] = [
             .font: subtitleFont,
-            .foregroundColor: UIColor.systemRed
+            .foregroundColor: UIColor.systemRed,
+            .kern: 2.0
         ]
         let subtitleString = NSAttributedString(string: "GHOUL CHARACTER SHEET", attributes: subtitleAttributes)
         subtitleString.draw(at: CGPoint(x: point.x, y: subtitleY))
         
-        return 45
+        return 50
     }
     
     @discardableResult
     private static func drawMageHeader(at point: CGPoint, pageSize: CGSize) -> CGFloat {
-        let titleFont = UIFont.boldSystemFont(ofSize: 20)
+        let titleFont = UIFont.boldSystemFont(ofSize: 24)
         let titleAttributes: [NSAttributedString.Key: Any] = [
             .font: titleFont,
             .foregroundColor: UIColor.black
@@ -216,148 +196,149 @@ class PDFGenerator {
         let titleString = NSAttributedString(string: "MAGE: THE AWAKENING", attributes: titleAttributes)
         titleString.draw(at: point)
         
-        let subtitleY = point.y + 22
-        let subtitleFont = UIFont.boldSystemFont(ofSize: 11)
+        let subtitleY = point.y + 28
+        let subtitleFont = UIFont.boldSystemFont(ofSize: 14)
         let subtitleAttributes: [NSAttributedString.Key: Any] = [
             .font: subtitleFont,
-            .foregroundColor: UIColor.systemBlue
+            .foregroundColor: UIColor.systemBlue,
+            .kern: 2.0
         ]
         let subtitleString = NSAttributedString(string: "CHARACTER SHEET", attributes: subtitleAttributes)
         subtitleString.draw(at: CGPoint(x: point.x, y: subtitleY))
+        
+        return 50
+    }
+    
+    @discardableResult
+    private static func drawMageDetailsRow(mage: MageCharacter, startY: CGFloat, margin: CGFloat, pageSize: CGSize) -> CGFloat {
+        let fieldWidth = (pageSize.width - 2 * margin - 20) / 2
+        
+        drawOfficialFormField(label: "CONCEPT", value: mage.concept,
+                            at: CGPoint(x: margin + 15, y: startY), 
+                            width: fieldWidth)
+        
+        drawOfficialFormField(label: "PATH", value: "",
+                            at: CGPoint(x: margin + fieldWidth + 25, y: startY), 
+                            width: fieldWidth)
         
         return 45
     }
     
     @discardableResult
-    private static func drawGhoulDetailsRow(ghoul: GhoulCharacter, startY: CGFloat, margin: CGFloat, pageSize: CGSize) -> CGFloat {
-        let fieldWidth = (pageSize.width - 2 * margin - 20) / 3
-        
-        drawFormField(label: "CONCEPT", value: ghoul.concept,
-                     at: CGPoint(x: margin, y: startY), 
-                     width: fieldWidth)
-        
-        drawFormField(label: "DOMITOR", value: "",
-                     at: CGPoint(x: margin + fieldWidth + 10, y: startY), 
-                     width: fieldWidth)
-        
-        drawFormField(label: "HUMANITY", value: "\(ghoul.humanity)",
-                     at: CGPoint(x: margin + 2 * (fieldWidth + 10), y: startY), 
-                     width: fieldWidth)
-        
-        return 40
-    }
-    
-    @discardableResult
-    private static func drawMageDetailsRow(mage: MageCharacter, startY: CGFloat, margin: CGFloat, pageSize: CGSize) -> CGFloat {
-        let fieldWidth = (pageSize.width - 2 * margin - 10) / 2
-        
-        drawFormField(label: "CONCEPT", value: mage.concept,
-                     at: CGPoint(x: margin, y: startY), 
-                     width: fieldWidth)
-        
-        drawFormField(label: "PATH", value: "",
-                     at: CGPoint(x: margin + fieldWidth + 10, y: startY), 
-                     width: fieldWidth)
-        
-        return 40
-    }
-    
-    @discardableResult
     private static func drawGhoulTraits(ghoul: GhoulCharacter, startY: CGFloat, margin: CGFloat, pageSize: CGSize) -> CGFloat {
-        let fieldWidth = (pageSize.width - 2 * margin - 10) / 2
+        let fieldWidth = (pageSize.width - 2 * margin - 30) / 2
         
-        drawFormField(label: "BLOOD BOND", value: "",
-                     at: CGPoint(x: margin, y: startY), 
-                     width: fieldWidth)
+        drawOfficialFormField(label: "BLOOD BOND", value: "",
+                            at: CGPoint(x: margin + 15, y: startY), 
+                            width: fieldWidth)
         
-        drawFormField(label: "DOMITOR INFLUENCE", value: "",
-                     at: CGPoint(x: margin + fieldWidth + 10, y: startY), 
-                     width: fieldWidth)
+        drawOfficialFormField(label: "DOMITOR INFLUENCE", value: "",
+                            at: CGPoint(x: margin + fieldWidth + 25, y: startY), 
+                            width: fieldWidth)
         
-        return 40
+        return 45
     }
     
     
-    // MARK: - VTM-Style Drawing Methods
+    // MARK: - Official VtM5e Template Style Methods
     
     @discardableResult
-    private static func drawVTMStyleBorder(pageSize: CGSize, margin: CGFloat) -> CGFloat {
+    private static func drawOfficialVtMBorder(pageSize: CGSize, margin: CGFloat) -> CGFloat {
         let context = UIGraphicsGetCurrentContext()
         
-        // Outer red border (thick)
+        // Draw main border frame - thick red border like official template
         context?.setStrokeColor(UIColor.systemRed.cgColor)
-        context?.setLineWidth(4.0)
-        let outerRect = CGRect(x: margin, y: margin, width: pageSize.width - 2 * margin, height: pageSize.height - 2 * margin)
-        context?.stroke(outerRect)
+        context?.setLineWidth(3.0)
+        let borderRect = CGRect(x: margin, y: margin, width: pageSize.width - 2 * margin, height: pageSize.height - 2 * margin)
+        context?.stroke(borderRect)
         
-        // Inner decorative border
-        context?.setLineWidth(1.5)
-        let innerMargin = margin + 8
+        // Inner decorative frame
+        context?.setLineWidth(1.0)
+        let innerMargin = margin + 10
         let innerRect = CGRect(x: innerMargin, y: innerMargin, width: pageSize.width - 2 * innerMargin, height: pageSize.height - 2 * innerMargin)
         context?.stroke(innerRect)
         
-        // Corner decorations
-        drawCornerDecorations(pageSize: pageSize, margin: margin)
+        // Add corner ornaments similar to official template
+        drawOfficialCornerOrnaments(pageSize: pageSize, margin: margin)
         
         return 0
     }
     
-    private static func drawCornerDecorations(pageSize: CGSize, margin: CGFloat) {
+    private static func drawOfficialCornerOrnaments(pageSize: CGSize, margin: CGFloat) {
         let context = UIGraphicsGetCurrentContext()
         context?.setStrokeColor(UIColor.systemRed.cgColor)
         context?.setLineWidth(2.0)
         
-        let cornerSize: CGFloat = 15
-        let corners = [
-            CGPoint(x: margin + 15, y: margin + 15), // top-left
-            CGPoint(x: pageSize.width - margin - 15, y: margin + 15), // top-right
-            CGPoint(x: margin + 15, y: pageSize.height - margin - 15), // bottom-left
-            CGPoint(x: pageSize.width - margin - 15, y: pageSize.height - margin - 15) // bottom-right
-        ]
+        let ornamentSize: CGFloat = 12
+        let offset: CGFloat = 20
         
-        for corner in corners {
-            // Draw small decorative cross at each corner
-            context?.move(to: CGPoint(x: corner.x - 5, y: corner.y))
-            context?.addLine(to: CGPoint(x: corner.x + 5, y: corner.y))
-            context?.move(to: CGPoint(x: corner.x, y: corner.y - 5))
-            context?.addLine(to: CGPoint(x: corner.x, y: corner.y + 5))
-        }
+        // Top-left corner ornament
+        let tlX = margin + offset
+        let tlY = margin + offset
+        context?.move(to: CGPoint(x: tlX - ornamentSize/2, y: tlY))
+        context?.addLine(to: CGPoint(x: tlX + ornamentSize/2, y: tlY))
+        context?.move(to: CGPoint(x: tlX, y: tlY - ornamentSize/2))
+        context?.addLine(to: CGPoint(x: tlX, y: tlY + ornamentSize/2))
+        
+        // Top-right corner ornament
+        let trX = pageSize.width - margin - offset
+        let trY = margin + offset
+        context?.move(to: CGPoint(x: trX - ornamentSize/2, y: trY))
+        context?.addLine(to: CGPoint(x: trX + ornamentSize/2, y: trY))
+        context?.move(to: CGPoint(x: trX, y: trY - ornamentSize/2))
+        context?.addLine(to: CGPoint(x: trX, y: trY + ornamentSize/2))
+        
+        // Bottom corners
+        let blX = margin + offset
+        let blY = pageSize.height - margin - offset
+        context?.move(to: CGPoint(x: blX - ornamentSize/2, y: blY))
+        context?.addLine(to: CGPoint(x: blX + ornamentSize/2, y: blY))
+        context?.move(to: CGPoint(x: blX, y: blY - ornamentSize/2))
+        context?.addLine(to: CGPoint(x: blX, y: blY + ornamentSize/2))
+        
+        let brX = pageSize.width - margin - offset
+        let brY = pageSize.height - margin - offset
+        context?.move(to: CGPoint(x: brX - ornamentSize/2, y: brY))
+        context?.addLine(to: CGPoint(x: brX + ornamentSize/2, y: brY))
+        context?.move(to: CGPoint(x: brX, y: brY - ornamentSize/2))
+        context?.addLine(to: CGPoint(x: brX, y: brY + ornamentSize/2))
+        
         context?.strokePath()
     }
     
     @discardableResult
-    private static func drawVTMHeader(at point: CGPoint, pageSize: CGSize) -> CGFloat {
+    private static func drawOfficialVtMHeader(at point: CGPoint, pageSize: CGSize) -> CGFloat {
         let context = UIGraphicsGetCurrentContext()
         
-        // Draw VTM Ankh logo
-        let logoSize: CGFloat = 35
-        let logoX = pageSize.width - 80
+        // VTM Ankh logo on the right
+        let logoSize: CGFloat = 40
+        let logoX = pageSize.width - 100
         let logoY = point.y + 5
         
-        // Red circle background
+        // Red circle background for logo
         context?.setFillColor(UIColor.systemRed.cgColor)
         context?.fillEllipse(in: CGRect(x: logoX, y: logoY, width: logoSize, height: logoSize))
         
         // White ankh symbol
         context?.setStrokeColor(UIColor.white.cgColor)
-        context?.setLineWidth(2.5)
-        let ankhCenterX = logoX + logoSize/2
-        let ankhCenterY = logoY + logoSize/2
+        context?.setLineWidth(3.0)
+        let centerX = logoX + logoSize/2
+        let centerY = logoY + logoSize/2
         
         // Ankh vertical line
-        context?.move(to: CGPoint(x: ankhCenterX, y: logoY + 6))
-        context?.addLine(to: CGPoint(x: ankhCenterX, y: logoY + logoSize - 6))
+        context?.move(to: CGPoint(x: centerX, y: logoY + 8))
+        context?.addLine(to: CGPoint(x: centerX, y: logoY + logoSize - 8))
         
         // Ankh horizontal line
-        context?.move(to: CGPoint(x: logoX + 8, y: ankhCenterY + 2))
-        context?.addLine(to: CGPoint(x: logoX + logoSize - 8, y: ankhCenterY + 2))
+        context?.move(to: CGPoint(x: logoX + 10, y: centerY + 3))
+        context?.addLine(to: CGPoint(x: logoX + logoSize - 10, y: centerY + 3))
         
         // Ankh top loop
-        context?.strokeEllipse(in: CGRect(x: ankhCenterX - 5, y: logoY + 6, width: 10, height: 10))
+        context?.strokeEllipse(in: CGRect(x: centerX - 6, y: logoY + 8, width: 12, height: 12))
         context?.strokePath()
         
         // Main title
-        let titleFont = UIFont.boldSystemFont(ofSize: 20)
+        let titleFont = UIFont.boldSystemFont(ofSize: 24)
         let titleAttributes: [NSAttributedString.Key: Any] = [
             .font: titleFont,
             .foregroundColor: UIColor.black
@@ -366,238 +347,254 @@ class PDFGenerator {
         titleString.draw(at: point)
         
         // Subtitle
-        let subtitleY = point.y + 22
-        let subtitleFont = UIFont.boldSystemFont(ofSize: 11)
+        let subtitleY = point.y + 28
+        let subtitleFont = UIFont.boldSystemFont(ofSize: 14)
         let subtitleAttributes: [NSAttributedString.Key: Any] = [
             .font: subtitleFont,
-            .foregroundColor: UIColor.systemRed
+            .foregroundColor: UIColor.systemRed,
+            .kern: 2.0
         ]
         let subtitleString = NSAttributedString(string: "CHARACTER SHEET", attributes: subtitleAttributes)
         subtitleString.draw(at: CGPoint(x: point.x, y: subtitleY))
         
-        // Decorative red line
+        // Decorative line under title
         context?.setStrokeColor(UIColor.systemRed.cgColor)
         context?.setLineWidth(2.0)
-        let lineY = subtitleY + 15
+        let lineY = subtitleY + 18
         context?.move(to: CGPoint(x: point.x, y: lineY))
-        context?.addLine(to: CGPoint(x: pageSize.width - 100, y: lineY))
+        context?.addLine(to: CGPoint(x: pageSize.width - 120, y: lineY))
         context?.strokePath()
         
-        return 50
+        return 60
     }
     
     @discardableResult
-    private static func drawCharacterIdentityRow(character: any BaseCharacter, startY: CGFloat, margin: CGFloat, pageSize: CGSize) -> CGFloat {
+    private static func drawOfficialCharacterInfo(character: any BaseCharacter, startY: CGFloat, margin: CGFloat, pageSize: CGSize) -> CGFloat {
         let fieldWidth = (pageSize.width - 2 * margin - 20) / 3
+        var currentY = startY
         
-        // Name (bold value)
-        drawFormField(label: "NAME", value: character.name, 
-                     at: CGPoint(x: margin, y: startY), 
-                     width: fieldWidth, isBold: true)
+        // First row: Name, Player, Chronicle
+        drawOfficialFormField(label: "NAME", value: character.name, 
+                            at: CGPoint(x: margin, y: currentY), 
+                            width: fieldWidth, valueStyle: .bold)
         
-        // Player (blank field)
-        drawFormField(label: "PLAYER", value: "", 
-                     at: CGPoint(x: margin + fieldWidth + 10, y: startY), 
-                     width: fieldWidth)
+        drawOfficialFormField(label: "PLAYER", value: "", 
+                            at: CGPoint(x: margin + fieldWidth + 10, y: currentY), 
+                            width: fieldWidth)
         
-        // Chronicle
-        drawFormField(label: "CHRONICLE", value: character.chronicleName,
-                     at: CGPoint(x: margin + 2 * (fieldWidth + 10), y: startY), 
-                     width: fieldWidth)
+        drawOfficialFormField(label: "CHRONICLE", value: character.chronicleName, 
+                            at: CGPoint(x: margin + 2 * (fieldWidth + 10), y: currentY), 
+                            width: fieldWidth)
         
-        return 40
+        currentY += 45
+        
+        // Vampire-specific fields if applicable
+        if let vampire = character as? VampireCharacter {
+            // Second row: Concept, Clan, Generation, Predator
+            let smallFieldWidth = (pageSize.width - 2 * margin - 30) / 4
+            
+            drawOfficialFormField(label: "CONCEPT", value: vampire.concept,
+                                at: CGPoint(x: margin, y: currentY), 
+                                width: smallFieldWidth)
+            
+            drawOfficialFormField(label: "CLAN", value: vampire.clan,
+                                at: CGPoint(x: margin + smallFieldWidth + 10, y: currentY), 
+                                width: smallFieldWidth)
+            
+            drawOfficialFormField(label: "GENERATION", value: "\(vampire.generation)",
+                                at: CGPoint(x: margin + 2 * (smallFieldWidth + 10), y: currentY), 
+                                width: smallFieldWidth)
+            
+            drawOfficialFormField(label: "PREDATOR", value: vampire.predatorType,
+                                at: CGPoint(x: margin + 3 * (smallFieldWidth + 10), y: currentY), 
+                                width: smallFieldWidth)
+            
+            currentY += 45
+            
+            // Third row: Sire, Ambition (wide fields)
+            let wideFieldWidth = (pageSize.width - 2 * margin - 10) / 2
+            
+            drawOfficialFormField(label: "SIRE", value: vampire.sire,
+                                at: CGPoint(x: margin, y: currentY), 
+                                width: wideFieldWidth)
+            
+            drawOfficialFormField(label: "AMBITION", value: vampire.ambition,
+                                at: CGPoint(x: margin + wideFieldWidth + 10, y: currentY), 
+                                width: wideFieldWidth)
+            
+            currentY += 45
+        }
+        
+        return currentY - startY
     }
     
-    @discardableResult
-    private static func drawVampireDetailsRows(vampire: VampireCharacter, startY: CGFloat, margin: CGFloat, pageSize: CGSize) -> CGFloat {
-        let fieldWidth = (pageSize.width - 2 * margin - 30) / 4
-        
-        // First row: Concept, Clan, Predator, Generation
-        drawFormField(label: "CONCEPT", value: vampire.concept,
-                     at: CGPoint(x: margin, y: startY), 
-                     width: fieldWidth)
-        
-        drawFormField(label: "CLAN", value: vampire.clan,
-                     at: CGPoint(x: margin + fieldWidth + 10, y: startY), 
-                     width: fieldWidth)
-        
-        drawFormField(label: "PREDATOR", value: vampire.predatorType,
-                     at: CGPoint(x: margin + 2 * (fieldWidth + 10), y: startY), 
-                     width: fieldWidth)
-        
-        drawFormField(label: "GENERATION", value: "\(vampire.generation)",
-                     at: CGPoint(x: margin + 3 * (fieldWidth + 10), y: startY), 
-                     width: fieldWidth)
-        
-        // Second row: Sire, Ambition (wider fields)
-        let secondRowY = startY + 40
-        let wideFieldWidth = (pageSize.width - 2 * margin - 10) / 2
-        
-        drawFormField(label: "SIRE", value: "",
-                     at: CGPoint(x: margin, y: secondRowY), 
-                     width: wideFieldWidth)
-        
-        drawFormField(label: "AMBITION", value: vampire.ambition,
-                     at: CGPoint(x: margin + wideFieldWidth + 10, y: secondRowY), 
-                     width: wideFieldWidth)
-        
-        return 80
-    }
-    
-    private static func drawFormField(label: String, value: String, at point: CGPoint, width: CGFloat, fontSize: CGFloat = 9, isBold: Bool = false) {
-        let labelFont = UIFont.boldSystemFont(ofSize: fontSize)
-        let valueFont = isBold ? UIFont.boldSystemFont(ofSize: fontSize + 1) : UIFont.systemFont(ofSize: fontSize)
-        
-        // Draw label in uppercase
+    private static func drawOfficialFormField(label: String, value: String, at point: CGPoint, width: CGFloat, valueStyle: FormFieldStyle = .normal) {
+        // Draw label
+        let labelFont = UIFont.boldSystemFont(ofSize: 9)
         let labelAttributes: [NSAttributedString.Key: Any] = [
             .font: labelFont,
-            .foregroundColor: UIColor.black
+            .foregroundColor: UIColor.black,
+            .kern: 1.0
         ]
         let labelString = NSAttributedString(string: label.uppercased(), attributes: labelAttributes)
         labelString.draw(at: point)
         
-        // Draw underline
+        // Draw field box with border
         let context = UIGraphicsGetCurrentContext()
+        let fieldHeight: CGFloat = 24
+        let fieldY = point.y + 14
+        let fieldRect = CGRect(x: point.x, y: fieldY, width: width, height: fieldHeight)
+        
+        // Field background
+        context?.setFillColor(UIColor.white.cgColor)
+        context?.fill(fieldRect)
+        
+        // Field border
         context?.setStrokeColor(UIColor.black.cgColor)
-        context?.setLineWidth(1.0)
-        let lineY = point.y + 17
-        context?.move(to: CGPoint(x: point.x, y: lineY))
-        context?.addLine(to: CGPoint(x: point.x + width, y: lineY))
-        context?.strokePath()
+        context?.setLineWidth(0.8)
+        context?.stroke(fieldRect)
         
         // Draw value if present
         if !value.isEmpty {
+            let valueFont = valueStyle == .bold ? UIFont.boldSystemFont(ofSize: 11) : UIFont.systemFont(ofSize: 11)
             let valueAttributes: [NSAttributedString.Key: Any] = [
                 .font: valueFont,
                 .foregroundColor: UIColor.black
             ]
             let valueString = NSAttributedString(string: value, attributes: valueAttributes)
-            valueString.draw(at: CGPoint(x: point.x + 2, y: point.y + 19))
+            let textRect = CGRect(x: point.x + 4, y: fieldY + 4, width: width - 8, height: fieldHeight - 8)
+            valueString.draw(in: textRect)
         }
     }
     
+    enum FormFieldStyle {
+        case normal
+        case bold
+    }
+    
     @discardableResult
-    private static func drawAttributesGrid(character: any BaseCharacter, startY: CGFloat, margin: CGFloat, pageSize: CGSize) -> CGFloat {
-        // Section header
-        drawSectionTitle("ATTRIBUTES", at: CGPoint(x: margin, y: startY), pageSize: pageSize)
+    private static func drawOfficialAttributesSection(character: any BaseCharacter, startY: CGFloat, margin: CGFloat, pageSize: CGSize) -> CGFloat {
+        // Section title with official styling
+        drawOfficialSectionHeader("ATTRIBUTES", at: CGPoint(x: margin, y: startY), pageSize: pageSize)
         
-        let attributesStartY = startY + 25
+        let attributesStartY = startY + 30
         let columnWidth = (pageSize.width - 2 * margin - 40) / 3
-        let physicalX = margin
-        let socialX = margin + columnWidth + 20
-        let mentalX = margin + 2 * (columnWidth + 20)
+        let physicalX = margin + 15
+        let socialX = margin + columnWidth + 35
+        let mentalX = margin + 2 * columnWidth + 55
         
         var maxHeight: CGFloat = 0
         
-        // Physical column
+        // Physical Attributes Column
         var currentY = attributesStartY
-        drawColumnHeader("PHYSICAL", at: CGPoint(x: physicalX, y: currentY))
-        currentY += 18
+        drawOfficialColumnHeader("PHYSICAL", at: CGPoint(x: physicalX, y: currentY))
+        currentY += 20
         
         for attribute in V5Constants.physicalAttributes {
             let value = character.getAttributeValue(attribute: attribute)
-            currentY += drawAttributeWithDots(attribute, value: value, at: CGPoint(x: physicalX, y: currentY), width: columnWidth)
+            currentY += drawOfficialAttributeRow(attribute, value: value, at: CGPoint(x: physicalX, y: currentY), width: columnWidth - 30)
         }
         maxHeight = max(maxHeight, currentY - attributesStartY)
         
-        // Social column
+        // Social Attributes Column
         currentY = attributesStartY
-        drawColumnHeader("SOCIAL", at: CGPoint(x: socialX, y: currentY))
-        currentY += 18
+        drawOfficialColumnHeader("SOCIAL", at: CGPoint(x: socialX, y: currentY))
+        currentY += 20
         
         for attribute in V5Constants.socialAttributes {
             let value = character.getAttributeValue(attribute: attribute)
-            currentY += drawAttributeWithDots(attribute, value: value, at: CGPoint(x: socialX, y: currentY), width: columnWidth)
+            currentY += drawOfficialAttributeRow(attribute, value: value, at: CGPoint(x: socialX, y: currentY), width: columnWidth - 30)
         }
         maxHeight = max(maxHeight, currentY - attributesStartY)
         
-        // Mental column
+        // Mental Attributes Column
         currentY = attributesStartY
-        drawColumnHeader("MENTAL", at: CGPoint(x: mentalX, y: currentY))
-        currentY += 18
+        drawOfficialColumnHeader("MENTAL", at: CGPoint(x: mentalX, y: currentY))
+        currentY += 20
         
         for attribute in V5Constants.mentalAttributes {
             let value = character.getAttributeValue(attribute: attribute)
-            currentY += drawAttributeWithDots(attribute, value: value, at: CGPoint(x: mentalX, y: currentY), width: columnWidth)
+            currentY += drawOfficialAttributeRow(attribute, value: value, at: CGPoint(x: mentalX, y: currentY), width: columnWidth - 30)
         }
         maxHeight = max(maxHeight, currentY - attributesStartY)
         
-        return maxHeight + 25
+        return maxHeight + 30
     }
     
     @discardableResult
-    private static func drawSkillsGrid(character: any BaseCharacter, startY: CGFloat, margin: CGFloat, pageSize: CGSize) -> CGFloat {
-        // Section header
-        drawSectionTitle("SKILLS", at: CGPoint(x: margin, y: startY), pageSize: pageSize)
+    private static func drawOfficialSkillsSection(character: any BaseCharacter, startY: CGFloat, margin: CGFloat, pageSize: CGSize) -> CGFloat {
+        // Section title with official styling
+        drawOfficialSectionHeader("SKILLS", at: CGPoint(x: margin, y: startY), pageSize: pageSize)
         
-        let skillsStartY = startY + 25
+        let skillsStartY = startY + 30
         let columnWidth = (pageSize.width - 2 * margin - 40) / 3
-        let physicalX = margin
-        let socialX = margin + columnWidth + 20
-        let mentalX = margin + 2 * (columnWidth + 20)
+        let physicalX = margin + 15
+        let socialX = margin + columnWidth + 35
+        let mentalX = margin + 2 * columnWidth + 55
         
         var maxHeight: CGFloat = 0
         
-        // Physical Skills
+        // Physical Skills Column
         var currentY = skillsStartY
-        drawColumnHeader("PHYSICAL", at: CGPoint(x: physicalX, y: currentY))
-        currentY += 18
+        drawOfficialColumnHeader("PHYSICAL", at: CGPoint(x: physicalX, y: currentY))
+        currentY += 20
         
         for skill in V5Constants.physicalSkills {
             let value = character.getSkillValue(skill: skill)
-            currentY += drawAttributeWithDots(skill, value: value, at: CGPoint(x: physicalX, y: currentY), width: columnWidth)
+            currentY += drawOfficialAttributeRow(skill, value: value, at: CGPoint(x: physicalX, y: currentY), width: columnWidth - 30)
         }
         maxHeight = max(maxHeight, currentY - skillsStartY)
         
-        // Social Skills
+        // Social Skills Column
         currentY = skillsStartY
-        drawColumnHeader("SOCIAL", at: CGPoint(x: socialX, y: currentY))
-        currentY += 18
+        drawOfficialColumnHeader("SOCIAL", at: CGPoint(x: socialX, y: currentY))
+        currentY += 20
         
         for skill in V5Constants.socialSkills {
             let value = character.getSkillValue(skill: skill)
-            currentY += drawAttributeWithDots(skill, value: value, at: CGPoint(x: socialX, y: currentY), width: columnWidth)
+            currentY += drawOfficialAttributeRow(skill, value: value, at: CGPoint(x: socialX, y: currentY), width: columnWidth - 30)
         }
         maxHeight = max(maxHeight, currentY - skillsStartY)
         
-        // Mental Skills
+        // Mental Skills Column
         currentY = skillsStartY
-        drawColumnHeader("MENTAL", at: CGPoint(x: mentalX, y: currentY))
-        currentY += 18
+        drawOfficialColumnHeader("MENTAL", at: CGPoint(x: mentalX, y: currentY))
+        currentY += 20
         
         for skill in V5Constants.mentalSkills {
             let value = character.getSkillValue(skill: skill)
-            currentY += drawAttributeWithDots(skill, value: value, at: CGPoint(x: mentalX, y: currentY), width: columnWidth)
+            currentY += drawOfficialAttributeRow(skill, value: value, at: CGPoint(x: mentalX, y: currentY), width: columnWidth - 30)
         }
         maxHeight = max(maxHeight, currentY - skillsStartY)
         
-        return maxHeight + 25
+        return maxHeight + 30
     }
     
-    
-    private static func drawSectionTitle(_ title: String, at point: CGPoint, pageSize: CGSize) {
-        let font = UIFont.boldSystemFont(ofSize: 13)
+    private static func drawOfficialSectionHeader(_ title: String, at point: CGPoint, pageSize: CGSize) {
+        let font = UIFont.boldSystemFont(ofSize: 16)
         let attributes: [NSAttributedString.Key: Any] = [
             .font: font,
-            .foregroundColor: UIColor.systemRed
+            .foregroundColor: UIColor.systemRed,
+            .kern: 1.5
         ]
         let titleString = NSAttributedString(string: title, attributes: attributes)
         titleString.draw(at: point)
         
-        // Red underline
+        // Red decorative line under title
         let context = UIGraphicsGetCurrentContext()
         context?.setStrokeColor(UIColor.systemRed.cgColor)
-        context?.setLineWidth(2.0)
-        context?.move(to: CGPoint(x: point.x, y: point.y + 16))
-        context?.addLine(to: CGPoint(x: point.x + 120, y: point.y + 16))
+        context?.setLineWidth(2.5)
+        context?.move(to: CGPoint(x: point.x, y: point.y + 20))
+        context?.addLine(to: CGPoint(x: point.x + 150, y: point.y + 20))
         context?.strokePath()
     }
     
-    private static func drawColumnHeader(_ title: String, at point: CGPoint) {
-        let font = UIFont.boldSystemFont(ofSize: 10)
+    private static func drawOfficialColumnHeader(_ title: String, at point: CGPoint) {
+        let font = UIFont.boldSystemFont(ofSize: 11)
         let attributes: [NSAttributedString.Key: Any] = [
             .font: font,
-            .foregroundColor: UIColor.black
+            .foregroundColor: UIColor.black,
+            .kern: 1.0
         ]
         let titleString = NSAttributedString(string: title, attributes: attributes)
         titleString.draw(at: point)
@@ -606,91 +603,92 @@ class PDFGenerator {
         let context = UIGraphicsGetCurrentContext()
         context?.setStrokeColor(UIColor.black.cgColor)
         context?.setLineWidth(1.0)
-        context?.move(to: CGPoint(x: point.x, y: point.y + 13))
-        context?.addLine(to: CGPoint(x: point.x + 70, y: point.y + 13))
+        context?.move(to: CGPoint(x: point.x, y: point.y + 15))
+        context?.addLine(to: CGPoint(x: point.x + 80, y: point.y + 15))
         context?.strokePath()
     }
     
     @discardableResult
-    private static func drawAttributeWithDots(_ name: String, value: Int, at point: CGPoint, width: CGFloat) -> CGFloat {
-        let font = UIFont.systemFont(ofSize: 9)
-        let attributes: [NSAttributedString.Key: Any] = [
-            .font: font,
+    private static func drawOfficialAttributeRow(_ name: String, value: Int, at point: CGPoint, width: CGFloat) -> CGFloat {
+        // Draw attribute/skill name
+        let nameFont = UIFont.systemFont(ofSize: 10)
+        let nameAttributes: [NSAttributedString.Key: Any] = [
+            .font: nameFont,
             .foregroundColor: UIColor.black
         ]
-        
-        // Draw attribute/skill name
-        let nameString = NSAttributedString(string: name, attributes: attributes)
+        let nameString = NSAttributedString(string: name, attributes: nameAttributes)
         nameString.draw(at: point)
         
-        // Draw dots (5 dots total)
-        let dotStartX = point.x + 65
-        let dotSize: CGFloat = 6
-        let dotSpacing: CGFloat = 9
+        // Draw professional dot notation (circles)
+        let dotStartX = point.x + 90
+        let dotSize: CGFloat = 8
+        let dotSpacing: CGFloat = 12
         
         for i in 0..<5 {
             let dotX = dotStartX + CGFloat(i) * dotSpacing
-            let dotCenter = CGPoint(x: dotX + dotSize/2, y: point.y + dotSize/2 + 1)
+            let dotY = point.y + 1
+            let dotRect = CGRect(x: dotX, y: dotY, width: dotSize, height: dotSize)
             
             let context = UIGraphicsGetCurrentContext()
             context?.setStrokeColor(UIColor.black.cgColor)
-            context?.setLineWidth(1.0)
+            context?.setLineWidth(1.2)
             
-            let dotRect = CGRect(x: dotX, y: point.y + 1, width: dotSize, height: dotSize)
+            // Draw circle outline
             context?.strokeEllipse(in: dotRect)
             
-            // Fill dots up to the character's value
+            // Fill circles up to the character's value
             if i < value {
                 context?.setFillColor(UIColor.black.cgColor)
                 context?.fillEllipse(in: dotRect)
             }
         }
         
-        return 13
+        return 16
     }
     
     @discardableResult
-    private static func drawHealthWillpowerBoxes(character: any BaseCharacter, startY: CGFloat, margin: CGFloat, pageSize: CGSize) -> CGFloat {
+    private static func drawOfficialHealthWillpower(character: any BaseCharacter, startY: CGFloat, margin: CGFloat, pageSize: CGSize) -> CGFloat {
         let columnWidth = (pageSize.width - 2 * margin - 20) / 2
-        let leftColumn = margin
-        let rightColumn = margin + columnWidth + 20
+        let leftColumn = margin + 15
+        let rightColumn = margin + columnWidth + 35
         
-        // Health boxes (always blank)
-        drawTrackerBoxes("HEALTH", maxValue: character.health, at: CGPoint(x: leftColumn, y: startY), width: columnWidth, alwaysBlank: true)
+        // Health section (always blank for printing)
+        drawOfficialTrackerSection("HEALTH", maxValue: character.health, at: CGPoint(x: leftColumn, y: startY), width: columnWidth - 30)
         
-        // Willpower boxes (always blank)  
-        drawTrackerBoxes("WILLPOWER", maxValue: character.willpower, at: CGPoint(x: rightColumn, y: startY), width: columnWidth, alwaysBlank: true)
+        // Willpower section (always blank for printing)
+        drawOfficialTrackerSection("WILLPOWER", maxValue: character.willpower, at: CGPoint(x: rightColumn, y: startY), width: columnWidth - 30)
         
-        return 60
+        return 80
     }
     
-    private static func drawTrackerBoxes(_ label: String, maxValue: Int, at point: CGPoint, width: CGFloat, alwaysBlank: Bool = true) {
-        // Section title
-        let font = UIFont.boldSystemFont(ofSize: 11)
-        let attributes: [NSAttributedString.Key: Any] = [
-            .font: font,
-            .foregroundColor: UIColor.systemRed
+    private static func drawOfficialTrackerSection(_ label: String, maxValue: Int, at point: CGPoint, width: CGFloat) {
+        // Section header
+        let headerFont = UIFont.boldSystemFont(ofSize: 12)
+        let headerAttributes: [NSAttributedString.Key: Any] = [
+            .font: headerFont,
+            .foregroundColor: UIColor.systemRed,
+            .kern: 1.0
         ]
-        let labelString = NSAttributedString(string: label, attributes: attributes)
-        labelString.draw(at: point)
+        let headerString = NSAttributedString(string: label, attributes: headerAttributes)
+        headerString.draw(at: point)
         
         // Red underline
         let context = UIGraphicsGetCurrentContext()
         context?.setStrokeColor(UIColor.systemRed.cgColor)
         context?.setLineWidth(1.5)
-        context?.move(to: CGPoint(x: point.x, y: point.y + 14))
-        context?.addLine(to: CGPoint(x: point.x + 70, y: point.y + 14))
+        context?.move(to: CGPoint(x: point.x, y: point.y + 16))
+        context?.addLine(to: CGPoint(x: point.x + 80, y: point.y + 16))
         context?.strokePath()
         
-        // Draw boxes (always empty as requested)
-        let boxSize: CGFloat = 11
-        let boxSpacing: CGFloat = 13
+        // Draw empty boxes for manual tracking (always blank as requested)
+        let boxSize: CGFloat = 12
+        let boxSpacing: CGFloat = 15
         let startX = point.x
-        let startY = point.y + 18
+        let startY = point.y + 22
         
         for i in 0..<maxValue {
-            let boxX = startX + CGFloat(i % 10) * boxSpacing
-            let boxY = startY + CGFloat(i / 10) * (boxSize + 3)
+            let boxX = startX + CGFloat(i % 8) * boxSpacing  // 8 boxes per row
+            let boxY = startY + CGFloat(i / 8) * (boxSize + 4)
             let boxRect = CGRect(x: boxX, y: boxY, width: boxSize, height: boxSize)
             
             // Always draw empty boxes for printing
@@ -703,101 +701,104 @@ class PDFGenerator {
     }
     
     @discardableResult
-    private static func drawVampireTraitsGrid(vampire: VampireCharacter, startY: CGFloat, margin: CGFloat, pageSize: CGSize) -> CGFloat {
-        let fieldWidth = (pageSize.width - 2 * margin - 30) / 4
+    private static func drawOfficialVampireTraits(vampire: VampireCharacter, startY: CGFloat, margin: CGFloat, pageSize: CGSize) -> CGFloat {
+        drawOfficialSectionHeader("VAMPIRE TRAITS", at: CGPoint(x: margin, y: startY), pageSize: pageSize)
+        
+        let traitsStartY = startY + 30
+        let fieldWidth = (pageSize.width - 2 * margin - 40) / 4
         
         // First row of vampire traits
-        drawFormField(label: "HUNGER", value: "\(vampire.hunger)",
-                     at: CGPoint(x: margin, y: startY), 
-                     width: fieldWidth - 10)
+        drawOfficialFormField(label: "HUNGER", value: "\(vampire.hunger)",
+                            at: CGPoint(x: margin + 15, y: traitsStartY), 
+                            width: fieldWidth - 10)
         
-        drawFormField(label: "HUMANITY", value: "\(vampire.humanity)",
-                     at: CGPoint(x: margin + fieldWidth, y: startY), 
-                     width: fieldWidth - 10)
+        drawOfficialFormField(label: "HUMANITY", value: "\(vampire.humanity)",
+                            at: CGPoint(x: margin + fieldWidth + 15, y: traitsStartY), 
+                            width: fieldWidth - 10)
         
-        drawFormField(label: "BLOOD POTENCY", value: "\(vampire.bloodPotency)",
-                     at: CGPoint(x: margin + 2 * fieldWidth, y: startY), 
-                     width: fieldWidth)
+        drawOfficialFormField(label: "BLOOD POTENCY", value: "\(vampire.bloodPotency)",
+                            at: CGPoint(x: margin + 2 * fieldWidth + 15, y: traitsStartY), 
+                            width: fieldWidth)
         
-        drawFormField(label: "BLOOD SURGE", value: "",
-                     at: CGPoint(x: margin + 3 * fieldWidth + 10, y: startY), 
-                     width: fieldWidth)
+        drawOfficialFormField(label: "BLOOD SURGE", value: "",
+                            at: CGPoint(x: margin + 3 * fieldWidth + 15, y: traitsStartY), 
+                            width: fieldWidth)
         
         // Second row
-        let secondRowY = startY + 40
+        let secondRowY = traitsStartY + 45
         
-        drawFormField(label: "POWER BONUS", value: "",
-                     at: CGPoint(x: margin, y: secondRowY), 
-                     width: fieldWidth)
+        drawOfficialFormField(label: "POWER BONUS", value: "",
+                            at: CGPoint(x: margin + 15, y: secondRowY), 
+                            width: fieldWidth)
         
-        drawFormField(label: "MEND AMOUNT", value: "",
-                     at: CGPoint(x: margin + fieldWidth + 10, y: secondRowY), 
-                     width: fieldWidth)
+        drawOfficialFormField(label: "MEND AMOUNT", value: "",
+                            at: CGPoint(x: margin + fieldWidth + 15, y: secondRowY), 
+                            width: fieldWidth)
         
-        drawFormField(label: "ROUSE RE-ROLL", value: "",
-                     at: CGPoint(x: margin + 2 * fieldWidth + 10, y: secondRowY), 
-                     width: fieldWidth + 20)
+        drawOfficialFormField(label: "ROUSE RE-ROLL", value: "",
+                            at: CGPoint(x: margin + 2 * fieldWidth + 15, y: secondRowY), 
+                            width: fieldWidth + 20)
         
         // Third row - wider fields
-        let thirdRowY = startY + 80
+        let thirdRowY = traitsStartY + 90
         let wideFieldWidth = (pageSize.width - 2 * margin - 10) / 2
         
-        drawFormField(label: "FEEDING PENALTY", value: "",
-                     at: CGPoint(x: margin, y: thirdRowY), 
-                     width: wideFieldWidth)
+        drawOfficialFormField(label: "FEEDING PENALTY", value: "",
+                            at: CGPoint(x: margin + 15, y: thirdRowY), 
+                            width: wideFieldWidth)
         
-        // Fourth row - clan abilities (full width)
-        let fourthRowY = startY + 120
-        let fullFieldWidth = pageSize.width - 2 * margin
+        // Fourth and fifth rows - full width clan abilities
+        let fourthRowY = traitsStartY + 135
+        let fullFieldWidth = pageSize.width - 2 * margin - 30
         
-        drawFormField(label: "CLAN BANE", value: "",
-                     at: CGPoint(x: margin, y: fourthRowY), 
-                     width: fullFieldWidth)
+        drawOfficialFormField(label: "CLAN BANE", value: "",
+                            at: CGPoint(x: margin + 15, y: fourthRowY), 
+                            width: fullFieldWidth)
         
-        let fifthRowY = startY + 160
-        drawFormField(label: "CLAN COMPULSION", value: "",
-                     at: CGPoint(x: margin, y: fifthRowY), 
-                     width: fullFieldWidth)
+        let fifthRowY = traitsStartY + 180
+        drawOfficialFormField(label: "CLAN COMPULSION", value: "",
+                            at: CGPoint(x: margin + 15, y: fifthRowY), 
+                            width: fullFieldWidth)
         
-        return 200
+        return 225
     }
     
     @discardableResult
-    private static func drawDisciplinesWithPowers(character: any DisciplineCapable, startY: CGFloat, margin: CGFloat, pageSize: CGSize, maxHeight: CGFloat) -> CGFloat {
-        // Section title
-        drawSectionTitle("DISCIPLINES", at: CGPoint(x: margin, y: startY), pageSize: pageSize)
+    private static func drawOfficialDisciplines(character: any DisciplineCapable, startY: CGFloat, margin: CGFloat, pageSize: CGSize, maxHeight: CGFloat) -> CGFloat {
+        drawOfficialSectionHeader("DISCIPLINES", at: CGPoint(x: margin, y: startY), pageSize: pageSize)
         
-        var currentY = startY + 25
+        var currentY = startY + 30
         
         if character.v5Disciplines.isEmpty {
-            let font = UIFont.italicSystemFont(ofSize: 10)
+            let font = UIFont.italicSystemFont(ofSize: 11)
             let attributes: [NSAttributedString.Key: Any] = [
                 .font: font,
                 .foregroundColor: UIColor.gray
             ]
             let text = NSAttributedString(string: "No disciplines learned", attributes: attributes)
-            text.draw(at: CGPoint(x: margin, y: currentY))
-            return 50
+            text.draw(at: CGPoint(x: margin + 15, y: currentY))
+            return 60
         }
         
         for discipline in character.v5Disciplines {
-            if currentY - startY > maxHeight - 60 { break }
+            if currentY - startY > maxHeight - 80 { break }
             
             let level = discipline.currentLevel()
             
-            // Draw discipline name with dots
-            let nameFont = UIFont.boldSystemFont(ofSize: 10)
+            // Draw discipline name with professional styling
+            let nameFont = UIFont.boldSystemFont(ofSize: 12)
             let nameAttributes: [NSAttributedString.Key: Any] = [
                 .font: nameFont,
-                .foregroundColor: UIColor.systemRed
+                .foregroundColor: UIColor.systemRed,
+                .kern: 1.0
             ]
             let nameString = NSAttributedString(string: discipline.name.uppercased(), attributes: nameAttributes)
-            nameString.draw(at: CGPoint(x: margin, y: currentY))
+            nameString.draw(at: CGPoint(x: margin + 15, y: currentY))
             
             // Draw dots for discipline level
-            let dotStartX = margin + 100
-            let dotSize: CGFloat = 7
-            let dotSpacing: CGFloat = 10
+            let dotStartX = margin + 150
+            let dotSize: CGFloat = 8
+            let dotSpacing: CGFloat = 12
             
             for i in 0..<5 {
                 let dotX = dotStartX + CGFloat(i) * dotSpacing
@@ -805,7 +806,7 @@ class PDFGenerator {
                 
                 let context = UIGraphicsGetCurrentContext()
                 context?.setStrokeColor(UIColor.black.cgColor)
-                context?.setLineWidth(1.0)
+                context?.setLineWidth(1.2)
                 context?.strokeEllipse(in: dotRect)
                 
                 if i < level {
@@ -814,46 +815,47 @@ class PDFGenerator {
                 }
             }
             
-            currentY += 16
+            currentY += 18
             
-            // List selected powers
+            // List selected powers in a clean format
             let selectedPowers = discipline.getAllSelectedPowerNames()
-            if !selectedPowers.isEmpty && currentY - startY < maxHeight - 30 {
+            if !selectedPowers.isEmpty && currentY - startY < maxHeight - 40 {
                 let powersText = Array(selectedPowers).joined(separator: ", ")
-                let powerFont = UIFont.systemFont(ofSize: 8)
+                let powerFont = UIFont.systemFont(ofSize: 9)
                 let powerAttributes: [NSAttributedString.Key: Any] = [
                     .font: powerFont,
                     .foregroundColor: UIColor.darkGray
                 ]
                 let powerString = NSAttributedString(string: powersText, attributes: powerAttributes)
-                let textRect = CGRect(x: margin + 10, y: currentY, width: pageSize.width - 2 * margin - 20, height: 20)
+                let textRect = CGRect(x: margin + 25, y: currentY, width: pageSize.width - 2 * margin - 50, height: 25)
                 powerString.draw(in: textRect)
-                currentY += 14
+                currentY += 18
             }
             
-            currentY += 8
+            currentY += 10
         }
         
         return currentY - startY
     }
     
     @discardableResult
-    private static func drawMeritsFlawsAndExperience(character: any BaseCharacter, startY: CGFloat, margin: CGFloat, pageSize: CGSize, maxHeight: CGFloat) -> CGFloat {
+    private static func drawOfficialMeritsFlaws(character: any BaseCharacter, startY: CGFloat, margin: CGFloat, pageSize: CGSize, maxHeight: CGFloat) -> CGFloat {
         var currentY = startY
         
         // Merits & Flaws section header
-        drawSectionTitle("MERITS & FLAWS", at: CGPoint(x: margin, y: currentY), pageSize: pageSize)
-        currentY += 25
+        drawOfficialSectionHeader("MERITS & FLAWS", at: CGPoint(x: margin, y: currentY), pageSize: pageSize)
+        currentY += 30
         
-        let columnWidth = (pageSize.width - 2 * margin - 20) / 2
-        let meritsColumn = margin
-        let flawsColumn = margin + columnWidth + 20
+        let columnWidth = (pageSize.width - 2 * margin - 40) / 2
+        let meritsColumn = margin + 15
+        let flawsColumn = margin + columnWidth + 35
         
         // Column headers
-        let headerFont = UIFont.boldSystemFont(ofSize: 10)
+        let headerFont = UIFont.boldSystemFont(ofSize: 11)
         let headerAttributes: [NSAttributedString.Key: Any] = [
             .font: headerFont,
-            .foregroundColor: UIColor.black
+            .foregroundColor: UIColor.black,
+            .kern: 1.0
         ]
         let meritsHeader = NSAttributedString(string: "MERITS", attributes: headerAttributes)
         meritsHeader.draw(at: CGPoint(x: meritsColumn, y: currentY))
@@ -861,14 +863,14 @@ class PDFGenerator {
         let flawsHeader = NSAttributedString(string: "FLAWS", attributes: headerAttributes)
         flawsHeader.draw(at: CGPoint(x: flawsColumn, y: currentY))
         
-        currentY += 18
+        currentY += 20
         let startListY = currentY
         
         // Draw merits
         currentY = startListY
         for merit in character.advantages {
-            if currentY - startY > maxHeight - 60 { break }
-            let font = UIFont.systemFont(ofSize: 8)
+            if currentY - startY > maxHeight - 80 { break }
+            let font = UIFont.systemFont(ofSize: 9)
             let attributes: [NSAttributedString.Key: Any] = [
                 .font: font,
                 .foregroundColor: UIColor.black
@@ -876,13 +878,13 @@ class PDFGenerator {
             let text = "\(merit.name) (\(merit.cost))"
             let textString = NSAttributedString(string: text, attributes: attributes)
             textString.draw(at: CGPoint(x: meritsColumn, y: currentY))
-            currentY += 11
+            currentY += 12
         }
         
         // Draw background merits
         for backgroundMerit in character.backgroundMerits where backgroundMerit.type == .merit {
-            if currentY - startY > maxHeight - 60 { break }
-            let font = UIFont.systemFont(ofSize: 8)
+            if currentY - startY > maxHeight - 80 { break }
+            let font = UIFont.systemFont(ofSize: 9)
             let attributes: [NSAttributedString.Key: Any] = [
                 .font: font,
                 .foregroundColor: UIColor.black
@@ -890,14 +892,14 @@ class PDFGenerator {
             let text = "\(backgroundMerit.name) (\(backgroundMerit.cost))"
             let textString = NSAttributedString(string: text, attributes: attributes)
             textString.draw(at: CGPoint(x: meritsColumn, y: currentY))
-            currentY += 11
+            currentY += 12
         }
         
         // Draw flaws
         var flawsY = startListY
         for flaw in character.flaws {
-            if flawsY - startY > maxHeight - 60 { break }
-            let font = UIFont.systemFont(ofSize: 8)
+            if flawsY - startY > maxHeight - 80 { break }
+            let font = UIFont.systemFont(ofSize: 9)
             let attributes: [NSAttributedString.Key: Any] = [
                 .font: font,
                 .foregroundColor: UIColor.black
@@ -905,13 +907,13 @@ class PDFGenerator {
             let text = "\(flaw.name) (\(flaw.cost))"
             let textString = NSAttributedString(string: text, attributes: attributes)
             textString.draw(at: CGPoint(x: flawsColumn, y: flawsY))
-            flawsY += 11
+            flawsY += 12
         }
         
         // Draw background flaws
         for backgroundFlaw in character.backgroundFlaws where backgroundFlaw.type == .flaw {
-            if flawsY - startY > maxHeight - 60 { break }
-            let font = UIFont.systemFont(ofSize: 8)
+            if flawsY - startY > maxHeight - 80 { break }
+            let font = UIFont.systemFont(ofSize: 9)
             let attributes: [NSAttributedString.Key: Any] = [
                 .font: font,
                 .foregroundColor: UIColor.black
@@ -919,345 +921,25 @@ class PDFGenerator {
             let text = "\(backgroundFlaw.name) (\(backgroundFlaw.cost))"
             let textString = NSAttributedString(string: text, attributes: attributes)
             textString.draw(at: CGPoint(x: flawsColumn, y: flawsY))
-            flawsY += 11
+            flawsY += 12
         }
         
         // Experience section
-        let experienceY = max(currentY, flawsY) + 20
-        if experienceY - startY < maxHeight - 40 {
-            let expFieldWidth = (pageSize.width - 2 * margin - 10) / 2
+        let experienceY = max(currentY, flawsY) + 25
+        if experienceY - startY < maxHeight - 50 {
+            let expFieldWidth = (pageSize.width - 2 * margin - 30) / 2
             
-            drawFormField(label: "TOTAL EXPERIENCE", value: "\(character.experience)",
-                         at: CGPoint(x: margin, y: experienceY), 
-                         width: expFieldWidth)
+            drawOfficialFormField(label: "TOTAL EXPERIENCE", value: "\(character.experience)",
+                                at: CGPoint(x: margin + 15, y: experienceY), 
+                                width: expFieldWidth)
             
-            drawFormField(label: "SPENT EXPERIENCE", value: "\(character.spentExperience)",
-                         at: CGPoint(x: margin + expFieldWidth + 10, y: experienceY), 
-                         width: expFieldWidth)
+            drawOfficialFormField(label: "SPENT EXPERIENCE", value: "\(character.spentExperience)",
+                                at: CGPoint(x: margin + expFieldWidth + 25, y: experienceY), 
+                                width: expFieldWidth)
             
-            return experienceY - startY + 40
+            return experienceY - startY + 45
         }
         
         return max(currentY, flawsY) - startY
-    }
-    
-    @discardableResult
-    private static func drawNotesAndBiography(character: any BaseCharacter, startY: CGFloat, margin: CGFloat, pageSize: CGSize) -> CGFloat {
-        var currentY = startY
-        
-        // Notes section
-        drawSectionTitle("NOTES", at: CGPoint(x: margin, y: currentY), pageSize: pageSize)
-        currentY += 25
-        
-        if !character.notes.isEmpty {
-            let font = UIFont.systemFont(ofSize: 9)
-            let attributes: [NSAttributedString.Key: Any] = [
-                .font: font,
-                .foregroundColor: UIColor.black
-            ]
-            
-            let notesText = character.notes
-            let textString = NSAttributedString(string: notesText, attributes: attributes)
-            let availableHeight = pageSize.height - currentY - 40
-            let textRect = CGRect(x: margin, y: currentY, width: pageSize.width - 2 * margin, height: availableHeight)
-            textString.draw(in: textRect)
-        }
-        
-        return 60
-    }
-    
-    // MARK: - Template-based PDF Generation
-    
-    @discardableResult
-    private static func drawTemplateBasedSheet(for character: any BaseCharacter, context: UIGraphicsPDFRendererContext, pageSize: CGSize) -> Bool {
-        // Try to load the template PDF from the main bundle first, then from the file system
-        var templatePath: String?
-        
-        // First try the bundle
-        if let bundlePath = Bundle.main.path(forResource: "VtM5e_ENG_CharacterSheet_2pLAYER", ofType: "pdf") {
-            templatePath = bundlePath
-        } else {
-            // Fall back to checking common locations where the template might be
-            let possiblePaths = [
-                "./VtM5e_ENG_CharacterSheet_2pLAYER.pdf",
-                "../VtM5e_ENG_CharacterSheet_2pLAYER.pdf",
-                FileManager.default.currentDirectoryPath + "/VtM5e_ENG_CharacterSheet_2pLAYER.pdf"
-            ]
-            
-            for path in possiblePaths {
-                if FileManager.default.fileExists(atPath: path) {
-                    templatePath = path
-                    break
-                }
-            }
-        }
-        
-        guard let validTemplatePath = templatePath,
-              let templateURL = URL(string: "file://\(validTemplatePath)"),
-              let templateDoc = CGPDFDocument(templateURL as CFURL),
-              let templatePage = templateDoc.page(at: 1) else {
-            return false
-        }
-        
-        // Draw the template as background
-        let templateRect = templatePage.getBoxRect(.mediaBox)
-        let scaleX = pageSize.width / templateRect.width
-        let scaleY = pageSize.height / templateRect.height
-        let scale = min(scaleX, scaleY)
-        
-        let scaledWidth = templateRect.width * scale
-        let scaledHeight = templateRect.height * scale
-        let offsetX = (pageSize.width - scaledWidth) / 2
-        let offsetY = (pageSize.height - scaledHeight) / 2
-        
-        context.cgContext.saveGState()
-        context.cgContext.translateBy(x: offsetX, y: offsetY + scaledHeight)
-        context.cgContext.scaleBy(x: scale, y: -scale)
-        context.cgContext.drawPDFPage(templatePage)
-        context.cgContext.restoreGState()
-        
-        // Overlay character data based on character type
-        switch character.characterType {
-        case .vampire:
-            if let vampire = character as? VampireCharacter {
-                overlayVampireDataOnTemplate(vampire: vampire, offsetX: offsetX, offsetY: offsetY, scale: scale)
-            }
-        case .ghoul:
-            if let ghoul = character as? GhoulCharacter {
-                overlayGhoulDataOnTemplate(ghoul: ghoul, offsetX: offsetX, offsetY: offsetY, scale: scale)
-            }
-        case .mage:
-            if let mage = character as? MageCharacter {
-                overlayMageDataOnTemplate(mage: mage, offsetX: offsetX, offsetY: offsetY, scale: scale)
-            }
-        }
-        
-        return true
-    }
-    
-    private static func overlayVampireDataOnTemplate(vampire: VampireCharacter, offsetX: CGFloat, offsetY: CGFloat, scale: CGFloat) {
-        let font = UIFont.systemFont(ofSize: 10)
-        let attributes: [NSAttributedString.Key: Any] = [
-            .font: font,
-            .foregroundColor: UIColor.black
-        ]
-        
-        // Basic character information with approximate coordinates
-        // These coordinates need to be fine-tuned to match the actual template layout
-        
-        // Name (top left field)
-        drawTextAtTemplatePosition(vampire.name, 
-                                 at: CGPoint(x: 85, y: 105), 
-                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
-                                 attributes: attributes)
-        
-        // Player field (center top)
-        drawTextAtTemplatePosition("Player", 
-                                 at: CGPoint(x: 260, y: 105), 
-                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
-                                 attributes: attributes)
-        
-        // Chronicle (top right)
-        drawTextAtTemplatePosition(vampire.chronicle, 
-                                 at: CGPoint(x: 430, y: 105), 
-                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
-                                 attributes: attributes)
-        
-        // Concept
-        drawTextAtTemplatePosition(vampire.concept, 
-                                 at: CGPoint(x: 85, y: 140), 
-                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
-                                 attributes: attributes)
-        
-        // Clan
-        drawTextAtTemplatePosition(vampire.clan, 
-                                 at: CGPoint(x: 260, y: 140), 
-                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
-                                 attributes: attributes)
-        
-        // Generation
-        drawTextAtTemplatePosition("\(vampire.generation)", 
-                                 at: CGPoint(x: 430, y: 140), 
-                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
-                                 attributes: attributes)
-        
-        // Sire
-        drawTextAtTemplatePosition(vampire.sire, 
-                                 at: CGPoint(x: 85, y: 175), 
-                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
-                                 attributes: attributes)
-        
-        // Ambition
-        drawTextAtTemplatePosition(vampire.ambition, 
-                                 at: CGPoint(x: 260, y: 175), 
-                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
-                                 attributes: attributes)
-        
-        // Predator Type
-        drawTextAtTemplatePosition(vampire.predatorType.rawValue, 
-                                 at: CGPoint(x: 85, y: 210), 
-                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
-                                 attributes: attributes)
-        
-        // Overlay attributes and skills with dots
-        overlayAttributesOnTemplate(character: vampire, offsetX: offsetX, offsetY: offsetY, scale: scale)
-        overlaySkillsOnTemplate(character: vampire, offsetX: offsetX, offsetY: offsetY, scale: scale)
-        overlayVampireTraitsOnTemplate(vampire: vampire, offsetX: offsetX, offsetY: offsetY, scale: scale)
-    }
-    
-    private static func overlayGhoulDataOnTemplate(ghoul: GhoulCharacter, offsetX: CGFloat, offsetY: CGFloat, scale: CGFloat) {
-        // Basic implementation for ghouls - similar to vampires but simplified
-        let font = UIFont.systemFont(ofSize: 10)
-        let attributes: [NSAttributedString.Key: Any] = [
-            .font: font,
-            .foregroundColor: UIColor.black
-        ]
-        
-        drawTextAtTemplatePosition(ghoul.name, 
-                                 at: CGPoint(x: 85, y: 105), 
-                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
-                                 attributes: attributes)
-        
-        drawTextAtTemplatePosition(ghoul.concept, 
-                                 at: CGPoint(x: 85, y: 140), 
-                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
-                                 attributes: attributes)
-    }
-    
-    private static func overlayMageDataOnTemplate(mage: MageCharacter, offsetX: CGFloat, offsetY: CGFloat, scale: CGFloat) {
-        // Basic implementation for mages - minimal for now
-        let font = UIFont.systemFont(ofSize: 10)
-        let attributes: [NSAttributedString.Key: Any] = [
-            .font: font,
-            .foregroundColor: UIColor.black
-        ]
-        
-        drawTextAtTemplatePosition(mage.name, 
-                                 at: CGPoint(x: 85, y: 105), 
-                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
-                                 attributes: attributes)
-    }
-    
-    private static func drawTextAtTemplatePosition(_ text: String, at point: CGPoint, offsetX: CGFloat, offsetY: CGFloat, scale: CGFloat, attributes: [NSAttributedString.Key: Any]) {
-        // Convert template coordinates to actual PDF coordinates
-        let adjustedX = offsetX + (point.x * scale)
-        let adjustedY = offsetY + ((841.89 - point.y) * scale) // Flip Y coordinate for PDF
-        
-        let textString = NSAttributedString(string: text, attributes: attributes)
-        textString.draw(at: CGPoint(x: adjustedX, y: adjustedY))
-    }
-    
-    private static func overlayAttributesOnTemplate(character: any BaseCharacter, offsetX: CGFloat, offsetY: CGFloat, scale: CGFloat) {
-        let dotAttributes: [NSAttributedString.Key: Any] = [
-            .font: UIFont.systemFont(ofSize: 8),
-            .foregroundColor: UIColor.black
-        ]
-        
-        // Estimated coordinates for attributes section - will need fine-tuning
-        var currentY: CGFloat = 310
-        
-        // Physical attributes
-        for attribute in V5Constants.physicalAttributes {
-            let value = character.getAttributeValue(attribute: attribute)
-            let dots = createDotString(value: value, maxDots: 5)
-            drawTextAtTemplatePosition(dots, 
-                                     at: CGPoint(x: 150, y: currentY), 
-                                     offsetX: offsetX, offsetY: offsetY, scale: scale, 
-                                     attributes: dotAttributes)
-            currentY += 18
-        }
-        
-        // Social attributes
-        currentY = 310
-        for attribute in V5Constants.socialAttributes {
-            let value = character.getAttributeValue(attribute: attribute)
-            let dots = createDotString(value: value, maxDots: 5)
-            drawTextAtTemplatePosition(dots, 
-                                     at: CGPoint(x: 260, y: currentY), 
-                                     offsetX: offsetX, offsetY: offsetY, scale: scale, 
-                                     attributes: dotAttributes)
-            currentY += 18
-        }
-        
-        // Mental attributes
-        currentY = 310
-        for attribute in V5Constants.mentalAttributes {
-            let value = character.getAttributeValue(attribute: attribute)
-            let dots = createDotString(value: value, maxDots: 5)
-            drawTextAtTemplatePosition(dots, 
-                                     at: CGPoint(x: 370, y: currentY), 
-                                     offsetX: offsetX, offsetY: offsetY, scale: scale, 
-                                     attributes: dotAttributes)
-            currentY += 18
-        }
-    }
-    
-    private static func overlaySkillsOnTemplate(character: any BaseCharacter, offsetX: CGFloat, offsetY: CGFloat, scale: CGFloat) {
-        let dotAttributes: [NSAttributedString.Key: Any] = [
-            .font: UIFont.systemFont(ofSize: 8),
-            .foregroundColor: UIColor.black
-        ]
-        
-        // Estimated coordinates for skills section - will need fine-tuning
-        var currentY: CGFloat = 450
-        
-        // Physical skills
-        for skill in V5Constants.physicalSkills {
-            let value = character.getSkillValue(skill: skill)
-            let dots = createDotString(value: value, maxDots: 5)
-            drawTextAtTemplatePosition(dots, 
-                                     at: CGPoint(x: 150, y: currentY), 
-                                     offsetX: offsetX, offsetY: offsetY, scale: scale, 
-                                     attributes: dotAttributes)
-            currentY += 15
-        }
-        
-        // Social skills
-        currentY = 450
-        for skill in V5Constants.socialSkills {
-            let value = character.getSkillValue(skill: skill)
-            let dots = createDotString(value: value, maxDots: 5)
-            drawTextAtTemplatePosition(dots, 
-                                     at: CGPoint(x: 260, y: currentY), 
-                                     offsetX: offsetX, offsetY: offsetY, scale: scale, 
-                                     attributes: dotAttributes)
-            currentY += 15
-        }
-        
-        // Mental skills
-        currentY = 450
-        for skill in V5Constants.mentalSkills {
-            let value = character.getSkillValue(skill: skill)
-            let dots = createDotString(value: value, maxDots: 5)
-            drawTextAtTemplatePosition(dots, 
-                                     at: CGPoint(x: 370, y: currentY), 
-                                     offsetX: offsetX, offsetY: offsetY, scale: scale, 
-                                     attributes: dotAttributes)
-            currentY += 15
-        }
-    }
-    
-    private static func overlayVampireTraitsOnTemplate(vampire: VampireCharacter, offsetX: CGFloat, offsetY: CGFloat, scale: CGFloat) {
-        let attributes: [NSAttributedString.Key: Any] = [
-            .font: UIFont.systemFont(ofSize: 10),
-            .foregroundColor: UIColor.black
-        ]
-        
-        // Vampire-specific traits - coordinates will need adjustment
-        drawTextAtTemplatePosition("\(vampire.bloodPotency)", 
-                                 at: CGPoint(x: 100, y: 650), 
-                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
-                                 attributes: attributes)
-        
-        drawTextAtTemplatePosition("\(vampire.humanity)", 
-                                 at: CGPoint(x: 200, y: 650), 
-                                 offsetX: offsetX, offsetY: offsetY, scale: scale, 
-                                 attributes: attributes)
-    }
-    
-    private static func createDotString(value: Int, maxDots: Int) -> String {
-        let filledDots = String(repeating: "●", count: min(value, maxDots))
-        let emptyDots = String(repeating: "○", count: max(0, maxDots - value))
-        return filledDots + emptyDots
     }
 }
