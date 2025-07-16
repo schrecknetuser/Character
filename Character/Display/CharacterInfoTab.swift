@@ -336,7 +336,10 @@ struct CharacterInfoTab: View {
                                 if isEditing {
                                     Picker("Essence", selection: Binding(
                                         get: { mageCharacter.essence },
-                                        set: { mageCharacter.essence = $0 }
+                                        set: {
+                                            mageCharacter.essence = $0
+                                            refreshID = UUID()
+                                        }
                                     )) {
                                         ForEach(MageEssence.allCases, id: \.self) { essence in
                                             Text(essence.displayName).tag(essence)
@@ -368,7 +371,10 @@ struct CharacterInfoTab: View {
                                 if isEditing {
                                     Picker("Resonance", selection: Binding(
                                         get: { mageCharacter.resonance },
-                                        set: { mageCharacter.resonance = $0 }
+                                        set: {
+                                            mageCharacter.resonance = $0
+                                            refreshID = UUID()
+                                        }
                                     )) {
                                         ForEach(MageResonance.allCases, id: \.self) { resonance in
                                             Text(resonance.displayName).tag(resonance)
@@ -400,7 +406,10 @@ struct CharacterInfoTab: View {
                                 if isEditing {
                                     Picker("Synergy", selection: Binding(
                                         get: { mageCharacter.synergy },
-                                        set: { mageCharacter.synergy = $0 }
+                                        set: {
+                                            mageCharacter.synergy = $0
+                                            refreshID = UUID()
+                                        }
                                     )) {
                                         ForEach(MageSynergy.allCases, id: \.self) { synergy in
                                             Text(synergy.displayName).tag(synergy)
