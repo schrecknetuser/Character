@@ -52,63 +52,16 @@ class GhoulCharacter:CharacterBase, DisciplineCapable, CharacterWithHumanity {
         var changes: [String] = []
         
         let other = updated as! GhoulCharacter
-                
-        // Check basic information changes
-        if self.name != other.name {
-            changes.append("name \(self.name)→\(other.name)")
-        }
-        if self.concept != other.concept {
-            changes.append("concept \(self.concept)→\(other.concept)")
-        }
-        if self.chronicleName != other.chronicleName {
-            changes.append("chronicle name \(self.chronicleName)→\(other.chronicleName)")
-        }
-        if self.ambition != other.ambition {
-            changes.append("ambition \(self.ambition)→\(other.ambition)")
-        }
-        if self.desire != other.desire {
-            changes.append("desire \(self.desire)→\(other.desire)")
-        }
         
-        // Check convictions and touchstones changes
-        processStringArrayChanges(original: self.convictions, updated: other.convictions, name: "convictions", changes: &changes)
-        processStringArrayChanges(original: self.touchstones, updated: other.touchstones, name: "touchstones", changes: &changes)
+        // Process base character changes first
+        generateBaseChangeSummary(for: updated, changes: &changes)
         
-        // Check attribute changes
-        for attribute in V5Constants.physicalAttributes + V5Constants.socialAttributes + V5Constants.mentalAttributes {
-            let originalVal = self.getAttributeValue(attribute: attribute)
-            let updatedVal = other.getAttributeValue(attribute: attribute)
-            if originalVal != updatedVal {
-                changes.append("\(attribute.lowercased()) \(originalVal)→\(updatedVal)")
-            }
-        }
-        
-        // Check skill changes
-        for skill in V5Constants.physicalSkills + V5Constants.socialSkills + V5Constants.mentalSkills {
-            let originalVal = self.getSkillValue(skill: skill)
-            let updatedVal = other.getSkillValue(skill: skill)
-            if originalVal != updatedVal {
-                changes.append("\(skill.lowercased()) \(originalVal)→\(updatedVal)")
-            }
-        }
-        
-        // Check core traits
+        // Check ghoul-specific traits
         if self.humanity != other.humanity {
             changes.append("humanity \(self.humanity)→\(other.humanity)")
         }
-        if self.experience != other.experience {
-            changes.append("experience \(self.experience)→\(other.experience)")
-        }
-        if self.spentExperience != other.spentExperience {
-            changes.append("spent experience \(self.spentExperience)→\(other.spentExperience)")
-        }
         
-        // Check date changes
-        if self.dateOfBirth != other.dateOfBirth {
-            let originalDate = self.dateOfBirth != nil ? formatDate(self.dateOfBirth!) : "not set"
-            let newDate = other.dateOfBirth != nil ? formatDate(other.dateOfBirth!) : "not set"
-            changes.append("date of birth \(originalDate)→\(newDate)")
-        }
+        // Check ghoul-specific date changes
         if self.dateOfGhouling != other.dateOfGhouling {
             let originalDate = self.dateOfGhouling != nil ? formatDate(self.dateOfGhouling!) : "not set"
             let newDate = other.dateOfGhouling != nil ? formatDate(other.dateOfGhouling!) : "not set"
@@ -117,15 +70,6 @@ class GhoulCharacter:CharacterBase, DisciplineCapable, CharacterWithHumanity {
         
         // Check V5 discipline changes
         processDisciplineChanges(original: self.v5Disciplines, updated: other.v5Disciplines, changes: &changes)
-        
-        //Check specialisations
-        processSpecializationChanges(original: self.specializations, updated: other.specializations, changes: &changes)
-        
-        // Check advantages/flaws changes
-        processBackgroundChanges(original: self.advantages, updated: other.advantages, name: "advantage", changes: &changes)
-        processBackgroundChanges(original: self.flaws, updated: other.flaws, name: "flaw", changes: &changes)
-        processCharacterBackgroundChanges(original: self.backgroundMerits, updated: other.backgroundMerits, name: "background merit", changes: &changes)
-        processCharacterBackgroundChanges(original: self.backgroundFlaws, updated: other.backgroundFlaws, name: "background flaw", changes: &changes)
         
         if changes.isEmpty {
             return ""
@@ -186,14 +130,6 @@ class GhoulCharacter:CharacterBase, DisciplineCapable, CharacterWithHumanity {
     // Check if using V5 discipline system (has any V5 disciplines)
     var isUsingV5Disciplines: Bool {
         return !v5Disciplines.isEmpty
-    }
-    
-    // Helper function to format dates consistently
-    private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .none
-        return formatter.string(from: date)
     }
         
 }

@@ -469,6 +469,85 @@ class CharacterBase: BaseCharacter {
         return ""
     }
     
+    func generateBaseChangeSummary(for updated: any BaseCharacter, changes: inout [String]) {
+        // Check basic information changes
+        if self.name != updated.name {
+            changes.append("name \(self.name)→\(updated.name)")
+        }
+        if self.concept != updated.concept {
+            changes.append("concept \(self.concept)→\(updated.concept)")
+        }
+        if self.chronicleName != updated.chronicleName {
+            changes.append("chronicle name \(self.chronicleName)→\(updated.chronicleName)")
+        }
+        if self.ambition != updated.ambition {
+            changes.append("ambition \(self.ambition)→\(updated.ambition)")
+        }
+        if self.desire != updated.desire {
+            changes.append("desire \(self.desire)→\(updated.desire)")
+        }
+        if self.characterDescription != updated.characterDescription {
+            changes.append("character description updated")
+        }
+        if self.notes != updated.notes {
+            changes.append("notes updated")
+        }
+        
+        // Check convictions and touchstones changes
+        processStringArrayChanges(original: self.convictions, updated: updated.convictions, name: "convictions", changes: &changes)
+        processStringArrayChanges(original: self.touchstones, updated: updated.touchstones, name: "touchstones", changes: &changes)
+        
+        // Check attribute changes
+        for attribute in V5Constants.physicalAttributes + V5Constants.socialAttributes + V5Constants.mentalAttributes {
+            let originalVal = self.getAttributeValue(attribute: attribute)
+            let updatedVal = updated.getAttributeValue(attribute: attribute)
+            if originalVal != updatedVal {
+                changes.append("\(attribute.lowercased()) \(originalVal)→\(updatedVal)")
+            }
+        }
+        
+        // Check skill changes
+        for skill in V5Constants.physicalSkills + V5Constants.socialSkills + V5Constants.mentalSkills {
+            let originalVal = self.getSkillValue(skill: skill)
+            let updatedVal = updated.getSkillValue(skill: skill)
+            if originalVal != updatedVal {
+                changes.append("\(skill.lowercased()) \(originalVal)→\(updatedVal)")
+            }
+        }
+        
+        // Check core traits
+        if self.experience != updated.experience {
+            changes.append("experience \(self.experience)→\(updated.experience)")
+        }
+        if self.spentExperience != updated.spentExperience {
+            changes.append("spent experience \(self.spentExperience)→\(updated.spentExperience)")
+        }
+        
+        // Check date changes
+        if self.dateOfBirth != updated.dateOfBirth {
+            let originalDate = self.dateOfBirth != nil ? formatDate(self.dateOfBirth!) : "not set"
+            let newDate = updated.dateOfBirth != nil ? formatDate(updated.dateOfBirth!) : "not set"
+            changes.append("date of birth \(originalDate)→\(newDate)")
+        }
+        
+        //Check specialisations
+        processSpecializationChanges(original: self.specializations, updated: updated.specializations, changes: &changes)
+        
+        // Check advantages/flaws changes
+        processBackgroundChanges(original: self.advantages, updated: updated.advantages, name: "advantage", changes: &changes)
+        processBackgroundChanges(original: self.flaws, updated: updated.flaws, name: "flaw", changes: &changes)
+        processCharacterBackgroundChanges(original: self.backgroundMerits, updated: updated.backgroundMerits, name: "background merit", changes: &changes)
+        processCharacterBackgroundChanges(original: self.backgroundFlaws, updated: updated.backgroundFlaws, name: "background flaw", changes: &changes)
+    }
+    
+    // Helper function to format dates consistently
+    func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        return formatter.string(from: date)
+    }
+    
     func processBackgroundChanges(original: [BackgroundBase], updated: [BackgroundBase], name: String, changes: inout [String])
     {
         let originalSet = Set(original)
