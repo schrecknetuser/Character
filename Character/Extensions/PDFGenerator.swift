@@ -692,5 +692,3 @@ class PDFGenerator {
         noteString.draw(at: point)
     }
 }
-}
-}
