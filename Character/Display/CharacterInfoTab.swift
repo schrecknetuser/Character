@@ -335,8 +335,8 @@ struct CharacterInfoTab: View {
                                 Spacer()
                                 if isEditing {
                                     Picker("Essence", selection: Binding(
-                                        get: { (character as! MageCharacter).essence },
-                                        set: { (character as! MageCharacter).essence = $0 }
+                                        get: { mageCharacter.essence },
+                                        set: { mageCharacter.essence = $0 }
                                     )) {
                                         ForEach(MageEssence.allCases, id: \.self) { essence in
                                             Text(essence.displayName).tag(essence)
@@ -353,7 +353,7 @@ struct CharacterInfoTab: View {
                                 .font(.system(size: dynamicFontSize - 2))
                                 .foregroundColor(.secondary)
                                 .italic()
-                            Text("\((character as! MageCharacter).essence.displayName): \((character as! MageCharacter).essence.description)")
+                            Text("\(mageCharacter.essence.displayName): \(mageCharacter.essence.description)")
                                 .font(.system(size: dynamicFontSize - 2))
                                 .foregroundColor(.blue)
                         }
@@ -367,8 +367,8 @@ struct CharacterInfoTab: View {
                                 Spacer()
                                 if isEditing {
                                     Picker("Resonance", selection: Binding(
-                                        get: { (character as! MageCharacter).resonance },
-                                        set: { (character as! MageCharacter).resonance = $0 }
+                                        get: { mageCharacter.resonance },
+                                        set: { mageCharacter.resonance = $0 }
                                     )) {
                                         ForEach(MageResonance.allCases, id: \.self) { resonance in
                                             Text(resonance.displayName).tag(resonance)
@@ -385,7 +385,7 @@ struct CharacterInfoTab: View {
                                 .font(.system(size: dynamicFontSize - 2))
                                 .foregroundColor(.secondary)
                                 .italic()
-                            Text("\((character as! MageCharacter).resonance.displayName): \((character as! MageCharacter).resonance.description)")
+                            Text("\(mageCharacter.resonance.displayName): \(mageCharacter.resonance.description)")
                                 .font(.system(size: dynamicFontSize - 2))
                                 .foregroundColor(.blue)
                         }
@@ -399,8 +399,8 @@ struct CharacterInfoTab: View {
                                 Spacer()
                                 if isEditing {
                                     Picker("Synergy", selection: Binding(
-                                        get: { (character as! MageCharacter).synergy },
-                                        set: { (character as! MageCharacter).synergy = $0 }
+                                        get: { mageCharacter.synergy },
+                                        set: { mageCharacter.synergy = $0 }
                                     )) {
                                         ForEach(MageSynergy.allCases, id: \.self) { synergy in
                                             Text(synergy.displayName).tag(synergy)
@@ -417,7 +417,7 @@ struct CharacterInfoTab: View {
                                 .font(.system(size: dynamicFontSize - 2))
                                 .foregroundColor(.secondary)
                                 .italic()
-                            Text("\((character as! MageCharacter).synergy.displayName): \((character as! MageCharacter).synergy.description)")
+                            Text("\(mageCharacter.synergy.displayName): \(mageCharacter.synergy.description)")
                                 .font(.system(size: dynamicFontSize - 2))
                                 .foregroundColor(.blue)
                         }
