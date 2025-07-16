@@ -541,7 +541,7 @@ class CharacterBase: BaseCharacter {
     }
     
     // Helper function to format dates consistently
-    private func formatDate(_ date: Date) -> String {
+    func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         formatter.timeStyle = .none
