@@ -6,6 +6,8 @@ struct QRDisplayModalView: View {
     
     @State private var qrImage: UIImage?
     @State private var showShareSheet = false
+    @State private var generationFailed = false
+    @State private var errorMessage = ""
     
     var body: some View {
         NavigationView {
@@ -39,6 +41,19 @@ struct QRDisplayModalView: View {
                         .background(Color.white)
                         .cornerRadius(12)
                         .shadow(radius: 4)
+                } else if generationFailed {
+                    VStack(spacing: 12) {
+                        Image(systemName: "exclamationmark.triangle")
+                            .font(.system(size: 40))
+                            .foregroundColor(.red)
+                        Text("QR Code Generation Failed")
+                            .font(.headline)
+                        Text(errorMessage)
+                            .font(.caption)
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(.secondary)
+                    }
+                    .frame(width: 200, height: 200)
                 } else {
                     ProgressView("Generating QR Code...")
                         .frame(width: 200, height: 200)
@@ -75,11 +90,21 @@ struct QRDisplayModalView: View {
     }
     
     private func generateQRCode() {
+        print("Starting QR code generation for character: \(character.name)")
+        
         DispatchQueue.global(qos: .background).async {
             let generatedImage = QRCodeGenerator.generateQRCode(from: character)
             
             DispatchQueue.main.async {
-                self.qrImage = generatedImage
+                if let image = generatedImage {
+                    print("✓ QR code generated successfully: \(image.size)")
+                    self.qrImage = image
+                    self.generationFailed = false
+                } else {
+                    print("✗ QR code generation failed")
+                    self.generationFailed = true
+                    self.errorMessage = "Character data may be too large or contain invalid characters"
+                }
             }
         }
     }

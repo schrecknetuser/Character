@@ -9,13 +9,27 @@ struct QRCodeGenerator {
     static func generateQRCode(from character: any BaseCharacter) -> UIImage? {
         // Convert character to compressed JSON for smaller QR codes
         let compressedData = CharacterDataTransfer.compressCharacterForQR(character)
-        guard let characterData = try? JSONEncoder().encode(compressedData),
+        
+        // Use compact JSON encoding (no pretty printing)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [] // Compact format
+        
+        guard let characterData = try? encoder.encode(compressedData),
               let jsonString = String(data: characterData, encoding: .utf8) else {
             print("Failed to encode character data")
             return nil
         }
         
         print("QR code data length: \(jsonString.count) characters")
+        
+        // Verify the data can be decoded back
+        if let _ = CharacterDataTransfer.importCharacter(from: jsonString) {
+            print("✓ QR data validation successful")
+        } else {
+            print("✗ QR data validation failed - generated data cannot be imported")
+            return nil
+        }
+        
         return generateQRCode(from: jsonString)
     }
     
@@ -24,27 +38,43 @@ struct QRCodeGenerator {
         let context = CIContext()
         let filter = CIFilter.qrCodeGenerator()
         
-        filter.message = Data(string.utf8)
-        
-        // Set error correction level to high for better reliability
-        filter.correctionLevel = "H"
-        
-        guard let outputImage = filter.outputImage else {
-            print("Failed to generate QR code")
+        // Ensure string is valid UTF-8 and not too long
+        guard let data = string.data(using: .utf8) else {
+            print("Failed to encode string as UTF-8")
             return nil
         }
         
-        // Scale up the QR code for better visibility
-        let scaleX = 200.0 / outputImage.extent.size.width
-        let scaleY = 200.0 / outputImage.extent.size.height
-        let scaledImage = outputImage.transformed(by: CGAffineTransform(scaleX: scaleX, y: scaleY))
+        print("Generating QR code for \(data.count) bytes of data")
         
+        // Check data size - QR codes have limits
+        if data.count > 2000 {
+            print("Warning: Data size (\(data.count) bytes) may be too large for reliable QR code scanning")
+        }
+        
+        filter.message = data
+        
+        // Use medium error correction for better balance between reliability and capacity
+        filter.correctionLevel = "M"
+        
+        guard let outputImage = filter.outputImage else {
+            print("Failed to generate QR code - data might be too large or invalid")
+            return nil
+        }
+        
+        // Create a properly scaled image without interpolation artifacts
+        let transform = CGAffineTransform(scaleX: 10, y: 10)
+        let scaledImage = outputImage.transformed(by: transform)
+        
+        // Render with nearest neighbor to keep sharp pixels
         guard let cgImage = context.createCGImage(scaledImage, from: scaledImage.extent) else {
             print("Failed to create CGImage from QR code")
             return nil
         }
         
-        return UIImage(cgImage: cgImage)
+        let finalImage = UIImage(cgImage: cgImage)
+        print("Generated QR code image: \(finalImage.size)")
+        
+        return finalImage
     }
 }
 
@@ -157,74 +187,177 @@ extension QRCodeScanner: AVCaptureMetadataOutputObjectsDelegate {
 
 // MARK: - Compressed Character Data for QR Codes
 struct CompressedCharacterData: Codable {
-    // Basic info
-    let name: String
-    let type: CharacterType
-    let concept: String
-    let chronicleName: String
+    // Basic info (shortened field names)
+    let n: String  // name
+    let t: String  // type
+    let c: String  // concept
+    let ch: String // chronicleName
     
-    // Attributes (values only)
-    let physicalAttributes: [String: Int]
-    let socialAttributes: [String: Int]
-    let mentalAttributes: [String: Int]
+    // Attributes (values only, shortened names)
+    let pa: [String: Int] // physicalAttributes
+    let sa: [String: Int] // socialAttributes
+    let ma: [String: Int] // mentalAttributes
     
-    // Skills (values only)
-    let physicalSkills: [String: Int]
-    let socialSkills: [String: Int]
-    let mentalSkills: [String: Int]
+    // Skills (values only, shortened names)
+    let ps: [String: Int] // physicalSkills
+    let ss: [String: Int] // socialSkills
+    let ms: [String: Int] // mentalSkills
     
     // Essential character stats
-    let willpower: Int
-    let health: Int
+    let w: Int // willpower
+    let h: Int // health
     
     // Specializations (names only)
-    let specializations: [String: String] // skillName: specializationName
+    let sp: [String: String] // specializations: skillName: specializationName
     
     // Character-specific data
-    let vampireData: VampireCompressedData?
-    let ghoulData: GhoulCompressedData?
-    let mageData: MageCompressedData?
+    let vd: VampireCompressedData? // vampireData
+    let gd: GhoulCompressedData?   // ghoulData
+    let md: MageCompressedData?    // mageData
     
     // Merit/Flaw names only (descriptions from constants)
-    let advantageNames: [String]
-    let flawNames: [String]
-    let backgroundMeritNames: [String]
-    let backgroundFlawNames: [String]
+    let an: [String] // advantageNames
+    let fn: [String] // flawNames
+    let bmn: [String] // backgroundMeritNames
+    let bfn: [String] // backgroundFlawNames
     
     // Convictions and touchstones
-    let convictions: [String]
-    let touchstones: [String]
+    let co: [String] // convictions
+    let to: [String] // touchstones
+    
+    // Add initializer to map from full field names
+    init(name: String, type: CharacterType, concept: String, chronicleName: String,
+         physicalAttributes: [String: Int], socialAttributes: [String: Int], mentalAttributes: [String: Int],
+         physicalSkills: [String: Int], socialSkills: [String: Int], mentalSkills: [String: Int],
+         willpower: Int, health: Int, specializations: [String: String],
+         vampireData: VampireCompressedData?, ghoulData: GhoulCompressedData?, mageData: MageCompressedData?,
+         advantageNames: [String], flawNames: [String], backgroundMeritNames: [String], backgroundFlawNames: [String],
+         convictions: [String], touchstones: [String]) {
+        self.n = name
+        self.t = type.rawValue
+        self.c = concept
+        self.ch = chronicleName
+        self.pa = physicalAttributes
+        self.sa = socialAttributes
+        self.ma = mentalAttributes
+        self.ps = physicalSkills
+        self.ss = socialSkills
+        self.ms = mentalSkills
+        self.w = willpower
+        self.h = health
+        self.sp = specializations
+        self.vd = vampireData
+        self.gd = ghoulData
+        self.md = mageData
+        self.an = advantageNames
+        self.fn = flawNames
+        self.bmn = backgroundMeritNames
+        self.bfn = backgroundFlawNames
+        self.co = convictions
+        self.to = touchstones
+    }
+    
+    // Properties to access the data with full names
+    var name: String { n }
+    var characterType: CharacterType { CharacterType(rawValue: t) ?? .vampire }
+    var concept: String { c }
+    var chronicleName: String { ch }
+    var physicalAttributes: [String: Int] { pa }
+    var socialAttributes: [String: Int] { sa }
+    var mentalAttributes: [String: Int] { ma }
+    var physicalSkills: [String: Int] { ps }
+    var socialSkills: [String: Int] { ss }
+    var mentalSkills: [String: Int] { ms }
+    var willpower: Int { w }
+    var health: Int { h }
+    var specializations: [String: String] { sp }
+    var vampireData: VampireCompressedData? { vd }
+    var ghoulData: GhoulCompressedData? { gd }
+    var mageData: MageCompressedData? { md }
+    var advantageNames: [String] { an }
+    var flawNames: [String] { fn }
+    var backgroundMeritNames: [String] { bmn }
+    var backgroundFlawNames: [String] { bfn }
+    var convictions: [String] { co }
+    var touchstones: [String] { to }
 }
 
 struct VampireCompressedData: Codable {
-    let clan: String
-    let generation: Int
-    let bloodPotency: Int
-    let humanity: Int
-    let hunger: Int
-    let predatorType: String
-    // Discipline power names only (descriptions from constants)
-    let selectedDisciplinePowers: [String: [String]] // disciplineName: [powerNames]
+    let c: String  // clan
+    let g: Int     // generation
+    let bp: Int    // bloodPotency
+    let hu: Int    // humanity
+    let hn: Int    // hunger
+    let pt: String // predatorType
+    let dp: [String: [String]] // selectedDisciplinePowers
+    
+    init(clan: String, generation: Int, bloodPotency: Int, humanity: Int, hunger: Int, predatorType: String, selectedDisciplinePowers: [String: [String]]) {
+        self.c = clan
+        self.g = generation
+        self.bp = bloodPotency
+        self.hu = humanity
+        self.hn = hunger
+        self.pt = predatorType
+        self.dp = selectedDisciplinePowers
+    }
+    
+    var clan: String { c }
+    var generation: Int { g }
+    var bloodPotency: Int { bp }
+    var humanity: Int { hu }
+    var hunger: Int { hn }
+    var predatorType: String { pt }
+    var selectedDisciplinePowers: [String: [String]] { dp }
 }
 
 struct GhoulCompressedData: Codable {
-    let humanity: Int
-    // Note: Ghoul has v5Disciplines, not its own disciplines
-    let selectedDisciplinePowers: [String: [String]]
+    let hu: Int // humanity
+    let dp: [String: [String]] // selectedDisciplinePowers
+    
+    init(humanity: Int, selectedDisciplinePowers: [String: [String]]) {
+        self.hu = humanity
+        self.dp = selectedDisciplinePowers
+    }
+    
+    var humanity: Int { hu }
+    var selectedDisciplinePowers: [String: [String]] { dp }
 }
 
 struct MageCompressedData: Codable {
-    let arete: Int
-    let paradox: Int
-    let hubris: Int
-    let quiet: Int
-    let paradigm: String
-    let practice: String
-    let essence: String
-    let resonance: String
-    let synergy: String
-    let spheres: [String: Int]
-    // Note: Mage doesn't have v5Disciplines in the actual model
+    let a: Int     // arete
+    let p: Int     // paradox
+    let h: Int     // hubris
+    let q: Int     // quiet
+    let pa: String // paradigm
+    let pr: String // practice
+    let e: String  // essence
+    let r: String  // resonance
+    let s: String  // synergy
+    let sp: [String: Int] // spheres
+    
+    init(arete: Int, paradox: Int, hubris: Int, quiet: Int, paradigm: String, practice: String, essence: String, resonance: String, synergy: String, spheres: [String: Int]) {
+        self.a = arete
+        self.p = paradox
+        self.h = hubris
+        self.q = quiet
+        self.pa = paradigm
+        self.pr = practice
+        self.e = essence
+        self.r = resonance
+        self.s = synergy
+        self.sp = spheres
+    }
+    
+    var arete: Int { a }
+    var paradox: Int { p }
+    var hubris: Int { h }
+    var quiet: Int { q }
+    var paradigm: String { pa }
+    var practice: String { pr }
+    var essence: String { e }
+    var resonance: String { r }
+    var synergy: String { s }
+    var spheres: [String: Int] { sp }
 }
 
 // MARK: - Character Import/Export Utilities
@@ -384,7 +517,7 @@ struct CharacterDataTransfer {
     private static func expandCharacterFromCompressed(_ compressed: CompressedCharacterData) -> (any BaseCharacter)? {
         let character: any BaseCharacter
         
-        switch compressed.type {
+        switch compressed.characterType {
         case .vampire:
             guard let vampireData = compressed.vampireData else { return nil }
             let vampire = VampireCharacter()
