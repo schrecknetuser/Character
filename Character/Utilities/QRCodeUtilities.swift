@@ -57,11 +57,19 @@ class QRCodeScanner: NSObject, ObservableObject {
     private var captureSession: AVCaptureSession?
     private var previewLayer: AVCaptureVideoPreviewLayer?
     
+    override init() {
+        super.init()
+    }
+    
     func startScanning() {
         hasError = false
         scannedCode = nil
         
+        // Clean up any existing session
+        stopScanning()
+        
         captureSession = AVCaptureSession()
+        captureSession?.sessionPreset = .high
         
         guard let videoCaptureDevice = AVCaptureDevice.default(for: .video) else {
             setError("Camera not available")
@@ -90,13 +98,21 @@ class QRCodeScanner: NSObject, ObservableObject {
                 return
             }
             
-            // Create preview layer once the session is set up
-            previewLayer = AVCaptureVideoPreviewLayer(session: captureSession!)
-            previewLayer?.videoGravity = .resizeAspectFill
-            
-            // Start session on background queue
-            DispatchQueue.global(qos: .background).async {
-                self.captureSession?.startRunning()
+            // Create preview layer and ensure it's configured properly
+            if let session = captureSession {
+                previewLayer = AVCaptureVideoPreviewLayer(session: session)
+                previewLayer?.videoGravity = .resizeAspectFill
+                
+                // Start session on background queue after setup is complete
+                DispatchQueue.global(qos: .background).async {
+                    session.startRunning()
+                    
+                    // Notify on main thread that session has started
+                    DispatchQueue.main.async {
+                        // Trigger UI update
+                        self.objectWillChange.send()
+                    }
+                }
             }
             
         } catch {

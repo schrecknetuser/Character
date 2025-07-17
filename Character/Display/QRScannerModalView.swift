@@ -120,18 +120,33 @@ struct QRScannerModalView: View {
     }
     
     private func requestCameraPermission() {
-        AVCaptureDevice.requestAccess(for: .video) { granted in
-            DispatchQueue.main.async {
-                if granted {
-                    // Small delay to ensure UI is ready
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        self.scanner.startScanning()
+        let status = AVCaptureDevice.authorizationStatus(for: .video)
+        
+        switch status {
+        case .authorized:
+            // Already have permission, start immediately
+            scanner.startScanning()
+        case .notDetermined:
+            // Request permission
+            AVCaptureDevice.requestAccess(for: .video) { granted in
+                DispatchQueue.main.async {
+                    if granted {
+                        // Small delay to ensure UI is ready
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            self.scanner.startScanning()
+                        }
+                    } else {
+                        self.errorMessage = "Camera access is required to scan QR codes"
+                        self.showError = true
                     }
-                } else {
-                    self.errorMessage = "Camera access is required to scan QR codes"
-                    self.showError = true
                 }
             }
+        case .denied, .restricted:
+            self.errorMessage = "Camera access denied. Please enable camera access in Settings."
+            self.showError = true
+        @unknown default:
+            self.errorMessage = "Unknown camera permission status"
+            self.showError = true
         }
     }
     
@@ -149,23 +164,53 @@ struct QRScannerModalView: View {
 
 // Camera preview wrapper for SwiftUI
 struct CameraPreviewView: UIViewRepresentable {
-    let scanner: QRCodeScanner
+    @ObservedObject var scanner: QRCodeScanner
     
-    func makeUIView(context: Context) -> UIView {
-        let view = UIView()
+    func makeUIView(context: Context) -> CameraView {
+        let view = CameraView()
         view.backgroundColor = UIColor.black
         return view
     }
     
-    func updateUIView(_ uiView: UIView, context: Context) {
-        // Remove any existing preview layers
-        uiView.layer.sublayers?.removeAll(where: { $0 is AVCaptureVideoPreviewLayer })
+    func updateUIView(_ uiView: CameraView, context: Context) {
+        uiView.setPreviewLayer(scanner.getPreviewLayer())
+    }
+}
+
+// Custom UIView to handle camera preview layer
+class CameraView: UIView {
+    private var previewLayer: AVCaptureVideoPreviewLayer?
+    
+    func setPreviewLayer(_ layer: AVCaptureVideoPreviewLayer?) {
+        // Only update if we have a new layer
+        guard layer !== previewLayer else { return }
         
-        // Add the preview layer if available
-        if let previewLayer = scanner.getPreviewLayer() {
-            previewLayer.frame = uiView.bounds
-            uiView.layer.addSublayer(previewLayer)
+        // Remove old layer
+        previewLayer?.removeFromSuperlayer()
+        previewLayer = nil
+        
+        // Add new layer
+        if let newLayer = layer {
+            previewLayer = newLayer
+            newLayer.frame = bounds
+            newLayer.videoGravity = .resizeAspectFill
+            
+            // Ensure the connection is active
+            if let connection = newLayer.connection, connection.isEnabled {
+                // Set video orientation if supported
+                if connection.isVideoOrientationSupported {
+                    connection.videoOrientation = .portrait
+                }
+            }
+            
+            self.layer.addSublayer(newLayer)
         }
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        // Update preview layer frame when view bounds change
+        previewLayer?.frame = bounds
     }
 }
 
