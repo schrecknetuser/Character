@@ -125,13 +125,22 @@ class PDFGenerator {
         switch fieldName.lowercased() {
         case "clan":
             widget.widgetStringValue = vampire.clan
-        case "generation":
-            widget.widgetStringValue = "\(vampire.generation)"
         case "predator", "predator_type", "predatortype", "predator type":
             widget.widgetStringValue = vampire.predatorType
         case "sire":
             widget.widgetStringValue = "" // Leave blank as requested
         case "blood_potency", "bloodpotency":
+            widget.widgetStringValue = "\(vampire.bloodPotency)"
+        case "bloodsurge":
+            // Blood potency effect fields
+            widget.widgetStringValue = "\(vampire.bloodPotency)"
+        case "powbonus":
+            widget.widgetStringValue = "\(vampire.bloodPotency)"
+        case "mend":
+            widget.widgetStringValue = "\(vampire.bloodPotency)"
+        case "rerouse":
+            widget.widgetStringValue = "\(vampire.bloodPotency)"
+        case "feedpen":
             widget.widgetStringValue = "\(vampire.bloodPotency)"
         case "humanity":
             widget.widgetStringValue = "\(vampire.humanity)"
@@ -387,8 +396,9 @@ class PDFGenerator {
         if let skillName = specMapping[fieldName] {
             let specs = character.getSpecializations(for: skillName)
             if !specs.isEmpty {
-                // Fill with the first specialization found
-                widget.widgetStringValue = specs[0].name
+                // Fill with all specializations separated by commas
+                let specNames = specs.map { $0.name }
+                widget.widgetStringValue = specNames.joined(separator: ", ")
             }
         }
     }
