@@ -323,6 +323,7 @@ struct CharacterListView: View {
 struct ContentView: View {
     @StateObject private var store = CharacterStore()
     @State private var showingAddSheet = false
+    @State private var showingQRScanner = false
     @State private var expandedGroups: Set<String> = []
     @State private var expandedChronicles: [String: Bool] = [:]
     private let chronicleExpansionKey = "chronicleExpansionState"
@@ -365,6 +366,14 @@ struct ContentView: View {
             )
             .navigationTitle("Characters")
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: { showingQRScanner = true }) {
+                        Image(systemName: "qrcode.viewfinder")
+                    }
+                    .accessibilityLabel("Import Character")
+                    .accessibilityHint("Scan QR code to import character")
+                }
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showingAddSheet = true }) {
                         Image(systemName: "plus")
@@ -373,6 +382,9 @@ struct ContentView: View {
             }
             .fullScreenCover(isPresented: $showingAddSheet) {
                 CharacterCreationWizard(store: store)
+            }
+            .fullScreenCover(isPresented: $showingQRScanner) {
+                QRScannerModalView(isPresented: $showingQRScanner, store: store)
             }
         }
         .onAppear {

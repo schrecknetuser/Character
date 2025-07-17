@@ -10,6 +10,7 @@ struct CharacterDetailView: View {
     @State private var showingStatusModal = false
     @State private var showingDataModal = false
     @State private var showingPDFExport = false
+    @State private var showingQRExport = false
     
     var activeCharacterBinding: Binding<any BaseCharacter> {
         Binding(
@@ -180,6 +181,21 @@ struct CharacterDetailView: View {
                             .accessibilityLabel("Status")
                             .accessibilityHint("Opens character status for editing")
                             
+                            // QR Export Button
+                            Button(action: {
+                                showingQRExport = true
+                            }) {
+                                Image(systemName: "qrcode")
+                                    .font(.title2)
+                                    .foregroundColor(.white)
+                                    .frame(width: UIConstants.floatingButtonSize, height: UIConstants.floatingButtonSize)
+                                    .background(Color.green)
+                                    .clipShape(Circle())
+                                    .shadow(radius: 4)
+                            }
+                            .accessibilityLabel("Export QR Code")
+                            .accessibilityHint("Generate QR code to share character")
+                            
                             // Data Button
                             Button(action: {
                                 showingDataModal = true
@@ -246,6 +262,8 @@ struct CharacterDetailView: View {
             }
             .sheet(isPresented: $showingPDFExport) {
                 PDFExportView(character: character, isPresented: $showingPDFExport)
+            .sheet(isPresented: $showingQRExport) {
+                QRDisplayModalView(character: isEditing ? draftCharacter! : character, isPresented: $showingQRExport)
             }
             .onDisappear {
                 if isEditing {

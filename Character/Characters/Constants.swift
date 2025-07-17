@@ -611,6 +611,11 @@ struct V5Constants {
     // Mage Spheres (nine spheres of magic)
     static let mageSpheres = ["Correspondence", "Entropy", "Forces", "Life", "Matter", "Mind", "Prime", "Spirit", "Time"]
     
+    // Mage Traits Descriptions
+    static let mageEssenceDescription = "Mage's mystical connection to the universe's foundational forces, shaping how they perceive and channel magical energy."
+    static let mageResonanceDescription = "The unique emotional and thematic flavor of a mage's magic, shaped by their personality and beliefs."
+    static let mageSynergyDescription = "Inward flow of cosmic principles through a mage, reflecting their alignment with universal forces."
+    
     // V5 Clans
     static let clans = ["Brujah", "Gangrel", "Malkavian", "Nosferatu", "Toreador", "Tremere", "Ventrue", "Banu Haqim", "Hecata", "Lasombra", "Ministry", "Ravnos", "Salubri", "Tzimisce", "Caitiff", "Thin-Blood"]
     
