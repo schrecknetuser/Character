@@ -429,4 +429,112 @@ final class QRCodeTests: XCTestCase {
             XCTAssertEqual(importedVampire.notes, vampire.notes, "Large notes should be preserved")
         }
     }
+    
+    func testDateFieldsExport() throws {
+        // Test that all date fields are properly exported and imported
+        let testDate = Date(timeIntervalSince1970: 1000000000) // Fixed test date
+        
+        // Test vampire with dateOfBirth and dateOfEmbrace
+        let vampire = VampireCharacter()
+        vampire.name = "Date Test Vampire"
+        vampire.clan = "Toreador"
+        vampire.dateOfBirth = testDate
+        vampire.dateOfEmbrace = Date(timeIntervalSince1970: 1500000000)
+        
+        // Test QR export and import
+        let vampireQR = QRCodeGenerator.generateQRCode(from: vampire)
+        XCTAssertNotNil(vampireQR, "Vampire QR code should be generated")
+        
+        // Test data transfer
+        let vampireData = CharacterDataTransfer.prepareCharacterForQR(vampire)
+        
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted]
+        guard let jsonData = try? encoder.encode(vampireData),
+              let compressedString = DataCompressor.compressForQR(jsonData) else {
+            XCTFail("Failed to compress vampire data")
+            return
+        }
+        
+        let importedVampire = CharacterDataTransfer.importCharacter(from: compressedString)
+        XCTAssertNotNil(importedVampire, "Vampire should be imported")
+        
+        if let importedVampire = importedVampire as? VampireCharacter {
+            XCTAssertEqual(importedVampire.dateOfBirth, vampire.dateOfBirth, "dateOfBirth should be preserved")
+            XCTAssertEqual(importedVampire.dateOfEmbrace, vampire.dateOfEmbrace, "dateOfEmbrace should be preserved")
+        } else {
+            XCTFail("Imported character should be a VampireCharacter")
+        }
+        
+        // Test ghoul with dateOfBirth and dateOfGhouling
+        let ghoul = GhoulCharacter()
+        ghoul.name = "Date Test Ghoul"
+        ghoul.dateOfBirth = testDate
+        ghoul.dateOfGhouling = Date(timeIntervalSince1970: 1600000000)
+        
+        let ghoulData = CharacterDataTransfer.prepareCharacterForQR(ghoul)
+        guard let ghoulJsonData = try? encoder.encode(ghoulData),
+              let ghoulCompressedString = DataCompressor.compressForQR(ghoulJsonData) else {
+            XCTFail("Failed to compress ghoul data")
+            return
+        }
+        
+        let importedGhoul = CharacterDataTransfer.importCharacter(from: ghoulCompressedString)
+        XCTAssertNotNil(importedGhoul, "Ghoul should be imported")
+        
+        if let importedGhoul = importedGhoul as? GhoulCharacter {
+            XCTAssertEqual(importedGhoul.dateOfBirth, ghoul.dateOfBirth, "dateOfBirth should be preserved")
+            XCTAssertEqual(importedGhoul.dateOfGhouling, ghoul.dateOfGhouling, "dateOfGhouling should be preserved")
+        } else {
+            XCTFail("Imported character should be a GhoulCharacter")
+        }
+        
+        // Test mage with dateOfBirth and dateOfAwakening
+        let mage = MageCharacter()
+        mage.name = "Date Test Mage"
+        mage.dateOfBirth = testDate
+        mage.dateOfAwakening = Date(timeIntervalSince1970: 1700000000)
+        
+        let mageData = CharacterDataTransfer.prepareCharacterForQR(mage)
+        guard let mageJsonData = try? encoder.encode(mageData),
+              let mageCompressedString = DataCompressor.compressForQR(mageJsonData) else {
+            XCTFail("Failed to compress mage data")
+            return
+        }
+        
+        let importedMage = CharacterDataTransfer.importCharacter(from: mageCompressedString)
+        XCTAssertNotNil(importedMage, "Mage should be imported")
+        
+        if let importedMage = importedMage as? MageCharacter {
+            XCTAssertEqual(importedMage.dateOfBirth, mage.dateOfBirth, "dateOfBirth should be preserved")
+            XCTAssertEqual(importedMage.dateOfAwakening, mage.dateOfAwakening, "dateOfAwakening should be preserved")
+        } else {
+            XCTFail("Imported character should be a MageCharacter")
+        }
+        
+        // Test nil dates (should not crash)
+        let vampireNilDates = VampireCharacter()
+        vampireNilDates.name = "Nil Date Vampire"
+        vampireNilDates.dateOfBirth = nil
+        vampireNilDates.dateOfEmbrace = nil
+        
+        let nilDateData = CharacterDataTransfer.prepareCharacterForQR(vampireNilDates)
+        guard let nilDateJsonData = try? encoder.encode(nilDateData),
+              let nilDateCompressedString = DataCompressor.compressForQR(nilDateJsonData) else {
+            XCTFail("Failed to compress nil date data")
+            return
+        }
+        
+        let importedNilDateVampire = CharacterDataTransfer.importCharacter(from: nilDateCompressedString)
+        XCTAssertNotNil(importedNilDateVampire, "Vampire with nil dates should be imported")
+        
+        if let importedNilDateVampire = importedNilDateVampire as? VampireCharacter {
+            XCTAssertNil(importedNilDateVampire.dateOfBirth, "dateOfBirth should remain nil")
+            XCTAssertNil(importedNilDateVampire.dateOfEmbrace, "dateOfEmbrace should remain nil")
+        } else {
+            XCTFail("Imported character should be a VampireCharacter")
+        }
+        
+        print("Date fields export test completed successfully")
+    }
 }

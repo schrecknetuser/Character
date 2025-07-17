@@ -320,6 +320,9 @@ struct FullCharacterData: Codable {
     let characterDescription: String
     let notes: String
     
+    // Date fields
+    let dateOfBirth: Date?
+    
     // Background merits and flaws with costs preserved
     let backgroundMerits: [[String]] // [name, cost] pairs
     let backgroundFlaws: [[String]] // [name, cost] pairs
@@ -345,11 +348,13 @@ struct VampireFullData: Codable {
     let humanity: Int
     let hunger: Int
     let predatorType: String
+    let dateOfEmbrace: Date?
     let selectedDisciplinePowers: [String: [String]]
 }
 
 struct GhoulFullData: Codable {
     let humanity: Int
+    let dateOfGhouling: Date?
     let selectedDisciplinePowers: [String: [String]]
 }
 
@@ -363,6 +368,7 @@ struct MageFullData: Codable {
     let essence: String
     let resonance: String
     let synergy: String
+    let dateOfAwakening: Date?
     let spheres: [String: Int]
 }
 
@@ -447,12 +453,14 @@ struct CharacterDataTransfer {
                 humanity: vampire.humanity,
                 hunger: vampire.hunger,
                 predatorType: vampire.predatorType,
+                dateOfEmbrace: vampire.dateOfEmbrace,
                 selectedDisciplinePowers: disciplinePowers
             )
         } else if let ghoul = character as? GhoulCharacter {
             let disciplinePowers = extractSelectedDisciplinePowers(ghoul.v5Disciplines)
             ghoulData = GhoulFullData(
                 humanity: ghoul.humanity,
+                dateOfGhouling: ghoul.dateOfGhouling,
                 selectedDisciplinePowers: disciplinePowers
             )
         } else if let mage = character as? MageCharacter {
@@ -466,6 +474,7 @@ struct CharacterDataTransfer {
                 essence: mage.essence.rawValue,
                 resonance: mage.resonance.rawValue,
                 synergy: mage.synergy.rawValue,
+                dateOfAwakening: mage.dateOfAwakening,
                 spheres: mage.spheres
             )
         }
@@ -490,6 +499,7 @@ struct CharacterDataTransfer {
             desire: character.desire,
             characterDescription: character.characterDescription,
             notes: character.notes,
+            dateOfBirth: character.dateOfBirth,
             backgroundMerits: backgroundMerits,
             backgroundFlaws: backgroundFlaws,
             advantageNames: advantageNames,
@@ -535,6 +545,7 @@ struct CharacterDataTransfer {
             vampire.humanity = vampireData.humanity
             vampire.hunger = vampireData.hunger
             vampire.predatorType = vampireData.predatorType
+            vampire.dateOfEmbrace = vampireData.dateOfEmbrace
             
             // Restore disciplines with selected powers
             vampire.v5Disciplines = restoreDisciplines(vampireData.selectedDisciplinePowers)
@@ -545,6 +556,7 @@ struct CharacterDataTransfer {
             guard let ghoulData = fullData.ghoulData else { return nil }
             let ghoul = GhoulCharacter()
             ghoul.humanity = ghoulData.humanity
+            ghoul.dateOfGhouling = ghoulData.dateOfGhouling
             
             // Restore disciplines with selected powers
             ghoul.v5Disciplines = restoreDisciplines(ghoulData.selectedDisciplinePowers)
@@ -563,6 +575,7 @@ struct CharacterDataTransfer {
             mage.essence = MageEssence(rawValue: mageData.essence) ?? .none
             mage.resonance = MageResonance(rawValue: mageData.resonance) ?? .none
             mage.synergy = MageSynergy(rawValue: mageData.synergy) ?? .none
+            mage.dateOfAwakening = mageData.dateOfAwakening
             mage.spheres = mageData.spheres
             
             character = mage
@@ -586,6 +599,7 @@ struct CharacterDataTransfer {
         character.desire = fullData.desire
         character.characterDescription = fullData.characterDescription
         character.notes = fullData.notes
+        character.dateOfBirth = fullData.dateOfBirth
         character.convictions = fullData.convictions
         character.touchstones = fullData.touchstones
         
