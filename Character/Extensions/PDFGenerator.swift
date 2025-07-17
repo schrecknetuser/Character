@@ -62,13 +62,13 @@ class PDFGenerator {
     // MARK: - Template Background and Coordinate-based Overlay
     
     private static func createImageFromPDF(data: Data) -> UIImage? {
-        guard let provider = CGDataProvider(data: data),
+        guard let provider = CGDataProvider(data: data as CFData),
               let pdfDoc = CGPDFDocument(provider),
               let pdfPage = pdfDoc.page(at: 1) else {
             return nil
         }
         
-        let pageRect = pdfPage.getBoxRect(.mediaBox)
+        let pageRect = pdfPage.getBoxRect(CGPDFBox.mediaBox)
         let renderer = UIGraphicsImageRenderer(size: pageRect.size)
         
         let image = renderer.image { ctx in
@@ -92,7 +92,7 @@ class PDFGenerator {
         drawTextAtCoordinates(text: vampire.clan, x: 85, y: 170, fontSize: 10)
         drawTextAtCoordinates(text: vampire.predatorType, x: 200, y: 170, fontSize: 10)
         drawTextAtCoordinates(text: "\(vampire.generation)", x: 320, y: 170, fontSize: 10)
-        drawTextAtCoordinates(text: vampire.sire, x: 85, y: 200, fontSize: 10)
+        drawTextAtCoordinates(text: "", x: 85, y: 200, fontSize: 10)
         drawTextAtCoordinates(text: vampire.ambition, x: 320, y: 200, fontSize: 10)
         drawTextAtCoordinates(text: vampire.desire, x: 450, y: 200, fontSize: 10)
         
