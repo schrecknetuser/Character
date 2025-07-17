@@ -60,15 +60,15 @@ class PDFGenerator {
     }
     
     private static func fillFieldBasedOnCharacter(widget: PDFAnnotation, character: any BaseCharacter) {
-        guard let fieldName = widget.fieldName?.lowercased() else { return }
+        guard let fieldName = widget.fieldName else { return }
         
         // Fill basic character information
-        switch fieldName {
+        switch fieldName.lowercased() {
         case "name", "character_name", "charactername":
             widget.widgetStringValue = character.name
-        case "concept":
+        case "concept", "pcconcept":
             widget.widgetStringValue = character.concept
-        case "chronicle", "chronicle_name":
+        case "chronicle", "chronicle_name", "chronicles":
             widget.widgetStringValue = character.chronicleName
         case "player":
             widget.widgetStringValue = "" // Leave blank for manual fill
@@ -76,6 +76,39 @@ class PDFGenerator {
             widget.widgetStringValue = character.ambition
         case "desire":
             widget.widgetStringValue = character.desire
+        case "notes", "pc_notes":
+            widget.widgetStringValue = character.notes
+        case "cexp":
+            widget.widgetStringValue = "\(character.availableExperience)"
+        case "texp":
+            widget.widgetStringValue = "\(character.experience)"
+        case "generation":
+            if let vampire = character as? VampireCharacter {
+                widget.widgetStringValue = "\(vampire.generation)"
+            }
+        case "sire":
+            widget.widgetStringValue = "" // Leave blank as requested
+        case "sect":
+            widget.widgetStringValue = "" // Leave blank for manual fill
+        case "title":
+            widget.widgetStringValue = "" // Leave blank for manual fill
+        case "birthday":
+            if let birthDate = character.dateOfBirth {
+                let formatter = DateFormatter()
+                formatter.dateStyle = .medium
+                widget.widgetStringValue = formatter.string(from: birthDate)
+            }
+        case "age":
+            widget.widgetStringValue = "" // Leave blank for manual calculation
+        case "embrace":
+            if let vampire = character as? VampireCharacter,
+               let embraceDate = vampire.dateOfEmbrace {
+                let formatter = DateFormatter()
+                formatter.dateStyle = .medium
+                widget.widgetStringValue = formatter.string(from: embraceDate)
+            }
+        case "apparent age":
+            widget.widgetStringValue = "" // Leave blank for manual fill
         default:
             // Handle character-specific fields
             if let vampire = character as? VampireCharacter {
@@ -89,12 +122,12 @@ class PDFGenerator {
     }
     
     private static func fillVampireSpecificField(fieldName: String, widget: PDFAnnotation, vampire: VampireCharacter) {
-        switch fieldName {
+        switch fieldName.lowercased() {
         case "clan":
             widget.widgetStringValue = vampire.clan
         case "generation":
             widget.widgetStringValue = "\(vampire.generation)"
-        case "predator", "predator_type", "predatortype":
+        case "predator", "predator_type", "predatortype", "predator type":
             widget.widgetStringValue = vampire.predatorType
         case "sire":
             widget.widgetStringValue = "" // Leave blank as requested
@@ -105,7 +138,7 @@ class PDFGenerator {
         case "hunger":
             widget.widgetStringValue = "\(vampire.hunger)"
         default:
-            // Handle attributes and skills
+            // Handle attributes, skills, and other complex fields
             fillAttributeOrSkillField(fieldName: fieldName, widget: widget, character: vampire)
         }
     }
@@ -131,23 +164,223 @@ class PDFGenerator {
     }
     
     private static func fillAttributeOrSkillField(fieldName: String, widget: PDFAnnotation, character: any BaseCharacter) {
-        // Handle attributes
-        let attributes = ["strength", "dexterity", "stamina", "charisma", "manipulation", "composure", "intelligence", "wits", "resolve"]
-        if attributes.contains(fieldName) {
-            let value = character.getAttributeValue(attribute: fieldName.capitalized)
-            widget.widgetStringValue = "\(value)"
-            return
+        // Handle attribute button fields (format: Str-1, Str-2, etc.)
+        let attributeMapping = [
+            "Str": "Strength",
+            "Dex": "Dexterity", 
+            "Sta": "Stamina",
+            "Cha": "Charisma",
+            "Man": "Manipulation",
+            "Com": "Composure",
+            "Int": "Intelligence",
+            "Wit": "Wits",
+            "Res": "Resolve"
+        ]
+        
+        // Check if this is an attribute button field
+        for (prefix, attributeName) in attributeMapping {
+            if fieldName.hasPrefix(prefix + "-") {
+                let components = fieldName.split(separator: "-")
+                if components.count == 2, let level = Int(components[1]) {
+                    let attributeValue = character.getAttributeValue(attribute: attributeName)
+                    widget.buttonWidgetState = (level <= attributeValue) ? PDFAnnotationButtonWidgetState.onState : PDFAnnotationButtonWidgetState.offState
+                    return
+                }
+            }
         }
         
-        // Handle skills
-        let skills = ["athletics", "brawl", "craft", "drive", "firearms", "larceny", "melee", "stealth", "survival",
-                     "animal ken", "etiquette", "insight", "intimidation", "leadership", "performance", "persuasion", "streetwise", "subterfuge",
-                     "academics", "awareness", "finance", "investigation", "medicine", "occult", "politics", "science", "technology"]
+        // Handle skill button fields
+        fillSkillButtonField(fieldName: fieldName, widget: widget, character: character)
         
-        let skillName = fieldName.replacingOccurrences(of: "_", with: " ").capitalized
-        if skills.contains(skillName.lowercased()) {
-            let value = character.getSkillValue(skill: skillName)
-            widget.widgetStringValue = "\(value)"
+        // Handle merit/flaw button fields
+        fillMeritFlawButtonField(fieldName: fieldName, widget: widget, character: character)
+        
+        // Handle specialization fields
+        fillSpecializationField(fieldName: fieldName, widget: widget, character: character)
+        
+        // Handle conviction/touchstone fields
+        fillConvictionTouchstoneField(fieldName: fieldName, widget: widget, character: character)
+        
+        // Handle discipline fields
+        fillDisciplineField(fieldName: fieldName, widget: widget, character: character)
+    }
+    
+    private static func fillSkillButtonField(fieldName: String, widget: PDFAnnotation, character: any BaseCharacter) {
+        // Map skill field names to actual skill names
+        let skillMapping = [
+            "Athletics": "Athletics",
+            "Brawl": "Brawl", 
+            "Craft": "Craft",
+            "Drive": "Drive",
+            "Firearms": "Firearms",
+            "Larceny": "Larceny",
+            "Melee": "Melee",
+            "Stealth": "Stealth",
+            "Survival": "Survival",
+            "AnimalKen": "Animal Ken",
+            "Etiquette": "Etiquette",
+            "Insight": "Insight",
+            "Intimidation": "Intimidation",
+            "Leadership": "Leadership",
+            "Performance": "Performance",
+            "Persuasion": "Persuasion",
+            "Streetwise": "Streetwise",
+            "Subterfuge": "Subterfuge",
+            "Academics": "Academics",
+            "Awareness": "Awareness",
+            "Finance": "Finance",
+            "Investigation": "Investigation",
+            "Medicine": "Medicine",
+            "Occult": "Occult",
+            "Politics": "Politics",
+            "Science": "Science",
+            "Technology": "Technology"
+        ]
+        
+        for (fieldPrefix, skillName) in skillMapping {
+            if fieldName.hasPrefix(fieldPrefix + "-") {
+                let components = fieldName.split(separator: "-")
+                if components.count == 2, let level = Int(components[1]) {
+                    let skillValue = character.getSkillValue(skill: skillName)
+                    widget.buttonWidgetState = (level <= skillValue) ? PDFAnnotationButtonWidgetState.onState : PDFAnnotationButtonWidgetState.offState
+                    return
+                }
+            }
+        }
+    }
+    
+    private static func fillMeritFlawButtonField(fieldName: String, widget: PDFAnnotation, character: any BaseCharacter) {
+        // Handle Merit text fields (Merit1, Merit2, etc.)
+        if fieldName.hasPrefix("Merit") && !fieldName.contains("-") {
+            let pattern = "Merit(\\d+)"
+            if let regex = try? NSRegularExpression(pattern: pattern, options: []),
+               let match = regex.firstMatch(in: fieldName, options: [], range: NSRange(location: 0, length: fieldName.count)) {
+                let indexRange = Range(match.range(at: 1), in: fieldName)!
+                if let index = Int(fieldName[indexRange]) {
+                    let meritIndex = index - 1 // Convert to 0-based indexing
+                    
+                    // Check advantages (merits) first
+                    if meritIndex < character.advantages.count {
+                        let merit = character.advantages[meritIndex]
+                        widget.widgetStringValue = merit.name
+                        return
+                    }
+                    
+                    // Check background merits
+                    let backgroundMeritIndex = meritIndex - character.advantages.count
+                    if backgroundMeritIndex >= 0 && backgroundMeritIndex < character.backgroundMerits.count {
+                        let merit = character.backgroundMerits[backgroundMeritIndex]
+                        widget.widgetStringValue = merit.name
+                        return
+                    }
+                }
+            }
+        }
+        
+        // Handle Merit button fields (Merit1-1, Merit1-2, etc.)
+        if fieldName.hasPrefix("Merit") && fieldName.contains("-") {
+            let pattern = "Merit(\\d+)-(\\d+)"
+            if let regex = try? NSRegularExpression(pattern: pattern, options: []),
+               let match = regex.firstMatch(in: fieldName, options: [], range: NSRange(location: 0, length: fieldName.count)) {
+                let meritIndexRange = Range(match.range(at: 1), in: fieldName)!
+                let levelRange = Range(match.range(at: 2), in: fieldName)!
+                
+                if let meritIndex = Int(fieldName[meritIndexRange]),
+                   let level = Int(fieldName[levelRange]) {
+                    let meritIndex0 = meritIndex - 1 // Convert to 0-based indexing
+                    
+                    // Check advantages (merits) first
+                    if meritIndex0 < character.advantages.count {
+                        let merit = character.advantages[meritIndex0]
+                        widget.buttonWidgetState = (level <= merit.cost) ? PDFAnnotationButtonWidgetState.onState : PDFAnnotationButtonWidgetState.offState
+                        return
+                    }
+                    
+                    // Check background merits
+                    let backgroundMeritIndex = meritIndex0 - character.advantages.count
+                    if backgroundMeritIndex >= 0 && backgroundMeritIndex < character.backgroundMerits.count {
+                        let merit = character.backgroundMerits[backgroundMeritIndex]
+                        widget.buttonWidgetState = (level <= merit.cost) ? PDFAnnotationButtonWidgetState.onState : PDFAnnotationButtonWidgetState.offState
+                        return
+                    }
+                }
+            }
+        }
+    }
+    
+    private static func fillSpecializationField(fieldName: String, widget: PDFAnnotation, character: any BaseCharacter) {
+        // Handle specialization fields - these would be text fields showing specialization names
+        if fieldName.contains("Spec") || fieldName.contains("Special") {
+            // For now, just fill with first specialization found
+            if !character.specializations.isEmpty {
+                let spec = character.specializations[0]
+                widget.widgetStringValue = spec.name
+            }
+        }
+    }
+    
+    private static func fillConvictionTouchstoneField(fieldName: String, widget: PDFAnnotation, character: any BaseCharacter) {
+        // Handle conviction fields
+        if fieldName.hasPrefix("Conviction") {
+            let pattern = "Conviction(\\d+)"
+            if let regex = try? NSRegularExpression(pattern: pattern, options: []),
+               let match = regex.firstMatch(in: fieldName, options: [], range: NSRange(location: 0, length: fieldName.count)) {
+                let indexRange = Range(match.range(at: 1), in: fieldName)!
+                if let index = Int(fieldName[indexRange]) {
+                    let convictionIndex = index - 1 // Convert to 0-based indexing
+                    if convictionIndex < character.convictions.count {
+                        widget.widgetStringValue = character.convictions[convictionIndex]
+                    }
+                }
+            }
+        }
+        
+        // Handle touchstone fields
+        if fieldName.hasPrefix("Touchstone") {
+            let pattern = "Touchstone(\\d+)"
+            if let regex = try? NSRegularExpression(pattern: pattern, options: []),
+               let match = regex.firstMatch(in: fieldName, options: [], range: NSRange(location: 0, length: fieldName.count)) {
+                let indexRange = Range(match.range(at: 1), in: fieldName)!
+                if let index = Int(fieldName[indexRange]) {
+                    let touchstoneIndex = index - 1 // Convert to 0-based indexing
+                    if touchstoneIndex < character.touchstones.count {
+                        widget.widgetStringValue = character.touchstones[touchstoneIndex]
+                    }
+                }
+            }
+        }
+    }
+    
+    private static func fillDisciplineField(fieldName: String, widget: PDFAnnotation, character: any BaseCharacter) {
+        // Handle discipline fields for vampire characters
+        if let vampire = character as? VampireCharacter {
+            // Handle discipline name fields
+            if fieldName.hasPrefix("Discipline") {
+                let pattern = "Discipline(\\d+)"
+                if let regex = try? NSRegularExpression(pattern: pattern, options: []),
+                   let match = regex.firstMatch(in: fieldName, options: [], range: NSRange(location: 0, length: fieldName.count)) {
+                    let indexRange = Range(match.range(at: 1), in: fieldName)!
+                    if let index = Int(fieldName[indexRange]) {
+                        let disciplineIndex = index - 1 // Convert to 0-based indexing
+                        if disciplineIndex < vampire.v5Disciplines.count {
+                            widget.widgetStringValue = vampire.v5Disciplines[disciplineIndex].name
+                        }
+                    }
+                }
+            }
+            
+            // Handle discipline level button fields
+            for discipline in vampire.v5Disciplines {
+                let disciplineName = discipline.name
+                if fieldName.hasPrefix(disciplineName + "-") {
+                    let components = fieldName.split(separator: "-")
+                    if components.count == 2, let level = Int(components[1]) {
+                        let disciplineLevel = discipline.currentLevel()
+                        widget.buttonWidgetState = (level <= disciplineLevel) ? PDFAnnotationButtonWidgetState.onState : PDFAnnotationButtonWidgetState.offState
+                        return
+                    }
+                }
+            }
         }
     }
     
