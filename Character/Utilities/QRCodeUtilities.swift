@@ -207,31 +207,47 @@ struct CompressedCharacterData: Codable {
     let w: Int // willpower
     let h: Int // health
     
-    // Specializations (names only)
-    let sp: [String: String] // specializations: skillName: specializationName
+    // Specializations (names only) - array to handle multiple specializations per skill
+    let sp: [[String]] // specializations: [skillName, specializationName] pairs
+    
+    // Merit/Flaw names only (descriptions from constants)
+    let an: [String] // advantageNames
+    let fn: [String] // flawNames
+    
+    // Add experience fields
+    let ex: Int  // experience
+    let spex: Int // spentExperience
+    
+    // Add ambition and desire
+    let amb: String // ambition
+    let des: String // desire
+    
+    // Add description and notes
+    let desc: String // characterDescription
+    let nt: String   // notes
+    
+    // Background merits and flaws with costs preserved
+    let bm: [[String]] // backgroundMerits: [name, cost] pairs
+    let bf: [[String]] // backgroundFlaws: [name, cost] pairs
     
     // Character-specific data
     let vd: VampireCompressedData? // vampireData
     let gd: GhoulCompressedData?   // ghoulData
     let md: MageCompressedData?    // mageData
     
-    // Merit/Flaw names only (descriptions from constants)
-    let an: [String] // advantageNames
-    let fn: [String] // flawNames
-    let bmn: [String] // backgroundMeritNames
-    let bfn: [String] // backgroundFlawNames
-    
     // Convictions and touchstones
     let co: [String] // convictions
     let to: [String] // touchstones
-    
+         physicalAttributes: [String: Int], socialAttributes: [String: Int], mentalAttributes: [String: Int],
     // Add initializer to map from full field names
     init(name: String, type: CharacterType, concept: String, chronicleName: String,
          physicalAttributes: [String: Int], socialAttributes: [String: Int], mentalAttributes: [String: Int],
          physicalSkills: [String: Int], socialSkills: [String: Int], mentalSkills: [String: Int],
-         willpower: Int, health: Int, specializations: [String: String],
+         willpower: Int, health: Int, specializations: [[String]],
+         experience: Int, spentExperience: Int, ambition: String, desire: String,
+         characterDescription: String, notes: String,
          vampireData: VampireCompressedData?, ghoulData: GhoulCompressedData?, mageData: MageCompressedData?,
-         advantageNames: [String], flawNames: [String], backgroundMeritNames: [String], backgroundFlawNames: [String],
+         advantageNames: [String], flawNames: [String], backgroundMerits: [[String]], backgroundFlaws: [[String]],
          convictions: [String], touchstones: [String]) {
         self.n = name
         self.t = type.rawValue
@@ -246,13 +262,19 @@ struct CompressedCharacterData: Codable {
         self.w = willpower
         self.h = health
         self.sp = specializations
+        self.ex = experience
+        self.spex = spentExperience
+        self.amb = ambition
+        self.des = desire
+        self.desc = characterDescription
+        self.nt = notes
         self.vd = vampireData
         self.gd = ghoulData
         self.md = mageData
         self.an = advantageNames
         self.fn = flawNames
-        self.bmn = backgroundMeritNames
-        self.bfn = backgroundFlawNames
+        self.bm = backgroundMerits
+        self.bf = backgroundFlaws
         self.co = convictions
         self.to = touchstones
     }
@@ -270,14 +292,20 @@ struct CompressedCharacterData: Codable {
     var mentalSkills: [String: Int] { ms }
     var willpower: Int { w }
     var health: Int { h }
-    var specializations: [String: String] { sp }
+    var specializations: [[String]] { sp }
+    var experience: Int { ex }
+    var spentExperience: Int { spex }
+    var ambition: String { amb }
+    var desire: String { des }
+    var characterDescription: String { desc }
+    var notes: String { nt }
     var vampireData: VampireCompressedData? { vd }
     var ghoulData: GhoulCompressedData? { gd }
     var mageData: MageCompressedData? { md }
     var advantageNames: [String] { an }
     var flawNames: [String] { fn }
-    var backgroundMeritNames: [String] { bmn }
-    var backgroundFlawNames: [String] { bfn }
+    var backgroundMerits: [[String]] { bm }
+    var backgroundFlaws: [[String]] { bf }
     var convictions: [String] { co }
     var touchstones: [String] { to }
 }
@@ -419,18 +447,18 @@ struct CharacterDataTransfer {
     
     /// Create compressed character data for QR codes
     static func compressCharacterForQR(_ character: any BaseCharacter) -> CompressedCharacterData {
-        // Extract specializations as name pairs
-        let specializationPairs = Dictionary(
-            uniqueKeysWithValues: character.specializations.map { spec in
-                (spec.skillName, spec.name)
-            }
-        )
+        // Extract specializations as name pairs (array to handle multiple specializations per skill)
+        let specializationPairs = character.specializations.map { spec in
+            [spec.skillName, spec.name]
+        }
         
         // Extract merit/flaw names only
         let advantageNames = character.advantages.map { $0.name }
         let flawNames = character.flaws.map { $0.name }
-        let backgroundMeritNames = character.backgroundMerits.map { $0.name }
-        let backgroundFlawNames = character.backgroundFlaws.map { $0.name }
+        
+        // Extract background merits/flaws with costs preserved
+        let backgroundMerits = character.backgroundMerits.map { [$0.name, String($0.cost)] }
+        let backgroundFlaws = character.backgroundFlaws.map { [$0.name, String($0.cost)] }
         
         // Character-specific data
         var vampireData: VampireCompressedData? = nil
@@ -483,13 +511,19 @@ struct CharacterDataTransfer {
             willpower: character.willpower,
             health: character.health,
             specializations: specializationPairs,
+            experience: character.experience,
+            spentExperience: character.spentExperience,
+            ambition: character.ambition,
+            desire: character.desire,
+            characterDescription: character.characterDescription,
+            notes: character.notes,
             vampireData: vampireData,
             ghoulData: ghoulData,
             mageData: mageData,
             advantageNames: advantageNames,
             flawNames: flawNames,
-            backgroundMeritNames: backgroundMeritNames,
-            backgroundFlawNames: backgroundFlawNames,
+            backgroundMerits: backgroundMerits,
+            backgroundFlaws: backgroundFlaws,
             convictions: character.convictions,
             touchstones: character.touchstones
         )
@@ -572,25 +606,37 @@ struct CharacterDataTransfer {
         character.mentalSkills = compressed.mentalSkills
         character.willpower = compressed.willpower
         character.health = compressed.health
+        character.experience = compressed.experience
+        character.spentExperience = compressed.spentExperience
+        character.ambition = compressed.ambition
+        character.desire = compressed.desire
+        character.characterDescription = compressed.characterDescription
+        character.notes = compressed.notes
         character.convictions = compressed.convictions
         character.touchstones = compressed.touchstones
         
         // Restore specializations
-        character.specializations = compressed.specializations.map { skillName, specName in
-            Specialization(skillName: skillName, name: specName)
-        }
+        character.specializations = compressed.specializations.map { pair in
+            guard pair.count == 2 else { return nil }
+            return Specialization(skillName: pair[0], name: pair[1])
+        }.compactMap { $0 }
         
         // Restore merits/flaws (names only, descriptions from constants)
         character.advantages = restoreMeritsFlaws(compressed.advantageNames, from: V5Constants.predefinedAdvantages)
         character.flaws = restoreMeritsFlaws(compressed.flawNames, from: V5Constants.predefinedFlaws)
         
-        // Note: Background merits/flaws would need similar restoration from constants
-        // For now, just create basic entries
-        character.backgroundMerits = compressed.backgroundMeritNames.map { name in
-            CharacterBackground(name: name, cost: 0, type: .merit)
+        // Restore background merits/flaws with costs preserved
+        character.backgroundMerits = compressed.backgroundMerits.map { pair in
+            guard pair.count == 2, let cost = Int(pair[1]) else { 
+                return CharacterBackground(name: pair.first ?? "", cost: 0, type: .merit)
+            }
+            return CharacterBackground(name: pair[0], cost: cost, type: .merit)
         }
-        character.backgroundFlaws = compressed.backgroundFlawNames.map { name in
-            CharacterBackground(name: name, cost: 0, type: .flaw)
+        character.backgroundFlaws = compressed.backgroundFlaws.map { pair in
+            guard pair.count == 2, let cost = Int(pair[1]) else { 
+                return CharacterBackground(name: pair.first ?? "", cost: 0, type: .flaw)
+            }
+            return CharacterBackground(name: pair[0], cost: cost, type: .flaw)
         }
         
         // Recalculate derived values

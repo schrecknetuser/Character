@@ -227,4 +227,80 @@ final class QRCodeTests: XCTestCase {
         XCTAssertLessThan(compressionRatio, 0.5, "Compressed format should be less than 50% of full format")
         XCTAssertLessThan(compressedString.count, 2000, "Compressed format should be under 2000 characters")
     }
+    
+    func testQRBugFixes() throws {
+        // Test specific bug fixes for QR export
+        let vampire = VampireCharacter()
+        vampire.name = "Bug Fix Test Vampire"
+        vampire.clan = "Toreador"
+        vampire.concept = "Test Artist"
+        vampire.chronicleName = "Test Chronicle"
+        vampire.characterDescription = "Test description"
+        vampire.notes = "Test notes"
+        vampire.experience = 15
+        vampire.spentExperience = 10
+        vampire.ambition = "Test ambition"
+        vampire.desire = "Test desire"
+        
+        // Add multiple specializations for the same skill (this used to cause crashes)
+        vampire.specializations.append(Specialization(skillName: "Performance", name: "Singing"))
+        vampire.specializations.append(Specialization(skillName: "Performance", name: "Dancing"))
+        vampire.specializations.append(Specialization(skillName: "Craft", name: "Painting"))
+        
+        // Add background merits and flaws with costs
+        vampire.backgroundMerits.append(CharacterBackground(name: "Contacts", cost: 3, type: .merit))
+        vampire.backgroundMerits.append(CharacterBackground(name: "Resources", cost: 2, type: .merit))
+        vampire.backgroundFlaws.append(CharacterBackground(name: "Enemy", cost: -2, type: .flaw))
+        
+        // Test that compression doesn't crash with multiple specializations
+        let compressedData = CharacterDataTransfer.compressCharacterForQR(vampire)
+        
+        // Test that we can encode to JSON without crashing
+        guard let characterData = try? JSONEncoder().encode(compressedData),
+              let jsonString = String(data: characterData, encoding: .utf8) else {
+            XCTFail("Failed to encode character data with multiple specializations")
+            return
+        }
+        
+        print("QR data with multiple specializations: \(jsonString.count) characters")
+        
+        // Test that import works correctly
+        let importedCharacter = CharacterDataTransfer.importCharacter(from: jsonString)
+        XCTAssertNotNil(importedCharacter, "Character should be imported successfully")
+        
+        guard let importedVampire = importedCharacter as? VampireCharacter else {
+            XCTFail("Imported character should be a VampireCharacter")
+            return
+        }
+        
+        // Test that all new fields are preserved
+        XCTAssertEqual(importedVampire.experience, vampire.experience, "Experience should be preserved")
+        XCTAssertEqual(importedVampire.spentExperience, vampire.spentExperience, "Spent experience should be preserved")
+        XCTAssertEqual(importedVampire.ambition, vampire.ambition, "Ambition should be preserved")
+        XCTAssertEqual(importedVampire.desire, vampire.desire, "Desire should be preserved")
+        XCTAssertEqual(importedVampire.characterDescription, vampire.characterDescription, "Character description should be preserved")
+        XCTAssertEqual(importedVampire.notes, vampire.notes, "Notes should be preserved")
+        
+        // Test that multiple specializations are preserved
+        XCTAssertEqual(importedVampire.specializations.count, vampire.specializations.count, "All specializations should be preserved")
+        
+        let performanceSpecs = importedVampire.specializations.filter { $0.skillName == "Performance" }
+        XCTAssertEqual(performanceSpecs.count, 2, "Multiple specializations for same skill should be preserved")
+        
+        let specNames = Set(performanceSpecs.map { $0.name })
+        XCTAssertTrue(specNames.contains("Singing"), "Singing specialization should be preserved")
+        XCTAssertTrue(specNames.contains("Dancing"), "Dancing specialization should be preserved")
+        
+        // Test that background merits/flaws preserve costs
+        XCTAssertEqual(importedVampire.backgroundMerits.count, vampire.backgroundMerits.count, "Background merits should be preserved")
+        XCTAssertEqual(importedVampire.backgroundFlaws.count, vampire.backgroundFlaws.count, "Background flaws should be preserved")
+        
+        let contactsMerit = importedVampire.backgroundMerits.first { $0.name == "Contacts" }
+        XCTAssertNotNil(contactsMerit, "Contacts merit should be preserved")
+        XCTAssertEqual(contactsMerit?.cost, 3, "Contacts merit cost should be preserved")
+        
+        let enemyFlaw = importedVampire.backgroundFlaws.first { $0.name == "Enemy" }
+        XCTAssertNotNil(enemyFlaw, "Enemy flaw should be preserved")
+        XCTAssertEqual(enemyFlaw?.cost, -2, "Enemy flaw cost should be preserved")
+    }
 }
