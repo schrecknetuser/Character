@@ -123,10 +123,13 @@ struct QRScannerModalView: View {
         AVCaptureDevice.requestAccess(for: .video) { granted in
             DispatchQueue.main.async {
                 if granted {
-                    scanner.startScanning()
+                    // Small delay to ensure UI is ready
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        self.scanner.startScanning()
+                    }
                 } else {
-                    errorMessage = "Camera access is required to scan QR codes"
-                    showError = true
+                    self.errorMessage = "Camera access is required to scan QR codes"
+                    self.showError = true
                 }
             }
         }
@@ -149,21 +152,19 @@ struct CameraPreviewView: UIViewRepresentable {
     let scanner: QRCodeScanner
     
     func makeUIView(context: Context) -> UIView {
-        let view = UIView(frame: CGRect(x: 0, y: 0, width: 300, height: 300))
+        let view = UIView()
         view.backgroundColor = UIColor.black
-        
-        if let previewLayer = scanner.getPreviewLayer() {
-            previewLayer.frame = view.layer.bounds
-            view.layer.addSublayer(previewLayer)
-        }
-        
         return view
     }
     
     func updateUIView(_ uiView: UIView, context: Context) {
-        // Update the preview layer frame if needed
+        // Remove any existing preview layers
+        uiView.layer.sublayers?.removeAll(where: { $0 is AVCaptureVideoPreviewLayer })
+        
+        // Add the preview layer if available
         if let previewLayer = scanner.getPreviewLayer() {
             previewLayer.frame = uiView.bounds
+            uiView.layer.addSublayer(previewLayer)
         }
     }
 }

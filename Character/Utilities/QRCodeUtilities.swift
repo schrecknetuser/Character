@@ -90,6 +90,11 @@ class QRCodeScanner: NSObject, ObservableObject {
                 return
             }
             
+            // Create preview layer once the session is set up
+            previewLayer = AVCaptureVideoPreviewLayer(session: captureSession!)
+            previewLayer?.videoGravity = .resizeAspectFill
+            
+            // Start session on background queue
             DispatchQueue.global(qos: .background).async {
                 self.captureSession?.startRunning()
             }
@@ -102,6 +107,7 @@ class QRCodeScanner: NSObject, ObservableObject {
     func stopScanning() {
         captureSession?.stopRunning()
         captureSession = nil
+        previewLayer = nil
     }
     
     private func setError(_ message: String) {
@@ -110,11 +116,6 @@ class QRCodeScanner: NSObject, ObservableObject {
     }
     
     func getPreviewLayer() -> AVCaptureVideoPreviewLayer? {
-        guard let captureSession = captureSession else { return nil }
-        
-        let previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-        previewLayer.videoGravity = .resizeAspectFill
-        
         return previewLayer
     }
 }
