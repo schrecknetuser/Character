@@ -169,4 +169,51 @@ class VampireCharacter: CharacterBase, DisciplineCapable, CharacterWithHumanity 
         return !v5Disciplines.isEmpty
     }
     
+    // Get clan bane description
+    func getClanBane() -> String {
+        // This would typically come from a clan database/constants
+        // For now, return a placeholder or basic mapping
+        switch clan.lowercased() {
+        case "brujah":
+            return "Lose control when under stress (frenzy on aggravated damage)"
+        case "gangrel":
+            return "Gain animal features when hungry"
+        case "malkavian":
+            return "Suffer from mental derangement"
+        case "nosferatu":
+            return "Hideous appearance (social difficulty)"
+        case "toreador":
+            return "Become entranced by beauty"
+        case "tremere":
+            return "Blood bond to clan hierarchy"
+        case "ventrue":
+            return "Restrictive feeding requirements"
+        default:
+            return "Clan-specific bane (see rulebook)"
+        }
+    }
+    
+    // Get clan compulsion description
+    func getClanCompulsion() -> String {
+        // This would typically come from a clan database/constants
+        switch clan.lowercased() {
+        case "brujah":
+            return "Rebellion - must challenge authority"
+        case "gangrel":
+            return "Feral Impulses - act on animal instincts"
+        case "malkavian":
+            return "Delusion - believe something untrue"
+        case "nosferatu":
+            return "Cryptophilia - obsess over secrets"
+        case "toreador":
+            return "Obsession - fixate on beauty"
+        case "tremere":
+            return "Perfectionism - nothing less than perfect"
+        case "ventrue":
+            return "Arrogance - dominate and control"
+        default:
+            return "Clan-specific compulsion (see rulebook)"
+        }
+    }
+    
 }

@@ -1,0 +1,230 @@
+Name
+
+Patrick 2
+
+Player
+Chronicle
+
+Vyborg Sabbat
+
+Concept
+
+tbd
+
+Sire
+
+tbd
+
+Ambition
+
+tbd
+
+Clan
+
+Tzimisce
+
+Predator
+
+Alleycat
+
+Generation
+
+8
+
+ATTRIBUTES
+Physical
+
+Social
+
+Mental
+
+Strength
+
+Charisma
+
+Intelligence
+
+Dexterity
+
+Manipulation
+
+Wits
+
+Stamina
+
+Composure
+
+Resolve
+
+Health
+
+Willpower
+
+SKILLS
+Athletics (Jumping)
+
+Animal ken
+
+Academics
+
+Brawl (Grappling)
+
+Etiquette
+
+Awareness
+
+Craft
+
+Insight
+
+Finance
+
+Drive
+
+Intimidation
+
+Investigation
+
+Firearms
+
+Leadership
+
+Medicine
+
+Larceny
+
+Performance
+
+Occult
+
+Melee
+
+Persuasion
+
+Politics
+
+Stealth
+
+Streetwise
+
+Science
+
+Survival
+
+Subterfuge
+
+Technology
+
+Athletics: Jumping, Brawl: Grappling
+
+DISCIPLINES
+Auspex
+Heightened Senses
+Sense the Unseen
+Scry the Soul
+
+Dominate
+Compel
+Mesmerize
+
+Potence
+Soaring Leap
+Prowess
+Uncanny Grip
+
+Protean
+Eyes of the Beast
+Vicissitude
+Earth Meld
+Fleshcrafting
+Horrid Form
+
+Resonance
+
+Fortitude
+Resilience
+Toughness
+Defy Bane
+Shatter
+
+Hunger
+
+Humanity
+
+Advantages
+
+Blood Potency
+
+6
+
+Blood Surge
+
+Power Bonus
+
+1
+
+Add 3 dice
+
+Add 1 die
+
+Special Contact
+
+Mend Amount
+
+Rouse Re-Roll
+
+2 points
+
+Level 2 and below
+
+Flaws
+2
+
+Feeding Penalty
+Animal and bagged blood slakes no Hunger
+Clan Bane
+You must spend the day by your chosen charge, by
+whatever it is you rule. If you do not, you sustain 3
+aggravated Willpower damage upon waking the
+following night.
+Clan Compulsion
+Covetousness
+You become obsessed with possessing something in
+the scene, desiring to add it to your proverbial
+hoard. This can be anything from an object to a
+piece of property to an actual person. Any action
+not taken toward this purpose incurs a two-dice
+penalty. The Compulsion persists until ownership is
+established (the Storyteller decides what
+constitutes ownership in the case of a non-object)
+or the object of desire becomes unattainable.
+Experience 35
+Spent Experience 442
+
+Notes
+
+Chronicle Tenets
+
+Convictions & Touchstones
+tbd
+
+tbd
+
+Biography
+True Age
+
+Apparent Age
+
+Date of birth
+
+Date of death
+
+Mar 4, 2024
+
+Mar 4, 2024
+Appearance
+
+Distinguishing Features
+Notes
+
+
