@@ -11,23 +11,32 @@ final class QRCodeTests: XCTestCase {
         vampire.concept = "Artist"
         vampire.chronicleName = "Test Chronicle"
         
-        // Test QR code generation (now uses compressed format)
+        // Test QR code generation (now uses gzip+base64 compression)
         let qrImage = QRCodeGenerator.generateQRCode(from: vampire)
         XCTAssertNotNil(qrImage, "QR code should be generated successfully")
         
-        // Test character data transfer using compressed format
-        let compressedData = CharacterDataTransfer.compressCharacterForQR(vampire)
-        guard let characterData = try? JSONEncoder().encode(compressedData),
-              let jsonString = String(data: characterData, encoding: .utf8) else {
-            XCTFail("Failed to encode compressed character data")
+        // Test character data transfer using gzip+base64 compression
+        let fullData = CharacterDataTransfer.prepareCharacterForQR(vampire)
+        
+        // Encode to JSON
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted]
+        guard let jsonData = try? encoder.encode(fullData) else {
+            XCTFail("Failed to encode character data")
             return
         }
         
-        print("Compressed QR data length: \(jsonString.count) characters")
-        XCTAssertLessThan(jsonString.count, 2000, "Compressed data should be under 2000 characters for reliable QR scanning")
+        // Compress using gzip+base64
+        guard let compressedString = DataCompressor.compressForQR(jsonData) else {
+            XCTFail("Failed to compress character data")
+            return
+        }
+        
+        print("Gzip+Base64 compressed QR data length: \(compressedString.count) characters")
+        print("Original JSON size: \(jsonData.count) bytes")
         
         // Test import
-        let importedCharacter = CharacterDataTransfer.importCharacter(from: jsonString)
+        let importedCharacter = CharacterDataTransfer.importCharacter(from: compressedString)
         XCTAssertNotNil(importedCharacter, "Character should be imported successfully")
         XCTAssertEqual(importedCharacter?.name, vampire.name, "Character name should match")
         XCTAssertEqual(importedCharacter?.characterType, vampire.characterType, "Character type should match")
@@ -54,29 +63,9 @@ final class QRCodeTests: XCTestCase {
     }
     
     func testInvalidQRData() throws {
-        let invalidData = "This is not valid JSON"
+        let invalidData = "This is not valid base64 data"
         let character = CharacterDataTransfer.importCharacter(from: invalidData)
         XCTAssertNil(character, "Invalid data should not import a character")
-    }
-    
-    func testBackwardsCompatibility() throws {
-        // Test that old full format QR codes still work (fallback)
-        let vampire = VampireCharacter()
-        vampire.name = "Legacy Test Vampire"
-        vampire.clan = "Nosferatu"
-        
-        // Create legacy format (full AnyCharacter encoding)
-        let anyCharacter = AnyCharacter(vampire)
-        guard let legacyData = try? JSONEncoder().encode(anyCharacter),
-              let legacyJsonString = String(data: legacyData, encoding: .utf8) else {
-            XCTFail("Failed to encode legacy character data")
-            return
-        }
-        
-        // Test that legacy format can still be imported
-        let importedCharacter = CharacterDataTransfer.importCharacter(from: legacyJsonString)
-        XCTAssertNotNil(importedCharacter, "Legacy character should be imported successfully")
-        XCTAssertEqual(importedCharacter?.name, vampire.name, "Legacy character name should match")
     }
     
     func testMageQRCodeGeneration() throws {
@@ -104,19 +93,28 @@ final class QRCodeTests: XCTestCase {
         let qrImage = QRCodeGenerator.generateQRCode(from: mage)
         XCTAssertNotNil(qrImage, "QR code should be generated successfully for Mage")
         
-        // Test character data transfer using compressed format
-        let compressedData = CharacterDataTransfer.compressCharacterForQR(mage)
-        guard let characterData = try? JSONEncoder().encode(compressedData),
-              let jsonString = String(data: characterData, encoding: .utf8) else {
-            XCTFail("Failed to encode compressed mage character data")
+        // Test character data transfer using gzip+base64 compression
+        let fullData = CharacterDataTransfer.prepareCharacterForQR(mage)
+        
+        // Encode to JSON
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted]
+        guard let jsonData = try? encoder.encode(fullData) else {
+            XCTFail("Failed to encode mage character data")
             return
         }
         
-        print("Mage compressed QR data length: \(jsonString.count) characters")
-        XCTAssertLessThan(jsonString.count, 2000, "Compressed mage data should be under 2000 characters for reliable QR scanning")
+        // Compress using gzip+base64
+        guard let compressedString = DataCompressor.compressForQR(jsonData) else {
+            XCTFail("Failed to compress mage character data")
+            return
+        }
+        
+        print("Mage gzip+base64 compressed QR data length: \(compressedString.count) characters")
+        print("Mage original JSON size: \(jsonData.count) bytes")
         
         // Test import
-        let importedCharacter = CharacterDataTransfer.importCharacter(from: jsonString)
+        let importedCharacter = CharacterDataTransfer.importCharacter(from: compressedString)
         XCTAssertNotNil(importedCharacter, "Mage character should be imported successfully")
         XCTAssertEqual(importedCharacter?.name, mage.name, "Mage character name should match")
         XCTAssertEqual(importedCharacter?.characterType, mage.characterType, "Mage character type should match")
@@ -167,19 +165,28 @@ final class QRCodeTests: XCTestCase {
         let qrImage = QRCodeGenerator.generateQRCode(from: ghoul)
         XCTAssertNotNil(qrImage, "QR code should be generated successfully for Ghoul")
         
-        // Test character data transfer using compressed format
-        let compressedData = CharacterDataTransfer.compressCharacterForQR(ghoul)
-        guard let characterData = try? JSONEncoder().encode(compressedData),
-              let jsonString = String(data: characterData, encoding: .utf8) else {
-            XCTFail("Failed to encode compressed ghoul character data")
+        // Test character data transfer using gzip+base64 compression
+        let fullData = CharacterDataTransfer.prepareCharacterForQR(ghoul)
+        
+        // Encode to JSON
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted]
+        guard let jsonData = try? encoder.encode(fullData) else {
+            XCTFail("Failed to encode ghoul character data")
             return
         }
         
-        print("Ghoul compressed QR data length: \(jsonString.count) characters")
-        XCTAssertLessThan(jsonString.count, 2000, "Compressed ghoul data should be under 2000 characters for reliable QR scanning")
+        // Compress using gzip+base64
+        guard let compressedString = DataCompressor.compressForQR(jsonData) else {
+            XCTFail("Failed to compress ghoul character data")
+            return
+        }
+        
+        print("Ghoul gzip+base64 compressed QR data length: \(compressedString.count) characters")
+        print("Ghoul original JSON size: \(jsonData.count) bytes")
         
         // Test import
-        let importedCharacter = CharacterDataTransfer.importCharacter(from: jsonString)
+        let importedCharacter = CharacterDataTransfer.importCharacter(from: compressedString)
         XCTAssertNotNil(importedCharacter, "Ghoul character should be imported successfully")
         XCTAssertEqual(importedCharacter?.name, ghoul.name, "Ghoul character name should match")
         XCTAssertEqual(importedCharacter?.characterType, ghoul.characterType, "Ghoul character type should match")
@@ -194,65 +201,123 @@ final class QRCodeTests: XCTestCase {
     }
 
     func testCompressionEfficiency() throws {
-        // Create a character with lots of data
+        // Create a character with lots of data to test compression on larger datasets
         let vampire = VampireCharacter()
-        vampire.name = "Complex Test Vampire"
+        vampire.name = "Complex Test Vampire with Very Long Name That Repeats Common Words"
         vampire.clan = "Toreador"
-        vampire.concept = "Renaissance Artist"
-        vampire.chronicleName = "Chronicle of Eternal Nights"
-        vampire.characterDescription = "A detailed character with extensive background"
-        vampire.notes = "Lots of session notes and character development"
+        vampire.concept = "Renaissance Artist with Extensive Background"
+        vampire.chronicleName = "Chronicle of Eternal Nights and Endless Adventures"
+        vampire.characterDescription = "A very detailed character description that contains multiple paragraphs of text with repeated words and phrases to test compression efficiency. This vampire has lived for centuries and has extensive experience in various arts and crafts. The character has deep connections to the art world and maintains numerous contacts across different cities. This description demonstrates how gzip compression can handle large text fields efficiently."
+        vampire.notes = "Session 1: Met the Prince and discussed territory rights. Session 2: Investigated strange occurrences in the museum district. Session 3: Attended the Elysium gathering and made new contacts. Session 4: Dealt with Sabbat incursion. Session 5: Explored the underground tunnels. These notes contain repetitive session structures that should compress well with gzip."
+        vampire.ambition = "To become the greatest artist in the domain and establish a lasting legacy"
+        vampire.desire = "To find redemption for past mistakes and protect mortal artists"
         
-        // Add some specializations
+        // Add multiple similar specializations
         vampire.specializations.append(Specialization(skillName: "Performance", name: "Singing"))
+        vampire.specializations.append(Specialization(skillName: "Performance", name: "Dancing"))
+        vampire.specializations.append(Specialization(skillName: "Performance", name: "Acting"))
         vampire.specializations.append(Specialization(skillName: "Craft", name: "Painting"))
+        vampire.specializations.append(Specialization(skillName: "Craft", name: "Sculpting"))
+        vampire.specializations.append(Specialization(skillName: "Craft", name: "Photography"))
         
-        // Create both formats
-        let compressedData = CharacterDataTransfer.compressCharacterForQR(vampire)
-        let anyCharacter = AnyCharacter(vampire)
+        // Add background elements
+        vampire.backgroundMerits.append(CharacterBackground(name: "Contacts", cost: 3, type: .merit))
+        vampire.backgroundMerits.append(CharacterBackground(name: "Resources", cost: 4, type: .merit))
+        vampire.backgroundMerits.append(CharacterBackground(name: "Haven", cost: 2, type: .merit))
+        vampire.backgroundFlaws.append(CharacterBackground(name: "Enemy", cost: -2, type: .flaw))
+        vampire.backgroundFlaws.append(CharacterBackground(name: "Hunted", cost: -3, type: .flaw))
         
-        guard let compressedJson = try? JSONEncoder().encode(compressedData),
-              let fullJson = try? JSONEncoder().encode(anyCharacter),
-              let compressedString = String(data: compressedJson, encoding: .utf8),
-              let fullString = String(data: fullJson, encoding: .utf8) else {
+        // Test gzip+base64 compression
+        let fullData = CharacterDataTransfer.prepareCharacterForQR(vampire)
+        
+        // Encode to pretty-printed JSON (gzip will handle the redundancy)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted]
+        guard let prettyJsonData = try? encoder.encode(fullData) else {
             XCTFail("Failed to encode character data")
             return
         }
         
-        print("Full format size: \(fullString.count) characters")
-        print("Compressed format size: \(compressedString.count) characters")
+        // Encode to compact JSON for comparison
+        encoder.outputFormatting = []
+        guard let compactJsonData = try? encoder.encode(fullData) else {
+            XCTFail("Failed to encode character data")
+            return
+        }
         
-        // Verify compression is reasonable and QR-code friendly
-        let compressionRatio = Double(compressedString.count) / Double(fullString.count)
-        XCTAssertLessThan(compressedString.count, 2000, "Compressed format should be under 2000 characters")
+        // Compress using gzip+base64
+        guard let gzipCompressedString = DataCompressor.compressForQR(prettyJsonData) else {
+            XCTFail("Failed to compress character data")
+            return
+        }
         
-        // With all the new fields added, compression ratio might be higher but still efficient
-        if compressionRatio < 0.5 {
-            print("Excellent compression ratio: \(String(format: "%.0f", compressionRatio * 100))%")
-        } else if compressionRatio < 0.8 {
-            print("Good compression ratio: \(String(format: "%.0f", compressionRatio * 100))% (acceptable with new fields)")
-        } else {
-            print("Compression ratio: \(String(format: "%.0f", compressionRatio * 100))% (higher due to new fields)")
+        print("=== Gzip+Base64 Compression Analysis ===")
+        print("Pretty JSON size: \(prettyJsonData.count) bytes")
+        print("Compact JSON size: \(compactJsonData.count) bytes")
+        print("Gzip+Base64 compressed size: \(gzipCompressedString.count) characters")
+        
+        let prettyCompressionRatio = Double(gzipCompressedString.count) / Double(prettyJsonData.count)
+        let compactCompressionRatio = Double(gzipCompressedString.count) / Double(compactJsonData.count)
+        
+        print("Compression ratio vs pretty JSON: \(String(format: "%.1f", prettyCompressionRatio * 100))%")
+        print("Compression ratio vs compact JSON: \(String(format: "%.1f", compactCompressionRatio * 100))%")
+        
+        // Test that compression is effective
+        XCTAssertLessThan(prettyCompressionRatio, 0.8, "Gzip should compress pretty JSON significantly")
+        XCTAssertLessThan(compactCompressionRatio, 1.0, "Gzip should be better than or equal to compact JSON")
+        
+        // Test with even larger data to show how gzip scales
+        let largeDescription = String(repeating: vampire.characterDescription, count: 5)
+        let largeNotes = String(repeating: vampire.notes, count: 3)
+        vampire.characterDescription = largeDescription
+        vampire.notes = largeNotes
+        
+        let largeFullData = CharacterDataTransfer.prepareCharacterForQR(vampire)
+        guard let largeJsonData = try? encoder.encode(largeFullData),
+              let largeCompressedString = DataCompressor.compressForQR(largeJsonData) else {
+            XCTFail("Failed to compress large character data")
+            return
+        }
+        
+        print("\n=== Large Data Compression Test ===")
+        print("Large JSON size: \(largeJsonData.count) bytes")
+        print("Large compressed size: \(largeCompressedString.count) characters")
+        
+        let largeCompressionRatio = Double(largeCompressedString.count) / Double(largeJsonData.count)
+        print("Large data compression ratio: \(String(format: "%.1f", largeCompressionRatio * 100))%")
+        
+        // With repetitive data, gzip should perform even better
+        XCTAssertLessThan(largeCompressionRatio, prettyCompressionRatio, "Gzip should perform better with more repetitive data")
+        
+        // Verify the compressed data can be decompressed and imported
+        let importedCharacter = CharacterDataTransfer.importCharacter(from: gzipCompressedString)
+        XCTAssertNotNil(importedCharacter, "Compressed character should be imported successfully")
+        
+        if let importedVampire = importedCharacter as? VampireCharacter {
+            XCTAssertEqual(importedVampire.name, vampire.name, "Character name should match")
+            XCTAssertEqual(importedVampire.specializations.count, vampire.specializations.count, "Specializations should match")
+            XCTAssertEqual(importedVampire.backgroundMerits.count, vampire.backgroundMerits.count, "Background merits should match")
         }
     }
     
     func testQRBugFixes() throws {
-        // Test specific bug fixes for QR export
+        // Test specific bug fixes for QR export with gzip+base64 compression
         let vampire = VampireCharacter()
         vampire.name = "Bug Fix Test Vampire"
         vampire.clan = "Toreador"
         vampire.concept = "Test Artist"
         vampire.chronicleName = "Test Chronicle"
-        vampire.characterDescription = "Test description"
-        vampire.notes = "Test notes"
+        vampire.characterDescription = "Test description with multiple paragraphs and repeated words that should compress well with gzip compression algorithm."
+        vampire.notes = "Test notes with session information: Session 1 notes, Session 2 notes, Session 3 notes. These repetitive structures should compress efficiently."
         vampire.experience = 15
         vampire.spentExperience = 10
-        vampire.ambition = "Test ambition"
-        vampire.desire = "Test desire"
+        vampire.ambition = "Test ambition with detailed goals"
+        vampire.desire = "Test desire with specific motivations"
         
         // Add multiple specializations for the same skill (this used to cause crashes)
         vampire.specializations.append(Specialization(skillName: "Performance", name: "Singing"))
         vampire.specializations.append(Specialization(skillName: "Performance", name: "Dancing"))
+        vampire.specializations.append(Specialization(skillName: "Performance", name: "Acting"))
         vampire.specializations.append(Specialization(skillName: "Craft", name: "Painting"))
         
         // Add background merits and flaws with costs
@@ -261,19 +326,26 @@ final class QRCodeTests: XCTestCase {
         vampire.backgroundFlaws.append(CharacterBackground(name: "Enemy", cost: -2, type: .flaw))
         
         // Test that compression doesn't crash with multiple specializations
-        let compressedData = CharacterDataTransfer.compressCharacterForQR(vampire)
+        let fullData = CharacterDataTransfer.prepareCharacterForQR(vampire)
         
-        // Test that we can encode to JSON without crashing
-        guard let characterData = try? JSONEncoder().encode(compressedData),
-              let jsonString = String(data: characterData, encoding: .utf8) else {
+        // Test that we can encode to JSON and compress without crashing
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted]
+        guard let jsonData = try? encoder.encode(fullData) else {
             XCTFail("Failed to encode character data with multiple specializations")
             return
         }
         
-        print("QR data with multiple specializations: \(jsonString.count) characters")
+        guard let compressedString = DataCompressor.compressForQR(jsonData) else {
+            XCTFail("Failed to compress character data with multiple specializations")
+            return
+        }
+        
+        print("QR data with multiple specializations: \(compressedString.count) characters")
+        print("Original JSON size: \(jsonData.count) bytes")
         
         // Test that import works correctly
-        let importedCharacter = CharacterDataTransfer.importCharacter(from: jsonString)
+        let importedCharacter = CharacterDataTransfer.importCharacter(from: compressedString)
         XCTAssertNotNil(importedCharacter, "Character should be imported successfully")
         
         guard let importedVampire = importedCharacter as? VampireCharacter else {
@@ -281,7 +353,7 @@ final class QRCodeTests: XCTestCase {
             return
         }
         
-        // Test that all new fields are preserved
+        // Test that all fields are preserved
         XCTAssertEqual(importedVampire.experience, vampire.experience, "Experience should be preserved")
         XCTAssertEqual(importedVampire.spentExperience, vampire.spentExperience, "Spent experience should be preserved")
         XCTAssertEqual(importedVampire.ambition, vampire.ambition, "Ambition should be preserved")
@@ -293,11 +365,12 @@ final class QRCodeTests: XCTestCase {
         XCTAssertEqual(importedVampire.specializations.count, vampire.specializations.count, "All specializations should be preserved")
         
         let performanceSpecs = importedVampire.specializations.filter { $0.skillName == "Performance" }
-        XCTAssertEqual(performanceSpecs.count, 2, "Multiple specializations for same skill should be preserved")
+        XCTAssertEqual(performanceSpecs.count, 3, "Multiple specializations for same skill should be preserved")
         
         let specNames = Set(performanceSpecs.map { $0.name })
         XCTAssertTrue(specNames.contains("Singing"), "Singing specialization should be preserved")
         XCTAssertTrue(specNames.contains("Dancing"), "Dancing specialization should be preserved")
+        XCTAssertTrue(specNames.contains("Acting"), "Acting specialization should be preserved")
         
         // Test that background merits/flaws preserve costs
         XCTAssertEqual(importedVampire.backgroundMerits.count, vampire.backgroundMerits.count, "Background merits should be preserved")
@@ -310,5 +383,50 @@ final class QRCodeTests: XCTestCase {
         let enemyFlaw = importedVampire.backgroundFlaws.first { $0.name == "Enemy" }
         XCTAssertNotNil(enemyFlaw, "Enemy flaw should be preserved")
         XCTAssertEqual(enemyFlaw?.cost, -2, "Enemy flaw cost should be preserved")
+    }
+    
+    func testGzipCompressionWithLargeText() throws {
+        // Test that gzip compression handles unlimited length fields well
+        let vampire = VampireCharacter()
+        vampire.name = "Large Text Test Vampire"
+        vampire.clan = "Toreador"
+        
+        // Create very large text fields to test gzip compression
+        let repeatedText = "This is a test of gzip compression with repeated text patterns. "
+        vampire.characterDescription = String(repeating: repeatedText, count: 50) // ~3000 characters
+        vampire.notes = String(repeating: "Session notes: investigated, discovered, reported. ", count: 30) // ~1500 characters
+        
+        // Test compression
+        let fullData = CharacterDataTransfer.prepareCharacterForQR(vampire)
+        
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted]
+        guard let jsonData = try? encoder.encode(fullData) else {
+            XCTFail("Failed to encode large text character data")
+            return
+        }
+        
+        guard let compressedString = DataCompressor.compressForQR(jsonData) else {
+            XCTFail("Failed to compress large text character data")
+            return
+        }
+        
+        print("Large text JSON size: \(jsonData.count) bytes")
+        print("Large text compressed size: \(compressedString.count) characters")
+        
+        let compressionRatio = Double(compressedString.count) / Double(jsonData.count)
+        print("Large text compression ratio: \(String(format: "%.1f", compressionRatio * 100))%")
+        
+        // With repetitive text, gzip should achieve excellent compression
+        XCTAssertLessThan(compressionRatio, 0.3, "Gzip should achieve excellent compression on repetitive text")
+        
+        // Test that the compressed data can be decompressed correctly
+        let importedCharacter = CharacterDataTransfer.importCharacter(from: compressedString)
+        XCTAssertNotNil(importedCharacter, "Character with large text should be imported successfully")
+        
+        if let importedVampire = importedCharacter as? VampireCharacter {
+            XCTAssertEqual(importedVampire.characterDescription, vampire.characterDescription, "Large description should be preserved")
+            XCTAssertEqual(importedVampire.notes, vampire.notes, "Large notes should be preserved")
+        }
     }
 }

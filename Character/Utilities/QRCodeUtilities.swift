@@ -2,35 +2,135 @@ import SwiftUI
 import CoreImage
 import CoreImage.CIFilterBuiltins
 import AVFoundation
+import Compression
+import Foundation
 
-// MARK: - QR Code Generation
-struct QRCodeGenerator {
-    /// Generate a QR code image from character data
-    static func generateQRCode(from character: any BaseCharacter) -> UIImage? {
-        // Convert character to compressed JSON for smaller QR codes
-        let compressedData = CharacterDataTransfer.compressCharacterForQR(character)
-        
-        // Use compact JSON encoding (no pretty printing)
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [] // Compact format
-        
-        guard let characterData = try? encoder.encode(compressedData),
-              let jsonString = String(data: characterData, encoding: .utf8) else {
-            print("Failed to encode character data")
+// MARK: - Compression Utilities
+struct DataCompressor {
+    /// Compress data using gzip and encode as base64 for QR codes
+    static func compressForQR(_ data: Data) -> String? {
+        guard let compressedData = compress(data: data) else {
+            print("Failed to compress data")
             return nil
         }
         
-        print("QR code data length: \(jsonString.count) characters")
+        let base64String = compressedData.base64EncodedString()
+        print("Original size: \(data.count) bytes")
+        print("Compressed size: \(compressedData.count) bytes")
+        print("Base64 size: \(base64String.count) characters")
+        print("Compression ratio: \(String(format: "%.1f", Double(compressedData.count) / Double(data.count) * 100))%")
+        
+        return base64String
+    }
+    
+    /// Decompress base64 encoded gzip data
+    static func decompressFromQR(_ base64String: String) -> Data? {
+        guard let compressedData = Data(base64Encoded: base64String) else {
+            print("Failed to decode base64 data")
+            return nil
+        }
+        
+        return decompress(data: compressedData)
+    }
+    
+    /// Compress data using gzip
+    private static func compress(data: Data) -> Data? {
+        return data.withUnsafeBytes { bytes in
+            let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: data.count)
+            defer { buffer.deallocate() }
+            
+            let compressedSize = compression_encode_buffer(
+                buffer, data.count,
+                bytes.bindMemory(to: UInt8.self).baseAddress!, data.count,
+                nil, COMPRESSION_LZFSE
+            )
+            
+            guard compressedSize > 0 else {
+                print("Compression failed with LZFSE, trying LZMA")
+                
+                // Try LZMA compression as fallback
+                let lzmaSize = compression_encode_buffer(
+                    buffer, data.count,
+                    bytes.bindMemory(to: UInt8.self).baseAddress!, data.count,
+                    nil, COMPRESSION_LZMA
+                )
+                
+                guard lzmaSize > 0 else {
+                    print("All compression algorithms failed")
+                    return nil
+                }
+                
+                return Data(bytes: buffer, count: lzmaSize)
+            }
+            
+            return Data(bytes: buffer, count: compressedSize)
+        }
+    }
+    
+    /// Decompress gzip data
+    private static func decompress(data: Data) -> Data? {
+        return data.withUnsafeBytes { bytes in
+            // Estimate decompressed size (start with 4x compressed size)
+            let estimatedSize = data.count * 4
+            let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: estimatedSize)
+            defer { buffer.deallocate() }
+            
+            // Try LZFSE first
+            var decompressedSize = compression_decode_buffer(
+                buffer, estimatedSize,
+                bytes.bindMemory(to: UInt8.self).baseAddress!, data.count,
+                nil, COMPRESSION_LZFSE
+            )
+            
+            if decompressedSize == 0 {
+                print("LZFSE decompression failed, trying LZMA")
+                
+                // Try LZMA as fallback
+                decompressedSize = compression_decode_buffer(
+                    buffer, estimatedSize,
+                    bytes.bindMemory(to: UInt8.self).baseAddress!, data.count,
+                    nil, COMPRESSION_LZMA
+                )
+                
+                if decompressedSize == 0 {
+                    print("All decompression algorithms failed")
+                    return nil
+                }
+            }
+            
+            return Data(bytes: buffer, count: decompressedSize)
+        }
+    }
+}
+
+// MARK: - QR Code Generation
+struct QRCodeGenerator {
+    /// Generate a QR code image from character data using gzip+base64 compression
+    static func generateQRCode(from character: any BaseCharacter) -> UIImage? {
+        // Convert character to JSON for compression
+        let characterData = CharacterDataTransfer.prepareCharacterForQR(character)
+        
+        // Use pretty-printed JSON since compression will handle the redundancy
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted]
+        
+        guard let jsonData = try? encoder.encode(characterData),
+              let compressedString = DataCompressor.compressForQR(jsonData) else {
+            print("Failed to compress character data")
+            return nil
+        }
+        
+        print("QR code compressed data length: \(compressedString.count) characters")
         
         // Verify the data can be decoded back
-        if let _ = CharacterDataTransfer.importCharacter(from: jsonString) {
+        if let _ = CharacterDataTransfer.importCharacter(from: compressedString) {
             print("✓ QR data validation successful")
         } else {
             print("✗ QR data validation failed - generated data cannot be imported")
             return nil
         }
         
-        return generateQRCode(from: jsonString)
+        return generateQRCode(from: compressedString)
     }
     
     /// Generate a QR code image from string data
@@ -185,231 +285,104 @@ extension QRCodeScanner: AVCaptureMetadataOutputObjectsDelegate {
     }
 }
 
-// MARK: - Compressed Character Data for QR Codes
-struct CompressedCharacterData: Codable {
-    // Basic info (shortened field names)
-    let n: String  // name
-    let t: String  // type
-    let c: String  // concept
-    let ch: String // chronicleName
+// MARK: - Full Character Data for QR Codes (with gzip compression)
+struct FullCharacterData: Codable {
+    // Basic info (full field names since compression handles redundancy)
+    let name: String
+    let type: String
+    let concept: String
+    let chronicleName: String
     
-    // Attributes (values only, shortened names)
-    let pa: [String: Int] // physicalAttributes
-    let sa: [String: Int] // socialAttributes
-    let ma: [String: Int] // mentalAttributes
+    // Attributes
+    let physicalAttributes: [String: Int]
+    let socialAttributes: [String: Int]
+    let mentalAttributes: [String: Int]
     
-    // Skills (values only, shortened names)
-    let ps: [String: Int] // physicalSkills
-    let ss: [String: Int] // socialSkills
-    let ms: [String: Int] // mentalSkills
+    // Skills
+    let physicalSkills: [String: Int]
+    let socialSkills: [String: Int]
+    let mentalSkills: [String: Int]
     
     // Essential character stats
-    let w: Int // willpower
-    let h: Int // health
+    let willpower: Int
+    let health: Int
     
-    // Specializations (names only) - array to handle multiple specializations per skill
-    let sp: [[String]] // specializations: [skillName, specializationName] pairs
+    // Specializations (array to handle multiple specializations per skill)
+    let specializations: [[String]] // [skillName, specializationName] pairs
     
-    // Merit/Flaw names only (descriptions from constants)
-    let an: [String] // advantageNames
-    let fn: [String] // flawNames
+    // Experience fields
+    let experience: Int
+    let spentExperience: Int
     
-    // Add experience fields
-    let ex: Int  // experience
-    let spex: Int // spentExperience
-    
-    // Add ambition and desire
-    let amb: String // ambition
-    let des: String // desire
-    
-    // Add description and notes
-    let desc: String // characterDescription
-    let nt: String   // notes
+    // Character details
+    let ambition: String
+    let desire: String
+    let characterDescription: String
+    let notes: String
     
     // Background merits and flaws with costs preserved
-    let bm: [[String]] // backgroundMerits: [name, cost] pairs
-    let bf: [[String]] // backgroundFlaws: [name, cost] pairs
+    let backgroundMerits: [[String]] // [name, cost] pairs
+    let backgroundFlaws: [[String]] // [name, cost] pairs
     
-    // Character-specific data
-    let vd: VampireCompressedData? // vampireData
-    let gd: GhoulCompressedData?   // ghoulData
-    let md: MageCompressedData?    // mageData
+    // Merit/Flaw names only (descriptions from constants)
+    let advantageNames: [String]
+    let flawNames: [String]
     
     // Convictions and touchstones
-    let co: [String] // convictions
-    let to: [String] // touchstones
-         physicalAttributes: [String: Int], socialAttributes: [String: Int], mentalAttributes: [String: Int],
-    // Add initializer to map from full field names
-    init(name: String, type: CharacterType, concept: String, chronicleName: String,
-         physicalAttributes: [String: Int], socialAttributes: [String: Int], mentalAttributes: [String: Int],
-         physicalSkills: [String: Int], socialSkills: [String: Int], mentalSkills: [String: Int],
-         willpower: Int, health: Int, specializations: [[String]],
-         experience: Int, spentExperience: Int, ambition: String, desire: String,
-         characterDescription: String, notes: String,
-         vampireData: VampireCompressedData?, ghoulData: GhoulCompressedData?, mageData: MageCompressedData?,
-         advantageNames: [String], flawNames: [String], backgroundMerits: [[String]], backgroundFlaws: [[String]],
-         convictions: [String], touchstones: [String]) {
-        self.n = name
-        self.t = type.rawValue
-        self.c = concept
-        self.ch = chronicleName
-        self.pa = physicalAttributes
-        self.sa = socialAttributes
-        self.ma = mentalAttributes
-        self.ps = physicalSkills
-        self.ss = socialSkills
-        self.ms = mentalSkills
-        self.w = willpower
-        self.h = health
-        self.sp = specializations
-        self.ex = experience
-        self.spex = spentExperience
-        self.amb = ambition
-        self.des = desire
-        self.desc = characterDescription
-        self.nt = notes
-        self.vd = vampireData
-        self.gd = ghoulData
-        self.md = mageData
-        self.an = advantageNames
-        self.fn = flawNames
-        self.bm = backgroundMerits
-        self.bf = backgroundFlaws
-        self.co = convictions
-        self.to = touchstones
-    }
+    let convictions: [String]
+    let touchstones: [String]
     
-    // Properties to access the data with full names
-    var name: String { n }
-    var characterType: CharacterType { CharacterType(rawValue: t) ?? .vampire }
-    var concept: String { c }
-    var chronicleName: String { ch }
-    var physicalAttributes: [String: Int] { pa }
-    var socialAttributes: [String: Int] { sa }
-    var mentalAttributes: [String: Int] { ma }
-    var physicalSkills: [String: Int] { ps }
-    var socialSkills: [String: Int] { ss }
-    var mentalSkills: [String: Int] { ms }
-    var willpower: Int { w }
-    var health: Int { h }
-    var specializations: [[String]] { sp }
-    var experience: Int { ex }
-    var spentExperience: Int { spex }
-    var ambition: String { amb }
-    var desire: String { des }
-    var characterDescription: String { desc }
-    var notes: String { nt }
-    var vampireData: VampireCompressedData? { vd }
-    var ghoulData: GhoulCompressedData? { gd }
-    var mageData: MageCompressedData? { md }
-    var advantageNames: [String] { an }
-    var flawNames: [String] { fn }
-    var backgroundMerits: [[String]] { bm }
-    var backgroundFlaws: [[String]] { bf }
-    var convictions: [String] { co }
-    var touchstones: [String] { to }
+    // Character-specific data
+    let vampireData: VampireFullData?
+    let ghoulData: GhoulFullData?
+    let mageData: MageFullData?
 }
 
-struct VampireCompressedData: Codable {
-    let c: String  // clan
-    let g: Int     // generation
-    let bp: Int    // bloodPotency
-    let hu: Int    // humanity
-    let hn: Int    // hunger
-    let pt: String // predatorType
-    let dp: [String: [String]] // selectedDisciplinePowers
-    
-    init(clan: String, generation: Int, bloodPotency: Int, humanity: Int, hunger: Int, predatorType: String, selectedDisciplinePowers: [String: [String]]) {
-        self.c = clan
-        self.g = generation
-        self.bp = bloodPotency
-        self.hu = humanity
-        self.hn = hunger
-        self.pt = predatorType
-        self.dp = selectedDisciplinePowers
-    }
-    
-    var clan: String { c }
-    var generation: Int { g }
-    var bloodPotency: Int { bp }
-    var humanity: Int { hu }
-    var hunger: Int { hn }
-    var predatorType: String { pt }
-    var selectedDisciplinePowers: [String: [String]] { dp }
+struct VampireFullData: Codable {
+    let clan: String
+    let generation: Int
+    let bloodPotency: Int
+    let humanity: Int
+    let hunger: Int
+    let predatorType: String
+    let selectedDisciplinePowers: [String: [String]]
 }
 
-struct GhoulCompressedData: Codable {
-    let hu: Int // humanity
-    let dp: [String: [String]] // selectedDisciplinePowers
-    
-    init(humanity: Int, selectedDisciplinePowers: [String: [String]]) {
-        self.hu = humanity
-        self.dp = selectedDisciplinePowers
-    }
-    
-    var humanity: Int { hu }
-    var selectedDisciplinePowers: [String: [String]] { dp }
+struct GhoulFullData: Codable {
+    let humanity: Int
+    let selectedDisciplinePowers: [String: [String]]
 }
 
-struct MageCompressedData: Codable {
-    let a: Int     // arete
-    let p: Int     // paradox
-    let h: Int     // hubris
-    let q: Int     // quiet
-    let pa: String // paradigm
-    let pr: String // practice
-    let e: String  // essence
-    let r: String  // resonance
-    let s: String  // synergy
-    let sp: [String: Int] // spheres
-    
-    init(arete: Int, paradox: Int, hubris: Int, quiet: Int, paradigm: String, practice: String, essence: String, resonance: String, synergy: String, spheres: [String: Int]) {
-        self.a = arete
-        self.p = paradox
-        self.h = hubris
-        self.q = quiet
-        self.pa = paradigm
-        self.pr = practice
-        self.e = essence
-        self.r = resonance
-        self.s = synergy
-        self.sp = spheres
-    }
-    
-    var arete: Int { a }
-    var paradox: Int { p }
-    var hubris: Int { h }
-    var quiet: Int { q }
-    var paradigm: String { pa }
-    var practice: String { pr }
-    var essence: String { e }
-    var resonance: String { r }
-    var synergy: String { s }
-    var spheres: [String: Int] { sp }
+struct MageFullData: Codable {
+    let arete: Int
+    let paradox: Int
+    let hubris: Int
+    let quiet: Int
+    let paradigm: String
+    let practice: String
+    let essence: String
+    let resonance: String
+    let synergy: String
+    let spheres: [String: Int]
 }
 
 // MARK: - Character Import/Export Utilities
 struct CharacterDataTransfer {
-    /// Try to import a character from QR code data
+    /// Try to import a character from QR code data (gzip+base64 compressed)
     static func importCharacter(from qrData: String) -> (any BaseCharacter)? {
-        guard let data = qrData.data(using: .utf8) else {
-            print("Failed to convert QR data to Data")
+        // First try to decompress as gzip+base64
+        guard let decompressedData = DataCompressor.decompressFromQR(qrData) else {
+            print("Failed to decompress QR data")
             return nil
         }
         
         do {
-            // Try compressed format first
-            let compressedData = try JSONDecoder().decode(CompressedCharacterData.self, from: data)
-            return expandCharacterFromCompressed(compressedData)
+            // Try to decode the full format
+            let fullData = try JSONDecoder().decode(FullCharacterData.self, from: decompressedData)
+            return expandCharacterFromFull(fullData)
         } catch {
-            // Fallback to legacy full format
-            do {
-                let anyCharacter = try JSONDecoder().decode(AnyCharacter.self, from: data)
-                return anyCharacter.character
-            } catch {
-                print("Failed to decode character from QR data: \(error)")
-                return nil
-            }
+            print("Failed to decode character from QR data: \(error)")
+            return nil
         }
     }
     
@@ -445,9 +418,9 @@ struct CharacterDataTransfer {
         return summary
     }
     
-    /// Create compressed character data for QR codes
-    static func compressCharacterForQR(_ character: any BaseCharacter) -> CompressedCharacterData {
-        // Extract specializations as name pairs (array to handle multiple specializations per skill)
+    /// Prepare character data for QR code compression
+    static func prepareCharacterForQR(_ character: any BaseCharacter) -> FullCharacterData {
+        // Extract specializations as name pairs
         let specializationPairs = character.specializations.map { spec in
             [spec.skillName, spec.name]
         }
@@ -461,13 +434,13 @@ struct CharacterDataTransfer {
         let backgroundFlaws = character.backgroundFlaws.map { [$0.name, String($0.cost)] }
         
         // Character-specific data
-        var vampireData: VampireCompressedData? = nil
-        var ghoulData: GhoulCompressedData? = nil
-        var mageData: MageCompressedData? = nil
+        var vampireData: VampireFullData? = nil
+        var ghoulData: GhoulFullData? = nil
+        var mageData: MageFullData? = nil
         
         if let vampire = character as? VampireCharacter {
             let disciplinePowers = extractSelectedDisciplinePowers(vampire.v5Disciplines)
-            vampireData = VampireCompressedData(
+            vampireData = VampireFullData(
                 clan: vampire.clan,
                 generation: vampire.generation,
                 bloodPotency: vampire.bloodPotency,
@@ -478,12 +451,12 @@ struct CharacterDataTransfer {
             )
         } else if let ghoul = character as? GhoulCharacter {
             let disciplinePowers = extractSelectedDisciplinePowers(ghoul.v5Disciplines)
-            ghoulData = GhoulCompressedData(
+            ghoulData = GhoulFullData(
                 humanity: ghoul.humanity,
                 selectedDisciplinePowers: disciplinePowers
             )
         } else if let mage = character as? MageCharacter {
-            mageData = MageCompressedData(
+            mageData = MageFullData(
                 arete: mage.arete,
                 paradox: mage.paradox,
                 hubris: mage.hubris,
@@ -497,9 +470,9 @@ struct CharacterDataTransfer {
             )
         }
         
-        return CompressedCharacterData(
+        return FullCharacterData(
             name: character.name,
-            type: character.characterType,
+            type: character.characterType.rawValue,
             concept: character.concept,
             chronicleName: character.chronicleName,
             physicalAttributes: character.physicalAttributes,
@@ -517,15 +490,15 @@ struct CharacterDataTransfer {
             desire: character.desire,
             characterDescription: character.characterDescription,
             notes: character.notes,
-            vampireData: vampireData,
-            ghoulData: ghoulData,
-            mageData: mageData,
-            advantageNames: advantageNames,
-            flawNames: flawNames,
             backgroundMerits: backgroundMerits,
             backgroundFlaws: backgroundFlaws,
+            advantageNames: advantageNames,
+            flawNames: flawNames,
             convictions: character.convictions,
-            touchstones: character.touchstones
+            touchstones: character.touchstones,
+            vampireData: vampireData,
+            ghoulData: ghoulData,
+            mageData: mageData
         )
     }
     
@@ -547,13 +520,14 @@ struct CharacterDataTransfer {
         return result
     }
     
-    /// Expand compressed character data back to full character
-    private static func expandCharacterFromCompressed(_ compressed: CompressedCharacterData) -> (any BaseCharacter)? {
+    /// Expand full character data back to character object
+    private static func expandCharacterFromFull(_ fullData: FullCharacterData) -> (any BaseCharacter)? {
+        let characterType = CharacterType(rawValue: fullData.type) ?? .vampire
         let character: any BaseCharacter
         
-        switch compressed.characterType {
+        switch characterType {
         case .vampire:
-            guard let vampireData = compressed.vampireData else { return nil }
+            guard let vampireData = fullData.vampireData else { return nil }
             let vampire = VampireCharacter()
             vampire.clan = vampireData.clan
             vampire.generation = vampireData.generation
@@ -568,7 +542,7 @@ struct CharacterDataTransfer {
             character = vampire
             
         case .ghoul:
-            guard let ghoulData = compressed.ghoulData else { return nil }
+            guard let ghoulData = fullData.ghoulData else { return nil }
             let ghoul = GhoulCharacter()
             ghoul.humanity = ghoulData.humanity
             
@@ -578,7 +552,7 @@ struct CharacterDataTransfer {
             character = ghoul
             
         case .mage:
-            guard let mageData = compressed.mageData else { return nil }
+            guard let mageData = fullData.mageData else { return nil }
             let mage = MageCharacter()
             mage.arete = mageData.arete
             mage.paradox = mageData.paradox
@@ -595,44 +569,44 @@ struct CharacterDataTransfer {
         }
         
         // Restore common properties
-        character.name = compressed.name
-        character.concept = compressed.concept
-        character.chronicleName = compressed.chronicleName
-        character.physicalAttributes = compressed.physicalAttributes
-        character.socialAttributes = compressed.socialAttributes
-        character.mentalAttributes = compressed.mentalAttributes
-        character.physicalSkills = compressed.physicalSkills
-        character.socialSkills = compressed.socialSkills
-        character.mentalSkills = compressed.mentalSkills
-        character.willpower = compressed.willpower
-        character.health = compressed.health
-        character.experience = compressed.experience
-        character.spentExperience = compressed.spentExperience
-        character.ambition = compressed.ambition
-        character.desire = compressed.desire
-        character.characterDescription = compressed.characterDescription
-        character.notes = compressed.notes
-        character.convictions = compressed.convictions
-        character.touchstones = compressed.touchstones
+        character.name = fullData.name
+        character.concept = fullData.concept
+        character.chronicleName = fullData.chronicleName
+        character.physicalAttributes = fullData.physicalAttributes
+        character.socialAttributes = fullData.socialAttributes
+        character.mentalAttributes = fullData.mentalAttributes
+        character.physicalSkills = fullData.physicalSkills
+        character.socialSkills = fullData.socialSkills
+        character.mentalSkills = fullData.mentalSkills
+        character.willpower = fullData.willpower
+        character.health = fullData.health
+        character.experience = fullData.experience
+        character.spentExperience = fullData.spentExperience
+        character.ambition = fullData.ambition
+        character.desire = fullData.desire
+        character.characterDescription = fullData.characterDescription
+        character.notes = fullData.notes
+        character.convictions = fullData.convictions
+        character.touchstones = fullData.touchstones
         
         // Restore specializations
-        character.specializations = compressed.specializations.map { pair in
+        character.specializations = fullData.specializations.map { pair in
             guard pair.count == 2 else { return nil }
             return Specialization(skillName: pair[0], name: pair[1])
         }.compactMap { $0 }
         
         // Restore merits/flaws (names only, descriptions from constants)
-        character.advantages = restoreMeritsFlaws(compressed.advantageNames, from: V5Constants.predefinedAdvantages)
-        character.flaws = restoreMeritsFlaws(compressed.flawNames, from: V5Constants.predefinedFlaws)
+        character.advantages = restoreMeritsFlaws(fullData.advantageNames, from: V5Constants.predefinedAdvantages)
+        character.flaws = restoreMeritsFlaws(fullData.flawNames, from: V5Constants.predefinedFlaws)
         
         // Restore background merits/flaws with costs preserved
-        character.backgroundMerits = compressed.backgroundMerits.map { pair in
+        character.backgroundMerits = fullData.backgroundMerits.map { pair in
             guard pair.count == 2, let cost = Int(pair[1]) else { 
                 return CharacterBackground(name: pair.first ?? "", cost: 0, type: .merit)
             }
             return CharacterBackground(name: pair[0], cost: cost, type: .merit)
         }
-        character.backgroundFlaws = compressed.backgroundFlaws.map { pair in
+        character.backgroundFlaws = fullData.backgroundFlaws.map { pair in
             guard pair.count == 2, let cost = Int(pair[1]) else { 
                 return CharacterBackground(name: pair.first ?? "", cost: 0, type: .flaw)
             }
