@@ -183,7 +183,7 @@ class PDFGenerator {
                 let components = fieldName.split(separator: "-")
                 if components.count == 2, let level = Int(components[1]) {
                     let attributeValue = character.getAttributeValue(attribute: attributeName)
-                    widget.buttonWidgetState = (level <= attributeValue) ? PDFAnnotationButtonWidgetState.onState : PDFAnnotationButtonWidgetState.offState
+                    widget.state = (level <= attributeValue) ? 1 : 0
                     return
                 }
             }
@@ -215,7 +215,7 @@ class PDFGenerator {
             if fieldName.hasPrefix("BloodPotency-") {
                 let components = fieldName.split(separator: "-")
                 if components.count == 2, let level = Int(components[1]) {
-                    widget.buttonWidgetState = (level <= vampire.bloodPotency) ? PDFAnnotationButtonWidgetState.onState : PDFAnnotationButtonWidgetState.offState
+                    widget.state = (level <= vampire.bloodPotency) ? 1 : 0
                     return
                 }
             }
@@ -224,7 +224,7 @@ class PDFGenerator {
             if fieldName.hasPrefix("Humanity-") {
                 let components = fieldName.split(separator: "-")
                 if components.count == 2, let level = Int(components[1]) {
-                    widget.buttonWidgetState = (level <= vampire.humanity) ? PDFAnnotationButtonWidgetState.onState : PDFAnnotationButtonWidgetState.offState
+                    widget.state = (level <= vampire.humanity) ? 1 : 0
                     return
                 }
             }
@@ -234,7 +234,7 @@ class PDFGenerator {
         if fieldName.hasPrefix("Health-") {
             let components = fieldName.split(separator: "-")
             if components.count == 2, let level = Int(components[1]) {
-                widget.buttonWidgetState = (level <= character.health) ? PDFAnnotationButtonWidgetState.onState : PDFAnnotationButtonWidgetState.offState
+                widget.state = (level <= character.health) ? 1 : 0
                 return
             }
         }
@@ -243,7 +243,7 @@ class PDFGenerator {
         if fieldName.hasPrefix("WP-") || fieldName.hasPrefix("cWill-") {
             let components = fieldName.split(separator: "-")
             if components.count == 2, let level = Int(components[1]) {
-                widget.buttonWidgetState = (level <= character.willpower) ? PDFAnnotationButtonWidgetState.onState : PDFAnnotationButtonWidgetState.offState
+                widget.state = (level <= character.willpower) ? 1 : 0
                 return
             }
         }
@@ -286,7 +286,7 @@ class PDFGenerator {
                 let components = fieldName.split(separator: "-")
                 if components.count == 2, let level = Int(components[1]) {
                     let skillValue = character.getSkillValue(skill: skillName)
-                    widget.buttonWidgetState = (level <= skillValue) ? PDFAnnotationButtonWidgetState.onState : PDFAnnotationButtonWidgetState.offState
+                    widget.state = (level <= skillValue) ? 1 : 0
                     return
                 }
             }
@@ -336,7 +336,7 @@ class PDFGenerator {
                     // Check advantages (merits) first
                     if meritIndex0 < character.advantages.count {
                         let merit = character.advantages[meritIndex0]
-                        widget.buttonWidgetState = (level <= merit.cost) ? PDFAnnotationButtonWidgetState.onState : PDFAnnotationButtonWidgetState.offState
+                        widget.state = (level <= merit.cost) ? 1 : 0
                         return
                     }
                     
@@ -344,7 +344,7 @@ class PDFGenerator {
                     let backgroundMeritIndex = meritIndex0 - character.advantages.count
                     if backgroundMeritIndex >= 0 && backgroundMeritIndex < character.backgroundMerits.count {
                         let merit = character.backgroundMerits[backgroundMeritIndex]
-                        widget.buttonWidgetState = (level <= merit.cost) ? PDFAnnotationButtonWidgetState.onState : PDFAnnotationButtonWidgetState.offState
+                        widget.state = (level <= merit.cost) ? 1 : 0
                         return
                     }
                 }
@@ -444,7 +444,7 @@ class PDFGenerator {
                         if disciplineIndex0 < vampire.v5Disciplines.count {
                             let discipline = vampire.v5Disciplines[disciplineIndex0]
                             let disciplineLevel = discipline.currentLevel()
-                            widget.buttonWidgetState = (level <= disciplineLevel) ? PDFAnnotationButtonWidgetState.onState : PDFAnnotationButtonWidgetState.offState
+                            widget.state = (level <= disciplineLevel) ? 1 : 0
                         }
                     }
                 }
