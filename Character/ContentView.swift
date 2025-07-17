@@ -204,10 +204,53 @@ struct CharacterListView: View {
     @Binding var expandedChronicles: [String: Bool]
     @State private var showArchived: Bool = false
     @State private var expandedArchivedChronicles: [String: Bool] = [:]
+    @State private var showingCreationWizard = false
+    @State private var characterToResume: (any BaseCharacter)? = nil
     let getCharacterDisplayInfo: (any BaseCharacter) -> (symbol: String, additionalInfo: String)
 
     var body: some View {
         List {
+            // Characters in creation section
+            let charactersInCreation = store.getCharactersInCreation()
+            if !charactersInCreation.isEmpty {
+                Section {
+                    ForEach(charactersInCreation.indices, id: \.self) { index in
+                        let character = charactersInCreation[index].character
+                        let displayInfo = getCharacterDisplayInfo(character)
+                        
+                        Button(action: {
+                            characterToResume = character
+                            showingCreationWizard = true
+                        }) {
+                            HStack {
+                                CharacterRow(character: character, displayInfo: displayInfo)
+                                Spacer()
+                                VStack(alignment: .trailing) {
+                                    Text("In Creation")
+                                        .font(.caption)
+                                        .foregroundColor(.orange)
+                                    Text("Stage \(character.creationProgress + 1)")
+                                        .font(.caption2)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                        }
+                        .foregroundColor(.primary)
+                    }
+                    .onDelete { offsets in
+                        let charactersToDelete = offsets.map { charactersInCreation[$0].id }
+                        let indicesToDelete = IndexSet(store.characters.enumerated().compactMap { index, character in
+                            charactersToDelete.contains(character.id) ? index : nil
+                        })
+                        store.deleteCharacter(at: indicesToDelete)
+                    }
+                } header: {
+                    Text("Characters in Creation")
+                        .font(.headline)
+                        .foregroundColor(.orange)
+                }
+            }
+            
             // Active characters grouped by chronicle
             ForEach(groupedActiveCharacters(), id: \.chronicleName) { group in
                 // Ensure default expanded state before the view
@@ -260,6 +303,11 @@ struct CharacterListView: View {
                 }
             }
         }
+        .fullScreenCover(isPresented: $showingCreationWizard) {
+            if let character = characterToResume {
+                CharacterCreationWizard(store: store, existingCharacter: character)
+            }
+        }
     }
     
     @discardableResult
@@ -281,12 +329,12 @@ struct CharacterListView: View {
     }
 
     private func groupedActiveCharacters() -> [(chronicleName: String, characters: [AnyCharacter])] {
-        let activeCharacters = store.characters.filter { !$0.character.isArchived }
+        let activeCharacters = store.getCompletedCharacters().filter { !$0.character.isArchived }
         return groupCharacters(activeCharacters)
     }
     
     private func groupedArchivedCharacters() -> [(chronicleName: String, characters: [AnyCharacter])] {
-        let archivedCharacters = store.characters.filter { $0.character.isArchived }
+        let archivedCharacters = store.getCompletedCharacters().filter { $0.character.isArchived }
         return groupCharacters(archivedCharacters)
     }
     

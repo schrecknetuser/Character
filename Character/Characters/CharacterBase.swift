@@ -185,6 +185,8 @@ protocol BaseCharacter: AnyObject, Identifiable, Codable, ObservableObject {
     var currentSession: Int { get set }
     var changeLog: [ChangeLogEntry] { get set }
     var isArchived: Bool { get set }
+    var isInCreation: Bool { get set }
+    var creationProgress: Int { get set }
 
     var health: Int { get set }
     var healthStates: [HealthState] { get set }
@@ -245,6 +247,8 @@ class CharacterBase: BaseCharacter {
     @Published var currentSession: Int = 1
     @Published var changeLog: [ChangeLogEntry] = []
     @Published var isArchived: Bool = false
+    @Published var isInCreation: Bool = false
+    @Published var creationProgress: Int = 0
 
     @Published var health: Int
     @Published var healthStates: [HealthState]
@@ -788,5 +792,34 @@ class CharacterStore: ObservableObject {
         updatedCharacter.isArchived = false
         updatedCharacter.changeLog.append(ChangeLogEntry(summary: "Character returned from archive"))
         updateCharacter(updatedCharacter)
+    }
+    
+    func addCharacterInCreation(_ character: any BaseCharacter) {
+        var creationCharacter = character
+        creationCharacter.isInCreation = true
+        creationCharacter.creationProgress = 0
+        characters.append(AnyCharacter(creationCharacter))
+    }
+    
+    func updateCharacterCreationProgress(_ character: any BaseCharacter, stage: Int) {
+        var updatedCharacter = character
+        updatedCharacter.creationProgress = stage
+        updateCharacter(updatedCharacter)
+    }
+    
+    func completeCharacterCreation(_ character: any BaseCharacter) {
+        var completedCharacter = character
+        completedCharacter.isInCreation = false
+        completedCharacter.creationProgress = -1 // Mark as complete
+        completedCharacter.changeLog.append(ChangeLogEntry(summary: "Character creation completed."))
+        updateCharacter(completedCharacter)
+    }
+    
+    func getCharactersInCreation() -> [AnyCharacter] {
+        return characters.filter { $0.character.isInCreation }
+    }
+    
+    func getCompletedCharacters() -> [AnyCharacter] {
+        return characters.filter { !$0.character.isInCreation }
     }
 }

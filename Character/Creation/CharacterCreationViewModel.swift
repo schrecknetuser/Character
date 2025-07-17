@@ -14,6 +14,10 @@ class CharacterCreationViewModel: ObservableObject {
     init(characterType: CharacterType) {
         self.character = Self.createCharacter(of: characterType)
     }
+    
+    init(existingCharacter: any BaseCharacter) {
+        self.character = existingCharacter
+    }
 
     func setCharacterType(_ type: CharacterType) {
         self.character = Self.createCharacter(of: type)
