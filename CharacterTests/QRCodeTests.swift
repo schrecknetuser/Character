@@ -79,6 +79,120 @@ final class QRCodeTests: XCTestCase {
         XCTAssertEqual(importedCharacter?.name, vampire.name, "Legacy character name should match")
     }
     
+    func testMageQRCodeGeneration() throws {
+        // Create a test mage character
+        let mage = MageCharacter()
+        mage.name = "Test Mage"
+        mage.concept = "Digital Wizard"
+        mage.chronicleName = "Technomancer Chronicle"
+        mage.paradigm = "Digital Web Theory"
+        mage.practice = "High Ritual Magick"
+        mage.arete = 3
+        mage.paradox = 2
+        mage.hubris = 1
+        mage.quiet = 0
+        mage.essence = .dynamic
+        mage.resonance = .elemental
+        mage.synergy = .beneficial
+        
+        // Set some sphere values
+        mage.spheres["Correspondence"] = 2
+        mage.spheres["Forces"] = 3
+        mage.spheres["Matter"] = 1
+        
+        // Test QR code generation
+        let qrImage = QRCodeGenerator.generateQRCode(from: mage)
+        XCTAssertNotNil(qrImage, "QR code should be generated successfully for Mage")
+        
+        // Test character data transfer using compressed format
+        let compressedData = CharacterDataTransfer.compressCharacterForQR(mage)
+        guard let characterData = try? JSONEncoder().encode(compressedData),
+              let jsonString = String(data: characterData, encoding: .utf8) else {
+            XCTFail("Failed to encode compressed mage character data")
+            return
+        }
+        
+        print("Mage compressed QR data length: \(jsonString.count) characters")
+        XCTAssertLessThan(jsonString.count, 2000, "Compressed mage data should be under 2000 characters for reliable QR scanning")
+        
+        // Test import
+        let importedCharacter = CharacterDataTransfer.importCharacter(from: jsonString)
+        XCTAssertNotNil(importedCharacter, "Mage character should be imported successfully")
+        XCTAssertEqual(importedCharacter?.name, mage.name, "Mage character name should match")
+        XCTAssertEqual(importedCharacter?.characterType, mage.characterType, "Mage character type should match")
+        
+        // Test that essential mage data is preserved
+        if let importedMage = importedCharacter as? MageCharacter {
+            XCTAssertEqual(importedMage.concept, mage.concept, "Mage concept should match")
+            XCTAssertEqual(importedMage.paradigm, mage.paradigm, "Mage paradigm should match")
+            XCTAssertEqual(importedMage.practice, mage.practice, "Mage practice should match")
+            XCTAssertEqual(importedMage.arete, mage.arete, "Mage arete should match")
+            XCTAssertEqual(importedMage.paradox, mage.paradox, "Mage paradox should match")
+            XCTAssertEqual(importedMage.hubris, mage.hubris, "Mage hubris should match")
+            XCTAssertEqual(importedMage.quiet, mage.quiet, "Mage quiet should match")
+            XCTAssertEqual(importedMage.essence, mage.essence, "Mage essence should match")
+            XCTAssertEqual(importedMage.resonance, mage.resonance, "Mage resonance should match")
+            XCTAssertEqual(importedMage.synergy, mage.synergy, "Mage synergy should match")
+            XCTAssertEqual(importedMage.spheres["Correspondence"], mage.spheres["Correspondence"], "Mage sphere values should match")
+            XCTAssertEqual(importedMage.spheres["Forces"], mage.spheres["Forces"], "Mage sphere values should match")
+            XCTAssertEqual(importedMage.spheres["Matter"], mage.spheres["Matter"], "Mage sphere values should match")
+        } else {
+            XCTFail("Imported character should be a MageCharacter")
+        }
+    }
+    
+    func testMageCharacterSummary() throws {
+        let mage = MageCharacter()
+        mage.name = "Test Mage"
+        mage.concept = "Digital Wizard"
+        mage.arete = 3
+        
+        let summary = CharacterDataTransfer.getCharacterSummary(for: mage)
+        
+        XCTAssertTrue(summary.contains("Test Mage"), "Summary should contain mage character name")
+        XCTAssertTrue(summary.contains("Mage"), "Summary should contain character type")
+        XCTAssertTrue(summary.contains("Digital Wizard"), "Summary should contain concept")
+        XCTAssertTrue(summary.contains("Arete: 3"), "Summary should contain arete value")
+    }
+    
+    func testGhoulQRCodeGeneration() throws {
+        // Create a test ghoul character
+        let ghoul = GhoulCharacter()
+        ghoul.name = "Test Ghoul"
+        ghoul.concept = "Loyal Servant"
+        ghoul.chronicleName = "Ghoul Chronicle"
+        ghoul.humanity = 6
+        
+        // Test QR code generation
+        let qrImage = QRCodeGenerator.generateQRCode(from: ghoul)
+        XCTAssertNotNil(qrImage, "QR code should be generated successfully for Ghoul")
+        
+        // Test character data transfer using compressed format
+        let compressedData = CharacterDataTransfer.compressCharacterForQR(ghoul)
+        guard let characterData = try? JSONEncoder().encode(compressedData),
+              let jsonString = String(data: characterData, encoding: .utf8) else {
+            XCTFail("Failed to encode compressed ghoul character data")
+            return
+        }
+        
+        print("Ghoul compressed QR data length: \(jsonString.count) characters")
+        XCTAssertLessThan(jsonString.count, 2000, "Compressed ghoul data should be under 2000 characters for reliable QR scanning")
+        
+        // Test import
+        let importedCharacter = CharacterDataTransfer.importCharacter(from: jsonString)
+        XCTAssertNotNil(importedCharacter, "Ghoul character should be imported successfully")
+        XCTAssertEqual(importedCharacter?.name, ghoul.name, "Ghoul character name should match")
+        XCTAssertEqual(importedCharacter?.characterType, ghoul.characterType, "Ghoul character type should match")
+        
+        // Test that essential ghoul data is preserved
+        if let importedGhoul = importedCharacter as? GhoulCharacter {
+            XCTAssertEqual(importedGhoul.concept, ghoul.concept, "Ghoul concept should match")
+            XCTAssertEqual(importedGhoul.humanity, ghoul.humanity, "Ghoul humanity should match")
+        } else {
+            XCTFail("Imported character should be a GhoulCharacter")
+        }
+    }
+
     func testCompressionEfficiency() throws {
         // Create a character with lots of data
         let vampire = VampireCharacter()
