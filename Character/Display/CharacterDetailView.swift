@@ -233,7 +233,7 @@ struct CharacterDetailView: View {
             }
             .navigationTitle(character.name)
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {            
+            .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(isEditing ? "Save" : "Edit") {
                         if isEditing {
@@ -262,6 +262,7 @@ struct CharacterDetailView: View {
             }
             .sheet(isPresented: $showingPDFExport) {
                 PDFExportView(character: character, isPresented: $showingPDFExport)
+            }
             .sheet(isPresented: $showingQRExport) {
                 QRDisplayModalView(character: isEditing ? draftCharacter! : character, isPresented: $showingQRExport)
             }

@@ -21,9 +21,9 @@ class PDFGenerator {
     
     private static func generateWithFillableFields(character: any BaseCharacter) -> Data? {
         // Load the VtM5e template PDF from the bundle
-        guard let templateURL = Bundle.main.url(forResource: "VtM5e_ENG_CharacterSheet_2pLAYER", withExtension: "pdf") else {
+        guard let templateURL = Bundle.main.url(forResource: "VtM5e_ENG_CharacterSheet_2pMINI", withExtension: "pdf") else {
             // Fallback: try to load from main directory for testing
-            let templatePath = "/home/runner/work/Character/Character/VtM5e_ENG_CharacterSheet_2pLAYER.pdf"
+            let templatePath = "/home/runner/work/Character/Character/VtM5e_ENG_CharacterSheet_2pMINI.pdf"
             guard let fallbackURL = URL(string: "file://\(templatePath)") else {
                 return nil
             }
@@ -39,21 +39,24 @@ class PDFGenerator {
             return nil
         }
         
-        // Get the first page and its annotations (form fields)
-        guard let page = pdfDocument.page(at: 0) else {
-            print("Could not get first page of PDF")
-            return nil
-        }
-        
-        let annotations = page.annotations
-        print("Found \(annotations.count) annotations in PDF")
-        
-        // Fill form fields based on character data
-        for annotation in annotations {
-            if let widget = annotation as? PDFAnnotation {
-                fillFieldBasedOnCharacter(widget: widget, character: character)
+        for i in 0...pdfDocument.pageCount - 1 {
+            guard var page = pdfDocument.page(at: i) else {
+                print("Could not get page \(i) of PDF")
+                return nil
+            }
+            
+            let annotations = page.annotations
+            print("Found \(annotations.count) annotations in PDF")
+            
+            // Fill form fields based on character data
+            for annotation in annotations {
+                if let widget = annotation as? PDFAnnotation {
+                    fillFieldBasedOnCharacter(widget: widget, character: character)
+                }
             }
         }
+        // Get the first page and its annotations (form fields)
+        
         
         // Return the modified PDF data
         return pdfDocument.dataRepresentation()
@@ -133,15 +136,15 @@ class PDFGenerator {
             widget.widgetStringValue = "\(vampire.bloodPotency)"
         case "bloodsurge":
             // Blood potency effect fields
-            widget.widgetStringValue = "\(vampire.bloodPotency)"
+            widget.widgetStringValue = ""
         case "powbonus":
-            widget.widgetStringValue = "\(vampire.bloodPotency)"
+            widget.widgetStringValue = ""
         case "mend":
-            widget.widgetStringValue = "\(vampire.bloodPotency)"
+            widget.widgetStringValue = ""
         case "rerouse":
-            widget.widgetStringValue = "\(vampire.bloodPotency)"
+            widget.widgetStringValue = ""
         case "feedpen":
-            widget.widgetStringValue = "\(vampire.bloodPotency)"
+            widget.widgetStringValue = ""
         case "humanity":
             widget.widgetStringValue = "\(vampire.humanity)"
         case "hunger":
@@ -312,19 +315,42 @@ class PDFGenerator {
                 if let index = Int(fieldName[indexRange]) {
                     let meritIndex = index - 1 // Convert to 0-based indexing
                     
+                    let advantagesCount = character.advantages.count
+                    let backgroundMeritsCount = character.backgroundMerits.count
+                    let flawsCount = character.flaws.count
+                    let backgroundFlawsCount = character.backgroundFlaws.count
+                    
                     // Check advantages (merits) first
-                    if meritIndex < character.advantages.count {
+                    if meritIndex < advantagesCount {
                         let merit = character.advantages[meritIndex]
-                        widget.widgetStringValue = merit.name
+                        widget.widgetStringValue = "[M] \(merit.name)"
                         return
                     }
                     
                     // Check background merits
-                    let backgroundMeritIndex = meritIndex - character.advantages.count
-                    if backgroundMeritIndex >= 0 && backgroundMeritIndex < character.backgroundMerits.count {
-                        let merit = character.backgroundMerits[backgroundMeritIndex]
-                        widget.widgetStringValue = merit.name
-                        return
+                    if meritIndex >= advantagesCount && meritIndex < advantagesCount + backgroundMeritsCount {
+                        let backgroundMeritIndex = meritIndex - advantagesCount
+                        if backgroundMeritIndex >= 0 && backgroundMeritIndex < character.backgroundMerits.count {
+                            let merit = character.backgroundMerits[backgroundMeritIndex]
+                            widget.widgetStringValue = "[M] \(merit.name)"
+                            return
+                        }
+                    }
+                    
+                    if meritIndex >= advantagesCount + backgroundMeritsCount && meritIndex < advantagesCount + backgroundMeritsCount + flawsCount {
+                        let flawIndex = meritIndex - (advantagesCount + backgroundMeritsCount)
+                        if flawIndex >= 0 && flawIndex < character.flaws.count {
+                            let flaw = character.flaws[flawIndex]
+                            widget.widgetStringValue = "[F] \(flaw.name)"
+                        }
+                    }
+                    
+                    if meritIndex >= advantagesCount + backgroundMeritsCount + flawsCount && meritIndex < advantagesCount + backgroundMeritsCount + flawsCount + backgroundFlawsCount {
+                        let backgroundFlawIndex = meritIndex - (advantagesCount + backgroundMeritsCount + flawsCount)
+                        if backgroundFlawIndex >= 0 && backgroundFlawIndex < character.backgroundFlaws.count {
+                            let flaw = character.backgroundFlaws[backgroundFlawIndex]
+                            widget.widgetStringValue = "[F] \(flaw.name)"
+                        }
                     }
                 }
             }
@@ -338,23 +364,46 @@ class PDFGenerator {
                 let meritIndexRange = Range(match.range(at: 1), in: fieldName)!
                 let levelRange = Range(match.range(at: 2), in: fieldName)!
                 
-                if let meritIndex = Int(fieldName[meritIndexRange]),
+                if let index = Int(fieldName[meritIndexRange]),
                    let level = Int(fieldName[levelRange]) {
-                    let meritIndex0 = meritIndex - 1 // Convert to 0-based indexing
+                    let meritIndex = index - 1 // Convert to 0-based indexing
+                    
+                    let advantagesCount = character.advantages.count
+                    let backgroundMeritsCount = character.backgroundMerits.count
+                    let flawsCount = character.flaws.count
+                    let backgroundFlawsCount = character.backgroundFlaws.count
                     
                     // Check advantages (merits) first
-                    if meritIndex0 < character.advantages.count {
-                        let merit = character.advantages[meritIndex0]
+                    if meritIndex < advantagesCount {
+                        let merit = character.advantages[meritIndex]
                         widget.widgetStringValue = (level <= merit.cost) ? "Yes" : "Off"
                         return
                     }
                     
                     // Check background merits
-                    let backgroundMeritIndex = meritIndex0 - character.advantages.count
-                    if backgroundMeritIndex >= 0 && backgroundMeritIndex < character.backgroundMerits.count {
-                        let merit = character.backgroundMerits[backgroundMeritIndex]
-                        widget.widgetStringValue = (level <= merit.cost) ? "Yes" : "Off"
-                        return
+                    if meritIndex >= advantagesCount && meritIndex < advantagesCount + backgroundMeritsCount {
+                        let backgroundMeritIndex = meritIndex - advantagesCount
+                        if backgroundMeritIndex >= 0 && backgroundMeritIndex < backgroundMeritsCount {
+                            let merit = character.backgroundMerits[backgroundMeritIndex]
+                            widget.widgetStringValue = (level <= merit.cost) ? "Yes" : "Off"
+                            return
+                        }
+                    }
+                    
+                    if meritIndex >= advantagesCount + backgroundMeritsCount && meritIndex < advantagesCount + backgroundMeritsCount + flawsCount {
+                        let flawIndex = meritIndex - (advantagesCount + backgroundMeritsCount)
+                        if flawIndex >= 0 && flawIndex < flawsCount {
+                            let flaw = character.flaws[flawIndex]
+                            widget.widgetStringValue = (level <= abs(flaw.cost)) ? "Yes" : "Off"
+                        }
+                    }
+                    
+                    if meritIndex >= advantagesCount + backgroundMeritsCount + flawsCount && meritIndex < advantagesCount + backgroundMeritsCount + flawsCount + backgroundFlawsCount {
+                        let backgroundFlawIndex = meritIndex - (advantagesCount + backgroundMeritsCount + flawsCount)
+                        if backgroundFlawIndex >= 0 && backgroundFlawIndex < backgroundFlawsCount {
+                            let flaw = character.backgroundFlaws[backgroundFlawIndex]
+                            widget.widgetStringValue = (level <= abs(flaw.cost)) ? "Yes" : "Off"
+                        }
                     }
                 }
             }
