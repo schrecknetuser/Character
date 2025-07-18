@@ -65,6 +65,12 @@ struct CharacterCreationWizard: View {
         self.store = store
         self.existingCharacter = existingCharacter
         
+        print("DEBUG: CharacterCreationWizard init called")
+        print("DEBUG: existingCharacter is nil: \(existingCharacter == nil)")
+        if let existing = existingCharacter {
+            print("DEBUG: existingCharacter found: \(existing.name)")
+        }
+        
         // If resuming creation, set up the initial state
         if let existing = existingCharacter {
             print("DEBUG: Resuming character creation")

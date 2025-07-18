@@ -223,8 +223,11 @@ struct CharacterListView: View {
                             print("DEBUG: Character name: \(character.name)")
                             print("DEBUG: Character chronicle: \(character.chronicleName)")
                             print("DEBUG: Character progress: \(character.creationProgress)")
+                            print("DEBUG: Setting characterToResume to: \(character.name)")
                             characterToResume = character
+                            print("DEBUG: characterToResume set, now: \(characterToResume?.name ?? "nil")")
                             showingCreationWizard = true
+                            print("DEBUG: showingCreationWizard set to true")
                         }) {
                             HStack {
                                 CharacterRow(character: character, displayInfo: displayInfo)
@@ -308,7 +311,13 @@ struct CharacterListView: View {
             }
         }
         .fullScreenCover(isPresented: $showingCreationWizard) {
-            CharacterCreationWizard(store: store, existingCharacter: characterToResume)
+            print("DEBUG: fullScreenCover being created")
+            print("DEBUG: characterToResume is nil: \(characterToResume == nil)")
+            if let character = characterToResume {
+                print("DEBUG: characterToResume name: \(character.name)")
+                print("DEBUG: characterToResume progress: \(character.creationProgress)")
+            }
+            return CharacterCreationWizard(store: store, existingCharacter: characterToResume)
         }
     }
     
