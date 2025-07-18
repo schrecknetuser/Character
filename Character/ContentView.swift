@@ -219,6 +219,10 @@ struct CharacterListView: View {
                         let displayInfo = getCharacterDisplayInfo(character)
                         
                         Button(action: {
+                            print("DEBUG: User clicked on character in creation")
+                            print("DEBUG: Character name: \(character.name)")
+                            print("DEBUG: Character chronicle: \(character.chronicleName)")
+                            print("DEBUG: Character progress: \(character.creationProgress)")
                             characterToResume = character
                             showingCreationWizard = true
                         }) {

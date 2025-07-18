@@ -16,6 +16,13 @@ class CharacterCreationViewModel: ObservableObject {
     }
     
     init(existingCharacter: any BaseCharacter) {
+        print("DEBUG: CharacterCreationViewModel initializing with existing character")
+        print("DEBUG: Character name: \(existingCharacter.name)")
+        print("DEBUG: Character chronicle: \(existingCharacter.chronicleName)")
+        print("DEBUG: Character type: \(existingCharacter.characterType)")
+        if let vampire = existingCharacter as? VampireCharacter {
+            print("DEBUG: Vampire clan: \(vampire.clan)")
+        }
         self.character = existingCharacter
     }
 

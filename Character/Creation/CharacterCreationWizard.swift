@@ -67,11 +67,21 @@ struct CharacterCreationWizard: View {
         
         // If resuming creation, set up the initial state
         if let existing = existingCharacter {
+            print("DEBUG: Resuming character creation")
+            print("DEBUG: Character name: \(existing.name)")
+            print("DEBUG: Character chronicle: \(existing.chronicleName)")
+            print("DEBUG: Character type: \(existing.characterType)")
+            print("DEBUG: Creation progress: \(existing.creationProgress)")
+            print("DEBUG: Is in creation: \(existing.isInCreation)")
+            
             self._selectedCharacterType = State(initialValue: existing.characterType)
-            self._currentStage = State(initialValue: CreationStage(rawValue: existing.creationProgress) ?? .characterType)
+            let stage = CreationStage(rawValue: existing.creationProgress) ?? .characterType
+            print("DEBUG: Setting current stage to: \(stage) (raw value: \(stage.rawValue))")
+            self._currentStage = State(initialValue: stage)
             self._isCharacterSaved = State(initialValue: true)
             self._viewModel = StateObject(wrappedValue: CharacterCreationViewModel(existingCharacter: existing))
         } else {
+            print("DEBUG: Creating new character")
             self._selectedCharacterType = State(initialValue: .vampire)
             self._currentStage = State(initialValue: .characterType)
             self._isCharacterSaved = State(initialValue: false)
