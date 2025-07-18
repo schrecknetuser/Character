@@ -220,15 +220,8 @@ struct CharacterListView: View {
                         let displayInfo = getCharacterDisplayInfo(character)
                         
                         Button(action: {
-                            print("DEBUG: User clicked on character in creation")
-                            print("DEBUG: Character name: \(character.name)")
-                            print("DEBUG: Character chronicle: \(character.chronicleName)")
-                            print("DEBUG: Character progress: \(character.creationProgress)")
-                            print("DEBUG: Setting characterToResume to: \(character.name)")
                             characterToResume = character
-                            print("DEBUG: characterToResume set, now: \(characterToResume?.name ?? "nil")")
                             showingCharacterResume = true
-                            print("DEBUG: showingCharacterResume set to true")
                         }) {
                             HStack {
                                 CharacterRow(character: character, displayInfo: displayInfo)
@@ -312,17 +305,10 @@ struct CharacterListView: View {
             }
         }
         .fullScreenCover(isPresented: $showingCreationWizard) {
-            print("DEBUG: fullScreenCover (new character) being created")
-            return CharacterCreationWizard(store: store)
+            CharacterCreationWizard(store: store)
         }
         .fullScreenCover(isPresented: $showingCharacterResume) {
-            print("DEBUG: fullScreenCover (resume character) being created")
-            print("DEBUG: characterToResume is nil: \(characterToResume == nil)")
-            if let character = characterToResume {
-                print("DEBUG: characterToResume name: \(character.name)")
-                print("DEBUG: characterToResume progress: \(character.creationProgress)")
-            }
-            return CharacterCreationWizard(store: store, existingCharacter: characterToResume)
+            CharacterCreationWizard(store: store, existingCharacter: characterToResume)
         }
     }
     
