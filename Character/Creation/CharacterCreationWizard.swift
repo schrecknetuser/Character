@@ -251,13 +251,13 @@ struct CharacterCreationWizard: View {
             }
             .navigationTitle("Create Character")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar(content: {
+            .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
                         dismiss()
                     }
                 }
-            })
+            }
         }
         .onAppear {
             print("DEBUG: CharacterCreationWizard appeared")
