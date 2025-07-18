@@ -205,6 +205,7 @@ struct CharacterListView: View {
     @State private var showArchived: Bool = false
     @State private var expandedArchivedChronicles: [String: Bool] = [:]
     @State private var showingCreationWizard = false
+    @State private var showingCharacterResume = false
     @State private var characterToResume: (any BaseCharacter)? = nil
     let getCharacterDisplayInfo: (any BaseCharacter) -> (symbol: String, additionalInfo: String)
 
@@ -226,8 +227,8 @@ struct CharacterListView: View {
                             print("DEBUG: Setting characterToResume to: \(character.name)")
                             characterToResume = character
                             print("DEBUG: characterToResume set, now: \(characterToResume?.name ?? "nil")")
-                            showingCreationWizard = true
-                            print("DEBUG: showingCreationWizard set to true")
+                            showingCharacterResume = true
+                            print("DEBUG: showingCharacterResume set to true")
                         }) {
                             HStack {
                                 CharacterRow(character: character, displayInfo: displayInfo)
@@ -311,7 +312,11 @@ struct CharacterListView: View {
             }
         }
         .fullScreenCover(isPresented: $showingCreationWizard) {
-            print("DEBUG: fullScreenCover being created")
+            print("DEBUG: fullScreenCover (new character) being created")
+            return CharacterCreationWizard(store: store)
+        }
+        .fullScreenCover(isPresented: $showingCharacterResume) {
+            print("DEBUG: fullScreenCover (resume character) being created")
             print("DEBUG: characterToResume is nil: \(characterToResume == nil)")
             if let character = characterToResume {
                 print("DEBUG: characterToResume name: \(character.name)")
