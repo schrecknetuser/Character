@@ -119,7 +119,6 @@ struct CharacterCreationWizard: View {
                         } else {
                             Text("Character type not yet implemented")
                         }
-                        }
                     case .clan:
                         if selectedCharacterType == .vampire {
                             ClanSelectionStage(character: viewModel.asVampireForced, onChange: {
