@@ -205,8 +205,7 @@ struct CharacterListView: View {
     @State private var showArchived: Bool = false
     @State private var expandedArchivedChronicles: [String: Bool] = [:]
     @State private var showingCreationWizard = false
-    @State private var showingCharacterResume = false
-    @State private var characterToResume: (any BaseCharacter)? = nil
+    @State private var characterToResume: IdentifiableCharacter? = nil
     @State private var characterToDelete: (any BaseCharacter)? = nil
     @State private var showingDeleteConfirmation = false
     let getCharacterDisplayInfo: (any BaseCharacter) -> (symbol: String, additionalInfo: String)
@@ -222,8 +221,7 @@ struct CharacterListView: View {
                         let displayInfo = getCharacterDisplayInfo(character)
                         
                         Button(action: {
-                            characterToResume = character
-                            showingCharacterResume = true
+                            characterToResume = IdentifiableCharacter(character: character)
                         }) {
                             HStack {
                                 CharacterRow(character: character, displayInfo: displayInfo)
@@ -310,8 +308,8 @@ struct CharacterListView: View {
         .fullScreenCover(isPresented: $showingCreationWizard) {
             CharacterCreationWizard(store: store)
         }
-        .fullScreenCover(isPresented: $showingCharacterResume) {
-            CharacterCreationWizard(store: store, existingCharacter: characterToResume)
+        .fullScreenCover(item: $characterToResume) { identifiable in
+            CharacterCreationWizard(store: store, existingCharacter: identifiable.character)
         }
         .alert("Delete Unfinished Character", isPresented: $showingDeleteConfirmation) {
             Button("Delete", role: .destructive) {

@@ -975,6 +975,14 @@ struct V5Constants {
     // Predefined predator types for vampires
     static let predatorTypes: [PredatorType] = [
         PredatorType(
+            name: "None",
+            description: "No specific predator type chosen",
+            bonuses: [],
+            drawbacks: [],
+            feedingDescription: "Feeds as needed without a specialized hunting method"
+        ),
+        
+        PredatorType(
             name: "Alleycat",
             description: "Feeds by brute force and intimidation, taking blood through violence and threats from whoever they can overpower.",
             bonuses: [

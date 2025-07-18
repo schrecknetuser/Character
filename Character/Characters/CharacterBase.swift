@@ -209,6 +209,20 @@ protocol BaseCharacter: AnyObject, Identifiable, Codable, ObservableObject {
     func clone() -> any BaseCharacter
 }
 
+struct IdentifiableCharacter: Identifiable, Equatable {
+    let id: UUID
+    let character: any BaseCharacter
+
+    init(character: any BaseCharacter) {
+        self.id = character.id // assuming BaseCharacter has `id: UUID`
+        self.character = character
+    }
+
+    static func ==(lhs: IdentifiableCharacter, rhs: IdentifiableCharacter) -> Bool {
+        lhs.id == rhs.id
+    }
+}
+
 // MARK: - CharacterBase
 class CharacterBase: BaseCharacter {
     @Published var id = UUID()
