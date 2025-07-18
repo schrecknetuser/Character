@@ -207,6 +207,8 @@ struct CharacterListView: View {
     @State private var showingCreationWizard = false
     @State private var showingCharacterResume = false
     @State private var characterToResume: (any BaseCharacter)? = nil
+    @State private var characterToDelete: (any BaseCharacter)? = nil
+    @State private var showingDeleteConfirmation = false
     let getCharacterDisplayInfo: (any BaseCharacter) -> (symbol: String, additionalInfo: String)
 
     var body: some View {
@@ -239,11 +241,12 @@ struct CharacterListView: View {
                         .foregroundColor(.primary)
                     }
                     .onDelete { offsets in
-                        let charactersToDelete = offsets.map { charactersInCreation[$0].id }
-                        let indicesToDelete = IndexSet(store.characters.enumerated().compactMap { index, character in
-                            charactersToDelete.contains(character.id) ? index : nil
-                        })
-                        store.deleteCharacter(at: indicesToDelete)
+                        // For unfinished characters, show confirmation for the first character to be deleted
+                        if let firstOffset = offsets.first {
+                            let characterToDeleteCandidate = charactersInCreation[firstOffset].character
+                            characterToDelete = characterToDeleteCandidate
+                            showingDeleteConfirmation = true
+                        }
                     }
                 } header: {
                     Text("Characters in Creation")
@@ -310,6 +313,21 @@ struct CharacterListView: View {
         .fullScreenCover(isPresented: $showingCharacterResume) {
             CharacterCreationWizard(store: store, existingCharacter: characterToResume)
         }
+        .alert("Delete Unfinished Character", isPresented: $showingDeleteConfirmation) {
+            Button("Delete", role: .destructive) {
+                if let character = characterToDelete {
+                    deleteCharacterInCreation(character)
+                }
+                characterToDelete = nil
+            }
+            Button("Cancel", role: .cancel) {
+                characterToDelete = nil
+            }
+        } message: {
+            if let character = characterToDelete {
+                Text("Are you sure you want to delete the unfinished character '\(character.name.isEmpty ? "Unnamed Character" : character.name)'? All progress will be lost and this action cannot be undone.")
+            }
+        }
     }
     
     @discardableResult
@@ -328,6 +346,12 @@ struct CharacterListView: View {
             return true
         }
         return false
+    }
+    
+    private func deleteCharacterInCreation(_ character: any BaseCharacter) {
+        if let index = store.characters.firstIndex(where: { $0.id == character.id }) {
+            store.deleteCharacter(at: IndexSet([index]))
+        }
     }
 
     private func groupedActiveCharacters() -> [(chronicleName: String, characters: [AnyCharacter])] {
