@@ -781,8 +781,17 @@ class CharacterStore: ObservableObject {
     }
     
     func updateCharacter(_ updatedCharacter: any BaseCharacter) {
+        print("DEBUG: updateCharacter called")
+        print("DEBUG: Character ID: \(updatedCharacter.id)")
+        print("DEBUG: Character name: \(updatedCharacter.name)")
+        print("DEBUG: Character chronicle: \(updatedCharacter.chronicleName)")
+        
         if let index = characters.firstIndex(where: { $0.id == updatedCharacter.id }) {
+            print("DEBUG: Found character at index \(index)")
             characters[index] = AnyCharacter(updatedCharacter)
+            print("DEBUG: Updated character in store")
+        } else {
+            print("DEBUG: Character not found in store!")
         }
     }
     
@@ -808,8 +817,17 @@ class CharacterStore: ObservableObject {
     }
     
     func updateCharacterCreationProgress(_ character: any BaseCharacter, stage: Int) {
+        print("DEBUG: updateCharacterCreationProgress called")
+        print("DEBUG: Character name: \(character.name)")
+        print("DEBUG: Character chronicle: \(character.chronicleName)")
+        print("DEBUG: Stage: \(stage)")
+        if let vampire = character as? VampireCharacter {
+            print("DEBUG: Vampire clan: \(vampire.clan)")
+        }
+        
         var updatedCharacter = character
         updatedCharacter.creationProgress = stage
+        print("DEBUG: Updated character progress to: \(updatedCharacter.creationProgress)")
         updateCharacter(updatedCharacter)
     }
     
@@ -822,7 +840,12 @@ class CharacterStore: ObservableObject {
     }
     
     func getCharactersInCreation() -> [AnyCharacter] {
-        return characters.filter { $0.character.isInCreation }
+        let result = characters.filter { $0.character.isInCreation }
+        print("DEBUG: getCharactersInCreation returning \(result.count) characters")
+        for character in result {
+            print("DEBUG: - Character: \(character.character.name), progress: \(character.character.creationProgress)")
+        }
+        return result
     }
     
     func getCompletedCharacters() -> [AnyCharacter] {
