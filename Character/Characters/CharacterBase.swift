@@ -261,7 +261,7 @@ class CharacterBase: BaseCharacter {
              willpower, experience, spentExperience,
              ambition, desire, chronicleName, concept, characterDescription, notes, dateOfBirth,
              advantages, flaws, backgroundMerits, backgroundFlaws, convictions, touchstones, chronicleTenets,
-             specializations, currentSession, changeLog, isArchived,
+             specializations, currentSession, changeLog, isArchived, isInCreation, creationProgress,
              health, healthStates, willpowerStates
     }
 
@@ -296,6 +296,8 @@ class CharacterBase: BaseCharacter {
         currentSession = try container.decode(Int.self, forKey: .currentSession)
         changeLog = try container.decode([ChangeLogEntry].self, forKey: .changeLog)
         isArchived = try container.decodeIfPresent(Bool.self, forKey: .isArchived) ?? false
+        isInCreation = try container.decodeIfPresent(Bool.self, forKey: .isInCreation) ?? false
+        creationProgress = try container.decodeIfPresent(Int.self, forKey: .creationProgress) ?? 0
         health = try container.decode(Int.self, forKey: .health)
         healthStates = try container.decode([HealthState].self, forKey: .healthStates)
         willpowerStates = try container.decode([WillpowerState].self, forKey: .willpowerStates)
@@ -332,6 +334,8 @@ class CharacterBase: BaseCharacter {
         try container.encode(currentSession, forKey: .currentSession)
         try container.encode(changeLog, forKey: .changeLog)
         try container.encode(isArchived, forKey: .isArchived)
+        try container.encode(isInCreation, forKey: .isInCreation)
+        try container.encode(creationProgress, forKey: .creationProgress)
         try container.encode(health, forKey: .health)
         try container.encode(healthStates, forKey: .healthStates)
         try container.encode(willpowerStates, forKey: .willpowerStates)
@@ -682,6 +686,8 @@ class CharacterBase: BaseCharacter {
         copy.currentSession = self.currentSession
         copy.changeLog = self.changeLog
         copy.isArchived = self.isArchived
+        copy.isInCreation = self.isInCreation
+        copy.creationProgress = self.creationProgress
         copy.health = self.health
         copy.healthStates = self.healthStates
         copy.willpowerStates = self.willpowerStates

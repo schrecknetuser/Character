@@ -304,9 +304,7 @@ struct CharacterListView: View {
             }
         }
         .fullScreenCover(isPresented: $showingCreationWizard) {
-            if let character = characterToResume {
-                CharacterCreationWizard(store: store, existingCharacter: character)
-            }
+            CharacterCreationWizard(store: store, existingCharacter: characterToResume)
         }
     }
     
