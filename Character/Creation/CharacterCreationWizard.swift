@@ -95,7 +95,10 @@ struct CharacterCreationWizard: View {
 
                 switch currentStage {
                     case .characterType:
-                        CharacterTypeSelectionStage(selectedCharacterType: $selectedCharacterType)
+                        CharacterTypeSelectionStage(
+                            selectedCharacterType: $selectedCharacterType,
+                            isReadOnly: existingCharacter != nil
+                        )
                     case .nameAndChronicle:
                         if selectedCharacterType == .vampire, let binding = viewModel.vampireBinding() {
                             VampireNameAndChronicleStage(character: binding)
@@ -191,7 +194,11 @@ struct CharacterCreationWizard: View {
                         Button("Next") {
                             // Save character after first stage if not already saved
                             if currentStage == .characterType && !isCharacterSaved {
-                                viewModel.setCharacterType(selectedCharacterType)
+                                // Only set character type if we're creating a new character
+                                // Don't call setCharacterType when resuming existing character
+                                if existingCharacter == nil {
+                                    viewModel.setCharacterType(selectedCharacterType)
+                                }
                                 store.addCharacterInCreation(viewModel.character)
                                 isCharacterSaved = true
                             }
