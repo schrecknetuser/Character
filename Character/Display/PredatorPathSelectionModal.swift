@@ -16,7 +16,6 @@ struct PredatorTypeSelectionModal: View {
                 PredatorTypeSelectionView(
                     vampire: vampire,
                     selectedType: $selectedType,
-                    showNoneOption: true,
                     showCustomOption: true,
                     onCustomTypeRequested: {
                         showingCustomTypeForm = true

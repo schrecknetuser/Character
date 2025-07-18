@@ -53,9 +53,32 @@ struct CharacterCreationWizard: View {
     @ObservedObject var store: CharacterStore
     @State private var triggerRefresh = false
     
-    @State private var currentStage: CreationStage = .characterType
-    @StateObject private var viewModel = CharacterCreationViewModel(characterType: .vampire)
-    @State private var selectedCharacterType: CharacterType = .vampire
+    @State private var currentStage: CreationStage
+    @StateObject private var viewModel: CharacterCreationViewModel
+    @State private var selectedCharacterType: CharacterType
+    @State private var isCharacterSaved: Bool = false // Track if character was saved to store
+    
+    // Support for resuming creation from existing character
+    var existingCharacter: (any BaseCharacter)?
+    
+    init(store: CharacterStore, existingCharacter: (any BaseCharacter)? = nil) {
+        self.store = store
+        self.existingCharacter = existingCharacter
+        
+        // If resuming creation, set up the initial state
+        if let existing = existingCharacter {
+            self._selectedCharacterType = State(initialValue: existing.characterType)
+            let stage = CreationStage(rawValue: existing.creationProgress) ?? .characterType
+            self._currentStage = State(initialValue: stage)
+            self._isCharacterSaved = State(initialValue: true)
+            self._viewModel = StateObject(wrappedValue: CharacterCreationViewModel(existingCharacter: existing))
+        } else {
+            self._selectedCharacterType = State(initialValue: .vampire)
+            self._currentStage = State(initialValue: .characterType)
+            self._isCharacterSaved = State(initialValue: false)
+            self._viewModel = StateObject(wrappedValue: CharacterCreationViewModel(characterType: .vampire))
+        }
+    }
     
     var body: some View {
         NavigationView {
@@ -73,7 +96,10 @@ struct CharacterCreationWizard: View {
 
                 switch currentStage {
                     case .characterType:
-                        CharacterTypeSelectionStage(selectedCharacterType: $selectedCharacterType)
+                        CharacterTypeSelectionStage(
+                            selectedCharacterType: $selectedCharacterType,
+                            isReadOnly: existingCharacter != nil
+                        )
                     case .nameAndChronicle:
                         if selectedCharacterType == .vampire, let binding = viewModel.vampireBinding() {
                             VampireNameAndChronicleStage(character: binding)
@@ -160,17 +186,22 @@ struct CharacterCreationWizard: View {
                         Button("Create Character") {
                             // Recalculate derived values before saving
                             viewModel.character.recalculateDerivedValues()
-                            // Log the character creation
-                            viewModel.character.changeLog.append(ChangeLogEntry(summary: "Character created."))
-                            store.addCharacter(viewModel.character)
+                            // Complete character creation
+                            store.completeCharacterCreation(viewModel.character)
                             dismiss()
                         }
                         .disabled(!canProceedFromCurrentStage())
                     } else {
                         Button("Next") {
-                            
-                            if currentStage == .characterType {
-                                viewModel.setCharacterType(selectedCharacterType)
+                            // Save character after first stage if not already saved
+                            if currentStage == .characterType && !isCharacterSaved {
+                                // Only set character type if we're creating a new character
+                                // Don't call setCharacterType when resuming existing character
+                                if existingCharacter == nil {
+                                    viewModel.setCharacterType(selectedCharacterType)
+                                }
+                                store.addCharacterInCreation(viewModel.character)
+                                isCharacterSaved = true
                             }
                             
                             if currentStage.rawValue < CreationStage.allCases.count - 1 {
@@ -188,6 +219,11 @@ struct CharacterCreationWizard: View {
                                 }
                                 
                                 currentStage = targetStage
+                                
+                                // Update progress in store
+                                if isCharacterSaved {
+                                    store.updateCharacterCreationProgress(viewModel.character, stage: currentStage.rawValue)
+                                }
                             }
                         }
                         .disabled({
