@@ -110,20 +110,34 @@ struct CharacterCreationWizard: View {
                             isReadOnly: existingCharacter != nil
                         )
                     case .nameAndChronicle:
-                        print("DEBUG: Displaying nameAndChronicle stage")
-                        print("DEBUG: selectedCharacterType: \(selectedCharacterType)")
                         if selectedCharacterType == .vampire, let binding = viewModel.vampireBinding() {
-                            print("DEBUG: Using VampireNameAndChronicleStage")
                             VampireNameAndChronicleStage(character: binding)
+                                .onAppear {
+                                    print("DEBUG: Displaying nameAndChronicle stage")
+                                    print("DEBUG: selectedCharacterType: \(selectedCharacterType)")
+                                    print("DEBUG: Using VampireNameAndChronicleStage")
+                                }
                         } else if selectedCharacterType == .ghoul, let binding = viewModel.ghoulBinding() {
-                            print("DEBUG: Using GhoulNameAndChronicleStage")
                             GhoulNameAndChronicleStage(character: binding)
+                                .onAppear {
+                                    print("DEBUG: Displaying nameAndChronicle stage")
+                                    print("DEBUG: selectedCharacterType: \(selectedCharacterType)")
+                                    print("DEBUG: Using GhoulNameAndChronicleStage")
+                                }
                         } else if selectedCharacterType == .mage, let binding = viewModel.mageBinding() {
-                            print("DEBUG: Using MageNameAndChronicleStage")
                             MageNameAndChronicleStage(character: binding)
+                                .onAppear {
+                                    print("DEBUG: Displaying nameAndChronicle stage")
+                                    print("DEBUG: selectedCharacterType: \(selectedCharacterType)")
+                                    print("DEBUG: Using MageNameAndChronicleStage")
+                                }
                         } else {
-                            print("DEBUG: Character type not implemented or binding failed")
                             Text("Character type not yet implemented")
+                                .onAppear {
+                                    print("DEBUG: Displaying nameAndChronicle stage")
+                                    print("DEBUG: selectedCharacterType: \(selectedCharacterType)")
+                                    print("DEBUG: Character type not implemented or binding failed")
+                                }
                         }
                     case .clan:
                         if selectedCharacterType == .vampire {
