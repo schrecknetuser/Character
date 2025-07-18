@@ -110,13 +110,19 @@ struct CharacterCreationWizard: View {
                             isReadOnly: existingCharacter != nil
                         )
                     case .nameAndChronicle:
+                        print("DEBUG: Displaying nameAndChronicle stage")
+                        print("DEBUG: selectedCharacterType: \(selectedCharacterType)")
                         if selectedCharacterType == .vampire, let binding = viewModel.vampireBinding() {
+                            print("DEBUG: Using VampireNameAndChronicleStage")
                             VampireNameAndChronicleStage(character: binding)
                         } else if selectedCharacterType == .ghoul, let binding = viewModel.ghoulBinding() {
+                            print("DEBUG: Using GhoulNameAndChronicleStage")
                             GhoulNameAndChronicleStage(character: binding)
                         } else if selectedCharacterType == .mage, let binding = viewModel.mageBinding() {
+                            print("DEBUG: Using MageNameAndChronicleStage")
                             MageNameAndChronicleStage(character: binding)
                         } else {
+                            print("DEBUG: Character type not implemented or binding failed")
                             Text("Character type not yet implemented")
                         }
                     case .clan:
@@ -252,6 +258,13 @@ struct CharacterCreationWizard: View {
                     }
                 }
             }
+        }
+        .onAppear {
+            print("DEBUG: CharacterCreationWizard appeared")
+            print("DEBUG: Current stage: \(currentStage) (raw value: \(currentStage.rawValue))")
+            print("DEBUG: Selected character type: \(selectedCharacterType)")
+            print("DEBUG: Is character saved: \(isCharacterSaved)")
+            print("DEBUG: View model character name: \(viewModel.character.name)")
         }
     }
     

@@ -70,12 +70,25 @@ class CharacterCreationViewModel: ObservableObject {
     // MARK: - SwiftUI Bindings
 
     func vampireBinding() -> Binding<VampireCharacter>? {
-        guard let _ = character as? VampireCharacter else { return nil }
+        print("DEBUG: vampireBinding() called")
+        print("DEBUG: Character type: \(character.characterType)")
+        print("DEBUG: Character is vampire: \(character is VampireCharacter)")
+        guard let _ = character as? VampireCharacter else { 
+            print("DEBUG: Character cast to VampireCharacter failed")
+            return nil 
+        }
+        print("DEBUG: Character cast to VampireCharacter succeeded")
         return Binding(
             get: {
-                self.character as! VampireCharacter
+                print("DEBUG: vampireBinding get called")
+                let vampire = self.character as! VampireCharacter
+                print("DEBUG: Vampire name: \(vampire.name)")
+                print("DEBUG: Vampire chronicle: \(vampire.chronicleName)")
+                print("DEBUG: Vampire clan: \(vampire.clan)")
+                return vampire
             },
             set: {
+                print("DEBUG: vampireBinding set called")
                 self.character = $0
             }
         )
