@@ -220,7 +220,7 @@ class PDFGenerator {
     
     private static func fillMageSphereField(fieldName: String, widget: PDFAnnotation, mage: MageCharacter) {
         // Handle Arete button fields (Arete-1, Arete-2, etc.)
-        if fieldName.hasPrefix("Arete-") {
+        if fieldName.hasPrefix("arete-") {
             let components = fieldName.split(separator: "-")
             if components.count == 2, let level = Int(components[1]) {
                 widget.widgetStringValue = (level <= mage.arete) ? "Yes" : "Off"
@@ -229,7 +229,7 @@ class PDFGenerator {
         }
         
         // Handle Quintessence button fields (Quintessence-1, Quintessence-2, etc.)
-        if fieldName.hasPrefix("Quintessence-") {
+        if fieldName.hasPrefix("quint-") {
             let components = fieldName.split(separator: "-")
             if components.count == 2, let level = Int(components[1]) {
                 widget.widgetStringValue = (level <= mage.quintessence) ? "Yes" : "Off"
@@ -238,7 +238,7 @@ class PDFGenerator {
         }
         
         // Handle Paradox button fields (Paradox-1, Paradox-2, etc.)
-        if fieldName.hasPrefix("Paradox-") {
+        if fieldName.hasPrefix("paradox-") {
             let components = fieldName.split(separator: "-")
             if components.count == 2, let level = Int(components[1]) {
                 widget.widgetStringValue = (level <= mage.paradox) ? "Yes" : "Off"
@@ -247,7 +247,7 @@ class PDFGenerator {
         }
         
         // Handle Hubris button fields (Hubris-1, Hubris-2, etc.)
-        if fieldName.hasPrefix("Hubris-") {
+        if fieldName.hasPrefix("hubris-") {
             let components = fieldName.split(separator: "-")
             if components.count == 2, let level = Int(components[1]) {
                 widget.widgetStringValue = (level <= mage.hubris) ? "Yes" : "Off"
@@ -256,12 +256,17 @@ class PDFGenerator {
         }
         
         // Handle Quiet button fields (Quiet-1, Quiet-2, etc.)
-        if fieldName.hasPrefix("Quiet-") {
+        if fieldName.hasPrefix("quiet-") {
             let components = fieldName.split(separator: "-")
             if components.count == 2, let level = Int(components[1]) {
                 widget.widgetStringValue = (level <= mage.quiet) ? "Yes" : "Off"
                 return
             }
+        }
+        
+        if fieldName == "Instruments" {
+            let instruments = mage.instruments.map {$0.description}.joined(separator: "\n")
+            widget.widgetStringValue = instruments
         }
         
         // Map sphere prefixes to full sphere names
@@ -286,27 +291,6 @@ class PDFGenerator {
                     widget.widgetStringValue = (level <= sphereLevel) ? "Yes" : "Off"
                     return
                 }
-            }
-        }
-        
-        // Handle legacy sphere button fields (correspondence-1, forces-2, etc.)
-        for (sphereName, sphereLevel) in mage.spheres {
-            let lowerSphereName = sphereName.lowercased()
-            if fieldName.lowercased().hasPrefix(lowerSphereName + "-") {
-                let components = fieldName.split(separator: "-")
-                if components.count == 2, let level = Int(components[1]) {
-                    widget.widgetStringValue = (level <= sphereLevel) ? "Yes" : "Off"
-                    return
-                }
-            }
-        }
-        
-        // Handle sphere text fields (just sphere names)
-        for sphereName in mage.spheres.keys {
-            if fieldName.lowercased() == sphereName.lowercased() {
-                let level = mage.spheres[sphereName] ?? 0
-                widget.widgetStringValue = level > 0 ? "\(level)" : ""
-                return
             }
         }
     }
