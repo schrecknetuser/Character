@@ -84,7 +84,12 @@ struct QRDisplayModalView: View {
         }
         .sheet(isPresented: $showShareSheet) {
             if let qrImage = qrImage {
-                ShareSheet(items: [qrImage])
+                ShareSheet(items: [qrImage]) { completed in
+                    if completed {
+                        // Successfully shared - close the export window
+                        isPresented = false
+                    }
+                }
             }
         }
     }
@@ -113,9 +118,13 @@ struct QRDisplayModalView: View {
 // Share sheet for sharing the QR code image
 struct ShareSheet: UIViewControllerRepresentable {
     let items: [Any]
+    let onCompletion: (Bool) -> Void
     
     func makeUIViewController(context: Context) -> UIActivityViewController {
         let controller = UIActivityViewController(activityItems: items, applicationActivities: nil)
+        controller.completionWithItemsHandler = { _, completed, _, _ in
+            onCompletion(completed)
+        }
         return controller
     }
     
