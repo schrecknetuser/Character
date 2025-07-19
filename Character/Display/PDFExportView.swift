@@ -78,7 +78,12 @@ struct PDFExportView: View {
             }
             .sheet(isPresented: $showingShareSheet) {
                 if let pdfData = pdfData {
-                    ActivityViewController(activityItems: [createPDFURL(from: pdfData)])
+                    ActivityViewController(activityItems: [createPDFURL(from: pdfData)]) { completed in
+                        if completed {
+                            // Successfully shared - close the export window
+                            isPresented = false
+                        }
+                    }
                 }
             }
         }
@@ -114,9 +119,13 @@ struct PDFExportView: View {
 
 struct ActivityViewController: UIViewControllerRepresentable {
     let activityItems: [Any]
+    let onCompletion: (Bool) -> Void
     
     func makeUIViewController(context: Context) -> UIActivityViewController {
         let controller = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+        controller.completionWithItemsHandler = { _, completed, _, _ in
+            onCompletion(completed)
+        }
         return controller
     }
     
