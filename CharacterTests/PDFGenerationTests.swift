@@ -147,4 +147,46 @@ struct PDFGenerationTests {
         mage.quintessence = 0
         #expect(mage.quintessence == 0)
     }
+    
+    @Test func testMageTraitsForPDF() async throws {
+        // Create a mage character with various traits set
+        let mage = MageCharacter()
+        mage.name = "Test Mage"
+        mage.concept = "Hermetic Researcher"
+        mage.chronicleName = "Test Chronicle"
+        mage.paradigm = "Hermetic Order"
+        mage.practice = "High Ritual Magic"
+        mage.notes = "Test notes for character"
+        mage.characterDescription = "Test character background and history"
+        
+        // Set mage traits
+        mage.arete = 3
+        mage.quintessence = 5
+        mage.paradox = 2
+        mage.hubris = 1
+        mage.quiet = 0
+        
+        // Set some spheres
+        mage.spheres["Correspondence"] = 2
+        mage.spheres["Forces"] = 3
+        mage.spheres["Prime"] = 1
+        mage.spheres["Mind"] = 2
+        mage.spheres["Life"] = 1
+        
+        // Verify all values are set correctly for PDF generation
+        #expect(mage.arete == 3)
+        #expect(mage.quintessence == 5)
+        #expect(mage.paradox == 2)
+        #expect(mage.hubris == 1)
+        #expect(mage.quiet == 0)
+        #expect(mage.notes == "Test notes for character")
+        #expect(mage.characterDescription == "Test character background and history")
+        #expect(mage.spheres["Correspondence"] == 2)
+        #expect(mage.spheres["Forces"] == 3)
+        
+        // Generate PDF to ensure no crashes
+        let pdfData = PDFGenerator.generateCharacterPDF(for: mage)
+        #expect(pdfData != nil)
+        #expect((pdfData?.count ?? 0) > 1000)
+    }
 }

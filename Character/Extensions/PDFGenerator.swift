@@ -89,8 +89,12 @@ class PDFGenerator {
             widget.widgetStringValue = character.ambition
         case "desire":
             widget.widgetStringValue = character.desire
-        case "notes", "pc_notes":
+        case "notes":
             widget.widgetStringValue = character.notes
+        case "pc-notes", "pc_notes":
+            widget.widgetStringValue = character.notes
+        case "history", "pc-history":
+            widget.widgetStringValue = character.characterDescription
         case "cexp":
             widget.widgetStringValue = "\(character.availableExperience)"
         case "texp":
@@ -233,7 +237,59 @@ class PDFGenerator {
             }
         }
         
-        // Handle sphere button fields (correspondence-1, forces-2, etc.)
+        // Handle Paradox button fields (Paradox-1, Paradox-2, etc.)
+        if fieldName.hasPrefix("Paradox-") {
+            let components = fieldName.split(separator: "-")
+            if components.count == 2, let level = Int(components[1]) {
+                widget.widgetStringValue = (level <= mage.paradox) ? "Yes" : "Off"
+                return
+            }
+        }
+        
+        // Handle Hubris button fields (Hubris-1, Hubris-2, etc.)
+        if fieldName.hasPrefix("Hubris-") {
+            let components = fieldName.split(separator: "-")
+            if components.count == 2, let level = Int(components[1]) {
+                widget.widgetStringValue = (level <= mage.hubris) ? "Yes" : "Off"
+                return
+            }
+        }
+        
+        // Handle Quiet button fields (Quiet-1, Quiet-2, etc.)
+        if fieldName.hasPrefix("Quiet-") {
+            let components = fieldName.split(separator: "-")
+            if components.count == 2, let level = Int(components[1]) {
+                widget.widgetStringValue = (level <= mage.quiet) ? "Yes" : "Off"
+                return
+            }
+        }
+        
+        // Map sphere prefixes to full sphere names
+        let spherePrefixMapping: [String: String] = [
+            "cor": "Correspondence",
+            "ent": "Entropy", 
+            "for": "Forces",
+            "lif": "Life",
+            "mat": "Matter",
+            "min": "Mind",
+            "pri": "Prime",
+            "spi": "Spirit",
+            "tim": "Time"
+        ]
+        
+        // Handle sphere button fields using the specific prefixes (cor-1, ent-2, etc.)
+        for (prefix, sphereName) in spherePrefixMapping {
+            if fieldName.lowercased().hasPrefix(prefix + "-") {
+                let components = fieldName.split(separator: "-")
+                if components.count == 2, let level = Int(components[1]) {
+                    let sphereLevel = mage.spheres[sphereName] ?? 0
+                    widget.widgetStringValue = (level <= sphereLevel) ? "Yes" : "Off"
+                    return
+                }
+            }
+        }
+        
+        // Handle legacy sphere button fields (correspondence-1, forces-2, etc.)
         for (sphereName, sphereLevel) in mage.spheres {
             let lowerSphereName = sphereName.lowercased()
             if fieldName.lowercased().hasPrefix(lowerSphereName + "-") {
