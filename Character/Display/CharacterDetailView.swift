@@ -11,6 +11,13 @@ struct CharacterDetailView: View {
     @State private var showingDataModal = false
     @State private var showingPDFExport = false
     @State private var showingQRExport = false
+    @State private var showingExportWhileEditingAlert = false
+    @State private var pendingExportAction: ExportAction?
+    
+    private enum ExportAction {
+        case pdf
+        case qr
+    }
     
     var activeCharacterBinding: Binding<any BaseCharacter> {
         Binding(
@@ -62,6 +69,65 @@ struct CharacterDetailView: View {
                 selectedTab -= 1
             }
         }
+    }
+    
+    // Helper functions for export handling
+    private func handlePDFExport() {
+        if isEditing {
+            pendingExportAction = .pdf
+            showingExportWhileEditingAlert = true
+        } else {
+            showingPDFExport = true
+        }
+    }
+    
+    private func handleQRExport() {
+        if isEditing {
+            pendingExportAction = .qr
+            showingExportWhileEditingAlert = true
+        } else {
+            showingQRExport = true
+        }
+    }
+    
+    private func saveAndExport() {
+        // Save the changes first
+        if let draft = draftCharacter {
+            let summary = character.generateChangeSummary(for: draft)
+            if !summary.isEmpty {
+                let logEntry = ChangeLogEntry(summary: summary)
+                draft.changeLog.append(logEntry)
+            }
+            character = draft
+            store.updateCharacter(character)
+        }
+        draftCharacter = nil
+        isEditing = false
+        
+        // Then proceed with export
+        executeExport()
+    }
+    
+    private func discardAndExport() {
+        // Discard changes
+        draftCharacter = nil
+        isEditing = false
+        
+        // Then proceed with export
+        executeExport()
+    }
+    
+    private func executeExport() {
+        guard let action = pendingExportAction else { return }
+        
+        switch action {
+        case .pdf:
+            showingPDFExport = true
+        case .qr:
+            showingQRExport = true
+        }
+        
+        pendingExportAction = nil
     }
     
     private enum SwipeDirection {
@@ -183,7 +249,7 @@ struct CharacterDetailView: View {
                             
                             // QR Export Button
                             Button(action: {
-                                showingQRExport = true
+                                handleQRExport()
                             }) {
                                 Image(systemName: "qrcode")
                                     .font(.title2)
@@ -213,7 +279,7 @@ struct CharacterDetailView: View {
                             
                             // PDF Export Button
                             Button(action: {
-                                showingPDFExport = true
+                                handlePDFExport()
                             }) {
                                 Image(systemName: "square.and.arrow.up")
                                     .font(.title2)
@@ -264,7 +330,20 @@ struct CharacterDetailView: View {
                 PDFExportView(character: character, isPresented: $showingPDFExport)
             }
             .sheet(isPresented: $showingQRExport) {
-                QRDisplayModalView(character: isEditing ? draftCharacter! : character, isPresented: $showingQRExport)
+                QRDisplayModalView(character: character, isPresented: $showingQRExport)
+            }
+            .alert("Save Changes Before Export?", isPresented: $showingExportWhileEditingAlert) {
+                Button("Save and Export") {
+                    saveAndExport()
+                }
+                Button("Discard and Export", role: .destructive) {
+                    discardAndExport()
+                }
+                Button("Cancel", role: .cancel) {
+                    pendingExportAction = nil
+                }
+            } message: {
+                Text("You have unsaved changes. Would you like to save your changes before exporting, or discard them and export the original character?")
             }
             .onDisappear {
                 if isEditing {
