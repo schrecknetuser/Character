@@ -20,10 +20,20 @@ class PDFGenerator {
     }
     
     private static func generateWithFillableFields(character: any BaseCharacter) -> Data? {
-        // Load the VtM5e template PDF from the bundle
-        guard let templateURL = Bundle.main.url(forResource: "VtM5e_ENG_CharacterSheet_2pMINI", withExtension: "pdf") else {
+        // Choose template based on character type
+        let templateName: String
+        
+        switch character.characterType {
+        case .vampire, .ghoul:
+            templateName = "VtM5e_ENG_CharacterSheet_2pMINI"
+        case .mage:
+            templateName = "M5 Character Sheet"
+        }
+        
+        // Load the appropriate template PDF from the bundle
+        guard let templateURL = Bundle.main.url(forResource: templateName, withExtension: "pdf") else {
             // Fallback: try to load from main directory for testing
-            let templatePath = "/home/runner/work/Character/Character/VtM5e_ENG_CharacterSheet_2pMINI.pdf"
+            let templatePath = "/home/runner/work/Character/Character/\(templateName).pdf"
             guard let fallbackURL = URL(string: "file://\(templatePath)") else {
                 return nil
             }
@@ -79,8 +89,12 @@ class PDFGenerator {
             widget.widgetStringValue = character.ambition
         case "desire":
             widget.widgetStringValue = character.desire
-        case "notes", "pc_notes":
+        case "notes":
             widget.widgetStringValue = character.notes
+        case "pc-notes", "pc_notes":
+            widget.widgetStringValue = character.notes
+        case "history", "pc-history":
+            widget.widgetStringValue = character.characterDescription
         case "cexp":
             widget.widgetStringValue = "\(character.availableExperience)"
         case "texp":
@@ -167,11 +181,117 @@ class PDFGenerator {
     }
     
     private static func fillMageSpecificField(fieldName: String, widget: PDFAnnotation, mage: MageCharacter) {
-        switch fieldName {
+        switch fieldName.lowercased() {
         case "clan":
             widget.widgetStringValue = "Mage"
+        case "paradigm":
+            widget.widgetStringValue = mage.paradigm
+        case "practice":
+            widget.widgetStringValue = mage.practice
+        case "essence":
+            widget.widgetStringValue = mage.essence.displayName
+        case "resonance":
+            widget.widgetStringValue = mage.resonance.displayName
+        case "synergy":
+            widget.widgetStringValue = mage.synergy.displayName
+        case "arete":
+            widget.widgetStringValue = "\(mage.arete)"
+        case "quintessence":
+            widget.widgetStringValue = "\(mage.quintessence)"
+        case "paradox":
+            widget.widgetStringValue = "\(mage.paradox)"
+        case "hubris":
+            widget.widgetStringValue = "\(mage.hubris)"
+        case "quiet":
+            widget.widgetStringValue = "\(mage.quiet)"
+        case "awakening":
+            if let awakeningDate = mage.dateOfAwakening {
+                let formatter = DateFormatter()
+                formatter.dateStyle = .medium
+                widget.widgetStringValue = formatter.string(from: awakeningDate)
+            }
         default:
+            // Handle sphere fields and other mage-specific button fields
+            fillMageSphereField(fieldName: fieldName, widget: widget, mage: mage)
+            // Handle attributes, skills, and other common fields
             fillAttributeOrSkillField(fieldName: fieldName, widget: widget, character: mage)
+        }
+    }
+    
+    private static func fillMageSphereField(fieldName: String, widget: PDFAnnotation, mage: MageCharacter) {
+        // Handle Arete button fields (Arete-1, Arete-2, etc.)
+        if fieldName.hasPrefix("arete-") {
+            let components = fieldName.split(separator: "-")
+            if components.count == 2, let level = Int(components[1]) {
+                widget.widgetStringValue = (level <= mage.arete) ? "Yes" : "Off"
+                return
+            }
+        }
+        
+        // Handle Quintessence button fields (Quintessence-1, Quintessence-2, etc.)
+        if fieldName.hasPrefix("quint-") {
+            let components = fieldName.split(separator: "-")
+            if components.count == 2, let level = Int(components[1]) {
+                widget.widgetStringValue = (level <= mage.quintessence) ? "Yes" : "Off"
+                return
+            }
+        }
+        
+        // Handle Paradox button fields (Paradox-1, Paradox-2, etc.)
+        if fieldName.hasPrefix("paradox-") {
+            let components = fieldName.split(separator: "-")
+            if components.count == 2, let level = Int(components[1]) {
+                widget.widgetStringValue = (level <= mage.paradox) ? "Yes" : "Off"
+                return
+            }
+        }
+        
+        // Handle Hubris button fields (Hubris-1, Hubris-2, etc.)
+        if fieldName.hasPrefix("hubris-") {
+            let components = fieldName.split(separator: "-")
+            if components.count == 2, let level = Int(components[1]) {
+                widget.widgetStringValue = (level <= mage.hubris) ? "Yes" : "Off"
+                return
+            }
+        }
+        
+        // Handle Quiet button fields (Quiet-1, Quiet-2, etc.)
+        if fieldName.hasPrefix("quiet-") {
+            let components = fieldName.split(separator: "-")
+            if components.count == 2, let level = Int(components[1]) {
+                widget.widgetStringValue = (level <= mage.quiet) ? "Yes" : "Off"
+                return
+            }
+        }
+        
+        if fieldName == "Instruments" {
+            let instruments = mage.instruments.map {$0.description}.joined(separator: "\n")
+            widget.widgetStringValue = instruments
+        }
+        
+        // Map sphere prefixes to full sphere names
+        let spherePrefixMapping: [String: String] = [
+            "cor": "Correspondence",
+            "ent": "Entropy", 
+            "for": "Forces",
+            "lif": "Life",
+            "mat": "Matter",
+            "min": "Mind",
+            "pri": "Prime",
+            "spi": "Spirit",
+            "tim": "Time"
+        ]
+        
+        // Handle sphere button fields using the specific prefixes (cor-1, ent-2, etc.)
+        for (prefix, sphereName) in spherePrefixMapping {
+            if fieldName.lowercased().hasPrefix(prefix + "-") {
+                let components = fieldName.split(separator: "-")
+                if components.count == 2, let level = Int(components[1]) {
+                    let sphereLevel = mage.spheres[sphereName] ?? 0
+                    widget.widgetStringValue = (level <= sphereLevel) ? "Yes" : "Off"
+                    return
+                }
+            }
         }
     }
     
@@ -639,13 +759,24 @@ class PDFGenerator {
         let margin: CGFloat = 50
         var currentY: CGFloat = margin
         
-        drawFormTitle(text: "MAGE CHARACTER SHEET", y: &currentY, pageSize: pageSize)
+        drawFormTitle(text: "MAGE: THE ASCENSION CHARACTER SHEET", y: &currentY, pageSize: pageSize)
         currentY += 20
         
         drawSectionHeader(text: "CHARACTER INFORMATION", y: &currentY, pageSize: pageSize)
         drawFormField(label: "Name:", value: mage.name, y: &currentY, pageSize: pageSize)
         drawFormField(label: "Concept:", value: mage.concept, y: &currentY, pageSize: pageSize)
         drawFormField(label: "Chronicle:", value: mage.chronicleName, y: &currentY, pageSize: pageSize)
+        drawFormField(label: "Player:", value: "_________________", y: &currentY, pageSize: pageSize)
+        currentY += 10
+        
+        // Mage specifics
+        drawFormField(label: "Paradigm:", value: mage.paradigm, y: &currentY, pageSize: pageSize)
+        drawFormField(label: "Practice:", value: mage.practice, y: &currentY, pageSize: pageSize)
+        drawFormField(label: "Essence:", value: mage.essence.displayName, y: &currentY, pageSize: pageSize)
+        currentY += 10
+        
+        drawFormField(label: "Ambition:", value: mage.ambition, y: &currentY, pageSize: pageSize)
+        drawFormField(label: "Desire:", value: mage.desire, y: &currentY, pageSize: pageSize)
         currentY += 20
         
         drawAttributesSection(character: mage, y: &currentY, pageSize: pageSize)
@@ -655,9 +786,10 @@ class PDFGenerator {
         currentY += 20
         
         drawHealthWillpowerSection(character: mage, y: &currentY, pageSize: pageSize)
-        currentY += 40
+        currentY += 20
         
-        drawText(text: "Mage character sheet implementation in progress", x: 50, y: currentY, fontSize: 12, color: .gray)
+        // Mage traits section
+        drawMageTraitsSection(mage: mage, y: &currentY, pageSize: pageSize)
     }
     
     // MARK: - Form Drawing Helper Methods
@@ -772,6 +904,28 @@ class PDFGenerator {
         // Experience
         drawFormField(label: "Total Experience:", value: "\(vampire.experience)", y: &y, pageSize: pageSize)
         drawFormField(label: "Spent Experience:", value: "\(vampire.spentExperience)", y: &y, pageSize: pageSize)
+    }
+    
+    private static func drawMageTraitsSection(mage: MageCharacter, y: inout CGFloat, pageSize: CGSize) {
+        drawSectionHeader(text: "MAGE TRAITS", y: &y, pageSize: pageSize)
+        
+        drawFormField(label: "Arete:", value: "\(mage.arete)", y: &y, pageSize: pageSize)
+        drawFormField(label: "Quintessence:", value: "\(mage.quintessence)", y: &y, pageSize: pageSize)
+        drawFormField(label: "Paradox:", value: "\(mage.paradox)", y: &y, pageSize: pageSize)
+        drawFormField(label: "Hubris:", value: "\(mage.hubris)", y: &y, pageSize: pageSize)
+        drawFormField(label: "Quiet:", value: "\(mage.quiet)", y: &y, pageSize: pageSize)
+        
+        // Spheres section
+        y += 15
+        drawSectionHeader(text: "SPHERES", y: &y, pageSize: pageSize)
+        let learnedSpheres = mage.spheres.filter { $0.value > 0 }.sorted { $0.key < $1.key }
+        for (sphereName, level) in learnedSpheres {
+            drawFormField(label: "\(sphereName):", value: "\(level)", y: &y, pageSize: pageSize)
+        }
+        
+        // Experience
+        drawFormField(label: "Total Experience:", value: "\(mage.experience)", y: &y, pageSize: pageSize)
+        drawFormField(label: "Spent Experience:", value: "\(mage.spentExperience)", y: &y, pageSize: pageSize)
     }
     
     private static func drawText(text: String, x: CGFloat, y: CGFloat, fontSize: CGFloat = 10, bold: Bool = false, color: UIColor = .black, centered: Bool = false) {

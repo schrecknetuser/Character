@@ -271,6 +271,16 @@ struct EditableAreteRowView: View {
                 .font(.headline)
                 .fontWeight(.semibold)
             
+            // Dots visualization (like SphereRowView)
+            HStack(spacing: 4) {
+                ForEach(0..<5, id: \.self) { index in
+                    Circle()
+                        .fill(index < character.arete ? Color.primary : Color.clear)
+                        .stroke(Color.primary, lineWidth: 1)
+                        .frame(width: 12, height: 12)
+                }
+            }
+            
             // Arete controls
             HStack {
                 if character.arete > 0 {
@@ -294,6 +304,64 @@ struct EditableAreteRowView: View {
                     Button(action: {
                         if character.arete < 5 {
                             character.arete += 1
+                            onChange?()
+                        }
+                    }) {
+                        Image(systemName: "plus.circle")
+                            .foregroundColor(.green)
+                    }
+                }
+            }
+            .padding(.top, 8)
+        }
+    }
+}
+
+// Editable Quintessence Row View
+struct EditableQuintessenceRowView: View {
+    @Binding var character: MageCharacter
+    let availableWidth: CGFloat
+    var onChange: (() -> Void)? = nil
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Quintessence")
+                .font(.headline)
+                .fontWeight(.semibold)
+            
+            // Dots visualization (0-7 dots, filled based on current value)
+            HStack(spacing: 4) {
+                ForEach(0..<7, id: \.self) { index in
+                    Circle()
+                        .fill(index < character.quintessence ? Color.primary : Color.clear)
+                        .stroke(Color.primary, lineWidth: 1)
+                        .frame(width: 12, height: 12)
+                }
+            }
+            
+            // Quintessence controls
+            HStack {
+                if character.quintessence > 0 {
+                    Button(action: {
+                        if character.quintessence > 0 {
+                            character.quintessence -= 1
+                            onChange?()
+                        }
+                    }) {
+                        Image(systemName: "minus.circle")
+                            .foregroundColor(.red)
+                    }
+                }
+                
+                Text("Quintessence: \(character.quintessence)")
+                    .font(.body)
+                
+                Spacer()
+                
+                if character.quintessence < 7 {
+                    Button(action: {
+                        if character.quintessence < 7 {
+                            character.quintessence += 1
                             onChange?()
                         }
                     }) {

@@ -77,11 +77,19 @@ struct PDFGenerationTests {
         mage.name = "Test Mage"
         mage.concept = "Academic Researcher"
         mage.chronicleName = "Test Chronicle"
+        mage.paradigm = "Hermetic Order"
+        mage.practice = "High Ritual Magic"
+        mage.arete = 3
         
         // Set some basic attributes
         mage.physicalAttributes["Strength"] = 2
         mage.socialAttributes["Charisma"] = 2
         mage.mentalAttributes["Intelligence"] = 4
+        
+        // Set some spheres
+        mage.spheres["Forces"] = 2
+        mage.spheres["Prime"] = 1
+        mage.spheres["Correspondence"] = 1
         
         // Generate PDF
         let pdfData = PDFGenerator.generateCharacterPDF(for: mage)
@@ -89,6 +97,9 @@ struct PDFGenerationTests {
         // Verify PDF was generated
         #expect(pdfData != nil)
         #expect((pdfData?.count ?? 0) > 1000)
+        
+        // Verify quintessence defaults to 0
+        #expect(mage.quintessence == 0)
     }
     
     @Test func testPDFGenerationWithEmptyCharacter() async throws {
@@ -101,5 +112,81 @@ struct PDFGenerationTests {
         let pdfData = PDFGenerator.generateCharacterPDF(for: vampire)
         
         #expect(pdfData != nil)
+    }
+    
+    @Test func testMageQuintessenceDefaultsToZero() async throws {
+        // Create a new mage character
+        let mage = MageCharacter()
+        
+        // Quintessence should default to 0
+        #expect(mage.quintessence == 0)
+        
+        // Even after cloning
+        let clonedMage = mage.clone() as! MageCharacter
+        #expect(clonedMage.quintessence == 0)
+    }
+    
+    @Test func testMageQuintessenceEditable() async throws {
+        // Create a new mage character
+        let mage = MageCharacter()
+        
+        // Should start at 0
+        #expect(mage.quintessence == 0)
+        
+        // Should be able to increase to 7
+        mage.quintessence = 3
+        #expect(mage.quintessence == 3)
+        
+        mage.quintessence = 7
+        #expect(mage.quintessence == 7)
+        
+        // Should be able to decrease back to 0
+        mage.quintessence = 2
+        #expect(mage.quintessence == 2)
+        
+        mage.quintessence = 0
+        #expect(mage.quintessence == 0)
+    }
+    
+    @Test func testMageTraitsForPDF() async throws {
+        // Create a mage character with various traits set
+        let mage = MageCharacter()
+        mage.name = "Test Mage"
+        mage.concept = "Hermetic Researcher"
+        mage.chronicleName = "Test Chronicle"
+        mage.paradigm = "Hermetic Order"
+        mage.practice = "High Ritual Magic"
+        mage.notes = "Test notes for character"
+        mage.characterDescription = "Test character background and history"
+        
+        // Set mage traits
+        mage.arete = 3
+        mage.quintessence = 5
+        mage.paradox = 2
+        mage.hubris = 1
+        mage.quiet = 0
+        
+        // Set some spheres
+        mage.spheres["Correspondence"] = 2
+        mage.spheres["Forces"] = 3
+        mage.spheres["Prime"] = 1
+        mage.spheres["Mind"] = 2
+        mage.spheres["Life"] = 1
+        
+        // Verify all values are set correctly for PDF generation
+        #expect(mage.arete == 3)
+        #expect(mage.quintessence == 5)
+        #expect(mage.paradox == 2)
+        #expect(mage.hubris == 1)
+        #expect(mage.quiet == 0)
+        #expect(mage.notes == "Test notes for character")
+        #expect(mage.characterDescription == "Test character background and history")
+        #expect(mage.spheres["Correspondence"] == 2)
+        #expect(mage.spheres["Forces"] == 3)
+        
+        // Generate PDF to ensure no crashes
+        let pdfData = PDFGenerator.generateCharacterPDF(for: mage)
+        #expect(pdfData != nil)
+        #expect((pdfData?.count ?? 0) > 1000)
     }
 }

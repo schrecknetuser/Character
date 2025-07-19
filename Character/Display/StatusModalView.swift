@@ -175,6 +175,11 @@ struct StatusModalView: View {
             character: mage,
             onChange: { refresh() }
         )
+        EditableQuintessenceRowView(
+            character: mage,
+            availableWidth: geometry.size.width - 40,
+            onChange: { refresh() }
+        )
     }
     
     private func refresh() {
