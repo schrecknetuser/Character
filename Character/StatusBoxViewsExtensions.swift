@@ -271,6 +271,16 @@ struct EditableAreteRowView: View {
                 .font(.headline)
                 .fontWeight(.semibold)
             
+            // Dots visualization (like SphereRowView)
+            HStack(spacing: 4) {
+                ForEach(0..<5, id: \.self) { index in
+                    Circle()
+                        .fill(index < character.arete ? Color.primary : Color.clear)
+                        .stroke(Color.primary, lineWidth: 1)
+                        .frame(width: 12, height: 12)
+                }
+            }
+            
             // Arete controls
             HStack {
                 if character.arete > 0 {
@@ -303,6 +313,37 @@ struct EditableAreteRowView: View {
                 }
             }
             .padding(.top, 8)
+        }
+    }
+}
+
+// Editable Quintessence Row View
+struct EditableQuintessenceRowView: View {
+    @Binding var character: MageCharacter
+    let availableWidth: CGFloat
+    var onChange: (() -> Void)? = nil
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Quintessence")
+                .font(.headline)
+                .fontWeight(.semibold)
+            
+            // Dots visualization (always 7 dots, all filled)
+            HStack(spacing: 4) {
+                ForEach(0..<7, id: \.self) { index in
+                    Circle()
+                        .fill(Color.primary)
+                        .stroke(Color.primary, lineWidth: 1)
+                        .frame(width: 12, height: 12)
+                }
+            }
+            
+            // Note that quintessence is always 7
+            Text("Quintessence: 7 (Fixed)")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .padding(.top, 4)
         }
     }
 }

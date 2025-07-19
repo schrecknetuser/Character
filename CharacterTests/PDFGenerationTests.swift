@@ -77,11 +77,19 @@ struct PDFGenerationTests {
         mage.name = "Test Mage"
         mage.concept = "Academic Researcher"
         mage.chronicleName = "Test Chronicle"
+        mage.paradigm = "Hermetic Order"
+        mage.practice = "High Ritual Magic"
+        mage.arete = 3
         
         // Set some basic attributes
         mage.physicalAttributes["Strength"] = 2
         mage.socialAttributes["Charisma"] = 2
         mage.mentalAttributes["Intelligence"] = 4
+        
+        // Set some spheres
+        mage.spheres["Forces"] = 2
+        mage.spheres["Prime"] = 1
+        mage.spheres["Correspondence"] = 1
         
         // Generate PDF
         let pdfData = PDFGenerator.generateCharacterPDF(for: mage)
@@ -89,6 +97,9 @@ struct PDFGenerationTests {
         // Verify PDF was generated
         #expect(pdfData != nil)
         #expect((pdfData?.count ?? 0) > 1000)
+        
+        // Verify quintessence is always 7
+        #expect(mage.quintessence == 7)
     }
     
     @Test func testPDFGenerationWithEmptyCharacter() async throws {
@@ -101,5 +112,17 @@ struct PDFGenerationTests {
         let pdfData = PDFGenerator.generateCharacterPDF(for: vampire)
         
         #expect(pdfData != nil)
+    }
+    
+    @Test func testMageQuintessenceAlwaysSeven() async throws {
+        // Create a new mage character
+        let mage = MageCharacter()
+        
+        // Quintessence should always be 7
+        #expect(mage.quintessence == 7)
+        
+        // Even after cloning
+        let clonedMage = mage.clone() as! MageCharacter
+        #expect(clonedMage.quintessence == 7)
     }
 }

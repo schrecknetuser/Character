@@ -8,6 +8,7 @@ class MageCharacter: CharacterBase {
     @Published var hubris: Int
     @Published var quiet: Int
     @Published var arete: Int
+    @Published var quintessence: Int
     @Published var hubrisStates: [MageTraitState]
     @Published var quietStates: [MageTraitState]
     @Published var paradigm: String
@@ -19,7 +20,7 @@ class MageCharacter: CharacterBase {
     @Published var synergy: MageSynergy
 
     enum CodingKeys: String, CodingKey {
-        case spheres, paradox, hubris, quiet, arete, hubrisStates, quietStates, paradigm, practice, instruments, dateOfAwakening, essence, resonance, synergy
+        case spheres, paradox, hubris, quiet, arete, quintessence, hubrisStates, quietStates, paradigm, practice, instruments, dateOfAwakening, essence, resonance, synergy
     }
 
     override init(characterType: CharacterType = .mage) {
@@ -28,6 +29,7 @@ class MageCharacter: CharacterBase {
         self.hubris = 0
         self.quiet = 0
         self.arete = 2
+        self.quintessence = 7  // Always set to 7 as specified
         self.hubrisStates = Array(repeating: .unchecked, count: 5)
         self.quietStates = Array(repeating: .unchecked, count: 5)
         self.paradigm = ""
@@ -46,6 +48,7 @@ class MageCharacter: CharacterBase {
         self.hubris = try container.decode(Int.self, forKey: .hubris)
         self.quiet = try container.decode(Int.self, forKey: .quiet)
         self.arete = try container.decode(Int.self, forKey: .arete)
+        self.quintessence = try container.decodeIfPresent(Int.self, forKey: .quintessence) ?? 7  // Default to 7 for existing characters
         self.hubrisStates = try container.decode([MageTraitState].self, forKey: .hubrisStates)
         self.quietStates = try container.decode([MageTraitState].self, forKey: .quietStates)
         self.paradigm = try container.decodeIfPresent(String.self, forKey: .paradigm) ?? ""
@@ -66,6 +69,7 @@ class MageCharacter: CharacterBase {
         try container.encode(hubris, forKey: .hubris)
         try container.encode(quiet, forKey: .quiet)
         try container.encode(arete, forKey: .arete)
+        try container.encode(quintessence, forKey: .quintessence)
         try container.encode(hubrisStates, forKey: .hubrisStates)
         try container.encode(quietStates, forKey: .quietStates)
         try container.encode(paradigm, forKey: .paradigm)
@@ -103,6 +107,9 @@ class MageCharacter: CharacterBase {
         }
         if self.arete != other.arete {
             changes.append("arete \(self.arete)→\(other.arete)")
+        }
+        if self.quintessence != other.quintessence {
+            changes.append("quintessence \(self.quintessence)→\(other.quintessence)")
         }
         if self.hubris != other.hubris {
             changes.append("hubris \(self.hubris)→\(other.hubris)")
@@ -148,6 +155,7 @@ class MageCharacter: CharacterBase {
         copy.hubris = self.hubris
         copy.quiet = self.quiet
         copy.arete = self.arete
+        copy.quintessence = self.quintessence
         copy.hubrisStates = self.hubrisStates
         copy.quietStates = self.quietStates
         copy.paradigm = self.paradigm
