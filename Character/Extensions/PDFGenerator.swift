@@ -646,7 +646,13 @@ class PDFGenerator {
                             let abilityIndex0 = abilityIndex - 1 // Convert to 0-based indexing
                             if abilityIndex0 < allSelectedPowers.count {
                                 let selectedPowersArray = Array(allSelectedPowers)
-                                widget.widgetStringValue = selectedPowersArray[abilityIndex0]
+                                let levelPattern = "Page_"
+                                if let regex2 = try? NSRegularExpression(pattern: levelPattern, options: []),
+                                   let match2 = regex2.firstMatch(in: fieldName, options: [], range: NSRange(location: 0, length: fieldName.count)){
+                                    widget.widgetStringValue = String(discipline.getPowerLevel(powerName: selectedPowersArray[abilityIndex0]))
+                                } else {
+                                    widget.widgetStringValue = selectedPowersArray[abilityIndex0]
+                                }
                             }
                         }
                     }

@@ -308,6 +308,18 @@ struct V5Discipline: Identifiable, Codable, Hashable {
         return powers[level] ?? []
     }
     
+    func getPowerLevel(powerName: String) -> Int
+    {
+        for i in getLevels() {
+            for j in getPowers(for: i) {
+                if j.name == powerName {
+                    return i
+                }
+            }
+        }
+        return 0
+    }
+    
     // Add a power to a specific level
     mutating func addPower(_ power: V5DisciplinePower, level: Int) {
         if powers[level] == nil {
