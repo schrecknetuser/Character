@@ -642,7 +642,7 @@ class PDFGenerator {
                         let disciplineIndex0 = disciplineIndex - 1 // Convert to 0-based indexing
                         if disciplineIndex0 < vampire.v5Disciplines.count {
                             let discipline = vampire.v5Disciplines[disciplineIndex0]
-                            let allSelectedPowers = discipline.getAllSelectedPowerNames()
+                            let allSelectedPowers = discipline.getSortedSelectedPowerNames()
                             let abilityIndex0 = abilityIndex - 1 // Convert to 0-based indexing
                             if abilityIndex0 < allSelectedPowers.count {
                                 let selectedPowersArray = Array(allSelectedPowers)

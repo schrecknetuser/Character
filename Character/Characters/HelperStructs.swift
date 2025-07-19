@@ -359,6 +359,21 @@ struct V5Discipline: Identifiable, Codable, Hashable {
         return Set(selectedPowers.values.flatMap { $0.map(\.name) })
     }
     
+    func getSortedSelectedPowerNames() -> [String] {
+        let sortedPowerNames: [String] = selectedPowers
+            .values
+            .flatMap { $0 } // Flatten the dictionary values into a single array
+            .sorted { // Sort first by level, then by name
+                if $0.level != $1.level {
+                    return $0.level < $1.level
+                } else {
+                    return $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+                }
+            }
+            .map { $0.name } // Extract just the names
+        return sortedPowerNames
+    }
+    
     // Custom coding to maintain backwards compatibility
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
