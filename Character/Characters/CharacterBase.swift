@@ -185,6 +185,8 @@ protocol BaseCharacter: AnyObject, Identifiable, Codable, ObservableObject {
     var currentSession: Int { get set }
     var changeLog: [ChangeLogEntry] { get set }
     var isArchived: Bool { get set }
+    var isInCreation: Bool { get set }
+    var creationProgress: Int { get set }
 
     var health: Int { get set }
     var healthStates: [HealthState] { get set }
@@ -205,6 +207,20 @@ protocol BaseCharacter: AnyObject, Identifiable, Codable, ObservableObject {
     func getSkillValue(skill: String) -> Int
     func generateChangeSummary(for updated: any BaseCharacter) -> String
     func clone() -> any BaseCharacter
+}
+
+struct IdentifiableCharacter: Identifiable, Equatable {
+    let id: UUID
+    let character: any BaseCharacter
+
+    init(character: any BaseCharacter) {
+        self.id = character.id // assuming BaseCharacter has `id: UUID`
+        self.character = character
+    }
+
+    static func ==(lhs: IdentifiableCharacter, rhs: IdentifiableCharacter) -> Bool {
+        lhs.id == rhs.id
+    }
 }
 
 // MARK: - CharacterBase
@@ -245,6 +261,8 @@ class CharacterBase: BaseCharacter {
     @Published var currentSession: Int = 1
     @Published var changeLog: [ChangeLogEntry] = []
     @Published var isArchived: Bool = false
+    @Published var isInCreation: Bool = false
+    @Published var creationProgress: Int = 0
 
     @Published var health: Int
     @Published var healthStates: [HealthState]
@@ -257,7 +275,7 @@ class CharacterBase: BaseCharacter {
              willpower, experience, spentExperience,
              ambition, desire, chronicleName, concept, characterDescription, notes, dateOfBirth,
              advantages, flaws, backgroundMerits, backgroundFlaws, convictions, touchstones, chronicleTenets,
-             specializations, currentSession, changeLog, isArchived,
+             specializations, currentSession, changeLog, isArchived, isInCreation, creationProgress,
              health, healthStates, willpowerStates
     }
 
@@ -292,6 +310,8 @@ class CharacterBase: BaseCharacter {
         currentSession = try container.decode(Int.self, forKey: .currentSession)
         changeLog = try container.decode([ChangeLogEntry].self, forKey: .changeLog)
         isArchived = try container.decodeIfPresent(Bool.self, forKey: .isArchived) ?? false
+        isInCreation = try container.decodeIfPresent(Bool.self, forKey: .isInCreation) ?? false
+        creationProgress = try container.decodeIfPresent(Int.self, forKey: .creationProgress) ?? 0
         health = try container.decode(Int.self, forKey: .health)
         healthStates = try container.decode([HealthState].self, forKey: .healthStates)
         willpowerStates = try container.decode([WillpowerState].self, forKey: .willpowerStates)
@@ -328,6 +348,8 @@ class CharacterBase: BaseCharacter {
         try container.encode(currentSession, forKey: .currentSession)
         try container.encode(changeLog, forKey: .changeLog)
         try container.encode(isArchived, forKey: .isArchived)
+        try container.encode(isInCreation, forKey: .isInCreation)
+        try container.encode(creationProgress, forKey: .creationProgress)
         try container.encode(health, forKey: .health)
         try container.encode(healthStates, forKey: .healthStates)
         try container.encode(willpowerStates, forKey: .willpowerStates)
@@ -678,6 +700,8 @@ class CharacterBase: BaseCharacter {
         copy.currentSession = self.currentSession
         copy.changeLog = self.changeLog
         copy.isArchived = self.isArchived
+        copy.isInCreation = self.isInCreation
+        copy.creationProgress = self.creationProgress
         copy.health = self.health
         copy.healthStates = self.healthStates
         copy.willpowerStates = self.willpowerStates
@@ -788,5 +812,34 @@ class CharacterStore: ObservableObject {
         updatedCharacter.isArchived = false
         updatedCharacter.changeLog.append(ChangeLogEntry(summary: "Character returned from archive"))
         updateCharacter(updatedCharacter)
+    }
+    
+    func addCharacterInCreation(_ character: any BaseCharacter) {
+        var creationCharacter = character
+        creationCharacter.isInCreation = true
+        creationCharacter.creationProgress = 0
+        characters.append(AnyCharacter(creationCharacter))
+    }
+    
+    func updateCharacterCreationProgress(_ character: any BaseCharacter, stage: Int) {
+        var updatedCharacter = character
+        updatedCharacter.creationProgress = stage
+        updateCharacter(updatedCharacter)
+    }
+    
+    func completeCharacterCreation(_ character: any BaseCharacter) {
+        var completedCharacter = character
+        completedCharacter.isInCreation = false
+        completedCharacter.creationProgress = -1 // Mark as complete
+        completedCharacter.changeLog.append(ChangeLogEntry(summary: "Character creation completed."))
+        updateCharacter(completedCharacter)
+    }
+    
+    func getCharactersInCreation() -> [AnyCharacter] {
+        return characters.filter { $0.character.isInCreation }
+    }
+    
+    func getCompletedCharacters() -> [AnyCharacter] {
+        return characters.filter { !$0.character.isInCreation }
     }
 }

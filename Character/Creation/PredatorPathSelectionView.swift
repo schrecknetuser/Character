@@ -4,7 +4,6 @@ import SwiftUI
 struct PredatorTypeSelectionView: View {
     @ObservedObject var vampire: VampireCharacter
     @Binding var selectedType: PredatorType?
-    var showNoneOption: Bool = true
     var showCustomOption: Bool = true
     var onChange: (() -> Void)? = nil
     var onCustomTypeRequested: (() -> Void)? = nil
@@ -12,22 +11,10 @@ struct PredatorTypeSelectionView: View {
     @State private var showingCustomTypeForm: Bool = false
     @State private var customTypeName: String = ""
     @State private var customTypeDescription: String = ""
-    @State private var customTypeFeedingDescription: String = ""
+    @State private var customTypeFeedingDescription: String = ""        
     
     private var availableTypes: [PredatorType] {
         var types = V5Constants.predatorTypes
-        
-        // Add "None" option as a special type if enabled
-        if showNoneOption {
-            let noneType = PredatorType(
-                name: "None",
-                description: "No specific predator type chosen",
-                bonuses: [],
-                drawbacks: [],
-                feedingDescription: "Feeds as needed without a specialized hunting method"
-            )
-            types.insert(noneType, at: 0)
-        }
         
         // Add custom types from the vampire character
         types.append(contentsOf: vampire.customPredatorTypes)

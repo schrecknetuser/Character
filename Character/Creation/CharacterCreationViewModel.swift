@@ -14,6 +14,10 @@ class CharacterCreationViewModel: ObservableObject {
     init(characterType: CharacterType) {
         self.character = Self.createCharacter(of: characterType)
     }
+    
+    init(existingCharacter: any BaseCharacter) {
+        self.character = existingCharacter
+    }
 
     func setCharacterType(_ type: CharacterType) {
         self.character = Self.createCharacter(of: type)
@@ -59,10 +63,12 @@ class CharacterCreationViewModel: ObservableObject {
     // MARK: - SwiftUI Bindings
 
     func vampireBinding() -> Binding<VampireCharacter>? {
-        guard let _ = character as? VampireCharacter else { return nil }
+        guard let _ = character as? VampireCharacter else { 
+            return nil 
+        }
         return Binding(
             get: {
-                self.character as! VampireCharacter
+                return self.character as! VampireCharacter
             },
             set: {
                 self.character = $0

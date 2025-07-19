@@ -33,6 +33,7 @@ class VampireCharacter: CharacterBase, DisciplineCapable, CharacterWithHumanity 
         }
         
         self.humanityStates = humanityArray
+        self.predatorType = V5Constants.predatorTypes.first!.name
         
         super.init(characterType: characterType)
     }

@@ -15,7 +15,6 @@ struct PredatorTypeSelectionStage: View {
             PredatorTypeSelectionView(
                 vampire: character,
                 selectedType: $selectedType,
-                showNoneOption: true,
                 showCustomOption: true,
                 onChange: onChange,
                 onCustomTypeRequested: {
@@ -25,6 +24,11 @@ struct PredatorTypeSelectionStage: View {
             
             Section(footer: Text("Choose how your vampire hunts for blood. Each predator type provides unique advantages and challenges. You may also choose 'None' for no specific hunting style or create a custom predator type.")) {
                 EmptyView()
+            }
+        }
+        .onAppear {
+            if selectedType == nil, !character.predatorType.isEmpty {
+                selectedType = V5Constants.predatorTypes.first { $0.name == character.predatorType }
             }
         }
         .sheet(isPresented: $showingCustomTypeForm) {

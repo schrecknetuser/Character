@@ -204,10 +204,55 @@ struct CharacterListView: View {
     @Binding var expandedChronicles: [String: Bool]
     @State private var showArchived: Bool = false
     @State private var expandedArchivedChronicles: [String: Bool] = [:]
+    @State private var showingCreationWizard = false
+    @State private var characterToResume: IdentifiableCharacter? = nil
+    @State private var characterToDelete: (any BaseCharacter)? = nil
+    @State private var showingDeleteConfirmation = false
     let getCharacterDisplayInfo: (any BaseCharacter) -> (symbol: String, additionalInfo: String)
 
     var body: some View {
         List {
+            // Characters in creation section
+            let charactersInCreation = store.getCharactersInCreation()
+            if !charactersInCreation.isEmpty {
+                Section {
+                    ForEach(charactersInCreation.indices, id: \.self) { index in
+                        let character = charactersInCreation[index].character
+                        let displayInfo = getCharacterDisplayInfo(character)
+                        
+                        Button(action: {
+                            characterToResume = IdentifiableCharacter(character: character)
+                        }) {
+                            HStack {
+                                CharacterRow(character: character, displayInfo: displayInfo)
+                                Spacer()
+                                VStack(alignment: .trailing) {
+                                    Text("In Creation")
+                                        .font(.caption)
+                                        .foregroundColor(.orange)
+                                    Text("Stage \(character.creationProgress + 1)")
+                                        .font(.caption2)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                        }
+                        .foregroundColor(.primary)
+                    }
+                    .onDelete { offsets in
+                        // For unfinished characters, show confirmation for the first character to be deleted
+                        if let firstOffset = offsets.first {
+                            let characterToDeleteCandidate = charactersInCreation[firstOffset].character
+                            characterToDelete = characterToDeleteCandidate
+                            showingDeleteConfirmation = true
+                        }
+                    }
+                } header: {
+                    Text("Characters in Creation")
+                        .font(.headline)
+                        .foregroundColor(.orange)
+                }
+            }
+            
             // Active characters grouped by chronicle
             ForEach(groupedActiveCharacters(), id: \.chronicleName) { group in
                 // Ensure default expanded state before the view
@@ -260,6 +305,27 @@ struct CharacterListView: View {
                 }
             }
         }
+        .fullScreenCover(isPresented: $showingCreationWizard) {
+            CharacterCreationWizard(store: store)
+        }
+        .fullScreenCover(item: $characterToResume) { identifiable in
+            CharacterCreationWizard(store: store, existingCharacter: identifiable.character)
+        }
+        .alert("Delete Unfinished Character", isPresented: $showingDeleteConfirmation) {
+            Button("Delete", role: .destructive) {
+                if let character = characterToDelete {
+                    deleteCharacterInCreation(character)
+                }
+                characterToDelete = nil
+            }
+            Button("Cancel", role: .cancel) {
+                characterToDelete = nil
+            }
+        } message: {
+            if let character = characterToDelete {
+                Text("Are you sure you want to delete the unfinished character '\(character.name.isEmpty ? "Unnamed Character" : character.name)'? All progress will be lost and this action cannot be undone.")
+            }
+        }
     }
     
     @discardableResult
@@ -279,14 +345,20 @@ struct CharacterListView: View {
         }
         return false
     }
+    
+    private func deleteCharacterInCreation(_ character: any BaseCharacter) {
+        if let index = store.characters.firstIndex(where: { $0.id == character.id }) {
+            store.deleteCharacter(at: IndexSet([index]))
+        }
+    }
 
     private func groupedActiveCharacters() -> [(chronicleName: String, characters: [AnyCharacter])] {
-        let activeCharacters = store.characters.filter { !$0.character.isArchived }
+        let activeCharacters = store.getCompletedCharacters().filter { !$0.character.isArchived }
         return groupCharacters(activeCharacters)
     }
     
     private func groupedArchivedCharacters() -> [(chronicleName: String, characters: [AnyCharacter])] {
-        let archivedCharacters = store.characters.filter { $0.character.isArchived }
+        let archivedCharacters = store.getCompletedCharacters().filter { $0.character.isArchived }
         return groupCharacters(archivedCharacters)
     }
     
