@@ -98,8 +98,8 @@ struct PDFGenerationTests {
         #expect(pdfData != nil)
         #expect((pdfData?.count ?? 0) > 1000)
         
-        // Verify quintessence is always 7
-        #expect(mage.quintessence == 7)
+        // Verify quintessence defaults to 0
+        #expect(mage.quintessence == 0)
     }
     
     @Test func testPDFGenerationWithEmptyCharacter() async throws {
@@ -114,15 +114,37 @@ struct PDFGenerationTests {
         #expect(pdfData != nil)
     }
     
-    @Test func testMageQuintessenceAlwaysSeven() async throws {
+    @Test func testMageQuintessenceDefaultsToZero() async throws {
         // Create a new mage character
         let mage = MageCharacter()
         
-        // Quintessence should always be 7
-        #expect(mage.quintessence == 7)
+        // Quintessence should default to 0
+        #expect(mage.quintessence == 0)
         
         // Even after cloning
         let clonedMage = mage.clone() as! MageCharacter
-        #expect(clonedMage.quintessence == 7)
+        #expect(clonedMage.quintessence == 0)
+    }
+    
+    @Test func testMageQuintessenceEditable() async throws {
+        // Create a new mage character
+        let mage = MageCharacter()
+        
+        // Should start at 0
+        #expect(mage.quintessence == 0)
+        
+        // Should be able to increase to 7
+        mage.quintessence = 3
+        #expect(mage.quintessence == 3)
+        
+        mage.quintessence = 7
+        #expect(mage.quintessence == 7)
+        
+        // Should be able to decrease back to 0
+        mage.quintessence = 2
+        #expect(mage.quintessence == 2)
+        
+        mage.quintessence = 0
+        #expect(mage.quintessence == 0)
     }
 }

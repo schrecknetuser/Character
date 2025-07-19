@@ -329,21 +329,48 @@ struct EditableQuintessenceRowView: View {
                 .font(.headline)
                 .fontWeight(.semibold)
             
-            // Dots visualization (always 7 dots, all filled)
+            // Dots visualization (0-7 dots, filled based on current value)
             HStack(spacing: 4) {
                 ForEach(0..<7, id: \.self) { index in
                     Circle()
-                        .fill(Color.primary)
+                        .fill(index < character.quintessence ? Color.primary : Color.clear)
                         .stroke(Color.primary, lineWidth: 1)
                         .frame(width: 12, height: 12)
                 }
             }
             
-            // Note that quintessence is always 7
-            Text("Quintessence: 7 (Fixed)")
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .padding(.top, 4)
+            // Quintessence controls
+            HStack {
+                if character.quintessence > 0 {
+                    Button(action: {
+                        if character.quintessence > 0 {
+                            character.quintessence -= 1
+                            onChange?()
+                        }
+                    }) {
+                        Image(systemName: "minus.circle")
+                            .foregroundColor(.red)
+                    }
+                }
+                
+                Text("Quintessence: \(character.quintessence)")
+                    .font(.body)
+                
+                Spacer()
+                
+                if character.quintessence < 7 {
+                    Button(action: {
+                        if character.quintessence < 7 {
+                            character.quintessence += 1
+                            onChange?()
+                        }
+                    }) {
+                        Image(systemName: "plus.circle")
+                            .foregroundColor(.green)
+                    }
+                }
+            }
+            .padding(.top, 8)
         }
     }
 }

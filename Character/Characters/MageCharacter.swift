@@ -29,7 +29,7 @@ class MageCharacter: CharacterBase {
         self.hubris = 0
         self.quiet = 0
         self.arete = 2
-        self.quintessence = 7  // Always set to 7 as specified
+        self.quintessence = 0  // Default to 0, can be edited to 0-7
         self.hubrisStates = Array(repeating: .unchecked, count: 5)
         self.quietStates = Array(repeating: .unchecked, count: 5)
         self.paradigm = ""
@@ -48,7 +48,7 @@ class MageCharacter: CharacterBase {
         self.hubris = try container.decode(Int.self, forKey: .hubris)
         self.quiet = try container.decode(Int.self, forKey: .quiet)
         self.arete = try container.decode(Int.self, forKey: .arete)
-        self.quintessence = try container.decodeIfPresent(Int.self, forKey: .quintessence) ?? 7  // Default to 7 for existing characters
+        self.quintessence = try container.decodeIfPresent(Int.self, forKey: .quintessence) ?? 0  // Default to 0 for existing characters
         self.hubrisStates = try container.decode([MageTraitState].self, forKey: .hubrisStates)
         self.quietStates = try container.decode([MageTraitState].self, forKey: .quietStates)
         self.paradigm = try container.decodeIfPresent(String.self, forKey: .paradigm) ?? ""
