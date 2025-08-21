@@ -1249,4 +1249,417 @@ struct V5Constants {
     static func getAllPredatorTypeNames() -> [String] {
         return predatorTypes.map { $0.name }
     }
+    
+    // MARK: - Psychic Powers
+    static let psychicPowers: [PsychicPowerCategory: [PsychicPower]] = [
+        .minorPsychicPowers: [
+            PsychicPower(
+                name: "Call Vermin",
+                description: "You summon and compel simple creatures to fly or scurry at your whim. Until the start of your next turn, you gain control of vermin in the area (you don't need to see them), amassing them as a swarm that fills one Zone within Medium Range. If the vermin crawl, the swarm's Zone is Difficult Terrain. If the swarm flies, its Zone is Lightly Obscured. As a free action once on your turn, you can command the swarm to move to an adjacent Zone within Long Range of you.\n\nAlternatively, you can summon and control a single vermin, which emerges within Medium Range. As a free action once on your turn, you can direct it to perform a simple task, such as fetching a keycard or gnawing through bindings. You immediately lose control of vermin beyond Medium Range. This power does not grant you the ability to communicate with vermin, only command them.",
+                category: .minorPsychicPowers,
+                warpRating: 2,
+                difficulty: "Challenging (+0)",
+                range: "Medium",
+                target: "Special",
+                duration: "Sustained"
+            ),
+            PsychicPower(
+                name: "Combustion",
+                description: "Your connection to the Warp momentarily manifests an intense mote of flame, seemingly from nothing. Choose a flammable object within Medium Range. The target catches fire and burns normally. If the target is held or worn by a creature, the creature must drop or remove the item before the end of its next turn or become Ablaze until it or another creature within Immediate Range uses an Action to extinguish it.",
+                category: .minorPsychicPowers,
+                warpRating: 2,
+                difficulty: "Routine (+20)",
+                range: "Medium",
+                target: "1 Object",
+                duration: "Instant"
+            ),
+            PsychicPower(
+                name: "Dread Presence",
+                description: "You invoke the Warp's terrifying nature to exude a dreadful presence, inciting irrational fear in enemies near you. Until the start of your next turn, the first time an enemy enters your Zone in a round or starts its turn there, it must win a Challenging (+0) Discipline (Fear) Test Opposed by your Manifest Test or become Frightened of you until the start of its next turn. If a creature wins the Opposed Test, it is immune to this power for the rest of the encounter.",
+                category: .minorPsychicPowers,
+                warpRating: 2,
+                difficulty: "Challenging (+0)",
+                range: "Self",
+                target: "Your Zone",
+                duration: "Sustained"
+            ),
+            PsychicPower(
+                name: "Dull Pain",
+                description: "You disrupt a creature's nociceptors, dulling its sensitivity to pain. Choose a number of creatures (including yourself) up to the SL of your Manifest Test within Short Range. Until the start of your next turn, the target feels no pain, and gains one point of Armour to all hit locations.",
+                category: .minorPsychicPowers,
+                warpRating: 2,
+                difficulty: "Routine (+20)",
+                range: "Short",
+                target: "SL Creatures",
+                duration: "Sustained"
+            ),
+            PsychicPower(
+                name: "Float",
+                description: "You free yourself from gravity's constraints, floating weightlessly. Until the start of your next turn, you float suspended in space. While floating, you can move at Slow Speed in any direction, ignoring Difficult Terrain. Alternatively, you can touch an object within Immediate Range and reduce its Encumbrance by 1 per SL until the start of your next turn.",
+                category: .minorPsychicPowers,
+                warpRating: 2,
+                difficulty: "Routine (+20)",
+                range: "Self/Immediate",
+                target: "Self/1 Object",
+                duration: "Sustained"
+            ),
+            PsychicPower(
+                name: "Ignite",
+                description: "A mere thought summons a mote of flame into your hand. Until the start of your next turn, you create a small flame in one of your hands which does not burn you and cannot be extinguished by conventional means. Otherwise the flame functions as a normal flame, casting light, scorching creatures and objects, and igniting flammable materials it touches.",
+                category: .minorPsychicPowers,
+                warpRating: 1,
+                difficulty: "Easy (+40)",
+                range: "Self",
+                target: "Self",
+                duration: "Sustained"
+            ),
+            PsychicPower(
+                name: "Ill Omen",
+                description: "You allow the borders of the immaterium to bleed through into reality, twisting the physical realm to unsettle, amaze, or threaten those who experience the Warp's horrible nature. Roll on the Psychic Phenomena Table once per SL of your Manifest Test and choose one of the results. Choose a Zone within Medium Range. The chosen psychic phenomena appears in the target Zone until the start of your next turn.",
+                category: .minorPsychicPowers,
+                warpRating: 2,
+                difficulty: "Challenging (+0)",
+                range: "Medium",
+                target: "1 Zone",
+                duration: "Sustained"
+            ),
+            PsychicPower(
+                name: "Jinx",
+                description: "You invoke the maleficent nature of the Warp to curse your target with impending misfortune. Choose a creature within Medium Range. The first Test the target makes within the next hour is made with Disadvantage.",
+                category: .minorPsychicPowers,
+                warpRating: 2,
+                difficulty: "Challenging (+0)",
+                range: "Medium",
+                target: "1 Creature",
+                duration: "Instant"
+            ),
+            PsychicPower(
+                name: "Luck",
+                description: "You invoke the fickle nature of the Warp to tilt probability in your favour. When you must make a Test, you can attempt to manifest this power immediately before making that Test. If you manifest it, you make the Test with Advantage. If you fail to manifest it, you make the Test with Disadvantage. This power cannot be used to augment Psychic Mastery Tests, and it cannot be used more than once per Round.",
+                category: .minorPsychicPowers,
+                warpRating: 1,
+                difficulty: "Easy (+40)",
+                range: "Self",
+                target: "Self",
+                duration: "Instant"
+            ),
+            PsychicPower(
+                name: "Nova",
+                description: "You channel the Warp's destructive power, blasting everything around you with an expanding ring of searing energy. Each creature (excluding you) in your Zone suffers Damage equal to 4 + your Willpower Bonus + the SL from your Manifest Test, and must win a Routine (+20) Athletics (Might) Test Opposing your Manifest Test or be knocked Prone.",
+                category: .minorPsychicPowers,
+                warpRating: 2,
+                difficulty: "Routine (+20)",
+                range: "Self",
+                target: "Your Zone",
+                duration: "Instant"
+            ),
+            PsychicPower(
+                name: "Preternatural Senses",
+                description: "You augment your biology to grant yourself enhanced senses beyond those typical of your species. Until the start of your next turn, you gain the following effects:\n• You gain low light vision as though wearing Nightvision goggles.\n• You can see heat emissions as though wearing Preysense goggles.\n• You gain Advantage to Perception Tests.\nAdditionally, if you score at least 5 SL on your Manifest Test, you can sense creatures, objects, and movement using senses other than sight, allowing you to ignore the Blinded condition.",
+                category: .minorPsychicPowers,
+                warpRating: 2,
+                difficulty: "Routine (+20)",
+                range: "Self",
+                target: "Self",
+                duration: "Sustained"
+            ),
+            PsychicPower(
+                name: "Psychic Scrutiny",
+                description: "You can scrutinise a creature's soul, glimpsing shreds of its future and past to glean vital information about its current state of being. Choose a creature within Short Range. For each SL of your Manifest Test, you learn one of the following pieces of information about the target:\n• Current and Maximum Wounds\n• Highest and Lowest Characteristic\n• One Characteristic's Value (your choice)\n• Most advanced Skill (GM's choice)\n• One Talent or Trait (GM's choice)",
+                category: .minorPsychicPowers,
+                warpRating: 1,
+                difficulty: "Easy (+40)",
+                range: "Short",
+                target: "1 Creature",
+                duration: "Instant"
+            ),
+            PsychicPower(
+                name: "Psychic Static",
+                description: "You emanate imperceptible psychic static, shrouding you from notice and detection. Until the start of your next turn, a creature or device doesn't perceive you unless it wins an Easy (+40) Awareness (Any) Test Opposing your Manifest Test. Those you are shrouded from look past you, do not register your voice or footsteps, and otherwise act as though you aren't there. If a creature or device takes Damage or you interact with it, it becomes able to perceive you.",
+                category: .minorPsychicPowers,
+                warpRating: 1,
+                difficulty: "Easy (+40)",
+                range: "Self",
+                target: "Self",
+                duration: "Sustained"
+            ),
+            PsychicPower(
+                name: "Scalding Glance",
+                description: "With a simple glance, you pour pyromantic energy into a nearby liquid, causing it to spontaneously boil. Choose up to 20 gallons of liquid per SL of your Manifest Test within Medium Range. The liquid instantly boils and continues to do so until the start of your next turn. When this power ends, the boiling subsides, but the liquid still retains heat, cooling over time at a normal rate. This power can't target liquid inside a living creature. Confined liquids may cause the container they are in to explode.",
+                category: .minorPsychicPowers,
+                warpRating: 2,
+                difficulty: "Challenging (+0)",
+                range: "Medium",
+                target: "Special",
+                duration: "Sustained"
+            ),
+            PsychicPower(
+                name: "Seal Wounds",
+                description: "You perceive the biomantic energy in a creature's body, bolstering it with your psychic power to speed the restoration of damaged tissue. Touch a creature (including yourself) within Immediate Range. The target heals Wounds equal to your Willpower Bonus + the target's Toughness Bonus + the SL from your Manifest Test, and if the target is Bleeding, the Condition is removed. The influx of biomantic energy from this power taxes the target's body, so if it receives the benefit of this power again before it Rests, it becomes Fatigued.",
+                category: .minorPsychicPowers,
+                warpRating: 2,
+                difficulty: "Routine (+20)",
+                range: "Immediate",
+                target: "1 Creature",
+                duration: "Instant"
+            ),
+            PsychicPower(
+                name: "Sear",
+                description: "You channel psychic energy into an object until it glows with searing heat. Choose an object with an Encumbrance no greater than the SL of your Manifest Test within Medium Range. Until the start of your next turn, the object becomes burning hot and glows dimly. A creature touching the object when you manifest this power suffers Damage equal to your Willpower Bonus, and suffers the Damage again at the end of its turn if it's still touching the object. If the object is a piece of Armour a creature is wearing, its Armour Value does not reduce the Damage. When the power ends, the heated object cools at a normal rate. At the GM's discretion, materials that can withstand the heat may become somewhat malleable while heated, while less robust materials may simply melt.",
+                category: .minorPsychicPowers,
+                warpRating: 3,
+                difficulty: "Difficult (−10)",
+                range: "Medium",
+                target: "1 Object",
+                duration: "Sustained"
+            ),
+            PsychicPower(
+                name: "Smite",
+                description: "You unleash a corruscating blast of raw psychic power against a foe, rending flesh and spirit. Choose a Creature within Medium Range. The target suffers Damage equal to 2 + your Willpower Bonus + the SL from your Manifest Test, which ignores Armour.",
+                category: .minorPsychicPowers,
+                warpRating: 2,
+                difficulty: "Difficult (−10)",
+                range: "Medium",
+                target: "1 Creature",
+                duration: "Instant"
+            ),
+            PsychicPower(
+                name: "Soulsight",
+                description: "Souls burn like flames in the darkness of the Warp, and you can attune your senses to detect them. Until the start of your next turn, you can sense the presence of living creatures within Medium Range according to the Soulsight Table. You can exclude specific creatures, such as you and your allies, from what this power detects. Additionally, you have Advantage to Psyniscience Tests to detect or identify Daemons or Psykers while this power is active.",
+                category: .minorPsychicPowers,
+                warpRating: 2,
+                difficulty: "Challenging (+0)",
+                range: "Medium",
+                target: "Self",
+                duration: "Sustained"
+            ),
+            PsychicPower(
+                name: "Spasm",
+                description: "You disrupt the neuro-muscular system of a creature, causing it to momentarily lose control of one of its limbs. Choose a creature within Short Range. The target must win a Routine (+20) Fortitude (Endurance) Test Opposing your Manifest Test or lose the use of one of its limbs (your choice) until the start of your next turn. At the end of the target's turn, it makes another Routine (+20) Fortitude (Endurance) Test Opposing your Manifest Test, ending the power immediately if it wins. The affected limb cannot be used to perform any Action. If the limb is a leg, the target's Speed decreases one step (minimum Slow). If the limb is holding an item, it drops it. If the limb is Grappling a creature, the Grapple is released.",
+                category: .minorPsychicPowers,
+                warpRating: 2,
+                difficulty: "Routine (+20)",
+                range: "Short",
+                target: "1 Creature",
+                duration: "Sustained"
+            ),
+            PsychicPower(
+                name: "Spectral Hands",
+                description: "You manifest telekinetic forces to manipulate objects and move them through space around you. Choose any number of objects within Short Range with a total Encumbrance no greater than the SL of your Manifest Test. Until the start of your next turn, you can manipulate those objects as though they were held by invisible hands under your control. Fine, precise manipulation is not possible — only gross movements. The objects float in place, but as a Free Action once on your turn, you can move each of the objects within your Zone. Objects leave your control and fall to the ground if they are outside your Zone. Additionally, you can use your Action to Attack a target within your Zone with an object manipulated by this power. Make a Psychic Mastery (Telekinesis) Test as a melee weapon attack against the target. Regardless of what the object is, it deals 1 Damage per point of Encumbrance and is treated as an Ineffective weapon. Specialisation in Telekinesis applies to this power's Manifest Test.",
+                category: .minorPsychicPowers,
+                warpRating: 2,
+                difficulty: "Routine (+20)",
+                range: "Short",
+                target: "Special",
+                duration: "Sustained"
+            ),
+            PsychicPower(
+                name: "Lull",
+                description: "You're able to reach inside a creature with your mind, interfering with the biochemical systems keeping them awake. Choose a creature within Short Range. The target must win a Difficult (−10) Fortitude (Endurance) Test Opposing your Manifest Test or fall Unconscious until the start of your next turn. The target has Advantage on the Test if they are actively performing a strenuous or stressful task or involved in combat. If the target suffers Damage, this power ends. The target regains consciousness immediately when this power ends. Specialisation in Biomancy applies to this power's Manifest Test.",
+                category: .minorPsychicPowers,
+                warpRating: 3,
+                difficulty: "Difficult (−10)",
+                range: "Short",
+                target: "1 Creature",
+                duration: "Sustained"
+            )
+        ],
+        .biomancy: [
+            PsychicPower(
+                name: "Affliction",
+                description: "You psychically wreak havoc with a creature's biology to hinder and debilitate them. Choose a creature within Short Range. The target must win a Difficult (−10) Fortitude (Endurance) Test Opposing your Manifest Test or gain one of the following conditions until the start of your next turn: Blinded, Deafened, Fatigued, Poisoned, or Stunned. At the end of the target's turn, it makes another Difficult (−10) Fortitude (Endurance) Test Opposing your Manifest Test, ending the power immediately if it wins. Once a creature wins the Opposed Test, it is immune to this power for the next hour.",
+                category: .biomancy,
+                warpRating: 3,
+                difficulty: "Difficult (−10)",
+                range: "Short",
+                target: "1 Creature",
+                duration: "Sustained"
+            ),
+            PsychicPower(
+                name: "Iron Limb",
+                description: "You fortify your musculature with an influx of psychic energy, thickening muscles and strengthening tendons, augmenting your physical prowess with the boundless power of the Warp. Until the start of your next turn, you have Advantage on Strength and Weapon Skill Tests. Additionally, whenever you reference your Strength Bonus to calculate a number (such as melee weapon Damage), you may use the SL from your Manifest Test instead of your Strength Bonus.",
+                category: .biomancy,
+                warpRating: 1,
+                difficulty: "Easy (+40)",
+                range: "Self",
+                target: "Self",
+                duration: "Sustained"
+            ),
+            PsychicPower(
+                name: "Life Leech",
+                description: "Attuned to the rhythms of life, you form a psychic link to another creature's body, latching onto it like a parasite syphoning its vitality. Choose a creature within Medium Range. The target must win a Very Hard (−30) Fortitude (Endurance) Test Opposing your Manifest Test or become linked to you until the start of your next turn. While linked, you can use a Free Action once on your turn to deal Damage equal to your 3 + your Willpower Bonus to the target, which ignores Armour and can't be reduced in any way. When this power deals Damage, you heal a number of Wounds equal to half the Damage dealt (rounding up). At the end of the target's turn, it repeats the Opposed Test, ending the power immediately if it wins. Once a target wins the Opposed Test, it is immune to this power for the next hour.",
+                category: .biomancy,
+                warpRating: 4,
+                difficulty: "Very Hard (−30)",
+                range: "Medium",
+                target: "1 Creature",
+                duration: "Sustained"
+            ),
+            PsychicPower(
+                name: "Bio-Lightning",
+                description: "You alter your physiology to generate vast amounts of electrical current, discharging it in a devastating electrical arc. Choose a creature within Medium Range. The target and creatures within Immediate Range of the target suffer Damage equal to 4 + your Willpower Bonus + SL from your Manifest Test. A creature Damaged by this must also win a Hard (−20) Fortitude (Endurance) Test Opposing your Manifest Test or be Stunned until the beginning of your next turn.",
+                category: .biomancy,
+                warpRating: 3,
+                difficulty: "Hard (−20)",
+                range: "Medium",
+                target: "1 Creature",
+                duration: "Instant"
+            ),
+            PsychicPower(
+                name: "Ferrocrete Flesh",
+                description: "You rapidly modify a creature's flesh with psychic directives, thickening its skin, increasing the density of its flesh, and fortifying its bones while increasing its bulk. Touch a creature (including yourself) within Immediate Range. Until the start of your next turn, the target gains an amount of Armour equal to its Toughness Bonus to all hit locations. If the creature's Toughness Bonus is greater than its Strength Bonus, the target's Speed decreases by one step (minimum Slow), and the target makes Agility Tests with Disadvantage. The target can use an Action to make a Challenging (+20) Fortitude (Endurance) Test Opposing your Manifest Test, ending this power immediately if it wins.",
+                category: .biomancy,
+                warpRating: 3,
+                difficulty: "Challenging (+0)",
+                range: "Immediate",
+                target: "1 Creature",
+                duration: "Sustained"
+            ),
+            PsychicPower(
+                name: "Haemorrhage",
+                description: "You force a surge of psychic power through your victim, rupturing blood vessels and re-opening scars to cause bleeding throughout their body. Choose a creature within Short Range. The target must win a Challenging (+0) Fortitude (Endurance) Test opposing your Manifest Test or suffer 2 Damage, ignoring Armour, and begin Bleeding (Major). The bleeding continues until it's stopped through medicae treatment or other means.",
+                category: .biomancy,
+                warpRating: 2,
+                difficulty: "Challenging (+0)",
+                range: "Short",
+                target: "1 Creature",
+                duration: "Instant"
+            ),
+            PsychicPower(
+                name: "Metabolic Overdrive",
+                description: "Push creatures' endocrine systems into overdrive, you flood their bodies with potent hormones that quicken their movements and reflexes. Choose a number of creatures (including yourself) within Short Range up to the SL of your Manifest Test. Until the start of your next turn, each target's Speed increases one step, and it makes Reflexes Tests with Advantage.",
+                category: .biomancy,
+                warpRating: 2,
+                difficulty: "Challenging (+0)",
+                range: "Short",
+                target: "SL Creatures",
+                duration: "Sustained"
+            ),
+            PsychicPower(
+                name: "Cleanse",
+                description: "You pour Psychic power through a creature's body to purge it of harmful disease vectors and restore healthy function. Touch a creature within Immediate Range. If the target is Poisoned or Stunned, those Conditions end. If the target is afflicted with a disease, it adds the SL from your Manifest Test to its next Test to resist it.",
+                category: .biomancy,
+                warpRating: 3,
+                difficulty: "Difficult (−10)",
+                range: "Immediate",
+                target: "1 Creature",
+                duration: "Instant"
+            ),
+            PsychicPower(
+                name: "Shape Flesh",
+                description: "Psychic manipulation of flesh allows you to sculpt a creature's body and features as you envision them. Touch a creature within Immediate Range. Over the course of 10 minutes, you psychically manipulate the target's anatomy and appearance, permanently changing them according to the Shape Flesh Table. If the target is unwilling, it opposes your attempt with an Easy (+40) Fortitude (Endurance) Test. Willing or not, the more substantial the alterations you make, the more pain the target experiences. If alterations from this power deliberately mimic the appearance of another specific creature, it can be used as part of a disguise to impersonate that creature. In that case, the Difficulty of Tests to detect the disguise is modified by −10 per SL of your Manifest Test.\n\nSL +1 — +2: Alter minor cosmetic features such as hair/eye/skin colour, facial features, or blemishes.\nSL +3 — +4: Moderately alter height, weight, natural posture, and physique.\nSL +5 or more: Drastically alter features and body structure. This includes rebuilding, removing, or disabling body parts such as limbs and sensory organs. You can cause or repair one Injury or Amputation.",
+                category: .biomancy,
+                warpRating: 1,
+                difficulty: "Easy (+40)",
+                range: "Immediate",
+                target: "1 Creature",
+                duration: "Permanent"
+            ),
+            PsychicPower(
+                name: "Wither",
+                description: "You bathe your surroundings in the anathema of life, necrotising living creatures with entropic force that desiccates plants and renders flesh withered and ashen. Each creature in your Zone must make a Routine (+20) Fortitude (Endurance) Test Opposing your Manifest Test. If you win the Opposed Test, the victim suffers Damage equal to the difference in SL. This Damage ignores Armour. If a creature suffers Damage greater than its Toughness Bonus, it is also Poisoned until the start of your next turn.",
+                category: .biomancy,
+                warpRating: 2,
+                difficulty: "Routine (+20)",
+                range: "Self",
+                target: "Your Zone",
+                duration: "Instant"
+            )
+        ],
+        .divination: [
+            PsychicPower(
+                name: "Dowsing",
+                description: "If you can imagine something in your mind's eye, you can follow the Warp's currents to it as though they were strings tangled throughout reality, tethering everything together. Choose a specific object or creature you have observed firsthand. Until the start of your next turn, if the target is within 1 mile per SL, you know which direction and how far it is from you, allowing you to follow this power to the target. Rather than choosing a specific quarry, you can choose a type of object, a material, or a species, such as detpacks, water, or Aeldari. Until the start of your next turn, you can sense if your quarry is within Long Range. You do not learn its location or how many instances of it are present, simply that it is in the area.",
+                category: .divination,
+                warpRating: 3,
+                difficulty: "Difficult (−10)",
+                range: "Special",
+                target: "Special",
+                duration: "Sustained"
+            ),
+            PsychicPower(
+                name: "Forewarning",
+                description: "Flashes of foresight warn you of impending danger, allowing you the chance to manoeuvre out of harm's way. Until the start of your next turn, you can take the Dodge Action as a Free Action on your turn.",
+                category: .divination,
+                warpRating: 2,
+                difficulty: "Routine (+20)",
+                range: "Self",
+                target: "Self",
+                duration: "Sustained"
+            ),
+            PsychicPower(
+                name: "Perfect Timing",
+                description: "You alter an ally's perception of time, stretching moments without slowing their thoughts, giving them ample time to consider their actions. Choose a number of allies (including you) up to the SL of your Manifest Test within Short Range. At the end of each target's next turn, they can Seize the Initiative as a free action. Additionally, each target gains Advantage on the first Test they make before the end of their next turn.",
+                category: .divination,
+                warpRating: 2,
+                difficulty: "Challenging (+0)",
+                range: "Short",
+                target: "SL Allies",
+                duration: "Instant"
+            ),
+            PsychicPower(
+                name: "Prescience",
+                description: "You dare consult the Warp to gain insights into the possible futures awaiting you, preparing you for what's to come. During a Rest, you can spend 10 minutes in a Divinatory trance to examine the possible futures presented to you by the Warp. At the end of the trance, you gain a number of Prescience Points equal to the SL from your Manifest Test. After you make a Test, you can spend one of your Prescience Points to reroll one or both dice from the Test, using the result of the new roll to resolve the Test. Advantage and Disadvantage apply after the roll as normal. You can't spend more than one Prescience Point on a Test. Prescience Points do not expire, but you lose any unspent Points the next time you manifest this power.",
+                category: .divination,
+                warpRating: 1,
+                difficulty: "Easy (+40)",
+                range: "Self",
+                target: "Self",
+                duration: "Special"
+            ),
+            PsychicPower(
+                name: "Question The Warp",
+                description: "You enter a minute-long trance, casting your soul into the immaterium to search for answers, but the Warp is home to manipulative forces and should never be fully trusted. Within the roiling power of the Warp lies every truth, every lie and the knowledge of past, future and present. A psyker who is desperate enough can attempt to pluck a sliver of knowledge from within the Empyrean, although whether it is a glimpse of the future, a skein of wisdom or the lies of Daemonkind are anyone's guess… When you manifest this power, ask the GM a question you don't know the answer to. The GM secretly rolls 1d10 and compares it to the sum of your Willpower Bonus + the SL from your Manifest Test (maximum 9). If the d10 roll is less than the sum, the GM answers truthfully. If the d10 roll is greater than or equal to the sum, the GM's answer is false. Regardless of the veracity, once this power provides an answer, you can't ask the same question again.",
+                category: .divination,
+                warpRating: 1,
+                difficulty: "Challenging (+0)",
+                range: "Self",
+                target: "Self",
+                duration: "1 Minute"
+            ),
+            PsychicPower(
+                name: "Armour Bane",
+                description: "You guide a weapon with psychic foresight, subtly directing it to seek weak points in armour. Choose a weapon within Short Range. Until the start of your next turn, that weapon gains the Penetrating (X) Trait where X equals the SL of your Manifest Test. If the weapon already has the Penetrating Trait, it uses whichever rating is higher (they do not stack).",
+                category: .divination,
+                warpRating: 2,
+                difficulty: "Challenging (+0)",
+                range: "Short",
+                target: "1 Weapon",
+                duration: "Sustained"
+            ),
+            PsychicPower(
+                name: "Psychometry",
+                description: "Emotions experienced in the physical world boil into the Warp, but those same experiences linger where they occurred, simmering just beneath the surface of reality. This psychic residue seeps back into realspace, and properly attuned Diviners can witness these past events echoing back through time. Over the course of a minute, you enter a trance and attune your senses to an object you are touching within Immediate Range or your current Zone. You receive insight into the target's history depending on the SL of your Manifest Test according to the Psychometry Table.\n\nSL +1: You receive general, vague impressions of the most recent strong emotions creatures felt while nearby or interacting with the target.\nSL +2: You know how recently the emotions were experienced.\nSL +3: You witness a hazy memory of the events that caused the strong emotions.\nSL +4: You witness a clear, detailed memory of the events.\nSL +5: You learn the identities of the people who left emotional impressions on the target.\nSL +6 or more: You gain a deep understanding of what transpired involving the target. Ask the GM a single question about the event, which they answer truthfully.",
+                category: .divination,
+                warpRating: 1,
+                difficulty: "Easy (+40)",
+                range: "Immediate",
+                target: "1 Object or Zone",
+                duration: "1 Minute"
+            ),
+            PsychicPower(
+                name: "Scrying Gaze",
+                description: "Physical distance has little meaning in the Warp, so you can peer through that dimension to locate and observe targets anywhere. Choose a creature, object, or location you've observed firsthand. Over the course of a minute, you enter a trance and project your consciousness through the Warp to observe your target. You can see and hear everything within Short Range of your target as though you were standing there, though you cannot interact with anything. The target of your scrying (if a creature) can detect your presence with a Very Hard (-30) Psyniscience Test.",
+                category: .divination,
+                warpRating: 1,
+                difficulty: "Easy (+40)",
+                range: "Special",
+                target: "1 Creature",
+                duration: "1 Minute"
+            )
+        ]
+    ]
+    
+    // Helper methods for psychic powers
+    static func getPsychicPowers(for category: PsychicPowerCategory) -> [PsychicPower] {
+        return psychicPowers[category] ?? []
+    }
+    
+    static func getAllPsychicPowers() -> [PsychicPower] {
+        return psychicPowers.values.flatMap { $0 }
+    }
+    
+    static func getPsychicPowersByCategory() -> [PsychicPowerCategory: [PsychicPower]] {
+        return psychicPowers
+    }
 }

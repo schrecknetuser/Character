@@ -98,6 +98,43 @@ enum HealthState: String, Codable, CaseIterable {
 // Willpower tracking states (same as health)
 typealias WillpowerState = HealthState
 
+// Data structure for psychic powers
+struct PsychicPower: Identifiable, Codable, Hashable {
+    var id = UUID()
+    var name: String
+    var description: String
+    var category: PsychicPowerCategory
+    var warpRating: Int?
+    var difficulty: String?
+    var range: String?
+    var target: String?
+    var duration: String?
+    var isCustom: Bool = false
+    
+    init(name: String, description: String, category: PsychicPowerCategory, warpRating: Int? = nil, difficulty: String? = nil, range: String? = nil, target: String? = nil, duration: String? = nil, isCustom: Bool = false) {
+        self.name = name
+        self.description = description
+        self.category = category
+        self.warpRating = warpRating
+        self.difficulty = difficulty
+        self.range = range
+        self.target = target
+        self.duration = duration
+        self.isCustom = isCustom
+    }
+}
+
+// Psychic power categories
+enum PsychicPowerCategory: String, Codable, CaseIterable {
+    case minorPsychicPowers = "Minor Psychic Powers"
+    case biomancy = "Biomancy"
+    case divination = "Divination"
+    
+    var displayName: String {
+        return self.rawValue
+    }
+}
+
 // Humanity tracking states
 enum HumanityState: String, Codable, CaseIterable {
     case checked = "checked"

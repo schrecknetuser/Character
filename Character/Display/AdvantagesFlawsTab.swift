@@ -460,6 +460,7 @@ struct AdvantagesFlawsTab: View {
     @State private var showingFlawDeleteConfirmation = false
     @State private var showingBackgroundMeritDeleteConfirmation = false
     @State private var showingBackgroundFlawDeleteConfirmation = false
+    @State private var showingPsychicPowerDeleteConfirmation = false
     @State private var itemToDelete: (id: UUID, name: String, type: String) = (UUID(), "", "")
     
     var body: some View {
@@ -550,6 +551,58 @@ struct AdvantagesFlawsTab: View {
                         EditableAdvantagesListView(selectedAdvantages: $character.advantages, characterType: character.characterType, onRefresh: {
                             refreshID = UUID()
                         })
+                    }
+                }
+                
+                // Psychic Powers section
+                Section(header: Text("Psychic Powers")) {
+                    if character.psychicPowers.isEmpty {
+                        Text("No psychic powers selected")
+                            .foregroundColor(.secondary)
+                            .font(.system(size: dynamicFontSize))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
+                    } else {
+                        // Group psychic powers by category
+                        ForEach(PsychicPowerCategory.allCases, id: \.self) { category in
+                            let categoryPowers = character.psychicPowers.filter { $0.category == category }
+                            if !categoryPowers.isEmpty {
+                                // Category header
+                                VStack(alignment: .leading, spacing: 4) {
+                                    HStack {
+                                        Text(category.displayName)
+                                            .font(.system(size: dynamicFontSize, weight: .semibold))
+                                            .foregroundColor(.primary)
+                                        Spacer()
+                                    }
+                                    .padding(.top, 4)
+                                    
+                                    // Powers in this category
+                                    ForEach(categoryPowers) { power in
+                                        PsychicPowerRowView(
+                                            power: power,
+                                            dynamicFontSize: dynamicFontSize,
+                                            captionFontSize: captionFontSize,
+                                            isEditing: isEditing,
+                                            onDelete: {
+                                                itemToDelete = (power.id, power.name, "psychic power")
+                                                showingPsychicPowerDeleteConfirmation = true
+                                            }
+                                        )
+                                        .padding(.leading, 8)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    if isEditing {
+                        EditablePsychicPowersListView(
+                            selectedPowers: $character.psychicPowers,
+                            onRefresh: {
+                                refreshID = UUID()
+                            }
+                        )
                     }
                 }
                 
@@ -683,6 +736,15 @@ struct AdvantagesFlawsTab: View {
             .confirmationDialog("Delete \(itemToDelete.type)?", isPresented: $showingBackgroundFlawDeleteConfirmation) {
                 Button("Delete", role: .destructive) {
                     character.backgroundFlaws.removeAll { $0.id == itemToDelete.id }
+                    refreshID = UUID()
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("Are you sure you want to delete '\(itemToDelete.name)'? This action cannot be undone.")
+            }
+            .confirmationDialog("Delete \(itemToDelete.type)?", isPresented: $showingPsychicPowerDeleteConfirmation) {
+                Button("Delete", role: .destructive) {
+                    character.psychicPowers.removeAll { $0.id == itemToDelete.id }
                     refreshID = UUID()
                 }
                 Button("Cancel", role: .cancel) { }
@@ -876,6 +938,235 @@ struct EditCharacterBackgroundView: View {
                         editedBackground.cost = background.type == .flaw ? -cost : cost
                         editedBackground.comment = comment
                         onSave(editedBackground)
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Helper view for displaying psychic power rows
+struct PsychicPowerRowView: View {
+    let power: PsychicPower
+    let dynamicFontSize: CGFloat
+    let captionFontSize: CGFloat
+    let isEditing: Bool
+    let onDelete: () -> Void
+    @State private var showingDetails = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            HStack {
+                Button(action: {
+                    showingDetails.toggle()
+                }) {
+                    Text(power.name)
+                        .font(.system(size: dynamicFontSize))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                        .foregroundColor(.primary)
+                }
+                .buttonStyle(PlainButtonStyle())
+                
+                Spacer()
+                
+                if let warpRating = power.warpRating {
+                    Text("WR: \(warpRating)")
+                        .font(.system(size: captionFontSize))
+                        .foregroundColor(.secondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
+                }
+                
+                if isEditing {
+                    Button("Remove") {
+                        onDelete()
+                    }
+                    .font(.caption)
+                    .foregroundColor(.red)
+                    .buttonStyle(BorderlessButtonStyle())
+                }
+            }
+            
+            if showingDetails {
+                VStack(alignment: .leading, spacing: 4) {
+                    if let difficulty = power.difficulty {
+                        Text("Difficulty: \(difficulty)")
+                            .font(.system(size: captionFontSize))
+                            .foregroundColor(.secondary)
+                    }
+                    if let range = power.range {
+                        Text("Range: \(range)")
+                            .font(.system(size: captionFontSize))
+                            .foregroundColor(.secondary)
+                    }
+                    if let target = power.target {
+                        Text("Target: \(target)")
+                            .font(.system(size: captionFontSize))
+                            .foregroundColor(.secondary)
+                    }
+                    if let duration = power.duration {
+                        Text("Duration: \(duration)")
+                            .font(.system(size: captionFontSize))
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    Text(power.description)
+                        .font(.system(size: captionFontSize - 1))
+                        .foregroundColor(.secondary)
+                        .padding(.leading, 4)
+                        .padding(.top, 2)
+                }
+                .padding(.leading, 8)
+            }
+        }
+    }
+}
+
+// Editable Psychic Powers List View
+struct EditablePsychicPowersListView: View {
+    @Binding var selectedPowers: [PsychicPower]
+    let onRefresh: () -> Void
+    @State private var showingAddPower = false
+    
+    var body: some View {
+        Button("Add Psychic Power") {
+            showingAddPower = true
+        }
+        .foregroundColor(.accentColor)
+        .sheet(isPresented: $showingAddPower) {
+            AddPsychicPowerView(selectedPowers: $selectedPowers, onRefresh: onRefresh)
+        }
+    }
+}
+
+// Helper view for adding psychic powers
+struct AddPsychicPowerView: View {
+    @Binding var selectedPowers: [PsychicPower]
+    let onRefresh: () -> Void
+    @Environment(\.dismiss) var dismiss
+    @State private var selectedCategory: PsychicPowerCategory = .minorPsychicPowers
+    @State private var customName = ""
+    @State private var customDescription = ""
+    @State private var isCustom = false
+    
+    var availablePowers: [PsychicPower] {
+        if isCustom {
+            return []
+        } else {
+            let allPredefined = V5Constants.getPsychicPowers(for: selectedCategory)
+            let selectedPowerNames = Set(selectedPowers.map { $0.name })
+            return allPredefined.filter { !selectedPowerNames.contains($0.name) }
+        }
+    }
+    
+    var body: some View {
+        NavigationView {
+            Form {
+                Section("Power Selection") {
+                    Picker("Type", selection: $isCustom) {
+                        Text("Predefined Powers").tag(false)
+                        Text("Custom Power").tag(true)
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
+                    
+                    if !isCustom {
+                        Picker("Category", selection: $selectedCategory) {
+                            ForEach(PsychicPowerCategory.allCases, id: \.self) { category in
+                                Text(category.displayName).tag(category)
+                            }
+                        }
+                        .pickerStyle(MenuPickerStyle())
+                    }
+                    
+                    if isCustom {
+                        TextField("Power Name", text: $customName)
+                        TextField("Description", text: $customDescription, axis: .vertical)
+                            .lineLimit(3...6)
+                        
+                        Picker("Category", selection: $selectedCategory) {
+                            ForEach(PsychicPowerCategory.allCases, id: \.self) { category in
+                                Text(category.displayName).tag(category)
+                            }
+                        }
+                        .pickerStyle(MenuPickerStyle())
+                    }
+                }
+                
+                if !isCustom {
+                    Section("Available Powers") {
+                        if availablePowers.isEmpty {
+                            Text("All powers from this category have been selected")
+                                .foregroundColor(.secondary)
+                                .italic()
+                        } else {
+                            ForEach(availablePowers) { power in
+                                VStack(alignment: .leading, spacing: 4) {
+                                    HStack {
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(power.name)
+                                                .font(.headline)
+                                            
+                                            HStack {
+                                                if let warpRating = power.warpRating {
+                                                    Text("Warp Rating: \(warpRating)")
+                                                        .font(.caption)
+                                                        .foregroundColor(.secondary)
+                                                }
+                                                if let difficulty = power.difficulty {
+                                                    Text("• \(difficulty)")
+                                                        .font(.caption)
+                                                        .foregroundColor(.secondary)
+                                                }
+                                            }
+                                        }
+                                        Spacer()
+                                        Button("Add") {
+                                            selectedPowers.append(power)
+                                            onRefresh()
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                                dismiss()
+                                            }
+                                        }
+                                        .buttonStyle(BorderedProminentButtonStyle())
+                                    }
+                                    
+                                    Text(power.description)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                        .lineLimit(3)
+                                        .padding(.leading, 4)
+                                }
+                                .padding(.vertical, 4)
+                            }
+                        }
+                    }
+                }
+                
+                if isCustom {
+                    Section {
+                        Button("Add Custom Power") {
+                            let customPower = PsychicPower(
+                                name: customName,
+                                description: customDescription,
+                                category: selectedCategory,
+                                isCustom: true
+                            )
+                            selectedPowers.append(customPower)
+                            onRefresh()
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                dismiss()
+                            }
+                        }
+                        .disabled(customName.isEmpty || customDescription.isEmpty)
+                    }
+                }
+            }
+            .navigationTitle("Add Psychic Power")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
                         dismiss()
                     }
                 }

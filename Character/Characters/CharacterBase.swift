@@ -258,6 +258,7 @@ class CharacterBase: BaseCharacter {
     @Published var touchstones: [String] = []
 
     @Published var specializations: [Specialization] = []
+    @Published var psychicPowers: [PsychicPower] = []
     @Published var currentSession: Int = 1
     @Published var changeLog: [ChangeLogEntry] = []
     @Published var isArchived: Bool = false
@@ -275,7 +276,7 @@ class CharacterBase: BaseCharacter {
              willpower, experience, spentExperience,
              ambition, desire, chronicleName, concept, characterDescription, notes, dateOfBirth,
              advantages, flaws, backgroundMerits, backgroundFlaws, convictions, touchstones, chronicleTenets,
-             specializations, currentSession, changeLog, isArchived, isInCreation, creationProgress,
+             specializations, psychicPowers, currentSession, changeLog, isArchived, isInCreation, creationProgress,
              health, healthStates, willpowerStates
     }
 
@@ -307,6 +308,7 @@ class CharacterBase: BaseCharacter {
         convictions = try container.decode([String].self, forKey: .convictions)
         touchstones = try container.decode([String].self, forKey: .touchstones)
         specializations = try container.decode([Specialization].self, forKey: .specializations)
+        psychicPowers = try container.decodeIfPresent([PsychicPower].self, forKey: .psychicPowers) ?? []
         currentSession = try container.decode(Int.self, forKey: .currentSession)
         changeLog = try container.decode([ChangeLogEntry].self, forKey: .changeLog)
         isArchived = try container.decodeIfPresent(Bool.self, forKey: .isArchived) ?? false
@@ -345,6 +347,7 @@ class CharacterBase: BaseCharacter {
         try container.encode(convictions, forKey: .convictions)
         try container.encode(touchstones, forKey: .touchstones)
         try container.encode(specializations, forKey: .specializations)
+        try container.encode(psychicPowers, forKey: .psychicPowers)
         try container.encode(currentSession, forKey: .currentSession)
         try container.encode(changeLog, forKey: .changeLog)
         try container.encode(isArchived, forKey: .isArchived)
